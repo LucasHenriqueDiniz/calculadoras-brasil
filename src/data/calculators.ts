@@ -1,0 +1,180 @@
+import {
+  Car,
+  Home as HomeIcon,
+  Zap,
+  CreditCard,
+  Truck,
+  PawPrint,
+  type LucideIcon,
+} from "lucide-react";
+
+export interface CalculatorMeta {
+  slug: string;
+  path:
+    | "/calculadora-custo-carro"
+    | "/calculadora-morar-sozinho"
+    | "/calculadora-conta-de-luz"
+    | "/calculadora-assinaturas"
+    | "/calculadora-custo-mudanca"
+    | "/calculadora-custo-pet";
+  title: string;
+  shortTitle: string;
+  tagline: string;
+  description: string;
+  icon: LucideIcon;
+  intro: string;
+  whatItDoes: string[];
+  inputs: string[];
+}
+
+export const calculators: CalculatorMeta[] = [
+  {
+    slug: "custo-carro",
+    path: "/calculadora-custo-carro",
+    title: "Calculadora de custo de carro",
+    shortTitle: "Custo de carro",
+    tagline: "Quanto seu carro realmente custa por mês",
+    description:
+      "Some combustível, IPVA, seguro, manutenção e depreciação para entender o custo mensal real do seu carro.",
+    icon: Car,
+    intro:
+      "Muita gente olha só para o preço da parcela do financiamento e esquece que ter um carro envolve combustível, IPVA, seguro, manutenção preventiva, pneus e a perda natural de valor do veículo. Esta calculadora reúne todos esses itens em uma estimativa mensal honesta.",
+    whatItDoes: [
+      "Estima o gasto mensal com combustível a partir da quilometragem e do consumo do veículo.",
+      "Considera IPVA, licenciamento e seguro como custos anuais diluídos por mês.",
+      "Inclui manutenção preventiva, troca de pneus e revisões.",
+      "Calcula a depreciação aproximada do veículo no período de uso.",
+    ],
+    inputs: [
+      "Quilometragem mensal média",
+      "Consumo médio do carro (km/l)",
+      "Preço do combustível na sua cidade",
+      "Valor anual de IPVA, seguro e licenciamento",
+      "Tempo planejado de uso do veículo",
+    ],
+  },
+  {
+    slug: "morar-sozinho",
+    path: "/calculadora-morar-sozinho",
+    title: "Calculadora de custo para morar sozinho",
+    shortTitle: "Morar sozinho",
+    tagline: "Estime quanto custa sair da casa dos pais",
+    description:
+      "Junte aluguel, condomínio, contas básicas, internet, mercado e imprevistos para saber se cabe no seu salário.",
+    icon: HomeIcon,
+    intro:
+      "Morar sozinho não é só pagar aluguel. Há condomínio, IPTU, luz, água, gás, internet, mercado, produtos de limpeza, transporte e uma reserva para imprevistos. Esta calculadora ajuda a montar o orçamento mensal antes de assinar o contrato.",
+    whatItDoes: [
+      "Soma aluguel, condomínio e IPTU em uma linha mensal só.",
+      "Inclui contas básicas: luz, água, gás e internet.",
+      "Estima mercado e itens de casa a partir do seu perfil.",
+      "Sugere reserva de emergência mensal proporcional ao custo fixo.",
+    ],
+    inputs: [
+      "Valor do aluguel pretendido",
+      "Condomínio e IPTU do imóvel",
+      "Cidade ou faixa de tarifa de luz/água",
+      "Hábito alimentar (em casa, delivery, refeições fora)",
+      "Renda líquida mensal",
+    ],
+  },
+  {
+    slug: "conta-de-luz",
+    path: "/calculadora-conta-de-luz",
+    title: "Calculadora de conta de luz por aparelho",
+    shortTitle: "Conta de luz",
+    tagline: "Descubra quais aparelhos pesam na sua conta",
+    description:
+      "Calcule o consumo mensal em kWh e o custo aproximado de cada aparelho da sua casa.",
+    icon: Zap,
+    intro:
+      "Geladeira, chuveiro, ar-condicionado e máquina de lavar costumam ser os campeões da conta de luz. Esta calculadora converte a potência de cada aparelho e o tempo de uso em kWh por mês, mostrando quanto cada um pesa na fatura.",
+    whatItDoes: [
+      "Converte potência (W) e tempo de uso em kWh por mês.",
+      "Aplica a tarifa de energia da sua região para virar reais.",
+      "Permite comparar aparelhos lado a lado.",
+      "Mostra quanto cada hábito (banho longo, ar ligado à noite) custa.",
+    ],
+    inputs: [
+      "Potência do aparelho em watts",
+      "Horas de uso por dia",
+      "Dias de uso por mês",
+      "Tarifa de energia (R$/kWh) da sua conta",
+    ],
+  },
+  {
+    slug: "assinaturas",
+    path: "/calculadora-assinaturas",
+    title: "Calculadora de gasto com assinaturas",
+    shortTitle: "Assinaturas",
+    tagline: "Veja o custo total das suas assinaturas",
+    description:
+      "Liste streaming, apps, academia e cursos para ver o impacto mensal, anual e por ano de uso.",
+    icon: CreditCard,
+    intro:
+      "Pequenas assinaturas de R$ 20, R$ 30 e R$ 50 somadas viram um custo expressivo no fim do ano. Esta calculadora reúne todas as suas assinaturas em um lugar e mostra o total mensal, anual e o quanto você pagaria em 3 ou 5 anos mantendo tudo.",
+    whatItDoes: [
+      "Soma assinaturas mensais e anuais em um total único.",
+      "Mostra o gasto projetado em 12, 36 e 60 meses.",
+      "Identifica assinaturas que mais pesam no orçamento.",
+      "Permite simular cortes e ver o impacto da economia.",
+    ],
+    inputs: [
+      "Nome e valor de cada assinatura",
+      "Frequência (mensal ou anual)",
+      "Categoria (streaming, software, academia, etc.)",
+    ],
+  },
+  {
+    slug: "custo-mudanca",
+    path: "/calculadora-custo-mudanca",
+    title: "Calculadora de custo de mudança residencial",
+    shortTitle: "Custo de mudança",
+    tagline: "Planeje o orçamento da sua mudança",
+    description:
+      "Estime caminhão, embalagem, taxas de imóvel novo, móveis e os primeiros meses de contas.",
+    icon: Truck,
+    intro:
+      "Uma mudança custa muito mais do que a diária do caminhão. Tem caixa, fita, plástico-bolha, taxa de condomínio, vistoria, depósito caução, montagem de móveis e a primeira leva de compras na casa nova. Esta calculadora monta um orçamento realista.",
+    whatItDoes: [
+      "Estima caminhão e mão de obra conforme distância e volume.",
+      "Inclui materiais de embalagem e seguro de mudança.",
+      "Considera custos do imóvel novo: caução, taxas e vistoria.",
+      "Reserva orçamento para móveis, eletro e itens básicos.",
+    ],
+    inputs: [
+      "Distância entre o imóvel atual e o novo",
+      "Tamanho do imóvel atual (cômodos)",
+      "Necessidade de comprar móveis ou eletrodomésticos",
+      "Caução, primeiro aluguel e taxas do imóvel novo",
+    ],
+  },
+  {
+    slug: "custo-pet",
+    path: "/calculadora-custo-pet",
+    title: "Calculadora de custo de pet",
+    shortTitle: "Custo de pet",
+    tagline: "Quanto custa cuidar bem do seu pet",
+    description:
+      "Ração, banho, vacinas, vermífugo, brinquedos e plano de saúde — tudo em uma estimativa mensal.",
+    icon: PawPrint,
+    intro:
+      "Ter um cachorro ou gato envolve gastos fixos (ração, areia) e gastos sazonais (vacina anual, banho mensal, consulta veterinária). Esta calculadora ajuda a estimar o custo mensal médio antes de adotar — ou a revisar o orçamento de quem já tem pet.",
+    whatItDoes: [
+      "Estima o consumo mensal de ração por porte e idade.",
+      "Inclui banho/tosa, vacinas, vermífugo e antipulgas.",
+      "Considera plano de saúde pet ou reserva para emergências.",
+      "Permite somar mais de um animal na mesma estimativa.",
+    ],
+    inputs: [
+      "Espécie (cão ou gato) e porte aproximado",
+      "Tipo de ração (padrão, premium, super premium)",
+      "Frequência de banho/tosa",
+      "Plano de saúde pet (sim/não)",
+    ],
+  },
+];
+
+export function getCalculator(slug: string) {
+  return calculators.find((c) => c.slug === slug);
+}

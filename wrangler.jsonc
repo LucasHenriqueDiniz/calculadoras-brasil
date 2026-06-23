@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "calculadoras-brasil",
+  "compatibility_date": "2026-06-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": "./dist",
+  "vars": {
+    "PUBLIC_SITE_URL": "https://calculadorasbrasil.com.br",
+    "PUBLIC_DATA_CACHE_TTL_HOURS": "24",
+  },
+
+  // Configure secrets in Cloudflare, never in this file:
+  // DADOS_GOV_BR_TOKEN
+  //
+  // Optional KV binding after creating the namespace:
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "PUBLIC_DATA_CACHE",
+  //     "id": "<KV_NAMESPACE_ID>"
+  //   }
+  // ]
+}
