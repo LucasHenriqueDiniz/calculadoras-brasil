@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ShieldCheck, Sparkles, Wallet } from "lucide-react";
 import { PageShell } from "@/components/layout/PageShell";
 import { calculators } from "@/data/calculators";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -18,9 +19,9 @@ export const Route = createFileRoute("/")({
         content:
           "Estime quanto custa ter carro, morar sozinho, sua conta de luz, assinaturas, mudança e pet.",
       },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: absoluteUrl("/") },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/") }],
   }),
   component: Home,
 });

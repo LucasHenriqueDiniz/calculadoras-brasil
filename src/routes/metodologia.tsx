@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/metodologia")({
   head: () => ({
@@ -15,9 +16,9 @@ export const Route = createFileRoute("/metodologia")({
         property: "og:description",
         content: "Fórmulas, premissas e limitações das nossas calculadoras.",
       },
-      { property: "og:url", content: "/metodologia" },
+      { property: "og:url", content: absoluteUrl("/metodologia") },
     ],
-    links: [{ rel: "canonical", href: "/metodologia" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/metodologia") }],
   }),
   component: MetodologiaPage,
 });

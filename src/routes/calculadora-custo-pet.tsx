@@ -15,6 +15,7 @@ import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { Prose } from "@/components/layout/PageShell";
 import { formatBRL } from "@/lib/format";
 import { calculatePetCost, type PetCostInput } from "@/lib/calculators/petCost";
+import { absoluteUrl } from "@/lib/site";
 
 const PAGE_TITLE = "Calculadora de custo de pet";
 const DESCRIPTION =
@@ -60,9 +61,9 @@ export const Route = createFileRoute("/calculadora-custo-pet")({
       { name: "description", content: DESCRIPTION },
       { property: "og:title", content: PAGE_TITLE },
       { property: "og:description", content: DESCRIPTION },
-      { property: "og:url", content: "/calculadora-custo-pet" },
+      { property: "og:url", content: absoluteUrl("/calculadora-custo-pet") },
     ],
-    links: [{ rel: "canonical", href: "/calculadora-custo-pet" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/calculadora-custo-pet") }],
     scripts: [
       {
         type: "application/ld+json",

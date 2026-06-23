@@ -1,0 +1,20 @@
+# Calculadoras Brasil
+
+> Ferramentas gratuitas em português para estimar custos cotidianos no Brasil.
+
+## Calculadoras
+
+- [Custo de carro](https://calculadorasbrasil.com.br/calculadora-custo-carro)
+- [Custo para morar sozinho](https://calculadorasbrasil.com.br/calculadora-morar-sozinho)
+- [Conta de luz por aparelho](https://calculadorasbrasil.com.br/calculadora-conta-de-luz)
+- [Gasto com assinaturas](https://calculadorasbrasil.com.br/calculadora-assinaturas)
+- [Custo de mudança residencial](https://calculadorasbrasil.com.br/calculadora-custo-mudanca)
+- [Custo de pet](https://calculadorasbrasil.com.br/calculadora-custo-pet)
+
+## Institucional
+
+- [Metodologia](https://calculadorasbrasil.com.br/metodologia)
+- [Sobre](https://calculadorasbrasil.com.br/sobre)
+- [Contato](https://calculadorasbrasil.com.br/contato)
+- [Política de Privacidade](https://calculadorasbrasil.com.br/privacidade)
+- [Termos de Uso](https://calculadorasbrasil.com.br/termos)

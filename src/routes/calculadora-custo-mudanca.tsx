@@ -14,6 +14,7 @@ import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { Prose } from "@/components/layout/PageShell";
 import { formatBRL } from "@/lib/format";
 import { calculateMovingCost, type MovingCostInput } from "@/lib/calculators/movingCost";
+import { absoluteUrl } from "@/lib/site";
 
 const PAGE_TITLE = "Calculadora de custo de mudança residencial";
 const DESCRIPTION =
@@ -58,9 +59,9 @@ export const Route = createFileRoute("/calculadora-custo-mudanca")({
       { name: "description", content: DESCRIPTION },
       { property: "og:title", content: PAGE_TITLE },
       { property: "og:description", content: DESCRIPTION },
-      { property: "og:url", content: "/calculadora-custo-mudanca" },
+      { property: "og:url", content: absoluteUrl("/calculadora-custo-mudanca") },
     ],
-    links: [{ rel: "canonical", href: "/calculadora-custo-mudanca" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/calculadora-custo-mudanca") }],
     scripts: [
       {
         type: "application/ld+json",

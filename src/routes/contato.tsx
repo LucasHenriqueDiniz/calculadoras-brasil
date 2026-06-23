@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Mail, MessageSquare } from "lucide-react";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/contato")({
   head: () => ({
@@ -12,9 +13,9 @@ export const Route = createFileRoute("/contato")({
           "Sugestões, correções, parcerias e questões legais sobre o Calculadoras Brasil — fale com a gente por e-mail.",
       },
       { property: "og:title", content: "Contato — Calculadoras Brasil" },
-      { property: "og:url", content: "/contato" },
+      { property: "og:url", content: absoluteUrl("/contato") },
     ],
-    links: [{ rel: "canonical", href: "/contato" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/contato") }],
   }),
   component: ContatoPage,
 });

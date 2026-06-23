@@ -1,0 +1,38 @@
+{
+  "domain": "calculadorasbrasil.com.br",
+  "auditDate": "2026-06-23",
+  "scope": {
+    "indexableUrls": 12,
+    "calculatorPages": 6,
+    "institutionalPages": 5,
+    "homepage": 1
+  },
+  "score": {
+    "overall": 76,
+    "technical": 68,
+    "onPage": 90,
+    "content": 74,
+    "structuredData": 84,
+    "sitemap": 94,
+    "geo": 63,
+    "sxo": 84,
+    "images": 82
+  },
+  "criticalFindings": [
+    {
+      "severity": "high",
+      "id": "csr-only-rendering",
+      "finding": "Route-specific content and metadata depend on JavaScript execution.",
+      "recommendation": "Pre-render all 12 public routes."
+    }
+  ],
+  "implementedFixes": [
+    "absolute-canonical-urls",
+    "absolute-open-graph-urls",
+    "website-organization-schema",
+    "absolute-breadcrumb-urls",
+    "sitemap-lastmod",
+    "ai-crawler-rules",
+    "llms-txt"
+  ]
+}

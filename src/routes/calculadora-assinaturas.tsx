@@ -22,6 +22,7 @@ import {
   type BillingCycle,
   type SubscriptionInput,
 } from "@/lib/calculators/subscriptions";
+import { absoluteUrl } from "@/lib/site";
 
 const PAGE_TITLE = "Calculadora de gasto com assinaturas";
 const DESCRIPTION =
@@ -72,9 +73,9 @@ export const Route = createFileRoute("/calculadora-assinaturas")({
       { name: "description", content: DESCRIPTION },
       { property: "og:title", content: PAGE_TITLE },
       { property: "og:description", content: DESCRIPTION },
-      { property: "og:url", content: "/calculadora-assinaturas" },
+      { property: "og:url", content: absoluteUrl("/calculadora-assinaturas") },
     ],
-    links: [{ rel: "canonical", href: "/calculadora-assinaturas" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/calculadora-assinaturas") }],
     scripts: [
       {
         type: "application/ld+json",

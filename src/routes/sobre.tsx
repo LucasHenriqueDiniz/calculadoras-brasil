@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/sobre")({
   head: () => ({
@@ -15,9 +16,9 @@ export const Route = createFileRoute("/sobre")({
         property: "og:description",
         content: "Hub independente de calculadoras para o dia a dia brasileiro.",
       },
-      { property: "og:url", content: "/sobre" },
+      { property: "og:url", content: absoluteUrl("/sobre") },
     ],
-    links: [{ rel: "canonical", href: "/sobre" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/sobre") }],
   }),
   component: SobrePage,
 });

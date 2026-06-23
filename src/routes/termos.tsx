@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/termos")({
   head: () => ({
@@ -11,9 +12,9 @@ export const Route = createFileRoute("/termos")({
           "Termos de uso do Calculadoras Brasil: conteúdo informativo, sem aconselhamento profissional, sem garantia de resultados.",
       },
       { property: "og:title", content: "Termos de Uso — Calculadoras Brasil" },
-      { property: "og:url", content: "/termos" },
+      { property: "og:url", content: absoluteUrl("/termos") },
     ],
-    links: [{ rel: "canonical", href: "/termos" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/termos") }],
   }),
   component: TermosPage,
 });

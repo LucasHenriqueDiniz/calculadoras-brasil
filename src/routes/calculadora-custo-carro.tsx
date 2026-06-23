@@ -26,6 +26,7 @@ import { formatBRL, parseBRNumber } from "@/lib/format";
 import { calculateCarCost, type CarCostInput, type FuelType } from "@/lib/calculators/carCost";
 import { getFuelPrice } from "@/lib/public-data/client";
 import { BRAZILIAN_STATES } from "@/lib/public-data/states";
+import { absoluteUrl } from "@/lib/site";
 
 const meta = getCalculator("custo-carro")!;
 const PAGE_TITLE = "Calculadora de Custo de Carro no Brasil";
@@ -120,10 +121,10 @@ export const Route = createFileRoute("/calculadora-custo-carro")({
       { name: "description", content: PAGE_DESCRIPTION },
       { property: "og:title", content: PAGE_TITLE },
       { property: "og:description", content: PAGE_DESCRIPTION },
-      { property: "og:url", content: meta.path },
+      { property: "og:url", content: absoluteUrl(meta.path) },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "canonical", href: meta.path }],
+    links: [{ rel: "canonical", href: absoluteUrl(meta.path) }],
     scripts: [
       {
         type: "application/ld+json",
@@ -144,8 +145,13 @@ export const Route = createFileRoute("/calculadora-custo-carro")({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Início", item: "/" },
-            { "@type": "ListItem", position: 2, name: PAGE_TITLE, item: meta.path },
+            { "@type": "ListItem", position: 1, name: "Início", item: absoluteUrl("/") },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: PAGE_TITLE,
+              item: absoluteUrl(meta.path),
+            },
           ],
         }),
       },

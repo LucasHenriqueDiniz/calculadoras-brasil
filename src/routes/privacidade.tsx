@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
+import { absoluteUrl } from "@/lib/site";
 
 export const Route = createFileRoute("/privacidade")({
   head: () => ({
@@ -11,9 +12,9 @@ export const Route = createFileRoute("/privacidade")({
           "Como o Calculadoras Brasil trata seus dados: nada de cadastro, cálculos no seu navegador e uso responsável de cookies.",
       },
       { property: "og:title", content: "Política de Privacidade — Calculadoras Brasil" },
-      { property: "og:url", content: "/privacidade" },
+      { property: "og:url", content: absoluteUrl("/privacidade") },
     ],
-    links: [{ rel: "canonical", href: "/privacidade" }],
+    links: [{ rel: "canonical", href: absoluteUrl("/privacidade") }],
   }),
   component: PrivacidadePage,
 });
