@@ -1,11 +1,36 @@
+import type { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-  Outlet,
+  HeadContent,
   Link,
+  Outlet,
+  Scripts,
   createRootRouteWithContext,
   useRouter,
-  HeadContent,
 } from "@tanstack/react-router";
+import appCss from "@/styles.css?url";
+import { SITE_URL } from "@/lib/site";
+
+const siteSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: "Calculadoras Brasil",
+      description: "Calculadoras gratuitas para estimar custos do dia a dia no Brasil.",
+      inLanguage: "pt-BR",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "Calculadoras Brasil",
+      url: SITE_URL,
+    },
+  ],
+};
 
 function NotFoundComponent() {
   return (
@@ -79,36 +104,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "Calculadoras Brasil" },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "pt_BR" },
-      {
-        property: "og:image",
-        content: "https://calculadorasbrasil.com.br/og-image.png",
-      },
-      { property: "og:image:width", content: "1731" },
-      { property: "og:image:height", content: "909" },
+      { property: "og:image", content: `${SITE_URL}/og-image.png` },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
       { property: "og:image:alt", content: "Calculadoras Brasil — decisões do dia a dia" },
       { name: "twitter:card", content: "summary_large_image" },
-      {
-        name: "twitter:image",
-        content: "https://calculadorasbrasil.com.br/og-image.png",
-      },
+      { name: "twitter:image", content: `${SITE_URL}/og-image.png` },
     ],
-    links: [
+    links: [{ rel: "stylesheet", href: appCss }],
+    scripts: [
       {
-        rel: "preconnect",
-        href: "https://fonts.googleapis.com",
-      },
-      {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap",
+        type: "application/ld+json",
+        children: JSON.stringify(siteSchema),
       },
     ],
   }),
   component: RootComponent,
+  shellComponent: RootDocument,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
@@ -118,7 +130,6 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <HeadContent />
       <a
         href="#conteudo"
         className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
@@ -127,5 +138,19 @@ function RootComponent() {
       </a>
       <Outlet />
     </QueryClientProvider>
+  );
+}
+
+function RootDocument({ children }: { children: ReactNode }) {
+  return (
+    <html lang="pt-BR">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {children}
+        <Scripts />
+      </body>
+    </html>
   );
 }

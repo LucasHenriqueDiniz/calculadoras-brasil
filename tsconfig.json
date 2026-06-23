@@ -2,10 +2,9 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    "functions/**/*.ts",
-    "worker/**/*.ts",
     "worker-configuration.d.ts",
     "vite.config.ts",
+    "vitest.config.ts",
     "eslint.config.js"
   ],
   "compilerOptions": {

@@ -8,4 +8,3 @@ Melhorias:
 - mostrar exemplos preenchidos para reduzir esforço;
 - manter links de calculadoras relacionadas próximos ao resultado;
 - testar títulos e descrições no Search Console com dados reais de CTR.
-

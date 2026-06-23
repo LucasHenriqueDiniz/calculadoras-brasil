@@ -16,6 +16,7 @@ import { Prose } from "@/components/layout/PageShell";
 import { formatBRL } from "@/lib/format";
 import { calculatePetCost, type PetCostInput } from "@/lib/calculators/petCost";
 import { absoluteUrl } from "@/lib/site";
+import { calculatorStructuredData } from "@/lib/structured-data";
 
 const PAGE_TITLE = "Calculadora de custo de pet";
 const DESCRIPTION =
@@ -64,33 +65,13 @@ export const Route = createFileRoute("/calculadora-custo-pet")({
       { property: "og:url", content: absoluteUrl("/calculadora-custo-pet") },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/calculadora-custo-pet") }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          name: PAGE_TITLE,
-          description: DESCRIPTION,
-          applicationCategory: "FinanceApplication",
-          operatingSystem: "Web",
-          inLanguage: "pt-BR",
-          offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: FAQ.map((item) => ({
-            "@type": "Question",
-            name: item.question,
-            acceptedAnswer: { "@type": "Answer", text: item.answer },
-          })),
-        }),
-      },
-    ],
+    scripts: calculatorStructuredData({
+      name: PAGE_TITLE,
+      description: DESCRIPTION,
+      path: "/calculadora-custo-pet",
+      applicationCategory: "FinanceApplication",
+      faq: FAQ,
+    }),
   }),
   component: PetPage,
 });

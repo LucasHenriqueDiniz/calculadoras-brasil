@@ -9,12 +9,11 @@
 
 ## Melhorias
 
-- Adicionar `BreadcrumbList` em assinaturas, mudança e pet.
-- Adicionar `dateModified` apenas quando existir uma data real de revisão.
+- `BreadcrumbList` foi adicionado às seis calculadoras.
+- `dateModified` usa a mesma data real exibida na página.
 - Relacionar entidades com `@id` em uma futura revisão do grafo.
-- Validar a saída renderizada após pré-renderização.
+- A saída pré-renderizada é validada automaticamente; os validadores externos ficam para o deploy.
 
 ## Nota sobre FAQ
 
 O FAQ ajuda organização semântica e recuperação por sistemas de IA, mas não deve ser vendido como rich result garantido no Google.
-

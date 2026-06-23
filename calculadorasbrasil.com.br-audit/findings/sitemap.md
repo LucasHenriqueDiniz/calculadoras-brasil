@@ -7,4 +7,3 @@ Cuidados:
 - atualizar `lastmod` somente quando o conteúdo realmente mudar;
 - não incluir páginas 404, parâmetros, endpoints de API ou URLs não canônicas;
 - enviar o sitemap ao Search Console após o deploy do domínio.
-

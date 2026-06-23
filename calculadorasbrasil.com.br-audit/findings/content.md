@@ -16,4 +16,3 @@ Há páginas de metodologia, sobre, contato, privacidade e termos, o que melhora
 ## Recomendação
 
 Evitar aumentar texto apenas para atingir contagem de palavras. Priorizar respostas objetivas, exemplos reais, fontes, premissas e atualização verificável.
-

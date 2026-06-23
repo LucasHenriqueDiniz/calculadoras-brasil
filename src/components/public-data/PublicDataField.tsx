@@ -8,6 +8,8 @@ interface PublicDataFieldProps {
   value: number | string;
   sourceName?: string;
   sourceLastUpdated?: string | null;
+  sourceUrl?: string;
+  sourcePeriod?: string;
   isLoading?: boolean;
   isStale?: boolean;
   error?: string | null;
@@ -21,6 +23,8 @@ export function PublicDataField({
   value,
   sourceName,
   sourceLastUpdated,
+  sourceUrl,
+  sourcePeriod,
   isLoading = false,
   isStale = false,
   error,
@@ -52,7 +56,12 @@ export function PublicDataField({
           </p>
         ) : null}
         {sourceName ? (
-          <SourceBadge sourceName={sourceName} sourceLastUpdated={sourceLastUpdated} />
+          <SourceBadge
+            sourceName={sourceName}
+            sourceLastUpdated={sourceLastUpdated}
+            sourceUrl={sourceUrl}
+            sourcePeriod={sourcePeriod}
+          />
         ) : null}
       </div>
     </div>

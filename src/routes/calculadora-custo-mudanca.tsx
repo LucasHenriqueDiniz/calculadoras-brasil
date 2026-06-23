@@ -15,6 +15,7 @@ import { Prose } from "@/components/layout/PageShell";
 import { formatBRL } from "@/lib/format";
 import { calculateMovingCost, type MovingCostInput } from "@/lib/calculators/movingCost";
 import { absoluteUrl } from "@/lib/site";
+import { calculatorStructuredData } from "@/lib/structured-data";
 
 const PAGE_TITLE = "Calculadora de custo de mudança residencial";
 const DESCRIPTION =
@@ -62,33 +63,13 @@ export const Route = createFileRoute("/calculadora-custo-mudanca")({
       { property: "og:url", content: absoluteUrl("/calculadora-custo-mudanca") },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/calculadora-custo-mudanca") }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          name: PAGE_TITLE,
-          description: DESCRIPTION,
-          applicationCategory: "FinanceApplication",
-          operatingSystem: "Web",
-          inLanguage: "pt-BR",
-          offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: FAQ.map((item) => ({
-            "@type": "Question",
-            name: item.question,
-            acceptedAnswer: { "@type": "Answer", text: item.answer },
-          })),
-        }),
-      },
-    ],
+    scripts: calculatorStructuredData({
+      name: PAGE_TITLE,
+      description: DESCRIPTION,
+      path: "/calculadora-custo-mudanca",
+      applicationCategory: "FinanceApplication",
+      faq: FAQ,
+    }),
   }),
   component: MovingPage,
 });

@@ -18,6 +18,20 @@
     "sxo": 84,
     "images": 82
   },
+  "postImplementation": {
+    "date": "2026-06-23",
+    "estimatedOverallScore": 89,
+    "lighthouseMobile": {
+      "performance": 83,
+      "accessibility": 100,
+      "seo": 100,
+      "lcpLabSeconds": 3.5,
+      "cls": 0.001,
+      "tbtMilliseconds": 20
+    },
+    "prerenderedUrls": 12,
+    "ogImageBytes": 320328
+  },
   "criticalFindings": [
     {
       "severity": "high",

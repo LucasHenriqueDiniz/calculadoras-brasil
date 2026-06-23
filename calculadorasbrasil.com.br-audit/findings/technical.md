@@ -5,13 +5,14 @@
 - URLs descritivas e sem parâmetros de indexação.
 - `lang="pt-BR"`, viewport e charset configurados.
 - Sitemap e robots.txt públicos.
-- Página desconhecida recebe status HTTP 404 por meio de Cloudflare Pages Functions.
+- Página desconhecida recebe status HTTP 404 pelo servidor do TanStack Start.
 - Headers de segurança e cache já definidos em `public/_headers`.
 - Build, TypeScript, testes e auditoria de dependências fazem parte do comando de verificação.
 
-## Risco crítico: renderização client-side
+## Risco crítico: renderização client-side — resolvido
 
-O arquivo `index.html` é um shell de SPA. O conteúdo principal, os metadados por rota e os dados estruturados são inseridos pelo React/TanStack Router.
+O projeto foi migrado para TanStack Start e Cloudflare Workers. As 12 rotas públicas são
+pré-renderizadas e contêm conteúdo, metadados e dados estruturados no HTML inicial.
 
 Impactos:
 
@@ -20,9 +21,10 @@ Impactos:
 - previews sociais podem usar apenas os metadados genéricos;
 - falhas de bundle tornam todas as páginas semanticamente vazias.
 
-Recomendação: pré-renderização estática das 12 URLs no build ou migração controlada para uma solução SSR/SSG compatível com Cloudflare.
+O smoke test SEO consulta todas as rotas sem executar JavaScript e bloqueia regressões no CI.
 
 ## Desempenho
 
-Não há dados de campo porque o domínio ainda precisa ser medido em produção. Não atribuir notas de Core Web Vitals sem Lighthouse/CrUX. A OG image de aproximadamente 1,6 MB é um alvo simples de otimização.
-
+O Lighthouse móvel local registrou SEO 100, acessibilidade 100 e performance 83. A imagem OG foi
+reduzida para aproximadamente 320 KB. Core Web Vitals de campo ainda dependem do deploy e de
+tráfego real.

@@ -8,16 +8,15 @@
 - Crawlers de IA permitidos.
 - `llms.txt` aponta para recursos centrais.
 
-## Limitação principal
+## Limitação principal — resolvida
 
-Vários crawlers de IA não executam JavaScript. Sem pré-renderização, eles podem não acessar o conteúdo das calculadoras, FAQs e dados estruturados.
+As rotas agora entregam conteúdo, FAQs e dados estruturados no HTML inicial, sem exigir JavaScript.
 
 ## Melhorias
 
-- Pré-renderizar cada rota.
+- Manter o teste de pré-renderização no CI.
 - Produzir respostas curtas e citáveis antes das seções detalhadas.
 - Exibir fontes primárias e datas de revisão.
 - Fortalecer a entidade do projeto com autoria e referências externas legítimas.
 
 `llms.txt` é um recurso auxiliar; não há evidência de peso direto em ranking.
-

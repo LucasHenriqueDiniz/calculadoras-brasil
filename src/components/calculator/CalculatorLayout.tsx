@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { PageShell, PageHeader } from "@/components/layout/PageShell";
+import { EDITORIAL_RESPONSIBLE, SITE_REVIEW_DATE, SITE_REVIEW_DATE_LABEL } from "@/lib/seo-pages";
 
 interface CalculatorLayoutProps {
   eyebrow?: string;
@@ -25,9 +26,13 @@ export function CalculatorLayout({
       <PageHeader eyebrow={eyebrow} title={title} description={description} />
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <p className="mt-4 text-xs text-muted-foreground">
+          Revisado em <time dateTime={SITE_REVIEW_DATE}>{SITE_REVIEW_DATE_LABEL}</time>
+          {" · "}Responsável editorial: {EDITORIAL_RESPONSIBLE}
+        </p>
         <Link
           to="/"
-          className="mt-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+          className="mt-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden /> Todas as calculadoras
         </Link>

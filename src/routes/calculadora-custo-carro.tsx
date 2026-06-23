@@ -27,6 +27,7 @@ import { calculateCarCost, type CarCostInput, type FuelType } from "@/lib/calcul
 import { getFuelPrice } from "@/lib/public-data/client";
 import { BRAZILIAN_STATES } from "@/lib/public-data/states";
 import { absoluteUrl } from "@/lib/site";
+import { calculatorStructuredData } from "@/lib/structured-data";
 
 const meta = getCalculator("custo-carro")!;
 const PAGE_TITLE = "Calculadora de Custo de Carro no Brasil";
@@ -63,6 +64,8 @@ interface PublicFieldState {
   isStale: boolean;
   sourceName?: string;
   sourceLastUpdated?: string | null;
+  sourceUrl?: string;
+  sourcePeriod?: string;
   error?: string | null;
 }
 
@@ -125,49 +128,13 @@ export const Route = createFileRoute("/calculadora-custo-carro")({
       { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(meta.path) }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          name: PAGE_TITLE,
-          description: PAGE_DESCRIPTION,
-          applicationCategory: "FinanceApplication",
-          operatingSystem: "Web",
-          inLanguage: "pt-BR",
-          offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "BreadcrumbList",
-          itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Início", item: absoluteUrl("/") },
-            {
-              "@type": "ListItem",
-              position: 2,
-              name: PAGE_TITLE,
-              item: absoluteUrl(meta.path),
-            },
-          ],
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: FAQ.map((f) => ({
-            "@type": "Question",
-            name: f.question,
-            acceptedAnswer: { "@type": "Answer", text: f.answer },
-          })),
-        }),
-      },
-    ],
+    scripts: calculatorStructuredData({
+      name: PAGE_TITLE,
+      description: PAGE_DESCRIPTION,
+      path: meta.path,
+      applicationCategory: "FinanceApplication",
+      faq: FAQ,
+    }),
   }),
   component: CarCostPage,
 });
@@ -220,6 +187,10 @@ function CarCostPage() {
                 isManual: true,
                 sourceName: data.source,
                 sourceLastUpdated: data.lastUpdated,
+                sourceUrl:
+                  "sourceUrl" in data && typeof data.sourceUrl === "string"
+                    ? data.sourceUrl
+                    : undefined,
                 isStale: data.isStale ?? false,
                 error: data.notes ?? data.error ?? "Preço público indisponível.",
               },
@@ -235,6 +206,8 @@ function CarCostPage() {
               isManual: false,
               sourceName: data.source,
               sourceLastUpdated: data.lastUpdated,
+              sourceUrl: data.sourceUrl,
+              sourcePeriod: data.period,
               isStale: data.isStale,
               error: null,
             },
@@ -559,6 +532,21 @@ function CarCostPage() {
           combustível, ele gasta cerca de R$ 460 por mês. Somando IPVA, seguro, licenciamento,
           manutenção, pneus, lavagem e depreciação de um carro de R$ 50.000 a 8% ao ano, o custo
           mensal real fica próximo de R$ 1.500 — quase o triplo do que ele paga só na bomba.
+        </p>
+
+        <h2>Fonte dos preços de combustível</h2>
+        <p>
+          O preenchimento automático consulta o{" "}
+          <a
+            href="https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/levantamento-de-precos-de-combustiveis-ultimas-semanas-pesquisadas"
+            target="_blank"
+            rel="noreferrer"
+          >
+            levantamento semanal oficial da ANP
+          </a>
+          . Quando a consulta funciona, mostramos o período pesquisado, a data de atualização do
+          cache e um link para a fonte utilizada. A média estadual não representa necessariamente o
+          preço da sua cidade ou do seu posto; por isso, o campo permanece editável.
         </p>
 
         <h2>Limitações</h2>
