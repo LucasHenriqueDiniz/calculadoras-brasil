@@ -124,6 +124,45 @@ function Home() {
           })}
         </ul>
       </section>
+
+      <section className="border-t border-border bg-surface">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-3">
+          <div>
+            <h2 className="font-display text-xl text-foreground">Como as estimativas funcionam</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Cada ferramenta explicita fórmulas, premissas e limitações. Os resultados são
+              educativos e devem ser ajustados com os valores reais do seu orçamento.
+            </p>
+            <Link to="/metodologia" className="mt-3 inline-flex text-sm font-medium text-primary">
+              Consultar metodologia
+            </Link>
+          </div>
+          <div>
+            <h2 className="font-display text-xl text-foreground">Fontes públicas verificáveis</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Quando disponível, usamos dados oficiais da ANP e da ANEEL apenas para sugerir valores
+              iniciais. A fonte, o período e a atualização aparecem junto ao campo.
+            </p>
+            <Link
+              to="/metodologia"
+              hash="fontes"
+              className="mt-3 inline-flex text-sm font-medium text-primary"
+            >
+              Ver fontes e limitações
+            </Link>
+          </div>
+          <div>
+            <h2 className="font-display text-xl text-foreground">Privacidade por padrão</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Os números digitados são processados no navegador. Consultas públicas enviam somente
+              os filtros necessários, como UF e tipo de dado.
+            </p>
+            <Link to="/privacidade" className="mt-3 inline-flex text-sm font-medium text-primary">
+              Ler política de privacidade
+            </Link>
+          </div>
+        </div>
+      </section>
     </PageShell>
   );
 }

@@ -23,6 +23,7 @@ import {
   type SubscriptionInput,
 } from "@/lib/calculators/subscriptions";
 import { absoluteUrl } from "@/lib/site";
+import { calculatorStructuredData } from "@/lib/structured-data";
 
 const PAGE_TITLE = "Calculadora de gasto com assinaturas";
 const DESCRIPTION =
@@ -76,33 +77,13 @@ export const Route = createFileRoute("/calculadora-assinaturas")({
       { property: "og:url", content: absoluteUrl("/calculadora-assinaturas") },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/calculadora-assinaturas") }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          name: PAGE_TITLE,
-          description: DESCRIPTION,
-          applicationCategory: "FinanceApplication",
-          operatingSystem: "Web",
-          inLanguage: "pt-BR",
-          offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: FAQ.map((item) => ({
-            "@type": "Question",
-            name: item.question,
-            acceptedAnswer: { "@type": "Answer", text: item.answer },
-          })),
-        }),
-      },
-    ],
+    scripts: calculatorStructuredData({
+      name: PAGE_TITLE,
+      description: DESCRIPTION,
+      path: "/calculadora-assinaturas",
+      applicationCategory: "FinanceApplication",
+      faq: FAQ,
+    }),
   }),
   component: SubscriptionsPage,
 });

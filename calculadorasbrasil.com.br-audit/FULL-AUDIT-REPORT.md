@@ -3,6 +3,21 @@
 Data: 23 de junho de 2026  
 Escopo: código-fonte, build de produção, 12 URLs indexáveis, metadados, conteúdo, dados estruturados, sitemap, GEO e experiência de busca.
 
+## Status da implementação
+
+Os problemas técnicos descritos nesta auditoria foram corrigidos em 23 de junho de 2026:
+
+- migração para TanStack Start em Cloudflare Workers;
+- pré-renderização das 12 rotas;
+- HTML inicial com conteúdo, metadados e JSON-LD;
+- autoria institucional, fontes e datas de revisão;
+- breadcrumbs em todas as calculadoras;
+- imagem OG 1200×630 com aproximadamente 320 KB;
+- Lighthouse móvel local: SEO 100, acessibilidade 100 e performance 83.
+
+Permanecem externas as validações após deploy: domínio, Rich Results Test, Schema Validator,
+PageSpeed de produção, Search Console e Bing Webmaster Tools.
+
 ## Resumo executivo
 
 **Pontuação estimada após as correções: 76/100.**
@@ -13,16 +28,16 @@ O principal risco é arquitetural: o site é uma SPA Vite. O HTML inicial conté
 
 ## Pontuação por área
 
-| Área | Nota | Situação |
-|---|---:|---|
-| SEO técnico | 68 | Boa infraestrutura, limitada pela renderização client-side |
-| On-page | 90 | Metadados únicos e canônicas absolutas |
-| Conteúdo e E-E-A-T | 74 | Ferramentas úteis e metodologia; autoria e referências podem melhorar |
-| Dados estruturados | 84 | WebSite, Organization, WebApplication, Breadcrumb e FAQ |
-| Sitemap e descoberta | 94 | 12 URLs, URLs absolutas e `lastmod` |
-| GEO / busca por IA | 63 | `llms.txt` e acesso liberado; HTML inicial ainda vazio |
-| Experiência de busca | 84 | Intenção, UX e ferramentas bem alinhadas |
-| Imagens | 82 | OG image presente e dimensionada; arquivo pode ser otimizado |
+| Área                 | Nota | Situação                                                              |
+| -------------------- | ---: | --------------------------------------------------------------------- |
+| SEO técnico          |   68 | Boa infraestrutura, limitada pela renderização client-side            |
+| On-page              |   90 | Metadados únicos e canônicas absolutas                                |
+| Conteúdo e E-E-A-T   |   74 | Ferramentas úteis e metodologia; autoria e referências podem melhorar |
+| Dados estruturados   |   84 | WebSite, Organization, WebApplication, Breadcrumb e FAQ               |
+| Sitemap e descoberta |   94 | 12 URLs, URLs absolutas e `lastmod`                                   |
+| GEO / busca por IA   |   63 | `llms.txt` e acesso liberado; HTML inicial ainda vazio                |
+| Experiência de busca |   84 | Intenção, UX e ferramentas bem alinhadas                              |
+| Imagens              |   82 | OG image presente e dimensionada; arquivo pode ser otimizado          |
 
 ## Achados prioritários
 
@@ -37,7 +52,7 @@ O principal risco é arquitetural: o site é uma SPA Vite. O HTML inicial conté
 1. Adicionar autoria editorial ou uma página de responsáveis pelo conteúdo.
 2. Incluir breadcrumbs estruturados também nas páginas de assinaturas, mudança e pet.
 3. Expandir o conteúdo introdutório da página inicial e das páginas institucionais com respostas diretas às dúvidas principais.
-4. Otimizar `public/og-image.png`, atualmente com aproximadamente 1,6 MB, preferencialmente para menos de 500 KB sem perda visual perceptível.
+4. ~~Otimizar `public/og-image.png`.~~ Concluído: 1200×630 e aproximadamente 320 KB.
 5. Medir Core Web Vitals em produção com PageSpeed Insights e CrUX após o primeiro deploy.
 
 ### Baixa prioridade
@@ -62,4 +77,3 @@ As páginas de calculadora usam `WebApplication`, uma escolha coerente com ferra
 ## Próxima meta
 
 Com pré-renderização, fontes editoriais, autoria e validação de desempenho em produção, o projeto pode alcançar uma faixa estimada de **88–92/100** sem alterar o produto.
-

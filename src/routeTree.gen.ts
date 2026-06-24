@@ -21,6 +21,13 @@ import { Route as CalculadoraCustoCarroRouteImport } from './routes/calculadora-
 import { Route as CalculadoraContaDeLuzRouteImport } from './routes/calculadora-conta-de-luz'
 import { Route as CalculadoraAssinaturasRouteImport } from './routes/calculadora-assinaturas'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiVehicleEfficiencyRouteImport } from './routes/api.vehicle-efficiency'
+import { Route as ApiHealthRouteImport } from './routes/api.health'
+import { Route as ApiFuelPricesRouteImport } from './routes/api.fuel-prices'
+import { Route as ApiEnergyTariffsRouteImport } from './routes/api.energy-tariffs'
+import { Route as ApiPublicDataSourcesRouteImport } from './routes/api.public-data.sources'
+import { Route as ApiLocationsStatesRouteImport } from './routes/api.locations.states'
+import { Route as ApiLocationsCitiesRouteImport } from './routes/api.locations.cities'
 
 const TermosRoute = TermosRouteImport.update({
   id: '/termos',
@@ -82,6 +89,41 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiVehicleEfficiencyRoute = ApiVehicleEfficiencyRouteImport.update({
+  id: '/api/vehicle-efficiency',
+  path: '/api/vehicle-efficiency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiFuelPricesRoute = ApiFuelPricesRouteImport.update({
+  id: '/api/fuel-prices',
+  path: '/api/fuel-prices',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEnergyTariffsRoute = ApiEnergyTariffsRouteImport.update({
+  id: '/api/energy-tariffs',
+  path: '/api/energy-tariffs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicDataSourcesRoute = ApiPublicDataSourcesRouteImport.update({
+  id: '/api/public-data/sources',
+  path: '/api/public-data/sources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLocationsStatesRoute = ApiLocationsStatesRouteImport.update({
+  id: '/api/locations/states',
+  path: '/api/locations/states',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLocationsCitiesRoute = ApiLocationsCitiesRouteImport.update({
+  id: '/api/locations/cities',
+  path: '/api/locations/cities',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +138,13 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/sobre': typeof SobreRoute
   '/termos': typeof TermosRoute
+  '/api/energy-tariffs': typeof ApiEnergyTariffsRoute
+  '/api/fuel-prices': typeof ApiFuelPricesRoute
+  '/api/health': typeof ApiHealthRoute
+  '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
+  '/api/locations/cities': typeof ApiLocationsCitiesRoute
+  '/api/locations/states': typeof ApiLocationsStatesRoute
+  '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +159,13 @@ export interface FileRoutesByTo {
   '/privacidade': typeof PrivacidadeRoute
   '/sobre': typeof SobreRoute
   '/termos': typeof TermosRoute
+  '/api/energy-tariffs': typeof ApiEnergyTariffsRoute
+  '/api/fuel-prices': typeof ApiFuelPricesRoute
+  '/api/health': typeof ApiHealthRoute
+  '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
+  '/api/locations/cities': typeof ApiLocationsCitiesRoute
+  '/api/locations/states': typeof ApiLocationsStatesRoute
+  '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +181,13 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/sobre': typeof SobreRoute
   '/termos': typeof TermosRoute
+  '/api/energy-tariffs': typeof ApiEnergyTariffsRoute
+  '/api/fuel-prices': typeof ApiFuelPricesRoute
+  '/api/health': typeof ApiHealthRoute
+  '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
+  '/api/locations/cities': typeof ApiLocationsCitiesRoute
+  '/api/locations/states': typeof ApiLocationsStatesRoute
+  '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +204,13 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/sobre'
     | '/termos'
+    | '/api/energy-tariffs'
+    | '/api/fuel-prices'
+    | '/api/health'
+    | '/api/vehicle-efficiency'
+    | '/api/locations/cities'
+    | '/api/locations/states'
+    | '/api/public-data/sources'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +225,13 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/sobre'
     | '/termos'
+    | '/api/energy-tariffs'
+    | '/api/fuel-prices'
+    | '/api/health'
+    | '/api/vehicle-efficiency'
+    | '/api/locations/cities'
+    | '/api/locations/states'
+    | '/api/public-data/sources'
   id:
     | '__root__'
     | '/'
@@ -169,6 +246,13 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/sobre'
     | '/termos'
+    | '/api/energy-tariffs'
+    | '/api/fuel-prices'
+    | '/api/health'
+    | '/api/vehicle-efficiency'
+    | '/api/locations/cities'
+    | '/api/locations/states'
+    | '/api/public-data/sources'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +268,13 @@ export interface RootRouteChildren {
   PrivacidadeRoute: typeof PrivacidadeRoute
   SobreRoute: typeof SobreRoute
   TermosRoute: typeof TermosRoute
+  ApiEnergyTariffsRoute: typeof ApiEnergyTariffsRoute
+  ApiFuelPricesRoute: typeof ApiFuelPricesRoute
+  ApiHealthRoute: typeof ApiHealthRoute
+  ApiVehicleEfficiencyRoute: typeof ApiVehicleEfficiencyRoute
+  ApiLocationsCitiesRoute: typeof ApiLocationsCitiesRoute
+  ApiLocationsStatesRoute: typeof ApiLocationsStatesRoute
+  ApiPublicDataSourcesRoute: typeof ApiPublicDataSourcesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +363,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/vehicle-efficiency': {
+      id: '/api/vehicle-efficiency'
+      path: '/api/vehicle-efficiency'
+      fullPath: '/api/vehicle-efficiency'
+      preLoaderRoute: typeof ApiVehicleEfficiencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/fuel-prices': {
+      id: '/api/fuel-prices'
+      path: '/api/fuel-prices'
+      fullPath: '/api/fuel-prices'
+      preLoaderRoute: typeof ApiFuelPricesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/energy-tariffs': {
+      id: '/api/energy-tariffs'
+      path: '/api/energy-tariffs'
+      fullPath: '/api/energy-tariffs'
+      preLoaderRoute: typeof ApiEnergyTariffsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public-data/sources': {
+      id: '/api/public-data/sources'
+      path: '/api/public-data/sources'
+      fullPath: '/api/public-data/sources'
+      preLoaderRoute: typeof ApiPublicDataSourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/locations/states': {
+      id: '/api/locations/states'
+      path: '/api/locations/states'
+      fullPath: '/api/locations/states'
+      preLoaderRoute: typeof ApiLocationsStatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/locations/cities': {
+      id: '/api/locations/cities'
+      path: '/api/locations/cities'
+      fullPath: '/api/locations/cities'
+      preLoaderRoute: typeof ApiLocationsCitiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -288,7 +428,23 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacidadeRoute: PrivacidadeRoute,
   SobreRoute: SobreRoute,
   TermosRoute: TermosRoute,
+  ApiEnergyTariffsRoute: ApiEnergyTariffsRoute,
+  ApiFuelPricesRoute: ApiFuelPricesRoute,
+  ApiHealthRoute: ApiHealthRoute,
+  ApiVehicleEfficiencyRoute: ApiVehicleEfficiencyRoute,
+  ApiLocationsCitiesRoute: ApiLocationsCitiesRoute,
+  ApiLocationsStatesRoute: ApiLocationsStatesRoute,
+  ApiPublicDataSourcesRoute: ApiPublicDataSourcesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

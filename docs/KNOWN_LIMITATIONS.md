@@ -2,42 +2,31 @@
 
 ## Dados públicos
 
-- **ANP:** depende da estrutura da planilha semanal oficial. O parser valida domínio, formato,
-  tamanho e aba, mas uma mudança estrutural pode ativar o fallback manual.
-- **ANEEL:** retorna tarifa B1 residencial convencional de aplicação. Não inclui impostos,
-  bandeiras, contribuição de iluminação pública ou particularidades da fatura.
-- **Inmetro:** endpoint preparado, porém o dataset veicular normalizado ainda não foi integrado.
+- **ANP:** o parser depende da estrutura da planilha semanal oficial e ativa fallback manual se a
+  fonte mudar ou ficar indisponível.
+- **ANEEL:** a tarifa B1 pública não inclui impostos, bandeiras, iluminação pública ou regras
+  específicas da fatura.
+- **Inmetro:** endpoint preparado, mas sem dataset veicular normalizado.
 - **IBGE:** UFs possuem fallback local; municípios ainda retornam `available: false`.
-- **Cache:** cache HTTP está ativo. KV e Cron ainda não foram provisionados.
+- **Cache:** usa Cache API do Worker; KV e Cron não fazem parte deste pacote.
 
 ## Cálculos
 
-- **Custo de carro:** consumo real, seguro, manutenção e depreciação variam por veículo e motorista.
-- **Morar sozinho:** não utiliza médias automáticas por cidade; todos os valores devem ser ajustados.
-- **Conta de luz:** potência nominal e tempo informado não reproduzem ciclos reais dos aparelhos.
-- **Assinaturas:** projeções não incluem inflação, reajustes ou promoções futuras.
-- **Mudança:** não calcula automaticamente distância, volume, escadas ou regras de condomínio.
-- **Pet:** o cálculo de ração assume 30 dias e consumo diário constante; custos veterinários variam.
+- Os resultados são estimativas educativas e variam por região, período, perfil e fornecedor.
+- Custo de carro depende de consumo, seguro, manutenção e depreciação reais.
+- Conta de luz depende dos ciclos de uso e da tarifa completa da fatura.
+- Assinaturas, mudança, moradia e pet não projetam inflação ou reajustes futuros.
 
-## SEO
+## SEO e desempenho
 
-- O site é uma SPA. Metadata é atualizada no cliente, mas as rotas não possuem HTML pré-renderizado.
-- A imagem Open Graph tem 1731 × 909 px e aproximadamente 1,6 MB; pode ser otimizada futuramente.
-- A rota desconhecida retorna HTTP 404 por uma Pages Function catch-all.
+- As 12 rotas são pré-renderizadas e hidratadas no cliente.
+- Core Web Vitals de campo dependem de tráfego real e devem ser acompanhados após o deploy.
+- As fontes principais são servidas localmente por pacotes versionados para evitar dependência de
+  CSS externo no caminho crítico.
+- `FAQPage` não gera expectativa de rich result no Google.
 
 ## Infraestrutura
 
-- O workspace atual não possui diretório `.git`.
-- KV, Cron e ambientes separados de staging/produção não estão provisionados.
-- O domínio e variáveis de produção precisam ser confirmados no painel Cloudflare.
-- Core Web Vitals não foram medidos nesta revisão por ausência da integração Chrome DevTools MCP.
-
-## Futuras melhorias
-
-- Pré-renderização das páginas principais.
-- Ingestão normalizada do Inmetro.
-- Lista de municípios IBGE com cache.
-- KV para último resultado válido das fontes públicas.
-- Cron para aquecimento periódico dos agregados.
-- Otimização adicional da imagem social.
-- Separação de exports auxiliares dos componentes UI para eliminar avisos de Fast Refresh.
+- O domínio e os segredos de produção ainda precisam ser confirmados na conta Cloudflare.
+- O ambiente de preview está configurado, mas depende de autenticação para deploy.
+- Search Console e Bing Webmaster Tools exigem configuração externa após a publicação.

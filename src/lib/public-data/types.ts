@@ -19,6 +19,7 @@ export interface FuelPriceData {
   sampleSize?: number;
   period?: string;
   source: "ANP";
+  sourceUrl: string;
   lastUpdated: string;
   isStale: boolean;
 }
@@ -32,9 +33,17 @@ export interface EnergyTariffData {
   te?: number;
   taxesIncluded: boolean;
   source: "ANEEL";
+  sourceUrl: string;
   lastUpdated: string;
   isStale: boolean;
   notes?: string;
+}
+
+export interface EnergyDistributorOption {
+  uf: string;
+  distributor: string;
+  source: "ANEEL";
+  sourceUrl: string;
 }
 
 export type PublicDataResult<T> = T | PublicDataUnavailable;

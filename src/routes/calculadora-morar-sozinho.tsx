@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
 import { CurrencyInput } from "@/components/calculator/fields";
 import {
@@ -17,6 +17,8 @@ import { getCalculator } from "@/data/calculators";
 import { formatBRL } from "@/lib/format";
 import { calculateLivingAloneCost, type LivingAloneInput } from "@/lib/calculators/livingAlone";
 import { absoluteUrl } from "@/lib/site";
+import { calculatorStructuredData } from "@/lib/structured-data";
+import { usePersistedState } from "@/lib/usePersistedState";
 
 const meta = getCalculator("morar-sozinho")!;
 const PAGE_TITLE = "Calculadora de Custo para Morar Sozinho";
@@ -90,49 +92,13 @@ export const Route = createFileRoute("/calculadora-morar-sozinho")({
       { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(meta.path) }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          name: PAGE_TITLE,
-          description: PAGE_DESCRIPTION,
-          applicationCategory: "FinanceApplication",
-          operatingSystem: "Web",
-          inLanguage: "pt-BR",
-          offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "BreadcrumbList",
-          itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Início", item: absoluteUrl("/") },
-            {
-              "@type": "ListItem",
-              position: 2,
-              name: PAGE_TITLE,
-              item: absoluteUrl(meta.path),
-            },
-          ],
-        }),
-      },
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: FAQ.map((f) => ({
-            "@type": "Question",
-            name: f.question,
-            acceptedAnswer: { "@type": "Answer", text: f.answer },
-          })),
-        }),
-      },
-    ],
+    scripts: calculatorStructuredData({
+      name: PAGE_TITLE,
+      description: PAGE_DESCRIPTION,
+      path: meta.path,
+      applicationCategory: "FinanceApplication",
+      faq: FAQ,
+    }),
   }),
   component: LivingAlonePage,
 });
@@ -146,7 +112,10 @@ const STATUS_TONE: Record<string, "primary" | "neutral"> = {
 };
 
 function LivingAlonePage() {
-  const [input, setInput] = useState<LivingAloneInput>(DEFAULTS);
+  const [input, setInput] = usePersistedState<LivingAloneInput>(
+    "calculadoras-brasil:morar-sozinho:v1",
+    DEFAULTS,
+  );
   const result = useMemo(() => calculateLivingAloneCost(input), [input]);
 
   function update<K extends keyof LivingAloneInput>(key: K, value: LivingAloneInput[K]) {
