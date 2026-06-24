@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { PageShell, PageHeader } from "@/components/layout/PageShell";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
-import { EDITORIAL_RESPONSIBLE, SITE_REVIEW_DATE, SITE_REVIEW_DATE_LABEL } from "@/lib/seo-pages";
+import { SITE_REVIEW_DATE, SITE_REVIEW_DATE_LABEL } from "@/lib/seo-pages";
 
 interface CalculatorLayoutProps {
   eyebrow?: string;
@@ -30,7 +30,6 @@ export function CalculatorLayout({
           <Breadcrumbs items={[{ label: breadcrumbLabel ?? title }]} />
           <p className="text-xs text-muted-foreground">
             Revisado em <time dateTime={SITE_REVIEW_DATE}>{SITE_REVIEW_DATE_LABEL}</time>
-            {" · "}Responsável editorial: {EDITORIAL_RESPONSIBLE}
           </p>
         </div>
       </div>

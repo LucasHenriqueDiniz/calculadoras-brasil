@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { LoaderCircle, Plus, Trash2 } from "lucide-react";
+import { LoaderCircle, Plus, Table as TableIcon, Trash2 } from "lucide-react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
 import { SearchableSelectField } from "@/components/calculator/SearchableSelectField";
 import { NumberInput, SelectField } from "@/components/calculator/fields";
 import {
+  buildColorMap,
   DisclaimerBox,
   ResultSummaryCard,
   SimpleBarChart,
@@ -288,6 +289,8 @@ function ElectricityPage() {
     monthly: a.costPerMonth,
     annual: a.costPerYear,
   }));
+  const applianceColors = useMemo(() => buildColorMap(chartRows), [chartRows]);
+  const applianceColor = (id: string) => applianceColors[id] ?? "var(--color-border)";
 
   const shareText = `Minha conta de luz estimada é ${formatBRL(result.totalCostPerMonth)} por mês (${formatNumber(result.totalKwhPerMonth, 1)} kWh), considerando ${result.appliances.length} aparelho(s) e tarifa de ${formatBRL(tariff)}/kWh.`;
 
@@ -504,49 +507,82 @@ function ElectricityPage() {
       <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6">
         <div className="grid gap-4 lg:grid-cols-2">
           <SimpleBarChart rows={chartRows} title="Custo mensal por aparelho" />
-          <div className="overflow-x-auto rounded-xl border border-border bg-surface">
-            <table className="w-full text-sm">
-              <caption className="sr-only">Consumo e custo por aparelho</caption>
-              <thead>
-                <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-                  <th className="px-3 py-2 font-medium">Aparelho</th>
-                  <th className="px-3 py-2 text-right font-medium">kWh/mês</th>
-                  <th className="px-3 py-2 text-right font-medium">R$/mês</th>
-                  <th className="px-3 py-2 text-right font-medium">%</th>
-                </tr>
-              </thead>
-              <tbody>
-                {result.appliances.map((a) => (
-                  <tr key={a.id} className="border-b border-border last:border-0">
-                    <td className="px-3 py-2 text-foreground">{a.name}</td>
-                    <td className="px-3 py-2 text-right tabular-nums">
-                      {formatNumber(a.kwhPerMonth, 1)}
-                    </td>
-                    <td className="px-3 py-2 text-right tabular-nums">
-                      {formatBRL(a.costPerMonth)}
-                    </td>
-                    <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">
-                      {a.sharePercent.toFixed(1)}%
-                    </td>
+          <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]">
+            <div className="flex items-center gap-2 border-b border-border px-5 py-3.5">
+              <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary-soft text-primary">
+                <TableIcon className="h-4 w-4" aria-hidden />
+              </span>
+              <p className="text-sm font-semibold text-foreground">Consumo e custo por aparelho</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <caption className="sr-only">Consumo e custo por aparelho</caption>
+                <thead>
+                  <tr className="border-b border-border bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                    <th className="px-4 py-3 font-medium">Aparelho</th>
+                    <th className="px-4 py-3 text-right font-medium">kWh/mês</th>
+                    <th className="px-4 py-3 text-right font-medium">R$/mês</th>
+                    <th className="px-4 py-3 text-right font-medium">%</th>
                   </tr>
-                ))}
-                <tr className="bg-muted/40 font-medium">
-                  <td className="px-3 py-2">Total</td>
-                  <td className="px-3 py-2 text-right tabular-nums">
-                    {formatNumber(result.totalKwhPerMonth, 1)}
-                  </td>
-                  <td className="px-3 py-2 text-right tabular-nums">
-                    {formatBRL(result.totalCostPerMonth)}
-                  </td>
-                  <td className="px-3 py-2 text-right tabular-nums">100%</td>
-                </tr>
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {result.appliances.map((a) => (
+                    <tr
+                      key={a.id}
+                      className="border-b border-border/60 transition-colors last:border-0 odd:bg-muted/15 hover:bg-primary-soft/25"
+                    >
+                      <td className="px-4 py-2.5">
+                        <span className="flex items-center gap-2.5 text-foreground">
+                          <span
+                            className="h-2.5 w-2.5 shrink-0 rounded-full"
+                            style={{ backgroundColor: applianceColor(a.id) }}
+                            aria-hidden
+                          />
+                          <span className="truncate">{a.name}</span>
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
+                        {formatNumber(a.kwhPerMonth, 1)}
+                      </td>
+                      <td className="px-4 py-2.5 text-right font-medium tabular-nums">
+                        {formatBRL(a.costPerMonth)}
+                      </td>
+                      <td className="px-4 py-2.5 text-right">
+                        <span className="inline-flex items-center justify-end gap-2">
+                          <span className="hidden h-1.5 w-12 overflow-hidden rounded-full bg-muted sm:block">
+                            <span
+                              className="block h-full rounded-full"
+                              style={{
+                                width: `${Math.min(100, a.sharePercent)}%`,
+                                backgroundColor: applianceColor(a.id),
+                              }}
+                            />
+                          </span>
+                          <span className="w-12 text-right tabular-nums text-muted-foreground">
+                            {a.sharePercent.toFixed(1)}%
+                          </span>
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="border-t-2 border-border bg-primary-soft/40 font-semibold text-foreground">
+                    <td className="px-4 py-3">Total</td>
+                    <td className="px-4 py-3 text-right tabular-nums">
+                      {formatNumber(result.totalKwhPerMonth, 1)}
+                    </td>
+                    <td className="px-4 py-3 text-right tabular-nums">
+                      {formatBRL(result.totalCostPerMonth)}
+                    </td>
+                    <td className="px-4 py-3 text-right tabular-nums">100%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
 
-      <Prose>
+      <Prose collapsibleTitle="Saiba mais sobre a conta de luz">
         <h2>Como funciona o cálculo</h2>
         <p>O consumo de qualquer aparelho elétrico segue uma fórmula simples:</p>
         <p>

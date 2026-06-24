@@ -186,7 +186,7 @@ function PetPage() {
           <BreakdownTable rows={result.breakdown} caption="Custos mensais e anuais do pet" />
         </div>
       </section>
-      <Prose>
+      <Prose collapsibleTitle="Saiba mais sobre o custo de um pet">
         <h2>Planejamento responsável</h2>
         <p>
           O custo de um animal inclui rotina e saúde preventiva. Vacinas e consultas anuais são

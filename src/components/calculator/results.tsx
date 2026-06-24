@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { AlertTriangle, Info, PieChart } from "lucide-react";
 import { formatBRL } from "@/lib/format";
 
@@ -68,7 +68,7 @@ const CHART_COLORS = [
  * Mapeia cada categoria (por key) para uma cor estável, ordenando por valor.
  * Tanto o gráfico quanto a tabela usam as mesmas linhas, garantindo cores consistentes.
  */
-function buildColorMap(rows: BreakdownRow[]): Record<string, string> {
+export function buildColorMap(rows: BreakdownRow[]): Record<string, string> {
   const sorted = [...rows].filter((r) => r.monthly > 0).sort((a, b) => b.monthly - a.monthly);
   const map: Record<string, string> = {};
   sorted.forEach((r, i) => {
@@ -147,24 +147,40 @@ export function BreakdownTable({ rows, caption }: { rows: BreakdownRow[]; captio
   );
 }
 
-/** Donut em SVG puro — seguro para SSR/pré-renderização, sem dependências. */
+interface Slice {
+  key: string;
+  label: string;
+  value: number;
+  color: string;
+}
+
+/** Donut em SVG puro — seguro para SSR. Realça o segmento ativo no hover. */
 function Donut({
   segments,
   total,
+  activeKey,
+  onHover,
 }: {
-  segments: { key: string; value: number; color: string }[];
+  segments: Slice[];
   total: number;
+  activeKey: string | null;
+  onHover: (key: string | null) => void;
 }) {
-  const size = 168;
-  const stroke = 22;
-  const r = (size - stroke) / 2;
+  const size = 180;
+  const stroke = 24;
+  const r = (size - stroke - 8) / 2;
   const c = 2 * Math.PI * r;
   let offset = 0;
+
+  const active = segments.find((s) => s.key === activeKey) ?? null;
+  const centerLabel = active ? active.label : "Total/mês";
+  const centerValue = active ? formatBRL(active.value) : formatBRL(total);
+  const centerPct = active && total > 0 ? `${((active.value / total) * 100).toFixed(1)}%` : null;
 
   return (
     <svg
       viewBox={`0 0 ${size} ${size}`}
-      className="h-40 w-40 shrink-0"
+      className="h-44 w-44 shrink-0"
       role="img"
       aria-label="Gráfico de distribuição do custo por categoria"
     >
@@ -180,6 +196,8 @@ function Donut({
         {segments.map((s) => {
           const len = total > 0 ? (s.value / total) * c : 0;
           const dash = `${len} ${c - len}`;
+          const isActive = s.key === activeKey;
+          const dimmed = activeKey !== null && !isActive;
           const circle = (
             <circle
               key={s.key}
@@ -188,11 +206,17 @@ function Donut({
               r={r}
               fill="none"
               stroke={s.color}
-              strokeWidth={stroke}
+              strokeWidth={isActive ? stroke + 6 : stroke}
               strokeDasharray={dash}
               strokeDashoffset={-offset}
               strokeLinecap="butt"
-            />
+              className="cursor-pointer transition-[stroke-width,opacity] duration-150"
+              style={{ opacity: dimmed ? 0.35 : 1 }}
+              onMouseEnter={() => onHover(s.key)}
+              onMouseLeave={() => onHover(null)}
+            >
+              <title>{`${s.label}: ${formatBRL(s.value)}`}</title>
+            </circle>
           );
           offset += len;
           return circle;
@@ -200,25 +224,36 @@ function Donut({
       </g>
       <text
         x="50%"
-        y="46%"
+        y="43%"
         textAnchor="middle"
-        className="fill-muted-foreground text-[9px] font-medium uppercase tracking-wide"
+        className="fill-muted-foreground text-[8.5px] font-medium uppercase tracking-wide"
       >
-        Total/mês
+        {centerLabel.length > 18 ? `${centerLabel.slice(0, 17)}…` : centerLabel}
       </text>
       <text
         x="50%"
-        y="60%"
+        y="55%"
         textAnchor="middle"
         className="fill-foreground font-display text-[15px] font-bold"
       >
-        {formatBRL(total)}
+        {centerValue}
       </text>
+      {centerPct ? (
+        <text
+          x="50%"
+          y="66%"
+          textAnchor="middle"
+          className="fill-primary text-[10px] font-semibold tabular-nums"
+        >
+          {centerPct}
+        </text>
+      ) : null}
     </svg>
   );
 }
 
 export function SimpleBarChart({ rows, title }: { rows: BreakdownRow[]; title: string }) {
+  const [activeKey, setActiveKey] = useState<string | null>(null);
   const total = rows.reduce((s, r) => s + r.monthly, 0);
   const filtered = rows.filter((r) => r.monthly > 0).sort((a, b) => b.monthly - a.monthly);
   const colorMap = buildColorMap(rows);
@@ -227,32 +262,24 @@ export function SimpleBarChart({ rows, title }: { rows: BreakdownRow[]; title: s
   const MAX_SLICES = 6;
   const main = filtered.slice(0, MAX_SLICES);
   const rest = filtered.slice(MAX_SLICES);
-  const segments = main.map((r) => ({ key: r.key, value: r.monthly, color: colorMap[r.key] }));
+  const segments: Slice[] = main.map((r) => ({
+    key: r.key,
+    label: r.label,
+    value: r.monthly,
+    color: colorMap[r.key],
+  }));
   if (rest.length > 0) {
     segments.push({
       key: "__outros__",
+      label: "Outros",
       value: rest.reduce((s, r) => s + r.monthly, 0),
       color: "var(--color-chart-8)",
     });
   }
 
-  const legend = [
-    ...main.map((r) => ({ key: r.key, label: r.label, value: r.monthly, color: colorMap[r.key] })),
-    ...(rest.length > 0
-      ? [
-          {
-            key: "__outros__",
-            label: "Outros",
-            value: rest.reduce((s, r) => s + r.monthly, 0),
-            color: "var(--color-chart-8)",
-          },
-        ]
-      : []),
-  ];
-
   return (
-    <div className="rounded-2xl border border-border bg-surface p-5 shadow-[var(--shadow-card)] sm:p-6">
-      <div className="mb-4 flex items-center gap-2">
+    <div className="flex h-full flex-col rounded-2xl border border-border bg-surface p-5 shadow-[var(--shadow-card)] sm:p-6">
+      <div className="mb-5 flex items-center gap-2">
         <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary-soft text-primary">
           <PieChart className="h-4 w-4" aria-hidden />
         </span>
@@ -262,33 +289,55 @@ export function SimpleBarChart({ rows, title }: { rows: BreakdownRow[]; title: s
       {filtered.length === 0 ? (
         <p className="text-sm text-muted-foreground">Sem valores para exibir.</p>
       ) : (
-        <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:gap-6">
-          <Donut segments={segments} total={total} />
-          <ul className="w-full flex-1 space-y-2.5" aria-label={title}>
-            {legend.map((item) => {
+        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
+          <Donut
+            segments={segments}
+            total={total}
+            activeKey={activeKey}
+            onHover={setActiveKey}
+          />
+          <ul className="w-full min-w-0 flex-1 space-y-1" aria-label={title}>
+            {segments.map((item) => {
               const share = total > 0 ? (item.value / total) * 100 : 0;
+              const isActive = item.key === activeKey;
               return (
-                <li key={item.key} className="flex items-center gap-2.5 text-sm">
-                  <span
-                    className="h-3 w-3 shrink-0 rounded-[4px]"
-                    style={{ backgroundColor: item.color }}
-                    aria-hidden
-                  />
-                  <span className="min-w-0 flex-1 truncate text-foreground">{item.label}</span>
-                  <span className="shrink-0 tabular-nums font-medium text-foreground">
-                    {formatBRL(item.value)}
-                  </span>
-                  <span className="w-10 shrink-0 text-right tabular-nums text-xs text-muted-foreground">
-                    {share.toFixed(0)}%
-                  </span>
+                <li key={item.key}>
+                  <button
+                    type="button"
+                    onMouseEnter={() => setActiveKey(item.key)}
+                    onMouseLeave={() => setActiveKey(null)}
+                    onFocus={() => setActiveKey(item.key)}
+                    onBlur={() => setActiveKey(null)}
+                    className={`flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm transition-colors ${
+                      isActive ? "bg-primary-soft/50" : "hover:bg-muted/50"
+                    }`}
+                  >
+                    <span
+                      className="h-3 w-3 shrink-0 rounded-[4px] ring-2 ring-transparent transition-[box-shadow]"
+                      style={{
+                        backgroundColor: item.color,
+                        boxShadow: isActive ? `0 0 0 3px color-mix(in oklab, ${item.color} 30%, transparent)` : undefined,
+                      }}
+                      aria-hidden
+                    />
+                    <span className="min-w-0 flex-1 truncate text-foreground">{item.label}</span>
+                    <span className="shrink-0 text-right">
+                      <span className="block tabular-nums font-medium text-foreground">
+                        {formatBRL(item.value)}
+                      </span>
+                      <span className="block text-[11px] tabular-nums text-muted-foreground">
+                        {share.toFixed(1)}%
+                      </span>
+                    </span>
+                  </button>
                 </li>
               );
             })}
           </ul>
         </div>
       )}
-      <p className="mt-4 border-t border-border/60 pt-3 text-xs text-muted-foreground">
-        A tabela ao lado apresenta os mesmos valores com detalhamento mensal e anual.
+      <p className="mt-auto border-t border-border/60 pt-3 text-xs text-muted-foreground">
+        Passe o mouse sobre o gráfico ou a legenda para destacar cada categoria.
       </p>
     </div>
   );
