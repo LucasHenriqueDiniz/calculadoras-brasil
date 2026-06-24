@@ -10,7 +10,7 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "deploy": "npm run build && wrangler deploy",
-    "deploy:preview": "npm run build:preview && wrangler deploy",
+    "deploy:preview": "cross-env CLOUDFLARE_ENV=preview vite build && wrangler deploy --env preview",
     "worker:dry-run": "wrangler deploy --dry-run",
     "cf:types": "wrangler types worker-configuration.d.ts",
     "cf:types:check": "wrangler types worker-configuration.d.ts --check",

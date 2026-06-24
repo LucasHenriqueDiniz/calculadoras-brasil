@@ -16,7 +16,7 @@
     "preview": {
       "name": "calculadoras-brasil-preview",
       "vars": {
-        "PUBLIC_SITE_URL": "https://calculadoras-brasil-preview.workers.dev",
+        "PUBLIC_SITE_URL": "https://calculadoras-brasil-preview.lucas-hdo.workers.dev",
         "PUBLIC_DATA_CACHE_TTL_HOURS": "24",
       },
     },
