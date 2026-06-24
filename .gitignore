@@ -7,13 +7,18 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-.output
-.vinxi
+node_modules/
+dist/
+dist-ssr/
+.output/
+.vinxi/
 .tanstack/**
-.nitro
+.nitro/
+.cache/
+.vite/
+.eslintcache
+.turbo/
+.parcel-cache/
 *.local
 
 # Wrangler / Cloudflare

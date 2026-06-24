@@ -14,7 +14,7 @@ sem depender da execução de JavaScript. As seis calculadoras continuam interat
 ## Desenvolvimento
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
@@ -54,6 +54,10 @@ O build gera:
 
 O alvo de produção é Cloudflare Workers. O ambiente `preview` usa o Worker
 `calculadoras-brasil-preview`; produção usa `calculadoras-brasil`.
+
+`npm run preview` sobe uma prévia local do build para validação antes do deploy. O primeiro deploy
+remoto deve ser feito com `npm run deploy:preview`; use `npm run deploy` apenas após validar o
+Worker de preview, APIs, sitemap, 404 e headers.
 
 ## Variáveis e segredos
 

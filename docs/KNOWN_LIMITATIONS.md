@@ -21,8 +21,8 @@
 
 - As 12 rotas são pré-renderizadas e hidratadas no cliente.
 - Core Web Vitals de campo dependem de tráfego real e devem ser acompanhados após o deploy.
-- As fontes do Google permanecem externas até que uma medição comprove benefício em hospedá-las
-  localmente.
+- As fontes principais são servidas localmente por pacotes versionados para evitar dependência de
+  CSS externo no caminho crítico.
 - `FAQPage` não gera expectativa de rich result no Google.
 
 ## Infraestrutura
