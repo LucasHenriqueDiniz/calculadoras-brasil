@@ -1,3 +1,4 @@
+import { LoaderCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DataFreshnessNotice } from "./DataFreshnessNotice";
@@ -38,20 +39,32 @@ export function PublicDataField({
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
-      <Input
-        id={id}
-        type="text"
-        inputMode="decimal"
-        value={value}
-        disabled={isLoading}
-        onChange={(event) => onManualChange(event.target.value)}
-        aria-describedby={`${id}-help`}
-      />
-      <div id={`${id}-help`} className="space-y-1">
-        {helperText ? <p className="text-xs text-muted-foreground">{helperText}</p> : null}
+      <div className="relative">
+        <Input
+          id={id}
+          type="text"
+          inputMode="decimal"
+          value={value}
+          disabled={isLoading}
+          onChange={(event) => onManualChange(event.target.value)}
+          aria-describedby={`${id}-help`}
+          aria-busy={isLoading}
+          className={`h-11 bg-background transition-shadow focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40 ${isLoading ? "pr-10" : ""}`}
+        />
+        {isLoading ? (
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-primary">
+            <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden />
+            <span className="sr-only">Carregando dados públicos…</span>
+          </span>
+        ) : null}
+      </div>
+      <div id={`${id}-help`} className="space-y-2">
+        {helperText ? (
+          <p className="text-xs leading-relaxed text-muted-foreground">{helperText}</p>
+        ) : null}
         <DataFreshnessNotice state={state} />
         {error ? (
-          <p className="text-xs text-destructive" role="status">
+          <p className="text-xs leading-relaxed text-destructive" role="status">
             {error}
           </p>
         ) : null}

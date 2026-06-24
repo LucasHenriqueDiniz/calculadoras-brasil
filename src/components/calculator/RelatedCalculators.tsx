@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 import { calculators, type CalculatorMeta } from "@/data/calculators";
 
 export function RelatedCalculators({
@@ -29,15 +30,19 @@ export function RelatedCalculators({
             <li key={c.slug}>
               <Link
                 to={c.path}
-                className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4 transition hover:border-primary/40 hover:bg-primary-soft/30"
+                className="group flex h-full items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-card-hover)]"
               >
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
-                  <Icon className="h-4 w-4" aria-hidden />
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
+                  <Icon className="h-5 w-5" aria-hidden />
                 </span>
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="font-medium text-foreground">{c.shortTitle}</p>
-                  <p className="text-xs text-muted-foreground">{c.tagline}</p>
+                  <p className="truncate text-xs text-muted-foreground">{c.tagline}</p>
                 </div>
+                <ArrowRight
+                  className="h-4 w-4 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-primary"
+                  aria-hidden
+                />
               </Link>
             </li>
           );

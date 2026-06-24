@@ -29,13 +29,15 @@ export function PageHeader({ eyebrow, title, description }: PageHeaderProps) {
     <section className="border-b border-border bg-surface">
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
         {eyebrow ? (
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+          <p className="mb-3 inline-flex items-center rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="font-display text-3xl text-foreground sm:text-4xl">{title}</h1>
+        <h1 className="text-balance font-display text-3xl text-foreground sm:text-4xl">{title}</h1>
         {description ? (
-          <p className="mt-4 text-base text-muted-foreground sm:text-lg">{description}</p>
+          <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+            {description}
+          </p>
         ) : null}
       </div>
     </section>

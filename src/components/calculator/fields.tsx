@@ -37,10 +37,13 @@ function FieldWrap({
         {label}
       </Label>
       {children}
-      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
+      {hint ? <p className="text-xs leading-relaxed text-muted-foreground">{hint}</p> : null}
     </div>
   );
 }
+
+const FIELD_CLASS =
+  "h-11 bg-background transition-shadow focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:border-ring";
 
 export function NumberInput({
   label,
@@ -71,10 +74,10 @@ export function NumberInput({
             const safe = Number.isFinite(n) ? Math.max(min, n) : 0;
             onChange(max !== undefined ? Math.min(max, safe) : safe);
           }}
-          className={suffix ? "pr-14" : undefined}
+          className={`${FIELD_CLASS} ${suffix ? "pr-14" : ""}`}
         />
         {suffix ? (
-          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-muted-foreground">
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs font-medium text-muted-foreground">
             {suffix}
           </span>
         ) : null}
@@ -89,7 +92,7 @@ export function CurrencyInput({ label, hint, id, value, onChange, min = 0 }: Num
   return (
     <FieldWrap htmlFor={inputId} label={label} hint={hint}>
       <div className="relative">
-        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-muted-foreground">
+        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm font-medium text-muted-foreground">
           R$
         </span>
         <Input
@@ -101,7 +104,7 @@ export function CurrencyInput({ label, hint, id, value, onChange, min = 0 }: Num
             const n = parseBRNumber(e.target.value);
             onChange(Math.max(min, n));
           }}
-          className="pl-9"
+          className={`${FIELD_CLASS} pl-9`}
         />
       </div>
     </FieldWrap>
@@ -127,7 +130,7 @@ export function SelectField({ label, hint, id, value, onChange, options }: Selec
         id={inputId}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        className="flex h-11 w-full cursor-pointer rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-shadow focus-visible:border-ring focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
