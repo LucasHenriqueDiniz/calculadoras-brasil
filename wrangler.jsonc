@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "calculadoras-brasil",
+  "name": "calcule-brasil",
   "compatibility_date": "2026-06-23",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
@@ -9,14 +9,14 @@
     "head_sampling_rate": 1,
   },
   "vars": {
-    "PUBLIC_SITE_URL": "https://calculadorasbrasil.com.br",
+    "PUBLIC_SITE_URL": "https://calculebrasil.com",
     "PUBLIC_DATA_CACHE_TTL_HOURS": "24",
   },
   "env": {
     "preview": {
-      "name": "calculadoras-brasil-preview",
+      "name": "calcule-brasil-preview",
       "vars": {
-        "PUBLIC_SITE_URL": "https://calculadoras-brasil-preview.lucas-hdo.workers.dev",
+        "PUBLIC_SITE_URL": "https://calcule-brasil-preview.lucas-hdo.workers.dev",
         "PUBLIC_DATA_CACHE_TTL_HOURS": "24",
       },
     },

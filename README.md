@@ -1,4 +1,4 @@
-# Calculadoras Brasil
+# Calcule Brasil
 
 Hub de calculadoras brasileiras para estimar custos do dia a dia. A aplicação usa React,
 TypeScript, TanStack Start e Cloudflare Workers.
@@ -53,7 +53,7 @@ O build gera:
 - `dist/client/sitemap.xml`: sitemap gerado da lista central em `src/lib/seo-pages.ts`.
 
 O alvo de produção é Cloudflare Workers. O ambiente `preview` usa o Worker
-`calculadoras-brasil-preview`; produção usa `calculadoras-brasil`.
+`calcule-brasil-preview`; produção usa `calcule-brasil`.
 
 `npm run preview` sobe uma prévia local do build para validação antes do deploy. O primeiro deploy
 remoto deve ser feito com `npm run deploy:preview`; use `npm run deploy` apenas após validar o
