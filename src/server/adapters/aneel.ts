@@ -32,6 +32,13 @@ interface EnergyTariffResult {
   notes: string;
 }
 
+interface EnergyDistributorOption {
+  uf: string;
+  distributor: string;
+  source: "ANEEL";
+  sourceUrl: string;
+}
+
 function scoreDistributor(agent: string, query: string, uf: string): number {
   const normalizedAgent = normalizeText(agent);
   const normalizedQuery = normalizeText(query);
@@ -45,11 +52,8 @@ function roundTariff(value: number): number {
   return Math.round(value * 100_000) / 100_000;
 }
 
-export async function fetchAneelTariff(
-  uf: string,
-  distributor: string,
-): Promise<EnergyTariffResult | null> {
-  const filters = JSON.stringify({
+function baseFilters() {
+  return {
     DscBaseTarifaria: "Tarifa de Aplicação",
     DscSubGrupo: "B1",
     DscModalidadeTarifaria: "Convencional",
@@ -58,7 +62,50 @@ export async function fetchAneelTariff(
     DscDetalhe: "Não se aplica",
     NomPostoTarifario: "Não se aplica",
     DscUnidadeTerciaria: "MWh",
+  };
+}
+
+export async function fetchAneelDistributors(uf: string): Promise<EnergyDistributorOption[]> {
+  const filters = JSON.stringify(baseFilters());
+  const url = new URL(API_URL);
+  url.searchParams.set("resource_id", RESOURCE_ID);
+  url.searchParams.set("limit", "5000");
+  url.searchParams.set("filters", filters);
+  url.searchParams.set("sort", "SigAgente asc");
+
+  const { bytes } = await fetchBounded(url, {
+    maxBytes: 2_000_000,
+    headers: { accept: "application/json", "user-agent": "CalculadorasBrasil/1.0" },
   });
+  const payload = JSON.parse(decodeUtf8(bytes)) as AneelResponse;
+  if (!payload.success || !payload.result?.records) {
+    throw new Error("A API de dados abertos da ANEEL retornou uma resposta inválida.");
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const names = new Set<string>();
+
+  for (const record of payload.result.records) {
+    if (record.DatInicioVigencia <= today && record.DatFimVigencia >= today) {
+      names.add(record.SigAgente);
+    }
+  }
+
+  return [...names]
+    .sort((a, b) => a.localeCompare(b, "pt-BR"))
+    .map((distributor) => ({
+      uf,
+      distributor,
+      source: "ANEEL",
+      sourceUrl: url.toString(),
+    }));
+}
+
+export async function fetchAneelTariff(
+  uf: string,
+  distributor: string,
+): Promise<EnergyTariffResult | null> {
+  const filters = JSON.stringify(baseFilters());
   const url = new URL(API_URL);
   url.searchParams.set("resource_id", RESOURCE_ID);
   url.searchParams.set("limit", "100");

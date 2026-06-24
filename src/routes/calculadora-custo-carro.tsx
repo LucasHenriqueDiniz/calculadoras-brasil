@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
 import {
@@ -28,6 +28,7 @@ import { getFuelPrice } from "@/lib/public-data/client";
 import { BRAZILIAN_STATES } from "@/lib/public-data/states";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
+import { usePersistedState } from "@/lib/usePersistedState";
 
 const meta = getCalculator("custo-carro")!;
 const PAGE_TITLE = "Calculadora de Custo de Carro no Brasil";
@@ -83,6 +84,44 @@ const FUEL_REQUESTS: Array<{
   { key: "ethanolPrice", apiFuel: "etanol" },
   { key: "dieselPrice", apiFuel: "diesel" },
 ];
+
+const FUEL_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
+type FuelRequest = (typeof FUEL_REQUESTS)[number];
+type CachedFuelPrice = {
+  averagePrice: number;
+  field: Omit<PublicFieldState, "isLoading">;
+  cachedAt: number;
+};
+
+function fuelRequestsFor(type: FuelType): FuelRequest[] {
+  if (type === "flex") return FUEL_REQUESTS.filter(({ key }) => key !== "dieselPrice");
+  if (type === "ethanol") return FUEL_REQUESTS.filter(({ key }) => key === "ethanolPrice");
+  if (type === "diesel") return FUEL_REQUESTS.filter(({ key }) => key === "dieselPrice");
+  return FUEL_REQUESTS.filter(({ key }) => key === "gasolinePrice");
+}
+
+function readFuelCache(uf: string, fuel: string): CachedFuelPrice | null {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const raw = window.localStorage.getItem(`calculadoras-brasil:anp:${uf}:${fuel}`);
+    if (!raw) return null;
+    const cached = JSON.parse(raw) as CachedFuelPrice;
+    if (Date.now() - cached.cachedAt > FUEL_CACHE_TTL_MS) return null;
+    return cached;
+  } catch {
+    return null;
+  }
+}
+
+function writeFuelCache(uf: string, fuel: string, value: CachedFuelPrice) {
+  try {
+    window.localStorage.setItem(`calculadoras-brasil:anp:${uf}:${fuel}`, JSON.stringify(value));
+  } catch {
+    /* localStorage may be unavailable */
+  }
+}
 
 const FAQ: FAQItem[] = [
   {
@@ -140,14 +179,18 @@ export const Route = createFileRoute("/calculadora-custo-carro")({
 });
 
 function CarCostPage() {
-  const [input, setInput] = useState<CarCostInput>(DEFAULTS);
-  const [uf, setUf] = useState("SP");
+  const [input, setInput] = usePersistedState<CarCostInput>(
+    "calculadoras-brasil:custo-carro:input:v1",
+    DEFAULTS,
+  );
+  const [uf, setUf] = usePersistedState("calculadoras-brasil:custo-carro:uf:v1", "SP");
   const [fuelFields, setFuelFields] = useState<Record<FuelPriceKey, PublicFieldState>>({
     gasolinePrice: { ...EMPTY_PUBLIC_FIELD },
     ethanolPrice: { ...EMPTY_PUBLIC_FIELD },
     dieselPrice: { ...EMPTY_PUBLIC_FIELD },
   });
   const result = useMemo(() => calculateCarCost(input), [input]);
+  const activeFuelRequests = useMemo(() => fuelRequestsFor(input.fuelType), [input.fuelType]);
 
   function update<K extends keyof CarCostInput>(key: K, value: CarCostInput[K]) {
     setInput((prev) => ({ ...prev, [key]: value }));
@@ -166,16 +209,33 @@ function CarCostPage() {
     }));
   }
 
-  async function loadFuelPrices() {
-    setFuelFields(
-      (prev) =>
-        Object.fromEntries(
-          FUEL_REQUESTS.map(({ key }) => [key, { ...prev[key], isLoading: true, error: null }]),
-        ) as Record<FuelPriceKey, PublicFieldState>,
-    );
+  async function loadFuelPrices(requests = activeFuelRequests) {
+    const cachedRequests = requests.filter(({ key, apiFuel }) => {
+      const cached = readFuelCache(uf, apiFuel);
+      if (!cached) return true;
+
+      update(key, cached.averagePrice);
+      setFuelFields((prev) => ({
+        ...prev,
+        [key]: {
+          ...cached.field,
+          isLoading: false,
+        },
+      }));
+      return false;
+    });
+
+    if (cachedRequests.length === 0) return;
+
+    setFuelFields((prev) => ({
+      ...prev,
+      ...Object.fromEntries(
+        cachedRequests.map(({ key }) => [key, { ...prev[key], isLoading: true, error: null }]),
+      ),
+    }));
 
     await Promise.all(
-      FUEL_REQUESTS.map(async ({ key, apiFuel }) => {
+      cachedRequests.map(async ({ key, apiFuel }) => {
         try {
           const data = await getFuelPrice(uf, apiFuel);
           if (!data.available) {
@@ -199,17 +259,25 @@ function CarCostPage() {
           }
 
           update(key, data.averagePrice);
+          const nextField: Omit<PublicFieldState, "isLoading"> = {
+            isManual: false,
+            sourceName: data.source,
+            sourceLastUpdated: data.lastUpdated,
+            sourceUrl: data.sourceUrl,
+            sourcePeriod: data.period,
+            isStale: data.isStale,
+            error: null,
+          };
+          writeFuelCache(uf, apiFuel, {
+            averagePrice: data.averagePrice,
+            field: nextField,
+            cachedAt: Date.now(),
+          });
           setFuelFields((prev) => ({
             ...prev,
             [key]: {
+              ...nextField,
               isLoading: false,
-              isManual: false,
-              sourceName: data.source,
-              sourceLastUpdated: data.lastUpdated,
-              sourceUrl: data.sourceUrl,
-              sourcePeriod: data.period,
-              isStale: data.isStale,
-              error: null,
             },
           }));
         } catch {
@@ -236,6 +304,11 @@ function CarCostPage() {
       dieselPrice: { ...EMPTY_PUBLIC_FIELD },
     });
   }
+
+  useEffect(() => {
+    void loadFuelPrices(activeFuelRequests);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uf, input.fuelType]);
 
   const shareText = `Custo mensal estimado do carro: ${formatBRL(result.monthlyTotal)} (anual: ${formatBRL(result.annualTotal)})${
     result.costPerKm !== null ? ` — ${formatBRL(result.costPerKm)}/km` : ""
@@ -286,13 +359,13 @@ function CarCostPage() {
         <Button
           type="button"
           variant="outline"
-          onClick={loadFuelPrices}
-          disabled={FUEL_REQUESTS.some(({ key }) => fuelFields[key].isLoading)}
+          onClick={() => loadFuelPrices(activeFuelRequests)}
+          disabled={activeFuelRequests.some(({ key }) => fuelFields[key].isLoading)}
         >
-          {FUEL_REQUESTS.some(({ key }) => fuelFields[key].isLoading) ? (
+          {activeFuelRequests.some(({ key }) => fuelFields[key].isLoading) ? (
             <LoaderCircle className="animate-spin" />
           ) : null}
-          Tentar carregar preços da ANP
+          Atualizar preço da ANP
         </Button>
         <SelectField
           label="Tipo de combustível"
@@ -305,27 +378,33 @@ function CarCostPage() {
             { value: "flex", label: "Flex automático (compara gasolina x etanol)" },
           ]}
         />
-        <PublicDataField
-          label="Preço da gasolina por litro"
-          value={input.gasolinePrice}
-          onManualChange={(value) => updateFuelManually("gasolinePrice", value)}
-          {...fuelFields.gasolinePrice}
-          helperText="Valor em R$/litro; você pode editar mesmo após carregar."
-        />
-        <PublicDataField
-          label="Preço do etanol por litro"
-          value={input.ethanolPrice}
-          onManualChange={(value) => updateFuelManually("ethanolPrice", value)}
-          {...fuelFields.ethanolPrice}
-          helperText="Valor em R$/litro; você pode editar mesmo após carregar."
-        />
-        <PublicDataField
-          label="Preço do diesel por litro"
-          value={input.dieselPrice}
-          onManualChange={(value) => updateFuelManually("dieselPrice", value)}
-          {...fuelFields.dieselPrice}
-          helperText="Valor em R$/litro; você pode editar mesmo após carregar."
-        />
+        {activeFuelRequests.some(({ key }) => key === "gasolinePrice") ? (
+          <PublicDataField
+            label="Preço da gasolina por litro"
+            value={input.gasolinePrice}
+            onManualChange={(value) => updateFuelManually("gasolinePrice", value)}
+            {...fuelFields.gasolinePrice}
+            helperText="Valor em R$/litro; você pode editar mesmo após carregar."
+          />
+        ) : null}
+        {activeFuelRequests.some(({ key }) => key === "ethanolPrice") ? (
+          <PublicDataField
+            label="Preço do etanol por litro"
+            value={input.ethanolPrice}
+            onManualChange={(value) => updateFuelManually("ethanolPrice", value)}
+            {...fuelFields.ethanolPrice}
+            helperText="Valor em R$/litro; você pode editar mesmo após carregar."
+          />
+        ) : null}
+        {activeFuelRequests.some(({ key }) => key === "dieselPrice") ? (
+          <PublicDataField
+            label="Preço do diesel por litro"
+            value={input.dieselPrice}
+            onManualChange={(value) => updateFuelManually("dieselPrice", value)}
+            {...fuelFields.dieselPrice}
+            helperText="Valor em R$/litro; você pode editar mesmo após carregar."
+          />
+        ) : null}
       </FormSection>
 
       <FormSection title="Custos do veículo">

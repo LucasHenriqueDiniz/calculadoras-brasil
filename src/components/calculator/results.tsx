@@ -20,13 +20,15 @@ export function ResultSummaryCard({
       ? "bg-primary text-primary-foreground border-transparent"
       : "bg-surface text-foreground border-border";
   return (
-    <div className={`rounded-xl border p-4 shadow-sm ${base}`}>
+    <div className={`min-w-0 rounded-xl border p-4 shadow-sm ${base}`}>
       <p
         className={`text-xs font-medium uppercase tracking-wide ${tone === "primary" ? "text-primary-foreground/80" : "text-muted-foreground"}`}
       >
         {title}
       </p>
-      <p className="mt-1 font-display text-2xl">{value}</p>
+      <p className="mt-1 break-words font-display text-[clamp(1.25rem,5vw,1.5rem)] leading-tight [overflow-wrap:anywhere]">
+        {value}
+      </p>
       {description ? (
         <p
           className={`mt-1 text-xs ${tone === "primary" ? "text-primary-foreground/80" : "text-muted-foreground"}`}

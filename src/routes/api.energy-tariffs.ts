@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { fetchAneelTariff } from "@/server/adapters/aneel";
+import { fetchAneelDistributors, fetchAneelTariff } from "@/server/adapters/aneel";
 import { respondWithEdgeCache } from "@/server/edge-cache";
 import { unavailable, json } from "@/server/responses";
 import { readText, readUf } from "@/server/validation";
@@ -19,15 +19,19 @@ export const Route = createFileRoute("/api/energy-tariffs")({
           );
         }
 
-        if (!distributor) {
-          return unavailable(
-            "ANEEL",
-            "Informe a distribuidora como aparece na fatura para consultar a tarifa residencial.",
-          );
-        }
-
         return respondWithEdgeCache(request, async () => {
           try {
+            if (!distributor) {
+              const distributors = await fetchAneelDistributors(uf);
+              return json(
+                { available: true, source: "ANEEL", distributors },
+                {
+                  cacheControl:
+                    "public, max-age=0, s-maxage=604800, stale-while-revalidate=2592000",
+                },
+              );
+            }
+
             const result = await fetchAneelTariff(uf, distributor);
             if (!result) {
               return unavailable(

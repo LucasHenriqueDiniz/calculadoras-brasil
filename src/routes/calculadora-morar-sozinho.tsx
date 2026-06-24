@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
 import { CurrencyInput } from "@/components/calculator/fields";
 import {
@@ -18,6 +18,7 @@ import { formatBRL } from "@/lib/format";
 import { calculateLivingAloneCost, type LivingAloneInput } from "@/lib/calculators/livingAlone";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
+import { usePersistedState } from "@/lib/usePersistedState";
 
 const meta = getCalculator("morar-sozinho")!;
 const PAGE_TITLE = "Calculadora de Custo para Morar Sozinho";
@@ -111,7 +112,10 @@ const STATUS_TONE: Record<string, "primary" | "neutral"> = {
 };
 
 function LivingAlonePage() {
-  const [input, setInput] = useState<LivingAloneInput>(DEFAULTS);
+  const [input, setInput] = usePersistedState<LivingAloneInput>(
+    "calculadoras-brasil:morar-sozinho:v1",
+    DEFAULTS,
+  );
   const result = useMemo(() => calculateLivingAloneCost(input), [input]);
 
   function update<K extends keyof LivingAloneInput>(key: K, value: LivingAloneInput[K]) {

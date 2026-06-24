@@ -39,4 +39,11 @@ export interface EnergyTariffData {
   notes?: string;
 }
 
+export interface EnergyDistributorOption {
+  uf: string;
+  distributor: string;
+  source: "ANEEL";
+  sourceUrl: string;
+}
+
 export type PublicDataResult<T> = T | PublicDataUnavailable;

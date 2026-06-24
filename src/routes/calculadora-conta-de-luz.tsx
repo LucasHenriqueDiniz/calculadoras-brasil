@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LoaderCircle, Plus, Trash2 } from "lucide-react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
+import { SearchableSelectField } from "@/components/calculator/SearchableSelectField";
 import { NumberInput, SelectField } from "@/components/calculator/fields";
 import {
   DisclaimerBox,
@@ -25,10 +26,12 @@ import {
   calculateElectricityBill,
   type ApplianceInput,
 } from "@/lib/calculators/electricityBill";
-import { getEnergyTariff } from "@/lib/public-data/client";
+import { getEnergyDistributors, getEnergyTariff } from "@/lib/public-data/client";
+import type { EnergyDistributorOption } from "@/lib/public-data/types";
 import { BRAZILIAN_STATES } from "@/lib/public-data/states";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
+import { usePersistedState } from "@/lib/usePersistedState";
 
 const meta = getCalculator("conta-de-luz")!;
 const PAGE_TITLE = "Calculadora de conta de luz por aparelho";
@@ -129,11 +132,22 @@ export const Route = createFileRoute("/calculadora-conta-de-luz")({
 });
 
 function ElectricityPage() {
-  const [tariff, setTariff] = useState<number>(DEFAULT_TARIFF);
-  const [appliances, setAppliances] = useState<ApplianceInput[]>(DEFAULT_APPLIANCES);
+  const [tariff, setTariff] = usePersistedState<number>(
+    "calculadoras-brasil:conta-luz:tariff:v1",
+    DEFAULT_TARIFF,
+  );
+  const [appliances, setAppliances] = usePersistedState<ApplianceInput[]>(
+    "calculadoras-brasil:conta-luz:appliances:v1",
+    DEFAULT_APPLIANCES,
+  );
   const [presetValue, setPresetValue] = useState<string>("");
-  const [uf, setUf] = useState("SP");
-  const [distributor, setDistributor] = useState("");
+  const [uf, setUf] = usePersistedState("calculadoras-brasil:conta-luz:uf:v1", "SP");
+  const [distributor, setDistributor] = usePersistedState(
+    "calculadoras-brasil:conta-luz:distributor:v1",
+    "",
+  );
+  const [distributors, setDistributors] = useState<EnergyDistributorOption[]>([]);
+  const [isLoadingDistributors, setIsLoadingDistributors] = useState(false);
   const [tariffState, setTariffState] = useState<PublicFieldState>({
     isLoading: false,
     isManual: true,
@@ -188,6 +202,12 @@ function ElectricityPage() {
     setTariffState({ isLoading: false, isManual: true, isStale: false });
   }
 
+  function updateUf(value: string) {
+    setUf(value);
+    setDistributor("");
+    setTariffState({ isLoading: false, isManual: true, isStale: false });
+  }
+
   function updateTariffManually(value: string) {
     setTariff(parseBRNumber(value));
     setTariffState((prev) => ({
@@ -199,6 +219,7 @@ function ElectricityPage() {
   }
 
   async function loadEnergyTariff() {
+    if (!distributor.trim()) return;
     setTariffState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
@@ -238,6 +259,29 @@ function ElectricityPage() {
     }
   }
 
+  useEffect(() => {
+    const controller = new AbortController();
+    setIsLoadingDistributors(true);
+    getEnergyDistributors(uf, controller.signal)
+      .then((data) => {
+        setDistributors(data.available ? data.distributors : []);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setDistributors([]);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsLoadingDistributors(false);
+      });
+
+    return () => controller.abort();
+  }, [uf]);
+
+  useEffect(() => {
+    if (!distributor.trim()) return;
+    void loadEnergyTariff();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [distributor]);
+
   const chartRows: BreakdownRow[] = result.appliances.map((a) => ({
     key: a.id,
     label: a.name,
@@ -253,21 +297,24 @@ function ElectricityPage() {
         <SelectField
           label="Estado da unidade consumidora"
           value={uf}
-          onChange={setUf}
+          onChange={updateUf}
           options={[...BRAZILIAN_STATES]}
         />
-        <div className="space-y-1.5">
-          <Label htmlFor="energy-distributor">Distribuidora</Label>
-          <Input
-            id="energy-distributor"
-            value={distributor}
-            onChange={(event) => setDistributor(event.target.value)}
-            placeholder="Ex.: Enel, Neoenergia, CPFL"
-          />
-          <p className="text-xs text-muted-foreground">
-            Informe a sigla como aparece na fatura, por exemplo ENEL CE, CEMIG-D ou COPEL-DIS.
-          </p>
-        </div>
+        <SearchableSelectField
+          label="Distribuidora"
+          value={distributor}
+          onChange={setDistributor}
+          options={distributors.map((item) => ({
+            value: item.distributor,
+            label: item.distributor,
+            description: item.uf,
+          }))}
+          placeholder={isLoadingDistributors ? "Carregando distribuidoras..." : "Selecionar"}
+          searchPlaceholder="Buscar distribuidora..."
+          emptyText="Nenhuma distribuidora encontrada."
+          disabled={isLoadingDistributors}
+          hint="A lista vem da API pública da ANEEL. A UF selecionada é usada na consulta da tarifa."
+        />
         <Button
           type="button"
           variant="outline"
@@ -275,7 +322,7 @@ function ElectricityPage() {
           disabled={tariffState.isLoading || !distributor.trim()}
         >
           {tariffState.isLoading ? <LoaderCircle className="animate-spin" /> : null}
-          Tentar carregar tarifa da ANEEL
+          Atualizar tarifa da ANEEL
         </Button>
         <PublicDataField
           label="Tarifa em R$/kWh"

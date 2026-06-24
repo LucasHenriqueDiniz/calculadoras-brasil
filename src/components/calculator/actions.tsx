@@ -32,16 +32,9 @@ export function ShareResultButton({ title, text }: { title: string; text: string
       type="button"
       variant="outline"
       size="sm"
+      aria-label={`Copiar link de compartilhamento de ${title}`}
       onClick={async () => {
         const url = typeof window !== "undefined" ? window.location.href : "";
-        if (typeof navigator !== "undefined" && navigator.share) {
-          try {
-            await navigator.share({ title, text, url });
-            return;
-          } catch {
-            /* user cancelled */
-          }
-        }
         try {
           await navigator.clipboard.writeText(`${text} ${url}`.trim());
           setDone(true);
@@ -52,7 +45,7 @@ export function ShareResultButton({ title, text }: { title: string; text: string
       }}
     >
       <Share2 className="mr-1 h-4 w-4" />
-      {done ? "Link copiado" : "Compartilhar"}
+      {done ? "Link copiado" : "Copiar link"}
     </Button>
   );
 }

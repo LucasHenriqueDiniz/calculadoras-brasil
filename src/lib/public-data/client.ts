@@ -1,4 +1,9 @@
-import type { EnergyTariffData, FuelPriceData, PublicDataResult } from "./types";
+import type {
+  EnergyDistributorOption,
+  EnergyTariffData,
+  FuelPriceData,
+  PublicDataResult,
+} from "./types";
 
 async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(path, {
@@ -20,4 +25,14 @@ export function getEnergyTariff(uf: string, distributor?: string, signal?: Abort
   const params = new URLSearchParams({ uf });
   if (distributor) params.set("distributor", distributor);
   return getJson<PublicDataResult<EnergyTariffData>>(`/api/energy-tariffs?${params}`, signal);
+}
+
+export function getEnergyDistributors(uf: string, signal?: AbortSignal) {
+  const params = new URLSearchParams({ uf });
+  return getJson<{
+    available: boolean;
+    source: "ANEEL";
+    distributors: EnergyDistributorOption[];
+    error?: string;
+  }>(`/api/energy-tariffs?${params}`, signal);
 }
