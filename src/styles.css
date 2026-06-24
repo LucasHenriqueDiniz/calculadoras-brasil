@@ -61,6 +61,15 @@
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
 
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+  --color-chart-7: var(--chart-7);
+  --color-chart-8: var(--chart-8);
+
   --shadow-card: 0 1px 2px oklch(0 0 0 / 0.04), 0 4px 14px oklch(0 0 0 / 0.06);
   --shadow-card-hover: 0 2px 4px oklch(0 0 0 / 0.05), 0 12px 28px oklch(0 0 0 / 0.1);
   --shadow-panel: 0 1px 2px oklch(0 0 0 / 0.04), 0 10px 30px oklch(0.5 0.13 155 / 0.1);
@@ -104,6 +113,16 @@
   --border: oklch(0.9 0.015 95);
   --input: oklch(0.92 0.013 95);
   --ring: oklch(0.5 0.13 155);
+
+  /* Paleta de gráficos: verdes/teal da marca + dourado de apoio */
+  --chart-1: oklch(0.5 0.13 155);
+  --chart-2: oklch(0.62 0.12 175);
+  --chart-3: oklch(0.7 0.13 130);
+  --chart-4: oklch(0.7 0.13 75);
+  --chart-5: oklch(0.55 0.1 200);
+  --chart-6: oklch(0.45 0.09 160);
+  --chart-7: oklch(0.78 0.1 110);
+  --chart-8: oklch(0.6 0.06 160);
 }
 
 .dark {
@@ -133,6 +152,15 @@
   --border: oklch(1 0 0 / 0.1);
   --input: oklch(1 0 0 / 0.14);
   --ring: oklch(0.7 0.14 155);
+
+  --chart-1: oklch(0.72 0.14 155);
+  --chart-2: oklch(0.72 0.12 175);
+  --chart-3: oklch(0.78 0.13 130);
+  --chart-4: oklch(0.78 0.13 75);
+  --chart-5: oklch(0.7 0.1 200);
+  --chart-6: oklch(0.62 0.1 160);
+  --chart-7: oklch(0.82 0.1 110);
+  --chart-8: oklch(0.7 0.06 160);
 }
 
 @layer base {
