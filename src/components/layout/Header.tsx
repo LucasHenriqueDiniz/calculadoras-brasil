@@ -14,15 +14,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-surface/85 backdrop-blur supports-[backdrop-filter]:bg-surface/70">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link to="/" className="flex items-center gap-2" aria-label="Calculadoras Brasil — Início">
+        <Link to="/" className="flex items-center gap-2" aria-label="Calcule Brasil — Início">
           <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground">
             <Calculator className="h-5 w-5" aria-hidden />
           </span>
           <span className="flex flex-col leading-tight">
             <span className="font-display text-base font-semibold text-foreground">
-              Calculadoras Brasil
+              Calcule Brasil
             </span>
-            <span className="text-[11px] text-muted-foreground">Decisões do dia a dia</span>
+            <span className="text-[11px] text-muted-foreground">Custos do dia a dia</span>
           </span>
         </Link>
 

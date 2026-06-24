@@ -7,13 +7,13 @@ import { absoluteUrl } from "@/lib/site";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Calculadoras Brasil — Decisões do dia a dia" },
+      { title: "Calcule Brasil — Decisões do dia a dia" },
       {
         name: "description",
         content:
-          "Calculadoras simples e gratuitas para estimar custos do dia a dia no Brasil: carro, morar sozinho, conta de luz, assinaturas, mudança e pet.",
+          "Calculadoras simples para custos do dia a dia no Brasil: carro, morar sozinho, conta de luz, assinaturas, mudança e pet.",
       },
-      { property: "og:title", content: "Calculadoras Brasil — Decisões do dia a dia" },
+      { property: "og:title", content: "Calcule Brasil — Decisões do dia a dia" },
       {
         property: "og:description",
         content:

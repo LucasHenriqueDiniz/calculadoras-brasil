@@ -1,6 +1,6 @@
 export const SITE_REVIEW_DATE = "2026-06-23";
 export const SITE_REVIEW_DATE_LABEL = "23 de junho de 2026";
-export const EDITORIAL_RESPONSIBLE = "Calculadoras Brasil";
+export const EDITORIAL_RESPONSIBLE = "Calcule Brasil";
 
 export const SEO_PAGES = [
   { path: "/", changefreq: "weekly", priority: 1 },

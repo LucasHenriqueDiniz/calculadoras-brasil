@@ -5,13 +5,13 @@ import { absoluteUrl } from "@/lib/site";
 export const Route = createFileRoute("/termos")({
   head: () => ({
     meta: [
-      { title: "Termos de Uso — Calculadoras Brasil" },
+      { title: "Termos de Uso — Calcule Brasil" },
       {
         name: "description",
         content:
-          "Termos de uso do Calculadoras Brasil: conteúdo informativo, sem aconselhamento profissional, sem garantia de resultados.",
+          "Termos de uso do Calcule Brasil: conteúdo informativo, sem aconselhamento profissional, sem garantia de resultados.",
       },
-      { property: "og:title", content: "Termos de Uso — Calculadoras Brasil" },
+      { property: "og:title", content: "Termos de Uso — Calcule Brasil" },
       { property: "og:url", content: absoluteUrl("/termos") },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/termos") }],
@@ -30,7 +30,7 @@ function TermosPage() {
       <Prose>
         <h2>1. Natureza do serviço</h2>
         <p>
-          O Calculadoras Brasil disponibiliza calculadoras e conteúdos educacionais para apoiar
+          O Calcule Brasil disponibiliza calculadoras e conteúdos educacionais para apoiar
           decisões pessoais sobre orçamento. As ferramentas são oferecidas “como estão”, sem
           garantia de exatidão para o seu caso específico.
         </p>
@@ -50,7 +50,7 @@ function TermosPage() {
 
         <h2>4. Propriedade intelectual</h2>
         <p>
-          Os textos, marcas e elementos visuais do site pertencem ao Calculadoras Brasil, salvo
+          Os textos, marcas e elementos visuais do site pertencem ao Calcule Brasil, salvo
           quando indicado. É permitido compartilhar links para as páginas. Reproduções integrais
           dependem de autorização.
         </p>

@@ -7,10 +7,10 @@ export function Footer() {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-4">
         <div className="md:col-span-2">
           <p className="font-display text-base font-semibold text-foreground">
-            Calculadoras Brasil
+            Calcule Brasil
           </p>
           <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-            Calculadoras simples para decisões do dia a dia. Estimativas baseadas em médias públicas
+            Calculadoras simples para custos do dia a dia. Estimativas baseadas em médias públicas
             — sempre confira valores reais antes de tomar uma decisão.
           </p>
         </div>
@@ -106,7 +106,7 @@ export function Footer() {
       </div>
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>© {year} Calculadoras Brasil. Todos os direitos reservados.</p>
+          <p>© {year} Calcule Brasil. Todos os direitos reservados.</p>
           <p>
             Conteúdo informativo. Não constitui aconselhamento financeiro, jurídico ou veterinário.
           </p>

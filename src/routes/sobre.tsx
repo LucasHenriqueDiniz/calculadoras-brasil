@@ -5,13 +5,13 @@ import { absoluteUrl } from "@/lib/site";
 export const Route = createFileRoute("/sobre")({
   head: () => ({
     meta: [
-      { title: "Sobre — Calculadoras Brasil" },
+      { title: "Sobre — Calcule Brasil" },
       {
         name: "description",
         content:
-          "Conheça o Calculadoras Brasil: um hub independente de calculadoras para decisões cotidianas de orçamento no Brasil.",
+          "Conheça o Calcule Brasil: um hub independente de calculadoras para decisões cotidianas de orçamento no Brasil.",
       },
-      { property: "og:title", content: "Sobre — Calculadoras Brasil" },
+      { property: "og:title", content: "Sobre — Calcule Brasil" },
       {
         property: "og:description",
         content: "Hub independente de calculadoras para o dia a dia brasileiro.",
@@ -33,7 +33,7 @@ function SobrePage() {
       />
       <Prose>
         <p>
-          O <strong>Calculadoras Brasil</strong> nasceu da percepção de que muita gente toma
+          O <strong>Calcule Brasil</strong> nasceu da percepção de que muita gente toma
           decisões importantes — trocar de carro, sair da casa dos pais, adotar um pet, contratar
           mais um streaming — sem fazer a conta completa. O resultado costuma ser o mesmo: o
           orçamento aperta no terceiro mês.

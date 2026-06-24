@@ -56,7 +56,7 @@ const FAQ: FAQItem[] = [
 export const Route = createFileRoute("/calculadora-custo-mudanca")({
   head: () => ({
     meta: [
-      { title: `${PAGE_TITLE} — Calculadoras Brasil` },
+      { title: `${PAGE_TITLE} — Calcule Brasil` },
       { name: "description", content: DESCRIPTION },
       { property: "og:title", content: PAGE_TITLE },
       { property: "og:description", content: DESCRIPTION },
