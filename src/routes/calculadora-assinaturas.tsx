@@ -224,7 +224,7 @@ function SubscriptionsPage() {
           title="Custo mensal por assinatura"
         />
       </section>
-      <Prose>
+      <Prose collapsibleTitle="Saiba mais sobre assinaturas">
         <h2>Por que acompanhar assinaturas?</h2>
         <p>
           Débitos recorrentes pequenos podem passar despercebidos. A projeção anual e de cinco anos

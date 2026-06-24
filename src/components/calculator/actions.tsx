@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { Check, Copy, RotateCcw, Share2 } from "lucide-react";
+import { Check, Copy, Link2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+const DONE_CLASS = "border-success/40 bg-success/10 text-success hover:bg-success/15";
 
 export function CopyResultButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -9,6 +12,7 @@ export function CopyResultButton({ text }: { text: string }) {
       type="button"
       variant="outline"
       size="sm"
+      className={cn("transition-colors", copied && DONE_CLASS)}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(text);
@@ -19,7 +23,7 @@ export function CopyResultButton({ text }: { text: string }) {
         }
       }}
     >
-      {copied ? <Check className="mr-1 h-4 w-4" /> : <Copy className="mr-1 h-4 w-4" />}
+      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
       {copied ? "Copiado" : "Copiar resultado"}
     </Button>
   );
@@ -32,6 +36,7 @@ export function ShareResultButton({ title, text }: { title: string; text: string
       type="button"
       variant="outline"
       size="sm"
+      className={cn("transition-colors", done && DONE_CLASS)}
       aria-label={`Copiar link de compartilhamento de ${title}`}
       onClick={async () => {
         const url = typeof window !== "undefined" ? window.location.href : "";
@@ -44,7 +49,7 @@ export function ShareResultButton({ title, text }: { title: string; text: string
         }
       }}
     >
-      <Share2 className="mr-1 h-4 w-4" />
+      {done ? <Check className="h-4 w-4" /> : <Link2 className="h-4 w-4" />}
       {done ? "Link copiado" : "Copiar link"}
     </Button>
   );
@@ -52,8 +57,14 @@ export function ShareResultButton({ title, text }: { title: string; text: string
 
 export function ResetButton({ onReset }: { onReset: () => void }) {
   return (
-    <Button type="button" variant="ghost" size="sm" onClick={onReset}>
-      <RotateCcw className="mr-1 h-4 w-4" /> Restaurar valores padrão
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      className="text-muted-foreground hover:text-foreground"
+      onClick={onReset}
+    >
+      <RotateCcw className="h-4 w-4" /> Restaurar valores padrão
     </Button>
   );
 }

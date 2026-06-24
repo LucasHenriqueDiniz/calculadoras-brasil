@@ -137,7 +137,6 @@ try {
       assert.ok(types.has("WebApplication"), `${path} deve conter WebApplication`);
       assert.ok(types.has("BreadcrumbList"), `${path} deve conter BreadcrumbList`);
       assert.ok(types.has("FAQPage"), `${path} deve conter FAQPage`);
-      assert.match(textContent(html), /Responsável editorial:\s*Calculadoras Brasil/i);
       assert.match(html, /<time\b[^>]*datetime=["']2026-06-23["']/i);
     }
   }

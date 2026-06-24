@@ -308,7 +308,7 @@ function LivingAlonePage() {
         </div>
       </section>
 
-      <Prose>
+      <Prose collapsibleTitle="Saiba mais sobre morar sozinho">
         <h2>O que considerar antes de morar sozinho?</h2>
         <p>
           Morar sozinho envolve muito mais do que o valor do aluguel. Para ter uma estimativa

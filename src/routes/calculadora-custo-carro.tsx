@@ -539,7 +539,7 @@ function CarCostPage() {
         </div>
       </section>
 
-      <Prose>
+      <Prose collapsibleTitle="Saiba mais sobre o custo de um carro">
         <h2>O que entra no custo mensal de um carro?</h2>
         <p>
           Ter carro envolve muito mais do que abastecer. O custo mensal real inclui combustível,

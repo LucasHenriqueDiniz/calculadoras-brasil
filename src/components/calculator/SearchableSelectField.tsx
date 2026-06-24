@@ -57,9 +57,11 @@ export function SearchableSelectField({
             role="combobox"
             aria-expanded={open}
             disabled={disabled}
-            className="h-10 w-full justify-between font-normal"
+            className="h-11 w-full justify-between bg-background font-normal transition-shadow focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
           >
-            <span className="truncate">{selected?.label ?? placeholder}</span>
+            <span className={`truncate ${selected ? "text-foreground" : "text-muted-foreground"}`}>
+              {selected?.label ?? placeholder}
+            </span>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>

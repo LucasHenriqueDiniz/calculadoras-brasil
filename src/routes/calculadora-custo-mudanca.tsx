@@ -134,7 +134,7 @@ function MovingPage() {
           <BreakdownTable rows={result.breakdown} caption="Custos da mudança" />
         </div>
       </section>
-      <Prose>
+      <Prose collapsibleTitle="Saiba mais sobre o custo de mudança">
         <h2>O que considerar em uma mudança</h2>
         <p>
           Além do caminhão, considere embalagem, desmontagem, taxas de acesso, limpeza, caução,
