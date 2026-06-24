@@ -290,12 +290,7 @@ export function SimpleBarChart({ rows, title }: { rows: BreakdownRow[]; title: s
         <p className="text-sm text-muted-foreground">Sem valores para exibir.</p>
       ) : (
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
-          <Donut
-            segments={segments}
-            total={total}
-            activeKey={activeKey}
-            onHover={setActiveKey}
-          />
+          <Donut segments={segments} total={total} activeKey={activeKey} onHover={setActiveKey} />
           <ul className="w-full min-w-0 flex-1 space-y-1" aria-label={title}>
             {segments.map((item) => {
               const share = total > 0 ? (item.value / total) * 100 : 0;
@@ -316,7 +311,9 @@ export function SimpleBarChart({ rows, title }: { rows: BreakdownRow[]; title: s
                       className="h-3 w-3 shrink-0 rounded-[4px] ring-2 ring-transparent transition-[box-shadow]"
                       style={{
                         backgroundColor: item.color,
-                        boxShadow: isActive ? `0 0 0 3px color-mix(in oklab, ${item.color} 30%, transparent)` : undefined,
+                        boxShadow: isActive
+                          ? `0 0 0 3px color-mix(in oklab, ${item.color} 30%, transparent)`
+                          : undefined,
                       }}
                       aria-hidden
                     />

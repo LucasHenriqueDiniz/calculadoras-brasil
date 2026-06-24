@@ -67,7 +67,9 @@ export function Prose({ children, collapsibleTitle }: ProseProps) {
               +
             </span>
           </summary>
-          <div className={`border-t border-border/70 px-5 py-5 ${PROSE_TYPOGRAPHY}`}>{children}</div>
+          <div className={`border-t border-border/70 px-5 py-5 ${PROSE_TYPOGRAPHY}`}>
+            {children}
+          </div>
         </details>
       </div>
     );
