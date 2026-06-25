@@ -23,6 +23,7 @@ import { Route as CalculadoraCustoCarroRouteImport } from './routes/calculadora-
 import { Route as CalculadoraContaDeLuzRouteImport } from './routes/calculadora-conta-de-luz'
 import { Route as CalculadoraAssinaturasRouteImport } from './routes/calculadora-assinaturas'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CompararIndexRouteImport } from './routes/comparar/index'
 import { Route as CompararStreamingRouteImport } from './routes/comparar/streaming'
 import { Route as CompararMudancaRouteImport } from './routes/comparar/mudanca'
 import { Route as CompararEnergiaRouteImport } from './routes/comparar/energia'
@@ -109,6 +110,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const CompararIndexRoute = CompararIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CompararRoute,
 } as any)
 const CompararStreamingRoute = CompararStreamingRouteImport.update({
   id: '/streaming',
@@ -222,6 +228,7 @@ export interface FileRoutesByFullPath {
   '/comparar/energia': typeof CompararEnergiaRoute
   '/comparar/mudanca': typeof CompararMudancaRoute
   '/comparar/streaming': typeof CompararStreamingRoute
+  '/comparar/': typeof CompararIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
   '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
@@ -235,7 +242,6 @@ export interface FileRoutesByTo {
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
   '/calculadoras': typeof CalculadorasRoute
-  '/comparar': typeof CompararRouteWithChildren
   '/contato': typeof ContatoRoute
   '/metodologia': typeof MetodologiaRoute
   '/privacidade': typeof PrivacidadeRoute
@@ -254,6 +260,7 @@ export interface FileRoutesByTo {
   '/comparar/energia': typeof CompararEnergiaRoute
   '/comparar/mudanca': typeof CompararMudancaRoute
   '/comparar/streaming': typeof CompararStreamingRoute
+  '/comparar': typeof CompararIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
   '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
@@ -287,6 +294,7 @@ export interface FileRoutesById {
   '/comparar/energia': typeof CompararEnergiaRoute
   '/comparar/mudanca': typeof CompararMudancaRoute
   '/comparar/streaming': typeof CompararStreamingRoute
+  '/comparar/': typeof CompararIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
   '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
@@ -321,6 +329,7 @@ export interface FileRouteTypes {
     | '/comparar/energia'
     | '/comparar/mudanca'
     | '/comparar/streaming'
+    | '/comparar/'
     | '/api/locations/cities'
     | '/api/locations/states'
     | '/api/public-data/sources'
@@ -334,7 +343,6 @@ export interface FileRouteTypes {
     | '/calculadora-custo-pet'
     | '/calculadora-morar-sozinho'
     | '/calculadoras'
-    | '/comparar'
     | '/contato'
     | '/metodologia'
     | '/privacidade'
@@ -353,6 +361,7 @@ export interface FileRouteTypes {
     | '/comparar/energia'
     | '/comparar/mudanca'
     | '/comparar/streaming'
+    | '/comparar'
     | '/api/locations/cities'
     | '/api/locations/states'
     | '/api/public-data/sources'
@@ -385,6 +394,7 @@ export interface FileRouteTypes {
     | '/comparar/energia'
     | '/comparar/mudanca'
     | '/comparar/streaming'
+    | '/comparar/'
     | '/api/locations/cities'
     | '/api/locations/states'
     | '/api/public-data/sources'
@@ -519,6 +529,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comparar/': {
+      id: '/comparar/'
+      path: '/'
+      fullPath: '/comparar/'
+      preLoaderRoute: typeof CompararIndexRouteImport
+      parentRoute: typeof CompararRoute
+    }
     '/comparar/streaming': {
       id: '/comparar/streaming'
       path: '/streaming'
@@ -639,6 +656,7 @@ interface CompararRouteChildren {
   CompararEnergiaRoute: typeof CompararEnergiaRoute
   CompararMudancaRoute: typeof CompararMudancaRoute
   CompararStreamingRoute: typeof CompararStreamingRoute
+  CompararIndexRoute: typeof CompararIndexRoute
 }
 
 const CompararRouteChildren: CompararRouteChildren = {
@@ -646,6 +664,7 @@ const CompararRouteChildren: CompararRouteChildren = {
   CompararEnergiaRoute: CompararEnergiaRoute,
   CompararMudancaRoute: CompararMudancaRoute,
   CompararStreamingRoute: CompararStreamingRoute,
+  CompararIndexRoute: CompararIndexRoute,
 }
 
 const CompararRouteWithChildren = CompararRoute._addFileChildren(
