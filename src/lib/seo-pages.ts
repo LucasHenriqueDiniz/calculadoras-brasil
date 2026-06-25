@@ -11,6 +11,7 @@ export const SEO_PAGES = [
   { path: "/calculadora-custo-mudanca", changefreq: "monthly", priority: 0.9 },
   { path: "/calculadora-custo-pet", changefreq: "monthly", priority: 0.9 },
   { path: "/calculadora-irpf-2026", changefreq: "monthly", priority: 0.95 },
+  { path: "/calculadora-salario-liquido", changefreq: "monthly", priority: 0.95 },
   { path: "/blog/quanto-custa-ter-carro", changefreq: "monthly", priority: 0.8 },
   { path: "/blog/quanto-custa-morar-sozinho", changefreq: "monthly", priority: 0.8 },
   { path: "/blog/como-economizar-conta-de-luz", changefreq: "monthly", priority: 0.8 },

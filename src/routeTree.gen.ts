@@ -16,6 +16,7 @@ import { Route as MetodologiaRouteImport } from './routes/metodologia'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as CompararRouteImport } from './routes/comparar'
 import { Route as CalculadorasRouteImport } from './routes/calculadoras'
+import { Route as CalculadoraSalarioLiquidoRouteImport } from './routes/calculadora-salario-liquido'
 import { Route as CalculadoraMorarSozinhoRouteImport } from './routes/calculadora-morar-sozinho'
 import { Route as CalculadoraIrpf2026RouteImport } from './routes/calculadora-irpf-2026'
 import { Route as CalculadoraCustoPetRouteImport } from './routes/calculadora-custo-pet'
@@ -83,6 +84,12 @@ const CalculadorasRoute = CalculadorasRouteImport.update({
   path: '/calculadoras',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CalculadoraSalarioLiquidoRoute =
+  CalculadoraSalarioLiquidoRouteImport.update({
+    id: '/calculadora-salario-liquido',
+    path: '/calculadora-salario-liquido',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const CalculadoraMorarSozinhoRoute = CalculadoraMorarSozinhoRouteImport.update({
   id: '/calculadora-morar-sozinho',
   path: '/calculadora-morar-sozinho',
@@ -254,6 +261,7 @@ export interface FileRoutesByFullPath {
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
   '/calculadora-irpf-2026': typeof CalculadoraIrpf2026Route
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
+  '/calculadora-salario-liquido': typeof CalculadoraSalarioLiquidoRoute
   '/calculadoras': typeof CalculadorasRoute
   '/comparar': typeof CompararRouteWithChildren
   '/contato': typeof ContatoRoute
@@ -294,6 +302,7 @@ export interface FileRoutesByTo {
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
   '/calculadora-irpf-2026': typeof CalculadoraIrpf2026Route
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
+  '/calculadora-salario-liquido': typeof CalculadoraSalarioLiquidoRoute
   '/calculadoras': typeof CalculadorasRoute
   '/contato': typeof ContatoRoute
   '/metodologia': typeof MetodologiaRoute
@@ -334,6 +343,7 @@ export interface FileRoutesById {
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
   '/calculadora-irpf-2026': typeof CalculadoraIrpf2026Route
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
+  '/calculadora-salario-liquido': typeof CalculadoraSalarioLiquidoRoute
   '/calculadoras': typeof CalculadorasRoute
   '/comparar': typeof CompararRouteWithChildren
   '/contato': typeof ContatoRoute
@@ -376,6 +386,7 @@ export interface FileRouteTypes {
     | '/calculadora-custo-pet'
     | '/calculadora-irpf-2026'
     | '/calculadora-morar-sozinho'
+    | '/calculadora-salario-liquido'
     | '/calculadoras'
     | '/comparar'
     | '/contato'
@@ -416,6 +427,7 @@ export interface FileRouteTypes {
     | '/calculadora-custo-pet'
     | '/calculadora-irpf-2026'
     | '/calculadora-morar-sozinho'
+    | '/calculadora-salario-liquido'
     | '/calculadoras'
     | '/contato'
     | '/metodologia'
@@ -455,6 +467,7 @@ export interface FileRouteTypes {
     | '/calculadora-custo-pet'
     | '/calculadora-irpf-2026'
     | '/calculadora-morar-sozinho'
+    | '/calculadora-salario-liquido'
     | '/calculadoras'
     | '/comparar'
     | '/contato'
@@ -496,6 +509,7 @@ export interface RootRouteChildren {
   CalculadoraCustoPetRoute: typeof CalculadoraCustoPetRoute
   CalculadoraIrpf2026Route: typeof CalculadoraIrpf2026Route
   CalculadoraMorarSozinhoRoute: typeof CalculadoraMorarSozinhoRoute
+  CalculadoraSalarioLiquidoRoute: typeof CalculadoraSalarioLiquidoRoute
   CalculadorasRoute: typeof CalculadorasRoute
   CompararRoute: typeof CompararRouteWithChildren
   ContatoRoute: typeof ContatoRoute
@@ -572,6 +586,13 @@ declare module '@tanstack/react-router' {
       path: '/calculadoras'
       fullPath: '/calculadoras'
       preLoaderRoute: typeof CalculadorasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calculadora-salario-liquido': {
+      id: '/calculadora-salario-liquido'
+      path: '/calculadora-salario-liquido'
+      fullPath: '/calculadora-salario-liquido'
+      preLoaderRoute: typeof CalculadoraSalarioLiquidoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/calculadora-morar-sozinho': {
@@ -823,6 +844,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalculadoraCustoPetRoute: CalculadoraCustoPetRoute,
   CalculadoraIrpf2026Route: CalculadoraIrpf2026Route,
   CalculadoraMorarSozinhoRoute: CalculadoraMorarSozinhoRoute,
+  CalculadoraSalarioLiquidoRoute: CalculadoraSalarioLiquidoRoute,
   CalculadorasRoute: CalculadorasRoute,
   CompararRoute: CompararRouteWithChildren,
   ContatoRoute: ContatoRoute,

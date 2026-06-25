@@ -61,7 +61,12 @@ export interface CalculatorMeta {
     | "/calculadora-assinaturas"
     | "/calculadora-custo-mudanca"
     | "/calculadora-custo-pet"
-    | "/calculadora-irpf-2026";
+    | "/calculadora-irpf-2026"
+    | "/calculadora-salario-liquido"
+    | "/calculadora-inss-autonomo"
+    | "/calculadora-clt-vs-pj"
+    | "/calculadora-previdencia-complementar"
+    | "/calculadora-beneficios-fiscais";
   category: CalculatorCategoryId;
   title: string;
   shortTitle: string;
@@ -251,6 +256,131 @@ export const calculators: CalculatorMeta[] = [
       "Gastos anuais com educação e saúde",
       "Contribuição com previdência complementar",
       "Regime tributário (completo ou simplificado)",
+    ],
+  },
+  {
+    slug: "salario-liquido",
+    path: "/calculadora-salario-liquido",
+    category: "impostos",
+    title: "Calculadora de Salário Líquido",
+    shortTitle: "Salário Líquido",
+    tagline: "Descubra quanto você realmente recebe",
+    description:
+      "Converta seu salário bruto em líquido. Desconte IRPF, INSS, sindicato e veja quanto fica para você.",
+    icon: CreditCard,
+    intro:
+      "Salário bruto e salário líquido são bem diferentes. Seu empregador desconta automaticamente IRPF, INSS e sindicato. Esta calculadora mostra exatamente quanto você fica com seu ganho após todos os descontos.",
+    whatItDoes: [
+      "Calcula INSS automático conforme faixas salariais (7,7% a 14%).",
+      "Estima IRPF mensal com base em dependentes e deduções.",
+      "Inclui descontos com sindicato e vale transporte.",
+      "Mostra valor de benefícios não tributáveis (vale refeição).",
+      "Calcula alíquota efetiva e economia com dependentes.",
+    ],
+    inputs: [
+      "Salário bruto mensal",
+      "Número de dependentes",
+      "Gastos mensais com educação e saúde",
+      "Contribuição previdência complementar",
+      "Se tem vale refeição, transporte, sindicato",
+    ],
+  },
+  {
+    slug: "inss-autonomo",
+    path: "/calculadora-inss-autonomo",
+    category: "impostos",
+    title: "Calculadora INSS Autônomo",
+    shortTitle: "INSS Autônomo",
+    tagline: "Simule sua contribuição INSS como autônomo",
+    description:
+      "Calcule INSS para autônomo (20% ou 11% simplificado) e veja impacto na aposentadoria.",
+    icon: CreditCard,
+    intro:
+      "Autônomos pagam INSS diretamente. Podem escolher entre 20% de contribuinte individual ou 11% do regime simplificado. Esta calculadora mostra quanto você paga e o impacto na aposentadoria.",
+    whatItDoes: [
+      "Calcula INSS em ambos os regimes (20% vs 11%).",
+      "Estima benefício de aposentadoria futuro.",
+      "Mostra impacto de contribuições adicionais.",
+      "Compara os dois regimes lado a lado.",
+    ],
+    inputs: [
+      "Ganho mensal como autônomo",
+      "Régime preferido (20% ou 11%)",
+      "Tempo de contribuição planejado",
+    ],
+  },
+  {
+    slug: "clt-vs-pj",
+    path: "/calculadora-clt-vs-pj",
+    category: "impostos",
+    title: "Calculadora CLT vs PJ",
+    shortTitle: "CLT vs PJ",
+    tagline: "Compare ganho líquido: CLT vs PJ",
+    description:
+      "Descubra qual regime é mais vantajoso para você. Compare salário CLT com proposta PJ lado a lado.",
+    icon: CreditCard,
+    intro:
+      "Muitos têm oportunidade de virar PJ, mas qual é realmente mais vantajoso? Esta calculadora compara ganho líquido, benefícios e custos de ambos os regimes.",
+    whatItDoes: [
+      "Calcula salário líquido CLT com INSS, IRPF, benefícios.",
+      "Calcula ganho líquido PJ com impostos maiores.",
+      "Mostra quanto PJ precisa ganhar para igualar CLT.",
+      "Compara benefícios (FGTS, 13º, férias).",
+    ],
+    inputs: [
+      "Salário bruto CLT",
+      "Proposta de valor PJ",
+      "Número de dependentes",
+      "Despesas mensais estimadas PJ",
+    ],
+  },
+  {
+    slug: "previdencia-complementar",
+    path: "/calculadora-previdencia-complementar",
+    category: "impostos",
+    title: "Calculadora Previdência Complementar",
+    shortTitle: "Previdência Complementar",
+    tagline: "Simule economia tributária + aposentadoria",
+    description:
+      "Contribua para PGBL/VGBL, reduza IRPF agora e acumule para aposentadoria complementar.",
+    icon: CreditCard,
+    intro:
+      "Previdência complementar oferece duplo ganho: reduz seu IRPF hoje e constrói poupança para aposentadoria. Limite é até 13% da renda bruta. Simule seu caso.",
+    whatItDoes: [
+      "Calcula economia de IRPF mensal/anual.",
+      "Projeta valor acumulado em 10, 20, 30 anos.",
+      "Mostra impacto de diferentes taxas de retorno.",
+      "Compara contribuição regular vs eventual.",
+    ],
+    inputs: [
+      "Contribuição mensal planejada",
+      "Taxa de retorno estimada",
+      "Tempo até aposentadoria",
+      "Alíquota IRPF estimada",
+    ],
+  },
+  {
+    slug: "beneficios-fiscais",
+    path: "/calculadora-beneficios-fiscais",
+    category: "impostos",
+    title: "Calculadora Benefícios Fiscais",
+    shortTitle: "Benefícios Fiscais",
+    tagline: "Vale refeição, transporte e outros benefícios",
+    description:
+      "Simule economia com vale refeição e transporte. Veja impacto fiscal de benefícios não tributáveis.",
+    icon: CreditCard,
+    intro:
+      "Vale refeição e vale transporte são benefícios não tributáveis que reduzem seu IRPF. Esta calculadora mostra quanto você economiza em impostos com esses benefícios.",
+    whatItDoes: [
+      "Calcula economias com vale refeição/transporte.",
+      "Mostra impacto no salário líquido.",
+      "Compara com recebimento em dinheiro.",
+      "Projeta economia anual.",
+    ],
+    inputs: [
+      "Valor de vale refeição mensal",
+      "Valor de vale transporte mensal",
+      "Alíquota IRPF atual",
     ],
   },
 ];
