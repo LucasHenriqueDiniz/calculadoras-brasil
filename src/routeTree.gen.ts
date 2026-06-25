@@ -14,6 +14,7 @@ import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as MetodologiaRouteImport } from './routes/metodologia'
 import { Route as ContatoRouteImport } from './routes/contato'
+import { Route as CompararRouteImport } from './routes/comparar'
 import { Route as CalculadoraMorarSozinhoRouteImport } from './routes/calculadora-morar-sozinho'
 import { Route as CalculadoraCustoPetRouteImport } from './routes/calculadora-custo-pet'
 import { Route as CalculadoraCustoMudancaRouteImport } from './routes/calculadora-custo-mudanca'
@@ -21,6 +22,10 @@ import { Route as CalculadoraCustoCarroRouteImport } from './routes/calculadora-
 import { Route as CalculadoraContaDeLuzRouteImport } from './routes/calculadora-conta-de-luz'
 import { Route as CalculadoraAssinaturasRouteImport } from './routes/calculadora-assinaturas'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CompararStreamingRouteImport } from './routes/comparar/streaming'
+import { Route as CompararMudancaRouteImport } from './routes/comparar/mudanca'
+import { Route as CompararEnergiaRouteImport } from './routes/comparar/energia'
+import { Route as CompararAcademiaRouteImport } from './routes/comparar/academia'
 import { Route as BlogQuantoCustaTerCarroRouteImport } from './routes/blog/quanto-custa-ter-carro'
 import { Route as BlogQuantoCustaMorarSozinhoRouteImport } from './routes/blog/quanto-custa-morar-sozinho'
 import { Route as BlogCustoPetAnualRouteImport } from './routes/blog/custo-pet-anual'
@@ -59,6 +64,11 @@ const ContatoRoute = ContatoRouteImport.update({
   path: '/contato',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompararRoute = CompararRouteImport.update({
+  id: '/comparar',
+  path: '/comparar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CalculadoraMorarSozinhoRoute = CalculadoraMorarSozinhoRouteImport.update({
   id: '/calculadora-morar-sozinho',
   path: '/calculadora-morar-sozinho',
@@ -93,6 +103,26 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const CompararStreamingRoute = CompararStreamingRouteImport.update({
+  id: '/streaming',
+  path: '/streaming',
+  getParentRoute: () => CompararRoute,
+} as any)
+const CompararMudancaRoute = CompararMudancaRouteImport.update({
+  id: '/mudanca',
+  path: '/mudanca',
+  getParentRoute: () => CompararRoute,
+} as any)
+const CompararEnergiaRoute = CompararEnergiaRouteImport.update({
+  id: '/energia',
+  path: '/energia',
+  getParentRoute: () => CompararRoute,
+} as any)
+const CompararAcademiaRoute = CompararAcademiaRouteImport.update({
+  id: '/academia',
+  path: '/academia',
+  getParentRoute: () => CompararRoute,
 } as any)
 const BlogQuantoCustaTerCarroRoute = BlogQuantoCustaTerCarroRouteImport.update({
   id: '/blog/quanto-custa-ter-carro',
@@ -166,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/calculadora-custo-mudanca': typeof CalculadoraCustoMudancaRoute
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
+  '/comparar': typeof CompararRouteWithChildren
   '/contato': typeof ContatoRoute
   '/metodologia': typeof MetodologiaRoute
   '/privacidade': typeof PrivacidadeRoute
@@ -180,6 +211,10 @@ export interface FileRoutesByFullPath {
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
   '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
   '/blog/quanto-custa-ter-carro': typeof BlogQuantoCustaTerCarroRoute
+  '/comparar/academia': typeof CompararAcademiaRoute
+  '/comparar/energia': typeof CompararEnergiaRoute
+  '/comparar/mudanca': typeof CompararMudancaRoute
+  '/comparar/streaming': typeof CompararStreamingRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
   '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
@@ -192,6 +227,7 @@ export interface FileRoutesByTo {
   '/calculadora-custo-mudanca': typeof CalculadoraCustoMudancaRoute
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
+  '/comparar': typeof CompararRouteWithChildren
   '/contato': typeof ContatoRoute
   '/metodologia': typeof MetodologiaRoute
   '/privacidade': typeof PrivacidadeRoute
@@ -206,6 +242,10 @@ export interface FileRoutesByTo {
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
   '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
   '/blog/quanto-custa-ter-carro': typeof BlogQuantoCustaTerCarroRoute
+  '/comparar/academia': typeof CompararAcademiaRoute
+  '/comparar/energia': typeof CompararEnergiaRoute
+  '/comparar/mudanca': typeof CompararMudancaRoute
+  '/comparar/streaming': typeof CompararStreamingRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
   '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
@@ -219,6 +259,7 @@ export interface FileRoutesById {
   '/calculadora-custo-mudanca': typeof CalculadoraCustoMudancaRoute
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
+  '/comparar': typeof CompararRouteWithChildren
   '/contato': typeof ContatoRoute
   '/metodologia': typeof MetodologiaRoute
   '/privacidade': typeof PrivacidadeRoute
@@ -233,6 +274,10 @@ export interface FileRoutesById {
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
   '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
   '/blog/quanto-custa-ter-carro': typeof BlogQuantoCustaTerCarroRoute
+  '/comparar/academia': typeof CompararAcademiaRoute
+  '/comparar/energia': typeof CompararEnergiaRoute
+  '/comparar/mudanca': typeof CompararMudancaRoute
+  '/comparar/streaming': typeof CompararStreamingRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
   '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
@@ -247,6 +292,7 @@ export interface FileRouteTypes {
     | '/calculadora-custo-mudanca'
     | '/calculadora-custo-pet'
     | '/calculadora-morar-sozinho'
+    | '/comparar'
     | '/contato'
     | '/metodologia'
     | '/privacidade'
@@ -261,6 +307,10 @@ export interface FileRouteTypes {
     | '/blog/custo-pet-anual'
     | '/blog/quanto-custa-morar-sozinho'
     | '/blog/quanto-custa-ter-carro'
+    | '/comparar/academia'
+    | '/comparar/energia'
+    | '/comparar/mudanca'
+    | '/comparar/streaming'
     | '/api/locations/cities'
     | '/api/locations/states'
     | '/api/public-data/sources'
@@ -273,6 +323,7 @@ export interface FileRouteTypes {
     | '/calculadora-custo-mudanca'
     | '/calculadora-custo-pet'
     | '/calculadora-morar-sozinho'
+    | '/comparar'
     | '/contato'
     | '/metodologia'
     | '/privacidade'
@@ -287,6 +338,10 @@ export interface FileRouteTypes {
     | '/blog/custo-pet-anual'
     | '/blog/quanto-custa-morar-sozinho'
     | '/blog/quanto-custa-ter-carro'
+    | '/comparar/academia'
+    | '/comparar/energia'
+    | '/comparar/mudanca'
+    | '/comparar/streaming'
     | '/api/locations/cities'
     | '/api/locations/states'
     | '/api/public-data/sources'
@@ -299,6 +354,7 @@ export interface FileRouteTypes {
     | '/calculadora-custo-mudanca'
     | '/calculadora-custo-pet'
     | '/calculadora-morar-sozinho'
+    | '/comparar'
     | '/contato'
     | '/metodologia'
     | '/privacidade'
@@ -313,6 +369,10 @@ export interface FileRouteTypes {
     | '/blog/custo-pet-anual'
     | '/blog/quanto-custa-morar-sozinho'
     | '/blog/quanto-custa-ter-carro'
+    | '/comparar/academia'
+    | '/comparar/energia'
+    | '/comparar/mudanca'
+    | '/comparar/streaming'
     | '/api/locations/cities'
     | '/api/locations/states'
     | '/api/public-data/sources'
@@ -326,6 +386,7 @@ export interface RootRouteChildren {
   CalculadoraCustoMudancaRoute: typeof CalculadoraCustoMudancaRoute
   CalculadoraCustoPetRoute: typeof CalculadoraCustoPetRoute
   CalculadoraMorarSozinhoRoute: typeof CalculadoraMorarSozinhoRoute
+  CompararRoute: typeof CompararRouteWithChildren
   ContatoRoute: typeof ContatoRoute
   MetodologiaRoute: typeof MetodologiaRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
@@ -382,6 +443,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContatoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comparar': {
+      id: '/comparar'
+      path: '/comparar'
+      fullPath: '/comparar'
+      preLoaderRoute: typeof CompararRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/calculadora-morar-sozinho': {
       id: '/calculadora-morar-sozinho'
       path: '/calculadora-morar-sozinho'
@@ -430,6 +498,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/comparar/streaming': {
+      id: '/comparar/streaming'
+      path: '/streaming'
+      fullPath: '/comparar/streaming'
+      preLoaderRoute: typeof CompararStreamingRouteImport
+      parentRoute: typeof CompararRoute
+    }
+    '/comparar/mudanca': {
+      id: '/comparar/mudanca'
+      path: '/mudanca'
+      fullPath: '/comparar/mudanca'
+      preLoaderRoute: typeof CompararMudancaRouteImport
+      parentRoute: typeof CompararRoute
+    }
+    '/comparar/energia': {
+      id: '/comparar/energia'
+      path: '/energia'
+      fullPath: '/comparar/energia'
+      preLoaderRoute: typeof CompararEnergiaRouteImport
+      parentRoute: typeof CompararRoute
+    }
+    '/comparar/academia': {
+      id: '/comparar/academia'
+      path: '/academia'
+      fullPath: '/comparar/academia'
+      preLoaderRoute: typeof CompararAcademiaRouteImport
+      parentRoute: typeof CompararRoute
     }
     '/blog/quanto-custa-ter-carro': {
       id: '/blog/quanto-custa-ter-carro'
@@ -518,6 +614,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface CompararRouteChildren {
+  CompararAcademiaRoute: typeof CompararAcademiaRoute
+  CompararEnergiaRoute: typeof CompararEnergiaRoute
+  CompararMudancaRoute: typeof CompararMudancaRoute
+  CompararStreamingRoute: typeof CompararStreamingRoute
+}
+
+const CompararRouteChildren: CompararRouteChildren = {
+  CompararAcademiaRoute: CompararAcademiaRoute,
+  CompararEnergiaRoute: CompararEnergiaRoute,
+  CompararMudancaRoute: CompararMudancaRoute,
+  CompararStreamingRoute: CompararStreamingRoute,
+}
+
+const CompararRouteWithChildren = CompararRoute._addFileChildren(
+  CompararRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CalculadoraAssinaturasRoute: CalculadoraAssinaturasRoute,
@@ -526,6 +640,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalculadoraCustoMudancaRoute: CalculadoraCustoMudancaRoute,
   CalculadoraCustoPetRoute: CalculadoraCustoPetRoute,
   CalculadoraMorarSozinhoRoute: CalculadoraMorarSozinhoRoute,
+  CompararRoute: CompararRouteWithChildren,
   ContatoRoute: ContatoRoute,
   MetodologiaRoute: MetodologiaRoute,
   PrivacidadeRoute: PrivacidadeRoute,
