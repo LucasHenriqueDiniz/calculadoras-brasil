@@ -52,34 +52,65 @@ const FAQ: FAQItem[] = [
   {
     question: "Quanto custa morar sozinho no Brasil?",
     answer:
-      "Depende muito da cidade, do bairro, do tipo de imóvel e do estilo de vida. Em capitais e regiões metropolitanas, somando aluguel, condomínio, contas, alimentação, transporte e lazer, o custo costuma ficar entre R$ 2.500 e R$ 5.000 por mês. Em cidades menores, pode ser bem mais baixo. Use a calculadora com os seus números para uma estimativa personalizada.",
+      "Depende muito da cidade e do estilo de vida. Em capitais como SP/RJ, o custo é R$ 2.500-5.000/mês. Em cidades do interior, R$ 1.500-2.500/mês. Fatores: aluguel, condomínio, contas, alimentação, transporte, lazer.",
   },
   {
-    question: "O que considerar além do aluguel?",
+    question: "O que entra no orçamento de morar sozinho?",
     answer:
-      "Além do aluguel, considere condomínio, IPTU, luz, água, gás, internet, celular, mercado, delivery, transporte, limpeza, lazer, assinaturas, saúde, parcelas de móveis e uma reserva mensal para imprevistos.",
+      "Custos fixos: aluguel, condomínio, IPTU, luz, água, gás, internet. Variáveis: mercado, delivery, transporte, limpeza, lazer, assinaturas, saúde, emergências. Não esqueça reserva para imprevistos.",
+  },
+  {
+    question: "Quanto custa aluguel em SP, RJ, MG?",
+    answer:
+      "Estúdio em SP: R$ 800-1.500. 1 quarto em SP: R$ 1.200-2.000. Rio de Janeiro: 10-15% a mais. Belo Horizonte: 20-30% a menos. Preço varia conforme bairro e proximidade do trabalho.",
   },
   {
     question: "Como saber se consigo morar sozinho?",
     answer:
-      "Some todos os gastos mensais estimados e compare com a sua renda líquida. Se o total ficar próximo ou acima da renda, vale revisar o orçamento, escolher um imóvel mais barato ou esperar até ter uma reserva maior. Não existe regra única, mas quanto mais sobra no fim do mês, mais tranquilo é o processo.",
+      "Calcule: gastos mensais ÷ renda líquida. Se resultar em menos de 50% da renda, está seguro. 50-70% é apertado. Acima de 70%, espere ganhar mais ou gastar menos. Deixe 30% para emergências e lazer.",
   },
   {
-    question: "Quanto guardar antes de mudar?",
+    question: "Quanto guardar antes de sair de casa?",
     answer:
-      "É comum guardar pelo menos o equivalente a três meses dos custos fixos (aluguel, condomínio, contas) somado aos gastos iniciais: caução, frete, móveis, eletrodomésticos, utensílios e instalação. Uma reserva maior dá mais segurança contra imprevistos nos primeiros meses.",
+      "Idealmente: 3 meses de custos fixos + gastos iniciais (caução, frete, móveis, utensílios). Exemplo: R$ 2.000/mês em custos fixos = R$ 6.000 + R$ 5.000 (móveis) = R$ 11.000 como piso mínimo.",
   },
   {
-    question: "A calculadora serve para qualquer cidade?",
+    question: "Qual é o melhor bairro para morar sozinho?",
     answer:
-      "Sim. A calculadora é genérica e funciona para qualquer cidade do Brasil — basta ajustar os valores de aluguel, contas e alimentação de acordo com a realidade do lugar onde você pretende morar.",
+      "Critérios: proximidade do trabalho (reduz transporte), segurança, comércio, transportes. Às vezes um bairro mais barato mas distante custa mais em transporte. Use a calculadora para testar diferentes cenários.",
   },
   {
-    question: "O resultado substitui planejamento financeiro?",
+    question: "Quanto custa condomínio + IPTU?",
     answer:
-      "Não. A calculadora gera uma estimativa educativa para ajudar você a visualizar o orçamento. Decisões importantes de moradia e finanças devem considerar sua situação pessoal completa, e podem se beneficiar de conversa com um profissional de planejamento financeiro.",
+      "Condomínio varia R$ 150-500/mês (mais em áreas nobres). IPTU varia R$ 50-200/mês conforme valor do imóvel. Juntos podem ser R$ 200-700/mês. Negocie esses valores com o proprietário.",
+  },
+  {
+    question: "Como economizar morando sozinho?",
+    answer:
+      "1) Aluguel é 40-50% do orçamento — escolha bem. 2) Compartilhe (reduz aluguel em 50%). 3) Cozinhe em casa (comida caseira é 60% mais barata). 4) Transporte público vs uber/carro. 5) Corte assinaturas desnecessárias.",
+  },
+  {
+    question: "Vale a pena alugar ou comprar?",
+    answer:
+      "Aluguel: flexibilidade, sem compromisso. Compra: construir patrimônio, mas exige capital inicial. Com juros altos, alugar é mais barato. Com juros baixos, compra pode ser melhor a longo prazo (10+ anos).",
+  },
+  {
+    question: "Quanto gasto com energia elétrica sozinho?",
+    answer:
+      "Média: R$ 100-200/mês em apartamento. Varia conforme clima, eletrodomésticos, hábitos (ar-condicionado é o vilão). Use nossa calculadora de conta de luz para ver por aparelho.",
+  },
+  {
+    question: "A calculadora funciona para qualquer cidade?",
+    answer:
+      "Sim. Ajuste os valores de aluguel, contas, alimentação conforme sua realidade. A estrutura funciona igual — muda só os números. Para cidades maiores, aumente; para menores, reduza.",
+  },
+  {
+    question: "Quanto guardar por mês como emergência?",
+    answer:
+      "Recomendação: 5-10% da renda ou R$ 200-500/mês. Emergências acontecem (geladeira quebra, dente dói, carro precisa conserto). Ter reserva evita dívida desnecessária.",
   },
 ];
+
 
 export const Route = createFileRoute("/calculadora-morar-sozinho")({
   head: () => ({

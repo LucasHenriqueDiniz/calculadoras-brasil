@@ -39,19 +39,64 @@ const DEFAULTS: PetCostInput = {
 };
 const FAQ: FAQItem[] = [
   {
-    question: "A calculadora usa preço médio de ração?",
+    question: "Quanto custa ter um cachorro por mês?",
     answer:
-      "Não. O valor deve ser informado com base na marca, quantidade e frequência compradas por você.",
+      "Pequeno (< 10kg): R$ 300-600/mês. Médio (10-25kg): R$ 400-800/mês. Grande (> 25kg): R$ 600-1.500+/mês. Inclui ração, veterinário, banho. Pode crescer com emergências.",
   },
   {
-    question: "Como considerar gastos veterinários inesperados?",
+    question: "Quanto custa ter um gato por mês?",
     answer:
-      "Use o campo de reserva mensal para formar um fundo ou informe o custo do plano de saúde pet.",
+      "Gato é mais barato: R$ 200-400/mês. Ração mais barata que cachorro. Veterinário e vacinas são similares. Maior economia se usar areia caseira.",
+  },
+  {
+    question: "Qual é o custo veterinário anual de um pet?",
+    answer:
+      "Consulta: R$ 100-200. Vacinação (1x/ano): R$ 200-400. Vermífugo: R$ 100-200. Antiparasitário: R$ 100-200. Limpeza dental: R$ 300-800. Emergência: imprevisível (R$ 500-5.000).",
+  },
+  {
+    question: "A calculadora usa preço médio?",
+    answer:
+      "Não. Você informa seu preço real de ração, banho, veterinário. Preços variam bastante por marca, porte e cidade. Use seus números para estimativa real.",
+  },
+  {
+    question: "Vale a pena plano de saúde pet?",
+    answer:
+      "Plano custa R$ 50-200/mês. Se pet é idoso ou tem problemas, vale. Se jovem e saudável, guarde R$ 100/mês na reserva e pague emergências quando ocorrer.",
+  },
+  {
+    question: "Como economizar com ração para pet?",
+    answer:
+      "1) Compre ração em grande volume (desconto). 2) Compare marcas (mesma nutrição, preço diferente). 3) Ração premium vs padrão: premium pode durar mais. 4) Alimente correto (porção exata evita desperdício).",
+  },
+  {
+    question: "Quanto custa adotar um pet?",
+    answer:
+      "Adoção em ONG: R$ 100-500 (vacinado, castrado). Criador: R$ 2.000-10.000+ (depende da raça). Custo inicial também inclui cama, comedouro, brinquedos = R$ 500-1.000. Prepare esse valor antes.",
+  },
+  {
+    question: "Banho e tosa é despesa fixa?",
+    answer:
+      "Banho: R$ 50-100 por sessão. Tosa (cachorro): R$ 80-150. Frequência: 1-2x/mês. Se em casa = economia. Se em pet shop = custo fixo. Contas bem: +R$ 100-300/mês.",
+  },
+  {
+    question: "Como considerar emergências veterinárias?",
+    answer:
+      "Use campo de reserva mensal. Ideal: R$ 200-300/mês que fica guardado. Emergências hapcedem: cirurgia = R$ 2.000-5.000. Ter reserva evita dívida.",
   },
   {
     question: "Posso calcular mais de um animal?",
     answer:
-      "Sim. A quantidade multiplica os valores informados. Se os animais tiverem custos muito diferentes, faça simulações separadas.",
+      "Sim. A quantidade multiplica custos. Se tem 2 cachorros = custos similares × 2. Se animais diferentes (cachorro + gato) = valores diferentes, faça simulações separadas.",
+  },
+  {
+    question: "Pet causa aumento do aluguel?",
+    answer:
+      "Sim, muitos proprietários cobram taxa (R$ 100-300/mês extra). Negocie incluindo isso no orçamento de morar sozinho ou com pet.",
+  },
+  {
+    question: "O resultado é realista?",
+    answer:
+      "Sim, se você informar valores reais. É estimativa educativa — emergências não previstas podem aumentar custos. Sempre deixe margem de segurança no orçamento.",
   },
 ];
 

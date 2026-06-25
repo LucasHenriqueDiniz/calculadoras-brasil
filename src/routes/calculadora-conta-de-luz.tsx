@@ -79,34 +79,64 @@ interface PublicFieldState {
 
 const FAQ: FAQItem[] = [
   {
-    question: "Como sei a tarifa de energia da minha região?",
+    question: "Qual é a tarifa média de energia no Brasil?",
     answer:
-      "A tarifa aparece na sua conta de luz, normalmente em R$ por kWh, e já inclui impostos como ICMS, PIS e Cofins. Cada distribuidora tem valores diferentes, e a bandeira tarifária do mês pode somar um adicional. Para uma estimativa rápida, use o valor médio que aparece no detalhamento da sua fatura.",
+      "Varia bastante por estado: SP/RJ ~R$ 0,80-1,00/kWh. São mais caras: AM (R$ 0,90+), mais baratas: MA (R$ 0,60-0,70). Consulte sua fatura de luz para a tarifa exata.",
   },
   {
-    question: "A calculadora considera a bandeira tarifária?",
+    question: "Como sei a tarifa de energia da minha região?",
     answer:
-      "Indiretamente. Se você informar a tarifa total que aparece na fatura — já com bandeira amarela ou vermelha somada — o resultado refletirá esse adicional. Se preferir, use a tarifa base e some o adicional da bandeira manualmente depois.",
+      "Aparece na sua conta de luz, normalmente em R$/kWh. Já inclui impostos (ICMS, PIS, Cofins). Bandeira tarifária pode somar 15-50% (amarela/vermelha). Use o valor total da fatura para estimativas realistas.",
+  },
+  {
+    question: "Qual aparelho consome mais energia?",
+    answer:
+      "Ar-condicionado (3.000-5.000W), chuveiro elétrico (5.500W), máquina de lavar (2.000W), geladeira (500W 24h). Ar-condicionado é o maior vilão se ligado muito. Chuveiro elétrico é segundo porque usa muita potência rápido.",
+  },
+  {
+    question: "Quanto custa ligar ar-condicionado 8 horas/dia?",
+    answer:
+      "Ar de 3.000W × 8h × 30 dias = 720 kWh. Preço: 720 kWh × R$ 0,80/kWh = R$ 576/mês (aprox). Ar de 5.000W pode custar R$ 1.000+/mês. É realmente o maior custo.",
   },
   {
     question: "Por que o chuveiro elétrico consome tanto?",
     answer:
-      "Porque a potência dele é muito alta: tipicamente entre 4.500 W e 7.500 W. Mesmo usado por poucos minutos, ele costuma ser um dos maiores responsáveis pela conta de luz, especialmente quando há vários banhos longos por dia em uma casa.",
+      "Potência altíssima: 5.500W normalmente. Mesmo 5-10 minutos = 450-900Wh por banho. 2 banhos/dia × 30 dias = 27-54 kWh/mês (R$ 20-40). Chuveiro morno (40°C) consome metade.",
   },
   {
-    question: "Como reduzir a conta de luz sem perder conforto?",
+    question: "Como economizar na conta de luz?",
     answer:
-      "Trocar lâmpadas por LED, evitar deixar aparelhos em standby, reduzir o tempo do chuveiro elétrico no inverno, configurar o ar-condicionado em temperaturas mais altas (23–24 °C) e juntar roupas para lavar de uma vez são medidas que costumam render boa economia sem grande impacto na rotina.",
+      "1) Trocar lâmpadas por LED (80% economia). 2) Ar-condicionado: 24°C em vez de 18°C = 30% economia. 3) Desligar da tomada (reduz standby em 5%). 4) Banho morno (economia 50% do chuveiro). 5) Máquina com água fria.",
+  },
+  {
+    question: "Geladeira consome muito?",
+    answer:
+      "Consome 24/7, mas menos que ar-condicionado. Uma geladeira média (500W) funciona ~4 horas/dia = 60 kWh/mês = R$ 48. Geladeiras velhas consomem 2-3x mais. Manutenção regular reduz consumo.",
+  },
+  {
+    question: "Quanto custa manter máquina de lavar ligada?",
+    answer:
+      "Máquina de 2.000W por 1 hora = 2 kWh. Lavar 3x/semana = ~24 kWh/mês = R$ 19/mês. Água fria em vez de quente reduz em 30% (a maior parte do consumo é para aquecer água).",
   },
   {
     question: "Onde encontro a potência (W) de um aparelho?",
     answer:
-      "A potência aparece na etiqueta do produto, no manual ou na placa de identificação atrás/embaixo do aparelho. Em alguns casos vem em VA (volt-ampere) — para estimativa, dá para usar como aproximação dos watts. Use os valores da calculadora apenas como referência se não encontrar o número exato.",
+      "Na etiqueta de trás ou embaixo. Manual do aparelho também. Às vezes tem VA (volt-ampere) — use como aproximação. Se não encontrar, busque o modelo online.",
   },
   {
-    question: "O resultado serve para qualquer cidade do Brasil?",
+    question: "A bandeira tarifária afeta meu cálculo?",
     answer:
-      "Sim, basta ajustar a tarifa em R$/kWh conforme sua distribuidora. O cálculo de kWh por aparelho não muda — o que muda é o preço final do kWh, que varia entre estados e bandeiras tarifárias.",
+      "Sim. Bandeira verde = tarifa normal. Amarela = +7,5%. Vermelha = +15% ou +25%. Se você informar a tarifa total com bandeira, o resultado já está incluído. Bandeiras mudam mensalmente.",
+  },
+  {
+    question: "Como reduzir a conta de luz sem perder conforto?",
+    answer:
+      "LED em tudo (economia 80%). Ar-condicionado a 24-26°C (economia 30%). Banho morno (economia 50%). Desligar da tomada (economia 5%). Máquina com água fria (economia 30%). Juntas: redução 20-40%.",
+  },
+  {
+    question: "O resultado funciona para qualquer cidade?",
+    answer:
+      "Sim, basta ajustar tarifa em R$/kWh conforme sua distribuidora. Cálculo de kWh não muda. Só muda o preço final. Bandeira tarifária também varia por região.",
   },
 ];
 

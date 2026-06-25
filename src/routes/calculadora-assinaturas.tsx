@@ -51,19 +51,64 @@ const defaults = (): SubscriptionInput[] => [
 ];
 const FAQ: FAQItem[] = [
   {
-    question: "Como registrar uma assinatura anual?",
+    question: "Quanto custa ter streaming em casa?",
     answer:
-      "Escolha a frequência anual e informe o valor total pago no ano. A calculadora converte para uma média mensal.",
+      "Netflix (R$ 55-165/mês), Disney+ (R$ 33-55), Prime Video (R$ 15-45), Max (R$ 40), Apple TV+ (R$ 10). Se assina 3-4 = R$ 200-350/mês = R$ 2.400-4.200/ano. Compartilhar reduz custos.",
+  },
+  {
+    question: "Como registrar assinatura anual?",
+    answer:
+      "Escolha frequência 'Anual' e informe o valor total. A calculadora divide por 12 para média mensal. Exemplo: R$ 1.200/ano = R$ 100/mês.",
+  },
+  {
+    question: "Como simular cortes de assinaturas?",
+    answer:
+      "Desmarque 'Manter' na assinatura que quer cortar. O resultado recalcula automaticamente e mostra a economia.",
+  },
+  {
+    question: "Vale a pena assinar tudo de uma vez?",
+    answer:
+      "Não. Assine por 3 meses, teste, cancele se não usar. A regra dos 70%: se usa menos de 70% do tempo disponível, cancela.",
+  },
+  {
+    question: "Qual é o custo anual médio de assinaturas?",
+    answer:
+      "Usuário médio: R$ 500-800/mês = R$ 6.000-9.600/ano. Alguns chegam a R$ 1.500+/mês. Muitos servicosé esquecido e consome dinheiro.",
+  },
+  {
+    question: "Como saber qual assinatura estou usando?",
+    answer:
+      "Revise suas contas bancárias dos últimos 3 meses. Procure por recorrências. Use aplicativos como Truebill ou Gastos para rastrear assinaturas automáticas.",
+  },
+  {
+    question: "É possível compartilhar assinatura legalmente?",
+    answer:
+      "Netflix, Disney+, Prime permitem compartilhamento (é nos termos de serviço). Spotify, Apple Music, iCloud + são para pessoa. Divide custos legalmente quando permitido.",
+  },
+  {
+    question: "Como economizar em assinaturas?",
+    answer:
+      "1) Compartilhe (reduz 50%). 2) Cancele as que não usa. 3) Teste período grátis antes. 4) Alguns pacotes (telefone + TV + Netflix) são mais baratos. 5) Pague anual se oferece desconto.",
+  },
+  {
+    question: "Assinatura de software realmente vale a pena?",
+    answer:
+      "Microsoft 365 (R$ 40/mês): vale se usa Word/Excel/PowerPoint profissionalmente. Adobe Creative Cloud (R$ 80-110/mês): vale se designer/editor. Grátis (Canva, Google Docs) se uso casual.",
+  },
+  {
+    question: "Qual é o custo real de assinaturas em 5 anos?",
+    answer:
+      "Se gasta R$ 500/mês hoje: 500 × 12 × 5 = R$ 30.000 em 5 anos. Se conseguir reduzir para R$ 200/mês: economiza R$ 18.000. Impressionante quando ve o valor acumulado.",
   },
   {
     question: "Os preços são atualizados automaticamente?",
     answer:
-      "Não. Todos os valores são informados por você para evitar preços desatualizados ou diferentes do seu plano.",
+      "Não. Você informa o valor. Preços mudam frequentemente, então use o último que você pagou. Atualize a calculadora periodicamente.",
   },
   {
-    question: "Como simular cancelamentos?",
+    question: "Devo cancelar tudo e economizar?",
     answer:
-      "Desmarque a opção Manter na assinatura. O resultado mostra o novo total e a economia projetada.",
+      "Não, mas seja inteligente. Cancele as que não usa. Mantenha as que trazem valor. Se Netflix = lazer diário, mantém. Se usa 1x/mês, cancela. Qualidade de vida importa.",
   },
 ];
 

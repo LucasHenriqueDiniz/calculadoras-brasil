@@ -37,19 +37,64 @@ const DEFAULTS: MovingCostInput = {
 };
 const FAQ: FAQItem[] = [
   {
+    question: "Quanto custa uma mudança de apartamento?",
+    answer:
+      "Mudança local (mesma cidade): R$ 1.500-3.000. Interestadual: R$ 5.000-25.000+. Depende de: distância, volume, 4x andar, serviços contratados.",
+  },
+  {
     question: "A caução é um custo definitivo?",
     answer:
-      "Nem sempre. Ela pode ser devolvida no fim do contrato, mas precisa estar disponível no caixa no momento da mudança.",
+      "Geralmente volta quando sai do imóvel (se sem danos). Mas precisa estar no caixa no momento da assinatura. Contar como custo inicial.",
   },
   {
     question: "Como estimar o frete?",
     answer:
-      "Solicite orçamentos considerando distância, volume, escadas, elevador, desmontagem e montagem. Informe aqui o orçamento total escolhido.",
+      "Peça 3 orçamentos com: distância, volume total, andares, elevador, serviços (desmontagem/montagem). Preço varia 30-50% entre mudançadoras.",
   },
   {
-    question: "Por que incluir uma reserva?",
+    question: "Vale mais contratar mudançadora ou alugar caminhão?",
     answer:
-      "Mudanças costumam gerar compras e taxas não previstas. A reserva reduz o risco de depender de crédito caro.",
+      "Mudançadora: seguro, profissional, sem dor de cabeça. Caminhão + amigos: mais barato mas cansativo. Para apartamento/casa, contratar é melhor.",
+  },
+  {
+    question: "Quanto custa aluguel de caminhão baú?",
+    answer:
+      "Pequeno (2,5m): R$ 250-400/dia. Médio (4m): R$ 400-700/dia. Grande (6m): R$ 700-1.200/dia + combustível. Motorista extra: +R$ 200-400/dia.",
+  },
+  {
+    question: "Quais são as taxas do imóvel novo?",
+    answer:
+      "Caução: 1-2 meses aluguel. Vistoria: R$ 200-500. Cartório: R$ 300-600. Taxa condomínio: 1 mês. Total de taxas: R$ 1.000-5.000.",
+  },
+  {
+    question: "Quanto gasto comprando móveis e eletrodomésticos?",
+    answer:
+      "Estúdio/1 quarto: R$ 3.000-5.000 (básico). 2 quartos: R$ 5.000-10.000. 3+ quartos: R$ 10.000+. Comprar usado = 50-70% off.",
+  },
+  {
+    question: "Quanto custa embalagem para mudança?",
+    answer:
+      "Caixas: R$ 2-5 cada (precisa 30-100). Papel bolha, fita, filme plástico: R$ 50-150. Total: R$ 300-700 (se DIY) ou incluído na mudançadora.",
+  },
+  {
+    question: "Mudança interestadual: quanto custa?",
+    answer:
+      "SP-RJ: R$ 5.000-10.000. SP-Brasília: R$ 8.000-15.000. SP-Nordeste: R$ 12.000-25.000+. Distância = 30-40% do custo.",
+  },
+  {
+    question: "Como economizar na mudança?",
+    answer:
+      "1) Desfaça-se de coisas (menos volume = menos custo). 2) Peça múltiplos orçamentos. 3) Mude em dia de semana (desconto). 4) Compre móveis depois (economia).",
+  },
+  {
+    question: "Quanto custa seguro de mudança?",
+    answer:
+      "Básico: geralmente incluído. Extra: 0,5-1% do valor dos bens. Se bens valem R$ 30.000, seguro = R$ 150-300. Vale para frágeis.",
+  },
+  {
+    question: "Quanto preciso ter guardado para mudança?",
+    answer:
+      "Caução: 1-2 meses aluguel. Mudança: R$ 2.000-5.000. Móveis/eletros: R$ 3.000-5.000. Taxas: R$ 1.000-2.000. Total: R$ 8.000-20.000+",
   },
 ];
 

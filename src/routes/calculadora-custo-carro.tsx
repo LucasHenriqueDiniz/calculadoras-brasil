@@ -127,32 +127,67 @@ const FAQ: FAQItem[] = [
   {
     question: "Quanto custa manter um carro por mês?",
     answer:
-      "Depende do carro, do uso e da cidade. Em média, somando combustível, IPVA, seguro, licenciamento, manutenção e depreciação, um carro popular usado para deslocamentos urbanos costuma custar entre R$ 1.200 e R$ 2.500 por mês. Use a calculadora com os seus números para ter uma estimativa personalizada.",
+      "Depende do carro, do uso e da cidade. Em média, um carro popular custa entre R$ 1.200-1.500/mês. Carros intermediários custam R$ 1.800-2.500/mês. Carros premium podem ultrapassar R$ 3.000/mês. Use a calculadora com seus números para estimativa personalizada.",
+  },
+  {
+    question: "Qual é o custo anual total de ter um carro?",
+    answer:
+      "Um carro popular custa R$ 14.400-18.000/ano. Um carro intermediário custa R$ 21.600-30.000/ano. Carros premium custam R$ 36.000+/ano. O carro mais barato não é o mais econômico. Considere custo total, não só preço.",
   },
   {
     question: "Como calcular o custo por km de um carro?",
     answer:
-      "Some todos os custos mensais do carro (combustível, IPVA proporcional, seguro, manutenção, estacionamento, depreciação etc.) e divida pelos quilômetros rodados no mês. A fórmula é: custo por km = custo mensal total / quilômetros rodados no mês.",
+      "Divida o custo mensal total pelos quilômetros rodados no mês. Exemplo: se gasta R$ 2.000/mês e roda 1.000 km, o custo é R$ 2,00 por km. Carros populares custam R$ 1,50-2,50/km. Carros premium custam R$ 3,00-4,00+/km.",
   },
   {
     question: "A calculadora considera IPVA?",
     answer:
-      "Sim. Você informa o valor anual do IPVA e a calculadora divide por 12 para diluir esse custo dentro da estimativa mensal, junto com seguro e licenciamento.",
+      "Sim. O IPVA varia por estado (2-4%) e valor do carro. Uma calculadora divide o valor anual por 12 para distribuir mensalmente. Exemplo: carro de R$ 50.000 com alíquota de 3% = R$ 1.500/ano = R$ 125/mês.",
   },
   {
     question: "A calculadora considera depreciação?",
     answer:
-      "Sim. A depreciação é a perda anual de valor do carro. Você informa um percentual estimado (por padrão 8% ao ano) sobre o valor atual do veículo. Esse valor é diluído mensalmente, porque mesmo sem sair dinheiro do bolso, o carro vale menos a cada mês.",
+      "Sim. Depreciação é a perda de valor do veículo (mesmo parado na garagem). Um carro novo perde 15-20% no primeiro ano. Isso é custo real que muitos ignoram. A depreciação representa 30-40% do custo total.",
   },
   {
     question: "Gasolina ou etanol: qual vale mais a pena?",
     answer:
-      "A regra dos 70% (etanol vale a pena se custar até 70% do preço da gasolina) é só uma referência. O ideal é comparar o custo real, considerando o consumo do seu carro com cada combustível. No modo Flex, a calculadora simula os dois cenários e mostra qual é mais barato com os preços e consumos que você informou.",
+      "Regra dos 70%: etanol vale a pena se custar até 70% do preço da gasolina. Mas depende do consumo específico do seu carro. Carros flex modernos costumam rodar mais com gasolina.",
   },
   {
-    question: "O resultado é oficial?",
+    question: "Quanto custa o seguro de um carro?",
     answer:
-      "Não. Esta calculadora gera uma estimativa educativa baseada nos valores que você informa. Os custos reais variam por cidade, modelo do carro, perfil de uso, seguradora e oficina. Use o resultado como ponto de partida, não como orçamento oficial.",
+      "DPVAT (obrigatório) custa R$ 150-200/ano. Seguro completo varia bastante: carros populares custam R$ 80-150/mês. Carros intermediários custam R$ 120-250/mês. Preço depende de idade, perfil, histórico e região.",
+  },
+  {
+    question: "Quanto gasto com combustível por mês?",
+    answer:
+      "Depende de 3 fatores: quilometragem mensal, consumo do carro (km/l) e preço do combustível. Exemplo: 800 km/mês, carro que faz 10 km/l, gasolina a R$ 6,00 = 80 litros × R$ 6 = R$ 480/mês.",
+  },
+  {
+    question: "Qual é o custo de manutenção de um carro?",
+    answer:
+      "Carros novos (até 3 anos) custam R$ 100-200/mês em manutenção preventiva. Carros com 5-7 anos custam R$ 150-300/mês. Carros com 10+ anos custam R$ 300-500+/mês. Manutenção preventiva é mais barata que reparos de emergência.",
+  },
+  {
+    question: "Quanto custa estacionamento de carro?",
+    answer:
+      "Em grandes cidades (SP, RJ, BH) estacionamento custa R$ 50-300/mês. Em cidades menores, pode ser zero. Se usar metrô/ônibus, economiza R$ 50-150/mês apenas em estacionamento. Considere essa despesa na sua decisão.",
+  },
+  {
+    question: "Vale a pena comprar carro à vista ou financiar?",
+    answer:
+      "Depende do juros e da sua situação financeira. Com juros altos (12%+/ano), financiar fica caro. À vista você economiza em juros, mas imobiliza capital. Use a calculadora com diferentes cenários para ver o impacto real.",
+  },
+  {
+    question: "Como reduzir o custo de manutenção do carro?",
+    answer:
+      "1) Respeite prazos de revisão. 2) Use óleo de qualidade. 3) Mantenha pneus calibrados (reduz consumo 3-5%). 4) Dirija de forma suave (menos desgaste). 5) Evite multas (são custo real). Um carro bem mantido custa 30-40% menos.",
+  },
+  {
+    question: "O resultado da calculadora é garantido?",
+    answer:
+      "Não. Esta é uma estimativa educativa baseada em médias nacionais e valores que você informa. Custos reais variam por cidade, marca, modelo, seguradora, oficina e seus hábitos. Use como ponto de partida, não como orçamento oficial.",
   },
 ];
 
