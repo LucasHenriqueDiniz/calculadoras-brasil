@@ -17,12 +17,16 @@ import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as CompararRouteImport } from './routes/comparar'
 import { Route as CalculadorasRouteImport } from './routes/calculadoras'
 import { Route as CalculadoraSalarioLiquidoRouteImport } from './routes/calculadora-salario-liquido'
+import { Route as CalculadoraPrevidenciaComplementarRouteImport } from './routes/calculadora-previdencia-complementar'
 import { Route as CalculadoraMorarSozinhoRouteImport } from './routes/calculadora-morar-sozinho'
 import { Route as CalculadoraIrpf2026RouteImport } from './routes/calculadora-irpf-2026'
+import { Route as CalculadoraInssAutonomoRouteImport } from './routes/calculadora-inss-autonomo'
 import { Route as CalculadoraCustoPetRouteImport } from './routes/calculadora-custo-pet'
 import { Route as CalculadoraCustoMudancaRouteImport } from './routes/calculadora-custo-mudanca'
 import { Route as CalculadoraCustoCarroRouteImport } from './routes/calculadora-custo-carro'
 import { Route as CalculadoraContaDeLuzRouteImport } from './routes/calculadora-conta-de-luz'
+import { Route as CalculadoraCltVsPjRouteImport } from './routes/calculadora-clt-vs-pj'
+import { Route as CalculadoraBeneficiosFiscaisRouteImport } from './routes/calculadora-beneficios-fiscais'
 import { Route as CalculadoraAssinaturasRouteImport } from './routes/calculadora-assinaturas'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CompararIndexRouteImport } from './routes/comparar/index'
@@ -90,6 +94,12 @@ const CalculadoraSalarioLiquidoRoute =
     path: '/calculadora-salario-liquido',
     getParentRoute: () => rootRouteImport,
   } as any)
+const CalculadoraPrevidenciaComplementarRoute =
+  CalculadoraPrevidenciaComplementarRouteImport.update({
+    id: '/calculadora-previdencia-complementar',
+    path: '/calculadora-previdencia-complementar',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const CalculadoraMorarSozinhoRoute = CalculadoraMorarSozinhoRouteImport.update({
   id: '/calculadora-morar-sozinho',
   path: '/calculadora-morar-sozinho',
@@ -98,6 +108,11 @@ const CalculadoraMorarSozinhoRoute = CalculadoraMorarSozinhoRouteImport.update({
 const CalculadoraIrpf2026Route = CalculadoraIrpf2026RouteImport.update({
   id: '/calculadora-irpf-2026',
   path: '/calculadora-irpf-2026',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalculadoraInssAutonomoRoute = CalculadoraInssAutonomoRouteImport.update({
+  id: '/calculadora-inss-autonomo',
+  path: '/calculadora-inss-autonomo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CalculadoraCustoPetRoute = CalculadoraCustoPetRouteImport.update({
@@ -120,6 +135,17 @@ const CalculadoraContaDeLuzRoute = CalculadoraContaDeLuzRouteImport.update({
   path: '/calculadora-conta-de-luz',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CalculadoraCltVsPjRoute = CalculadoraCltVsPjRouteImport.update({
+  id: '/calculadora-clt-vs-pj',
+  path: '/calculadora-clt-vs-pj',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalculadoraBeneficiosFiscaisRoute =
+  CalculadoraBeneficiosFiscaisRouteImport.update({
+    id: '/calculadora-beneficios-fiscais',
+    path: '/calculadora-beneficios-fiscais',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const CalculadoraAssinaturasRoute = CalculadoraAssinaturasRouteImport.update({
   id: '/calculadora-assinaturas',
   path: '/calculadora-assinaturas',
@@ -255,12 +281,16 @@ const ApiLocationsCitiesRoute = ApiLocationsCitiesRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/calculadora-assinaturas': typeof CalculadoraAssinaturasRoute
+  '/calculadora-beneficios-fiscais': typeof CalculadoraBeneficiosFiscaisRoute
+  '/calculadora-clt-vs-pj': typeof CalculadoraCltVsPjRoute
   '/calculadora-conta-de-luz': typeof CalculadoraContaDeLuzRoute
   '/calculadora-custo-carro': typeof CalculadoraCustoCarroRoute
   '/calculadora-custo-mudanca': typeof CalculadoraCustoMudancaRoute
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
+  '/calculadora-inss-autonomo': typeof CalculadoraInssAutonomoRoute
   '/calculadora-irpf-2026': typeof CalculadoraIrpf2026Route
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
+  '/calculadora-previdencia-complementar': typeof CalculadoraPrevidenciaComplementarRoute
   '/calculadora-salario-liquido': typeof CalculadoraSalarioLiquidoRoute
   '/calculadoras': typeof CalculadorasRoute
   '/comparar': typeof CompararRouteWithChildren
@@ -296,12 +326,16 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calculadora-assinaturas': typeof CalculadoraAssinaturasRoute
+  '/calculadora-beneficios-fiscais': typeof CalculadoraBeneficiosFiscaisRoute
+  '/calculadora-clt-vs-pj': typeof CalculadoraCltVsPjRoute
   '/calculadora-conta-de-luz': typeof CalculadoraContaDeLuzRoute
   '/calculadora-custo-carro': typeof CalculadoraCustoCarroRoute
   '/calculadora-custo-mudanca': typeof CalculadoraCustoMudancaRoute
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
+  '/calculadora-inss-autonomo': typeof CalculadoraInssAutonomoRoute
   '/calculadora-irpf-2026': typeof CalculadoraIrpf2026Route
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
+  '/calculadora-previdencia-complementar': typeof CalculadoraPrevidenciaComplementarRoute
   '/calculadora-salario-liquido': typeof CalculadoraSalarioLiquidoRoute
   '/calculadoras': typeof CalculadorasRoute
   '/contato': typeof ContatoRoute
@@ -337,12 +371,16 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/calculadora-assinaturas': typeof CalculadoraAssinaturasRoute
+  '/calculadora-beneficios-fiscais': typeof CalculadoraBeneficiosFiscaisRoute
+  '/calculadora-clt-vs-pj': typeof CalculadoraCltVsPjRoute
   '/calculadora-conta-de-luz': typeof CalculadoraContaDeLuzRoute
   '/calculadora-custo-carro': typeof CalculadoraCustoCarroRoute
   '/calculadora-custo-mudanca': typeof CalculadoraCustoMudancaRoute
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
+  '/calculadora-inss-autonomo': typeof CalculadoraInssAutonomoRoute
   '/calculadora-irpf-2026': typeof CalculadoraIrpf2026Route
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
+  '/calculadora-previdencia-complementar': typeof CalculadoraPrevidenciaComplementarRoute
   '/calculadora-salario-liquido': typeof CalculadoraSalarioLiquidoRoute
   '/calculadoras': typeof CalculadorasRoute
   '/comparar': typeof CompararRouteWithChildren
@@ -380,12 +418,16 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/calculadora-assinaturas'
+    | '/calculadora-beneficios-fiscais'
+    | '/calculadora-clt-vs-pj'
     | '/calculadora-conta-de-luz'
     | '/calculadora-custo-carro'
     | '/calculadora-custo-mudanca'
     | '/calculadora-custo-pet'
+    | '/calculadora-inss-autonomo'
     | '/calculadora-irpf-2026'
     | '/calculadora-morar-sozinho'
+    | '/calculadora-previdencia-complementar'
     | '/calculadora-salario-liquido'
     | '/calculadoras'
     | '/comparar'
@@ -421,12 +463,16 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/calculadora-assinaturas'
+    | '/calculadora-beneficios-fiscais'
+    | '/calculadora-clt-vs-pj'
     | '/calculadora-conta-de-luz'
     | '/calculadora-custo-carro'
     | '/calculadora-custo-mudanca'
     | '/calculadora-custo-pet'
+    | '/calculadora-inss-autonomo'
     | '/calculadora-irpf-2026'
     | '/calculadora-morar-sozinho'
+    | '/calculadora-previdencia-complementar'
     | '/calculadora-salario-liquido'
     | '/calculadoras'
     | '/contato'
@@ -461,12 +507,16 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/calculadora-assinaturas'
+    | '/calculadora-beneficios-fiscais'
+    | '/calculadora-clt-vs-pj'
     | '/calculadora-conta-de-luz'
     | '/calculadora-custo-carro'
     | '/calculadora-custo-mudanca'
     | '/calculadora-custo-pet'
+    | '/calculadora-inss-autonomo'
     | '/calculadora-irpf-2026'
     | '/calculadora-morar-sozinho'
+    | '/calculadora-previdencia-complementar'
     | '/calculadora-salario-liquido'
     | '/calculadoras'
     | '/comparar'
@@ -503,12 +553,16 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CalculadoraAssinaturasRoute: typeof CalculadoraAssinaturasRoute
+  CalculadoraBeneficiosFiscaisRoute: typeof CalculadoraBeneficiosFiscaisRoute
+  CalculadoraCltVsPjRoute: typeof CalculadoraCltVsPjRoute
   CalculadoraContaDeLuzRoute: typeof CalculadoraContaDeLuzRoute
   CalculadoraCustoCarroRoute: typeof CalculadoraCustoCarroRoute
   CalculadoraCustoMudancaRoute: typeof CalculadoraCustoMudancaRoute
   CalculadoraCustoPetRoute: typeof CalculadoraCustoPetRoute
+  CalculadoraInssAutonomoRoute: typeof CalculadoraInssAutonomoRoute
   CalculadoraIrpf2026Route: typeof CalculadoraIrpf2026Route
   CalculadoraMorarSozinhoRoute: typeof CalculadoraMorarSozinhoRoute
+  CalculadoraPrevidenciaComplementarRoute: typeof CalculadoraPrevidenciaComplementarRoute
   CalculadoraSalarioLiquidoRoute: typeof CalculadoraSalarioLiquidoRoute
   CalculadorasRoute: typeof CalculadorasRoute
   CompararRoute: typeof CompararRouteWithChildren
@@ -595,6 +649,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CalculadoraSalarioLiquidoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/calculadora-previdencia-complementar': {
+      id: '/calculadora-previdencia-complementar'
+      path: '/calculadora-previdencia-complementar'
+      fullPath: '/calculadora-previdencia-complementar'
+      preLoaderRoute: typeof CalculadoraPrevidenciaComplementarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/calculadora-morar-sozinho': {
       id: '/calculadora-morar-sozinho'
       path: '/calculadora-morar-sozinho'
@@ -607,6 +668,13 @@ declare module '@tanstack/react-router' {
       path: '/calculadora-irpf-2026'
       fullPath: '/calculadora-irpf-2026'
       preLoaderRoute: typeof CalculadoraIrpf2026RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calculadora-inss-autonomo': {
+      id: '/calculadora-inss-autonomo'
+      path: '/calculadora-inss-autonomo'
+      fullPath: '/calculadora-inss-autonomo'
+      preLoaderRoute: typeof CalculadoraInssAutonomoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/calculadora-custo-pet': {
@@ -635,6 +703,20 @@ declare module '@tanstack/react-router' {
       path: '/calculadora-conta-de-luz'
       fullPath: '/calculadora-conta-de-luz'
       preLoaderRoute: typeof CalculadoraContaDeLuzRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calculadora-clt-vs-pj': {
+      id: '/calculadora-clt-vs-pj'
+      path: '/calculadora-clt-vs-pj'
+      fullPath: '/calculadora-clt-vs-pj'
+      preLoaderRoute: typeof CalculadoraCltVsPjRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calculadora-beneficios-fiscais': {
+      id: '/calculadora-beneficios-fiscais'
+      path: '/calculadora-beneficios-fiscais'
+      fullPath: '/calculadora-beneficios-fiscais'
+      preLoaderRoute: typeof CalculadoraBeneficiosFiscaisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/calculadora-assinaturas': {
@@ -838,12 +920,17 @@ const CompararRouteWithChildren = CompararRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CalculadoraAssinaturasRoute: CalculadoraAssinaturasRoute,
+  CalculadoraBeneficiosFiscaisRoute: CalculadoraBeneficiosFiscaisRoute,
+  CalculadoraCltVsPjRoute: CalculadoraCltVsPjRoute,
   CalculadoraContaDeLuzRoute: CalculadoraContaDeLuzRoute,
   CalculadoraCustoCarroRoute: CalculadoraCustoCarroRoute,
   CalculadoraCustoMudancaRoute: CalculadoraCustoMudancaRoute,
   CalculadoraCustoPetRoute: CalculadoraCustoPetRoute,
+  CalculadoraInssAutonomoRoute: CalculadoraInssAutonomoRoute,
   CalculadoraIrpf2026Route: CalculadoraIrpf2026Route,
   CalculadoraMorarSozinhoRoute: CalculadoraMorarSozinhoRoute,
+  CalculadoraPrevidenciaComplementarRoute:
+    CalculadoraPrevidenciaComplementarRoute,
   CalculadoraSalarioLiquidoRoute: CalculadoraSalarioLiquidoRoute,
   CalculadorasRoute: CalculadorasRoute,
   CompararRoute: CompararRouteWithChildren,
