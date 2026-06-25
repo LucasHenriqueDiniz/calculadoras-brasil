@@ -229,6 +229,137 @@ export const blogPosts: Record<string, BlogPost> = {
       },
     ],
   },
+
+  "guia-irpf-2026": {
+    slug: "guia-irpf-2026",
+    title: "Guia Completo: IRPF 2026 para Brasileiros",
+    description:
+      "Tudo que você precisa saber sobre IRPF 2026: alíquotas progressivas, dependentes, deduções, regimes de tributação e como reduzir imposto legalmente.",
+    category: "guia",
+    imageUrl: "/blog/guia-irpf.jpg",
+    imageAlt: "Guia completo IRPF 2026",
+    author: "Calcule Brasil",
+    publishedAt: "2026-06-26",
+    updatedAt: "2026-06-26",
+    readingTime: 18,
+    keywords: [
+      "guia IRPF 2026",
+      "alíquota IRPF",
+      "imposto de renda pessoa física",
+      "como pagar menos IRPF",
+      "dependentes e IRPF",
+      "deduções permitidas",
+    ],
+    faqs: [
+      {
+        question: "Qual é a alíquota IRPF para quem ganha R$ 50.000/ano?",
+        answer:
+          "Não é uma alíquota única. Você paga 0% até R$ 21.503, depois 7,5%, 15%, 22,5% conforme cada faixa. Alíquota efetiva fica em torno de 10-12%, bem menor que a marginal de 22,5%.",
+      },
+      {
+        question: "Dependentes realmente reduzem IRPF?",
+        answer:
+          "Sim, cada dependente reduz R$ 2.275 da base imponível em 2026. Com 2 filhos, você já economiza R$ 4.550. Efeito significativo na hora do imposto.",
+      },
+      {
+        question: "Qual regime é melhor para mim: completo ou simplificado?",
+        answer:
+          "Depende. Se tem muito gasto com educação/saúde, completo é melhor. Se tem pouco, simplificado (20,5% dedução fixa) é mais fácil e pode ser melhor. Use calculadora para comparar.",
+      },
+    ],
+  },
+
+  "salario-liquido-entenda": {
+    slug: "salario-liquido-entenda",
+    title: "Salário Líquido: Entenda Seus Descontos e o que Realmente Você Ganha",
+    description:
+      "Descubra de onde saem os descontos do seu salário: IRPF, INSS, sindicato e como calcular seu salário líquido real com base no bruto.",
+    category: "guia",
+    imageUrl: "/blog/salario-liquido.jpg",
+    imageAlt: "Desconto de salário líquido",
+    author: "Calcule Brasil",
+    publishedAt: "2026-06-27",
+    updatedAt: "2026-06-27",
+    readingTime: 16,
+    keywords: [
+      "salário líquido",
+      "salário bruto",
+      "desconto salário",
+      "IRPF desconto",
+      "INSS desconto",
+      "como calcular salário líquido",
+    ],
+    faqs: [],
+  },
+
+  "quanto-custa-ser-autonomo": {
+    slug: "quanto-custa-ser-autonomo",
+    title: "Quanto Custa Ser Autônomo no Brasil em 2026",
+    description:
+      "Guia completo sobre custos de ser autônomo: INSS autônomo, IRPF, deduções fiscais, recibos e quanto você realmente fica com seu ganho.",
+    category: "guia",
+    imageUrl: "/blog/autonomo.jpg",
+    imageAlt: "Custos de ser autônomo no Brasil",
+    author: "Calcule Brasil",
+    publishedAt: "2026-06-28",
+    updatedAt: "2026-06-28",
+    readingTime: 15,
+    keywords: [
+      "autônomo",
+      "INSS autônomo",
+      "imposto autônomo",
+      "ganho autônomo",
+      "recibo autônomo",
+      "custo ser autônomo",
+    ],
+    faqs: [],
+  },
+
+  "planejamento-tributario": {
+    slug: "planejamento-tributario",
+    title: "Planejamento Tributário Pessoal: Estratégias Legais para Reduzir Imposto",
+    description:
+      "Estratégias legais de planejamento tributário para pessoa física: previdência, investimentos, regime fiscal e como economizar imposto.",
+    category: "guia",
+    imageUrl: "/blog/planejamento.jpg",
+    imageAlt: "Planejamento tributário pessoal",
+    author: "Calcule Brasil",
+    publishedAt: "2026-06-29",
+    updatedAt: "2026-06-29",
+    readingTime: 17,
+    keywords: [
+      "planejamento tributário",
+      "reduzir imposto",
+      "estratégia fiscal",
+      "previdência complementar",
+      "investimentos isentos",
+      "economia tributária",
+    ],
+    faqs: [],
+  },
+
+  "clt-vs-pj-comparacao": {
+    slug: "clt-vs-pj-comparacao",
+    title: "CLT vs PJ: Qual Regime Vale Mais a Pena em 2026",
+    description:
+      "Análise completa: CLT vs PJ. Compare salário líquido, benefícios, impostos e veja qual regime é mais vantajoso para você.",
+    category: "guia",
+    imageUrl: "/blog/clt-pj.jpg",
+    imageAlt: "Comparação CLT vs PJ",
+    author: "Calcule Brasil",
+    publishedAt: "2026-06-30",
+    updatedAt: "2026-06-30",
+    readingTime: 16,
+    keywords: [
+      "CLT vs PJ",
+      "quando virar PJ",
+      "salário PJ",
+      "benefícios CLT",
+      "imposto PJ",
+      "ganho líquido CLT PJ",
+    ],
+    faqs: [],
+  },
 };
 
 export function getBlogPost(slug: string): BlogPost | undefined {

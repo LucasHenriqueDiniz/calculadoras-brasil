@@ -29,10 +29,15 @@ import { Route as CompararStreamingRouteImport } from './routes/comparar/streami
 import { Route as CompararMudancaRouteImport } from './routes/comparar/mudanca'
 import { Route as CompararEnergiaRouteImport } from './routes/comparar/energia'
 import { Route as CompararAcademiaRouteImport } from './routes/comparar/academia'
+import { Route as BlogSalarioLiquidoEntendaRouteImport } from './routes/blog/salario-liquido-entenda'
 import { Route as BlogQuantoCustaTerCarroRouteImport } from './routes/blog/quanto-custa-ter-carro'
+import { Route as BlogQuantoCustaSerAutonomoRouteImport } from './routes/blog/quanto-custa-ser-autonomo'
 import { Route as BlogQuantoCustaMorarSozinhoRouteImport } from './routes/blog/quanto-custa-morar-sozinho'
+import { Route as BlogPlanejamentoTributarioRouteImport } from './routes/blog/planejamento-tributario'
+import { Route as BlogGuiaIrpf2026RouteImport } from './routes/blog/guia-irpf-2026'
 import { Route as BlogCustoPetAnualRouteImport } from './routes/blog/custo-pet-anual'
 import { Route as BlogComoEconomizarContaDeLuzRouteImport } from './routes/blog/como-economizar-conta-de-luz'
+import { Route as BlogCltVsPjComparacaoRouteImport } from './routes/blog/clt-vs-pj-comparacao'
 import { Route as BlogCalculadoraIrpf2026RouteImport } from './routes/blog/calculadora-irpf-2026'
 import { Route as BlogAssinaturasQueValemAPenaRouteImport } from './routes/blog/assinaturas-que-valem-a-pena'
 import { Route as ApiVehicleEfficiencyRouteImport } from './routes/api.vehicle-efficiency'
@@ -143,17 +148,40 @@ const CompararAcademiaRoute = CompararAcademiaRouteImport.update({
   path: '/academia',
   getParentRoute: () => CompararRoute,
 } as any)
+const BlogSalarioLiquidoEntendaRoute =
+  BlogSalarioLiquidoEntendaRouteImport.update({
+    id: '/blog/salario-liquido-entenda',
+    path: '/blog/salario-liquido-entenda',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const BlogQuantoCustaTerCarroRoute = BlogQuantoCustaTerCarroRouteImport.update({
   id: '/blog/quanto-custa-ter-carro',
   path: '/blog/quanto-custa-ter-carro',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogQuantoCustaSerAutonomoRoute =
+  BlogQuantoCustaSerAutonomoRouteImport.update({
+    id: '/blog/quanto-custa-ser-autonomo',
+    path: '/blog/quanto-custa-ser-autonomo',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const BlogQuantoCustaMorarSozinhoRoute =
   BlogQuantoCustaMorarSozinhoRouteImport.update({
     id: '/blog/quanto-custa-morar-sozinho',
     path: '/blog/quanto-custa-morar-sozinho',
     getParentRoute: () => rootRouteImport,
   } as any)
+const BlogPlanejamentoTributarioRoute =
+  BlogPlanejamentoTributarioRouteImport.update({
+    id: '/blog/planejamento-tributario',
+    path: '/blog/planejamento-tributario',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogGuiaIrpf2026Route = BlogGuiaIrpf2026RouteImport.update({
+  id: '/blog/guia-irpf-2026',
+  path: '/blog/guia-irpf-2026',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogCustoPetAnualRoute = BlogCustoPetAnualRouteImport.update({
   id: '/blog/custo-pet-anual',
   path: '/blog/custo-pet-anual',
@@ -165,6 +193,11 @@ const BlogComoEconomizarContaDeLuzRoute =
     path: '/blog/como-economizar-conta-de-luz',
     getParentRoute: () => rootRouteImport,
   } as any)
+const BlogCltVsPjComparacaoRoute = BlogCltVsPjComparacaoRouteImport.update({
+  id: '/blog/clt-vs-pj-comparacao',
+  path: '/blog/clt-vs-pj-comparacao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogCalculadoraIrpf2026Route = BlogCalculadoraIrpf2026RouteImport.update({
   id: '/blog/calculadora-irpf-2026',
   path: '/blog/calculadora-irpf-2026',
@@ -234,10 +267,15 @@ export interface FileRoutesByFullPath {
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
   '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
   '/blog/calculadora-irpf-2026': typeof BlogCalculadoraIrpf2026Route
+  '/blog/clt-vs-pj-comparacao': typeof BlogCltVsPjComparacaoRoute
   '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
+  '/blog/guia-irpf-2026': typeof BlogGuiaIrpf2026Route
+  '/blog/planejamento-tributario': typeof BlogPlanejamentoTributarioRoute
   '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
+  '/blog/quanto-custa-ser-autonomo': typeof BlogQuantoCustaSerAutonomoRoute
   '/blog/quanto-custa-ter-carro': typeof BlogQuantoCustaTerCarroRoute
+  '/blog/salario-liquido-entenda': typeof BlogSalarioLiquidoEntendaRoute
   '/comparar/academia': typeof CompararAcademiaRoute
   '/comparar/energia': typeof CompararEnergiaRoute
   '/comparar/mudanca': typeof CompararMudancaRoute
@@ -268,10 +306,15 @@ export interface FileRoutesByTo {
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
   '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
   '/blog/calculadora-irpf-2026': typeof BlogCalculadoraIrpf2026Route
+  '/blog/clt-vs-pj-comparacao': typeof BlogCltVsPjComparacaoRoute
   '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
+  '/blog/guia-irpf-2026': typeof BlogGuiaIrpf2026Route
+  '/blog/planejamento-tributario': typeof BlogPlanejamentoTributarioRoute
   '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
+  '/blog/quanto-custa-ser-autonomo': typeof BlogQuantoCustaSerAutonomoRoute
   '/blog/quanto-custa-ter-carro': typeof BlogQuantoCustaTerCarroRoute
+  '/blog/salario-liquido-entenda': typeof BlogSalarioLiquidoEntendaRoute
   '/comparar/academia': typeof CompararAcademiaRoute
   '/comparar/energia': typeof CompararEnergiaRoute
   '/comparar/mudanca': typeof CompararMudancaRoute
@@ -304,10 +347,15 @@ export interface FileRoutesById {
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
   '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
   '/blog/calculadora-irpf-2026': typeof BlogCalculadoraIrpf2026Route
+  '/blog/clt-vs-pj-comparacao': typeof BlogCltVsPjComparacaoRoute
   '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
+  '/blog/guia-irpf-2026': typeof BlogGuiaIrpf2026Route
+  '/blog/planejamento-tributario': typeof BlogPlanejamentoTributarioRoute
   '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
+  '/blog/quanto-custa-ser-autonomo': typeof BlogQuantoCustaSerAutonomoRoute
   '/blog/quanto-custa-ter-carro': typeof BlogQuantoCustaTerCarroRoute
+  '/blog/salario-liquido-entenda': typeof BlogSalarioLiquidoEntendaRoute
   '/comparar/academia': typeof CompararAcademiaRoute
   '/comparar/energia': typeof CompararEnergiaRoute
   '/comparar/mudanca': typeof CompararMudancaRoute
@@ -341,10 +389,15 @@ export interface FileRouteTypes {
     | '/api/vehicle-efficiency'
     | '/blog/assinaturas-que-valem-a-pena'
     | '/blog/calculadora-irpf-2026'
+    | '/blog/clt-vs-pj-comparacao'
     | '/blog/como-economizar-conta-de-luz'
     | '/blog/custo-pet-anual'
+    | '/blog/guia-irpf-2026'
+    | '/blog/planejamento-tributario'
     | '/blog/quanto-custa-morar-sozinho'
+    | '/blog/quanto-custa-ser-autonomo'
     | '/blog/quanto-custa-ter-carro'
+    | '/blog/salario-liquido-entenda'
     | '/comparar/academia'
     | '/comparar/energia'
     | '/comparar/mudanca'
@@ -375,10 +428,15 @@ export interface FileRouteTypes {
     | '/api/vehicle-efficiency'
     | '/blog/assinaturas-que-valem-a-pena'
     | '/blog/calculadora-irpf-2026'
+    | '/blog/clt-vs-pj-comparacao'
     | '/blog/como-economizar-conta-de-luz'
     | '/blog/custo-pet-anual'
+    | '/blog/guia-irpf-2026'
+    | '/blog/planejamento-tributario'
     | '/blog/quanto-custa-morar-sozinho'
+    | '/blog/quanto-custa-ser-autonomo'
     | '/blog/quanto-custa-ter-carro'
+    | '/blog/salario-liquido-entenda'
     | '/comparar/academia'
     | '/comparar/energia'
     | '/comparar/mudanca'
@@ -410,10 +468,15 @@ export interface FileRouteTypes {
     | '/api/vehicle-efficiency'
     | '/blog/assinaturas-que-valem-a-pena'
     | '/blog/calculadora-irpf-2026'
+    | '/blog/clt-vs-pj-comparacao'
     | '/blog/como-economizar-conta-de-luz'
     | '/blog/custo-pet-anual'
+    | '/blog/guia-irpf-2026'
+    | '/blog/planejamento-tributario'
     | '/blog/quanto-custa-morar-sozinho'
+    | '/blog/quanto-custa-ser-autonomo'
     | '/blog/quanto-custa-ter-carro'
+    | '/blog/salario-liquido-entenda'
     | '/comparar/academia'
     | '/comparar/energia'
     | '/comparar/mudanca'
@@ -446,10 +509,15 @@ export interface RootRouteChildren {
   ApiVehicleEfficiencyRoute: typeof ApiVehicleEfficiencyRoute
   BlogAssinaturasQueValemAPenaRoute: typeof BlogAssinaturasQueValemAPenaRoute
   BlogCalculadoraIrpf2026Route: typeof BlogCalculadoraIrpf2026Route
+  BlogCltVsPjComparacaoRoute: typeof BlogCltVsPjComparacaoRoute
   BlogComoEconomizarContaDeLuzRoute: typeof BlogComoEconomizarContaDeLuzRoute
   BlogCustoPetAnualRoute: typeof BlogCustoPetAnualRoute
+  BlogGuiaIrpf2026Route: typeof BlogGuiaIrpf2026Route
+  BlogPlanejamentoTributarioRoute: typeof BlogPlanejamentoTributarioRoute
   BlogQuantoCustaMorarSozinhoRoute: typeof BlogQuantoCustaMorarSozinhoRoute
+  BlogQuantoCustaSerAutonomoRoute: typeof BlogQuantoCustaSerAutonomoRoute
   BlogQuantoCustaTerCarroRoute: typeof BlogQuantoCustaTerCarroRoute
+  BlogSalarioLiquidoEntendaRoute: typeof BlogSalarioLiquidoEntendaRoute
   ApiLocationsCitiesRoute: typeof ApiLocationsCitiesRoute
   ApiLocationsStatesRoute: typeof ApiLocationsStatesRoute
   ApiPublicDataSourcesRoute: typeof ApiPublicDataSourcesRoute
@@ -597,6 +665,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompararAcademiaRouteImport
       parentRoute: typeof CompararRoute
     }
+    '/blog/salario-liquido-entenda': {
+      id: '/blog/salario-liquido-entenda'
+      path: '/blog/salario-liquido-entenda'
+      fullPath: '/blog/salario-liquido-entenda'
+      preLoaderRoute: typeof BlogSalarioLiquidoEntendaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/quanto-custa-ter-carro': {
       id: '/blog/quanto-custa-ter-carro'
       path: '/blog/quanto-custa-ter-carro'
@@ -604,11 +679,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogQuantoCustaTerCarroRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/quanto-custa-ser-autonomo': {
+      id: '/blog/quanto-custa-ser-autonomo'
+      path: '/blog/quanto-custa-ser-autonomo'
+      fullPath: '/blog/quanto-custa-ser-autonomo'
+      preLoaderRoute: typeof BlogQuantoCustaSerAutonomoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/quanto-custa-morar-sozinho': {
       id: '/blog/quanto-custa-morar-sozinho'
       path: '/blog/quanto-custa-morar-sozinho'
       fullPath: '/blog/quanto-custa-morar-sozinho'
       preLoaderRoute: typeof BlogQuantoCustaMorarSozinhoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/planejamento-tributario': {
+      id: '/blog/planejamento-tributario'
+      path: '/blog/planejamento-tributario'
+      fullPath: '/blog/planejamento-tributario'
+      preLoaderRoute: typeof BlogPlanejamentoTributarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/guia-irpf-2026': {
+      id: '/blog/guia-irpf-2026'
+      path: '/blog/guia-irpf-2026'
+      fullPath: '/blog/guia-irpf-2026'
+      preLoaderRoute: typeof BlogGuiaIrpf2026RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/custo-pet-anual': {
@@ -623,6 +719,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/como-economizar-conta-de-luz'
       fullPath: '/blog/como-economizar-conta-de-luz'
       preLoaderRoute: typeof BlogComoEconomizarContaDeLuzRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/clt-vs-pj-comparacao': {
+      id: '/blog/clt-vs-pj-comparacao'
+      path: '/blog/clt-vs-pj-comparacao'
+      fullPath: '/blog/clt-vs-pj-comparacao'
+      preLoaderRoute: typeof BlogCltVsPjComparacaoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/calculadora-irpf-2026': {
@@ -733,10 +836,15 @@ const rootRouteChildren: RootRouteChildren = {
   ApiVehicleEfficiencyRoute: ApiVehicleEfficiencyRoute,
   BlogAssinaturasQueValemAPenaRoute: BlogAssinaturasQueValemAPenaRoute,
   BlogCalculadoraIrpf2026Route: BlogCalculadoraIrpf2026Route,
+  BlogCltVsPjComparacaoRoute: BlogCltVsPjComparacaoRoute,
   BlogComoEconomizarContaDeLuzRoute: BlogComoEconomizarContaDeLuzRoute,
   BlogCustoPetAnualRoute: BlogCustoPetAnualRoute,
+  BlogGuiaIrpf2026Route: BlogGuiaIrpf2026Route,
+  BlogPlanejamentoTributarioRoute: BlogPlanejamentoTributarioRoute,
   BlogQuantoCustaMorarSozinhoRoute: BlogQuantoCustaMorarSozinhoRoute,
+  BlogQuantoCustaSerAutonomoRoute: BlogQuantoCustaSerAutonomoRoute,
   BlogQuantoCustaTerCarroRoute: BlogQuantoCustaTerCarroRoute,
+  BlogSalarioLiquidoEntendaRoute: BlogSalarioLiquidoEntendaRoute,
   ApiLocationsCitiesRoute: ApiLocationsCitiesRoute,
   ApiLocationsStatesRoute: ApiLocationsStatesRoute,
   ApiPublicDataSourcesRoute: ApiPublicDataSourcesRoute,
