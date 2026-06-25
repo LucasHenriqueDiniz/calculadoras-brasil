@@ -80,9 +80,12 @@ function Home() {
               {/* Stats strip */}
               <dl className="mt-10 grid max-w-xl grid-cols-3 gap-px overflow-hidden rounded-2xl border border-border bg-border shadow-[var(--shadow-card)]">
                 {stats.map((stat) => (
-                  <div key={stat.label} className="bg-surface px-4 py-5 text-center sm:px-6">
+                  <div
+                    key={stat.label}
+                    className="flex flex-col items-center justify-center bg-surface px-3 py-5 text-center sm:px-6"
+                  >
                     <dt className="sr-only">{stat.label}</dt>
-                    <dd className="font-display text-xl font-semibold text-foreground sm:text-2xl">
+                    <dd className="whitespace-nowrap font-display text-base font-semibold tracking-tight text-foreground sm:text-xl">
                       {stat.value}
                     </dd>
                     <p className="mt-1 text-xs text-muted-foreground sm:text-sm">{stat.label}</p>

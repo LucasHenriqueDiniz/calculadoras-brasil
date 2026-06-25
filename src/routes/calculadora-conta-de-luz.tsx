@@ -326,7 +326,10 @@ function ElectricityPage() {
 
   const form = (
     <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
-      <FormSection title="Tarifa de energia">
+      <FormSection
+        title="Tarifa de energia"
+        description="Selecione seu estado e distribuidora para buscar a tarifa pública da ANEEL — ou informe o valor da sua fatura manualmente."
+      >
         <SelectField
           label="Estado da unidade consumidora"
           value={uf}
@@ -348,22 +351,37 @@ function ElectricityPage() {
           disabled={isLoadingDistributors}
           hint="A lista vem da API pública da ANEEL. A UF selecionada é usada na consulta da tarifa."
         />
-        <Button
-          type="button"
-          variant="outline"
-          onClick={loadEnergyTariff}
-          disabled={tariffState.isLoading || !distributor.trim()}
-        >
-          {tariffState.isLoading ? <LoaderCircle className="animate-spin" /> : null}
-          Atualizar tarifa da ANEEL
-        </Button>
-        <PublicDataField
-          label="Tarifa em R$/kWh"
-          value={tariff}
-          onManualChange={updateTariffManually}
-          {...tariffState}
-          helperText="Prefira o valor total da sua fatura, já com impostos e bandeira."
-        />
+        <div className="sm:col-span-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={loadEnergyTariff}
+            disabled={tariffState.isLoading || !distributor.trim()}
+            className="w-full"
+          >
+            {tariffState.isLoading ? <LoaderCircle className="animate-spin" /> : null}
+            Atualizar tarifa da ANEEL
+          </Button>
+        </div>
+        <div className="sm:col-span-2">
+          <PublicDataField
+            label="Tarifa em R$/kWh"
+            value={tariff}
+            onManualChange={updateTariffManually}
+            {...tariffState}
+            helperText="Prefira o valor total da sua fatura, já com impostos e bandeira."
+          />
+        </div>
+      </FormSection>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="font-display text-lg text-foreground">Seus aparelhos</h3>
+          <Button type="button" variant="outline" size="sm" onClick={addAppliance}>
+            <Plus className="mr-1 h-4 w-4" /> Adicionar
+          </Button>
+        </div>
+
         <SelectField
           label="Adicionar aparelho pré-configurado"
           value={presetValue}
@@ -379,15 +397,6 @@ function ElectricityPage() {
           ]}
           hint="Adiciona uma linha com potência e uso típicos. Edite depois."
         />
-      </FormSection>
-
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="font-display text-lg text-foreground">Seus aparelhos</h3>
-          <Button type="button" variant="outline" size="sm" onClick={addAppliance}>
-            <Plus className="mr-1 h-4 w-4" /> Adicionar
-          </Button>
-        </div>
 
         {appliances.length === 0 ? (
           <p className="rounded-xl border border-dashed border-border bg-surface p-6 text-center text-sm text-muted-foreground">

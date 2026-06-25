@@ -391,17 +391,6 @@ function CarCostPage() {
           options={[...BRAZILIAN_STATES]}
           hint="A consulta usa médias públicas quando disponíveis. O preço do seu posto pode ser diferente."
         />
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => loadFuelPrices(activeFuelRequests)}
-          disabled={activeFuelRequests.some(({ key }) => fuelFields[key].isLoading)}
-        >
-          {activeFuelRequests.some(({ key }) => fuelFields[key].isLoading) ? (
-            <LoaderCircle className="animate-spin" />
-          ) : null}
-          Atualizar preço da ANP
-        </Button>
         <SelectField
           label="Tipo de combustível"
           value={input.fuelType}
@@ -413,32 +402,52 @@ function CarCostPage() {
             { value: "flex", label: "Flex automático (compara gasolina x etanol)" },
           ]}
         />
+        <div className="sm:col-span-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => loadFuelPrices(activeFuelRequests)}
+            disabled={activeFuelRequests.some(({ key }) => fuelFields[key].isLoading)}
+            className="w-full"
+          >
+            {activeFuelRequests.some(({ key }) => fuelFields[key].isLoading) ? (
+              <LoaderCircle className="animate-spin" />
+            ) : null}
+            Atualizar preço da ANP
+          </Button>
+        </div>
         {activeFuelRequests.some(({ key }) => key === "gasolinePrice") ? (
-          <PublicDataField
-            label="Preço da gasolina por litro"
-            value={input.gasolinePrice}
-            onManualChange={(value) => updateFuelManually("gasolinePrice", value)}
-            {...fuelFields.gasolinePrice}
-            helperText="Valor em R$/litro; você pode editar mesmo após carregar."
-          />
+          <div className="sm:col-span-2">
+            <PublicDataField
+              label="Preço da gasolina por litro"
+              value={input.gasolinePrice}
+              onManualChange={(value) => updateFuelManually("gasolinePrice", value)}
+              {...fuelFields.gasolinePrice}
+              helperText="Valor em R$/litro; você pode editar mesmo após carregar."
+            />
+          </div>
         ) : null}
         {activeFuelRequests.some(({ key }) => key === "ethanolPrice") ? (
-          <PublicDataField
-            label="Preço do etanol por litro"
-            value={input.ethanolPrice}
-            onManualChange={(value) => updateFuelManually("ethanolPrice", value)}
-            {...fuelFields.ethanolPrice}
-            helperText="Valor em R$/litro; você pode editar mesmo após carregar."
-          />
+          <div className="sm:col-span-2">
+            <PublicDataField
+              label="Preço do etanol por litro"
+              value={input.ethanolPrice}
+              onManualChange={(value) => updateFuelManually("ethanolPrice", value)}
+              {...fuelFields.ethanolPrice}
+              helperText="Valor em R$/litro; você pode editar mesmo após carregar."
+            />
+          </div>
         ) : null}
         {activeFuelRequests.some(({ key }) => key === "dieselPrice") ? (
-          <PublicDataField
-            label="Preço do diesel por litro"
-            value={input.dieselPrice}
-            onManualChange={(value) => updateFuelManually("dieselPrice", value)}
-            {...fuelFields.dieselPrice}
-            helperText="Valor em R$/litro; você pode editar mesmo após carregar."
-          />
+          <div className="sm:col-span-2">
+            <PublicDataField
+              label="Preço do diesel por litro"
+              value={input.dieselPrice}
+              onManualChange={(value) => updateFuelManually("dieselPrice", value)}
+              {...fuelFields.dieselPrice}
+              helperText="Valor em R$/litro; você pode editar mesmo após carregar."
+            />
+          </div>
         ) : null}
       </FormSection>
 
