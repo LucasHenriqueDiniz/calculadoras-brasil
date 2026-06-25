@@ -14,13 +14,13 @@ const heroExample = [
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Calcule Brasil — Decisões do dia a dia" },
+      { title: "Calcule Brasil | Decisões do dia a dia" },
       {
         name: "description",
         content:
           "Calculadoras simples para custos do dia a dia no Brasil: carro, morar sozinho, conta de luz, assinaturas, mudança e pet.",
       },
-      { property: "og:title", content: "Calcule Brasil — Decisões do dia a dia" },
+      { property: "og:title", content: "Calcule Brasil | Decisões do dia a dia" },
       {
         property: "og:description",
         content:

@@ -20,7 +20,7 @@ const comparisonData = {
 export const Route = createFileRoute("/comparar/mudanca")({
   head: () => ({
     meta: [
-      { title: "Mudança Profissional vs DIY: Vale a pena? — Calcule Brasil" },
+      { title: "Mudança Profissional vs DIY: Vale a pena? | Calcule Brasil" },
       { name: "description", content: "Compare custo e trabalho: mudançadora profissional vs DIY com amigos." },
       { property: "og:title", content: "Vale a pena contratar mudançadora profissional?" },
       { property: "og:url", content: absoluteUrl("/comparar/mudanca") },

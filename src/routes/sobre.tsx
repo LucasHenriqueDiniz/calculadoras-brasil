@@ -43,13 +43,13 @@ const notDoing = [
 export const Route = createFileRoute("/sobre")({
   head: () => ({
     meta: [
-      { title: "Sobre — Calcule Brasil" },
+      { title: "Sobre | Calcule Brasil" },
       {
         name: "description",
         content:
           "Conheça o Calcule Brasil: um hub independente de calculadoras para decisões cotidianas de orçamento no Brasil.",
       },
-      { property: "og:title", content: "Sobre — Calcule Brasil" },
+      { property: "og:title", content: "Sobre | Calcule Brasil" },
       {
         property: "og:description",
         content: "Hub independente de calculadoras para o dia a dia brasileiro.",

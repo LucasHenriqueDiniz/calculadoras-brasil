@@ -46,7 +46,7 @@ const comparisonData = {
 export const Route = createFileRoute("/comparar/streaming")({
   head: () => ({
     meta: [
-      { title: "Netflix vs Disney+ vs Prime: Qual vale mais? — Calcule Brasil" },
+      { title: "Netflix vs Disney+ vs Prime: Qual vale mais? | Calcule Brasil" },
       {
         name: "description",
         content:

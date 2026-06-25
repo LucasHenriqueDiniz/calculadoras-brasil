@@ -143,7 +143,7 @@ const FAQ: FAQItem[] = [
 export const Route = createFileRoute("/calculadora-conta-de-luz")({
   head: () => ({
     meta: [
-      { title: `${PAGE_TITLE} — Calcule Brasil` },
+      { title: `${PAGE_TITLE} | Calcule Brasil` },
       { name: "description", content: PAGE_DESCRIPTION },
       { property: "og:title", content: PAGE_TITLE },
       { property: "og:description", content: PAGE_DESCRIPTION },

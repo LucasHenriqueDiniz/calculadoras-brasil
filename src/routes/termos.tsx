@@ -45,13 +45,13 @@ const sections: Section[] = [
 export const Route = createFileRoute("/termos")({
   head: () => ({
     meta: [
-      { title: "Termos de Uso — Calcule Brasil" },
+      { title: "Termos de Uso | Calcule Brasil" },
       {
         name: "description",
         content:
           "Termos de uso do Calcule Brasil: conteúdo informativo, sem aconselhamento profissional, sem garantia de resultados.",
       },
-      { property: "og:title", content: "Termos de Uso — Calcule Brasil" },
+      { property: "og:title", content: "Termos de Uso | Calcule Brasil" },
       { property: "og:url", content: absoluteUrl("/termos") },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/termos") }],

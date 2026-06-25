@@ -36,13 +36,13 @@ const sections: Section[] = [
 export const Route = createFileRoute("/metodologia")({
   head: () => ({
     meta: [
-      { title: "Metodologia — Calcule Brasil" },
+      { title: "Metodologia | Calcule Brasil" },
       {
         name: "description",
         content:
           "Como o Calcule Brasil constrói cada estimativa: fórmulas, premissas e limites de cada cálculo.",
       },
-      { property: "og:title", content: "Metodologia — Calcule Brasil" },
+      { property: "og:title", content: "Metodologia | Calcule Brasil" },
       {
         property: "og:description",
         content: "Fórmulas, premissas e limitações das nossas calculadoras.",

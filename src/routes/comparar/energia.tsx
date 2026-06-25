@@ -21,7 +21,7 @@ const comparisonData = {
 export const Route = createFileRoute("/comparar/energia")({
   head: () => ({
     meta: [
-      { title: "Energia Solar vs Tradicional: Vale a pena? — Calcule Brasil" },
+      { title: "Energia Solar vs Tradicional: Vale a pena? | Calcule Brasil" },
       {
         name: "description",
         content:

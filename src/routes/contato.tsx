@@ -42,13 +42,13 @@ const topics = [
 export const Route = createFileRoute("/contato")({
   head: () => ({
     meta: [
-      { title: "Contato — Calcule Brasil" },
+      { title: "Contato | Calcule Brasil" },
       {
         name: "description",
         content:
           "Sugestões, correções, parcerias e questões legais sobre o Calcule Brasil — fale com a gente por e-mail.",
       },
-      { property: "og:title", content: "Contato — Calcule Brasil" },
+      { property: "og:title", content: "Contato | Calcule Brasil" },
       { property: "og:url", content: absoluteUrl("/contato") },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/contato") }],

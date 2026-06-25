@@ -27,7 +27,7 @@ const comparisonData = {
 export const Route = createFileRoute("/comparar/academia")({
   head: () => ({
     meta: [
-      { title: "Academia vs Treino em Casa vs Online — Calcule Brasil" },
+      { title: "Academia vs Treino em Casa vs Online | Calcule Brasil" },
       {
         name: "description",
         content:

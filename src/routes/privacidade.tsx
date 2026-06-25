@@ -29,13 +29,13 @@ const sections: Section[] = [
 export const Route = createFileRoute("/privacidade")({
   head: () => ({
     meta: [
-      { title: "Política de Privacidade — Calcule Brasil" },
+      { title: "Política de Privacidade | Calcule Brasil" },
       {
         name: "description",
         content:
           "Como o Calcule Brasil trata seus dados: nada de cadastro, cálculos no seu navegador e uso responsável de cookies.",
       },
-      { property: "og:title", content: "Política de Privacidade — Calcule Brasil" },
+      { property: "og:title", content: "Política de Privacidade | Calcule Brasil" },
       { property: "og:url", content: absoluteUrl("/privacidade") },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/privacidade") }],

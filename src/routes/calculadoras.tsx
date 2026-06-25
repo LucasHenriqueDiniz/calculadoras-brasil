@@ -8,13 +8,13 @@ import { absoluteUrl } from "@/lib/site";
 export const Route = createFileRoute("/calculadoras")({
   head: () => ({
     meta: [
-      { title: "Todas as calculadoras — Calcule Brasil" },
+      { title: "Todas as calculadoras | Calcule Brasil" },
       {
         name: "description",
         content:
           "Explore todas as calculadoras de custo do dia a dia no Brasil, organizadas por categoria: moradia, veículos, finanças e pets.",
       },
-      { property: "og:title", content: "Todas as calculadoras — Calcule Brasil" },
+      { property: "og:title", content: "Todas as calculadoras | Calcule Brasil" },
       {
         property: "og:description",
         content: "Calculadoras de custo organizadas por categoria.",

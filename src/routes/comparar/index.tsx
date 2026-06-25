@@ -63,13 +63,13 @@ const comparisons: Comparison[] = [
 export const Route = createFileRoute("/comparar/")({
   head: () => ({
     meta: [
-      { title: "Comparador de Custos — Calcule Brasil" },
+      { title: "Comparador de Custos | Calcule Brasil" },
       {
         name: "description",
         content:
           "Compare custos: streaming, academia, mudança, energia solar. Veja qual opção compensa mais para você.",
       },
-      { property: "og:title", content: "Comparador de Custos — Calcule Brasil" },
+      { property: "og:title", content: "Comparador de Custos | Calcule Brasil" },
       {
         property: "og:description",
         content:
