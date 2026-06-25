@@ -4,12 +4,6 @@ import { PageShell } from "@/components/layout/PageShell";
 import { calculators } from "@/data/calculators";
 import { absoluteUrl } from "@/lib/site";
 
-const stats = [
-  { value: "6", label: "calculadoras" },
-  { value: "ANP · ANEEL", label: "fontes públicas" },
-  { value: "100%", label: "no navegador" },
-];
-
 const heroExample = [
   { label: "Combustível", value: "R$ 720", pct: 100 },
   { label: "IPVA + seguro", value: "R$ 540", pct: 75 },
@@ -76,22 +70,6 @@ function Home() {
                   Como calculamos
                 </Link>
               </div>
-
-              {/* Stats strip */}
-              <dl className="mt-10 grid max-w-xl grid-cols-3 gap-px overflow-hidden rounded-2xl border border-border bg-border shadow-[var(--shadow-card)]">
-                {stats.map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="flex flex-col items-center justify-center bg-surface px-3 py-5 text-center sm:px-6"
-                  >
-                    <dt className="sr-only">{stat.label}</dt>
-                    <dd className="whitespace-nowrap font-display text-base font-semibold tracking-tight text-foreground sm:text-xl">
-                      {stat.value}
-                    </dd>
-                    <p className="mt-1 text-xs text-muted-foreground sm:text-sm">{stat.label}</p>
-                  </div>
-                ))}
-              </dl>
             </div>
 
             {/* Card de exemplo */}
