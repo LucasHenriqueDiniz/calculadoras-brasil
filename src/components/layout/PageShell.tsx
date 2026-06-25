@@ -45,7 +45,7 @@ export function PageHeader({ eyebrow, title, description }: PageHeaderProps) {
 }
 
 const PROSE_TYPOGRAPHY =
-  "[&_h2]:font-display [&_h2]:text-2xl [&_h2]:text-foreground [&_h2]:mt-10 [&_h2]:mb-3 [&_h2:first-child]:mt-0 [&_h3]:font-display [&_h3]:text-lg [&_h3]:text-foreground [&_h3]:mt-6 [&_h3]:mb-2 [&_p]:text-foreground/85 [&_p]:leading-relaxed [&_p+p]:mt-4 [&_ul]:mt-3 [&_ul]:space-y-2 [&_ul]:text-foreground/85 [&_ul]:list-disc [&_ul]:pl-6 [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2";
+  "[&_h2]:font-display [&_h2]:text-2xl [&_h2]:text-foreground [&_h2]:mt-10 [&_h2]:mb-3 [&_h2:first-child]:mt-0 [&_h3]:font-display [&_h3]:text-lg [&_h3]:text-foreground [&_h3]:mt-6 [&_h3]:mb-2 [&_p]:text-foreground/85 [&_p]:leading-relaxed [&_p+p]:mt-4 [&_ul]:mt-3 [&_ul]:space-y-2 [&_ul]:text-foreground/85 [&_ul]:list-disc [&_ul]:pl-6 [&_p_a]:text-primary [&_p_a]:underline [&_p_a]:underline-offset-2 [&_li_a]:text-primary [&_li_a]:underline [&_li_a]:underline-offset-2";
 
 interface ProseProps {
   children: ReactNode;

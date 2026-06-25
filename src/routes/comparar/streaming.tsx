@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
 import { ComparisonChart } from "@/components/ComparisonChart";
 import { absoluteUrl } from "@/lib/site";
@@ -68,6 +69,16 @@ function StreamingComparison() {
           title="Netflix vs Disney+ vs Prime Video vs HBO Max"
           description="Qual streaming compensa mais? Compare preço, catálogo e qualidade."
         />
+
+        <div className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
+          <Link
+            to="/comparar"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            Voltar para comparações
+          </Link>
+        </div>
 
         <Prose>
           <p>
