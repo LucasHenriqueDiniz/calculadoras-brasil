@@ -21,6 +21,11 @@ import { Route as CalculadoraCustoCarroRouteImport } from './routes/calculadora-
 import { Route as CalculadoraContaDeLuzRouteImport } from './routes/calculadora-conta-de-luz'
 import { Route as CalculadoraAssinaturasRouteImport } from './routes/calculadora-assinaturas'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogQuantoCustaTerCarroRouteImport } from './routes/blog/quanto-custa-ter-carro'
+import { Route as BlogQuantoCustaMorarSozinhoRouteImport } from './routes/blog/quanto-custa-morar-sozinho'
+import { Route as BlogCustoPetAnualRouteImport } from './routes/blog/custo-pet-anual'
+import { Route as BlogComoEconomizarContaDeLuzRouteImport } from './routes/blog/como-economizar-conta-de-luz'
+import { Route as BlogAssinaturasQueValemAPenaRouteImport } from './routes/blog/assinaturas-que-valem-a-pena'
 import { Route as ApiVehicleEfficiencyRouteImport } from './routes/api.vehicle-efficiency'
 import { Route as ApiHealthRouteImport } from './routes/api.health'
 import { Route as ApiFuelPricesRouteImport } from './routes/api.fuel-prices'
@@ -89,6 +94,34 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogQuantoCustaTerCarroRoute = BlogQuantoCustaTerCarroRouteImport.update({
+  id: '/blog/quanto-custa-ter-carro',
+  path: '/blog/quanto-custa-ter-carro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogQuantoCustaMorarSozinhoRoute =
+  BlogQuantoCustaMorarSozinhoRouteImport.update({
+    id: '/blog/quanto-custa-morar-sozinho',
+    path: '/blog/quanto-custa-morar-sozinho',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogCustoPetAnualRoute = BlogCustoPetAnualRouteImport.update({
+  id: '/blog/custo-pet-anual',
+  path: '/blog/custo-pet-anual',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogComoEconomizarContaDeLuzRoute =
+  BlogComoEconomizarContaDeLuzRouteImport.update({
+    id: '/blog/como-economizar-conta-de-luz',
+    path: '/blog/como-economizar-conta-de-luz',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogAssinaturasQueValemAPenaRoute =
+  BlogAssinaturasQueValemAPenaRouteImport.update({
+    id: '/blog/assinaturas-que-valem-a-pena',
+    path: '/blog/assinaturas-que-valem-a-pena',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiVehicleEfficiencyRoute = ApiVehicleEfficiencyRouteImport.update({
   id: '/api/vehicle-efficiency',
   path: '/api/vehicle-efficiency',
@@ -142,6 +175,11 @@ export interface FileRoutesByFullPath {
   '/api/fuel-prices': typeof ApiFuelPricesRoute
   '/api/health': typeof ApiHealthRoute
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
+  '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
+  '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
+  '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
+  '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
+  '/blog/quanto-custa-ter-carro': typeof BlogQuantoCustaTerCarroRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
   '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
@@ -163,6 +201,11 @@ export interface FileRoutesByTo {
   '/api/fuel-prices': typeof ApiFuelPricesRoute
   '/api/health': typeof ApiHealthRoute
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
+  '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
+  '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
+  '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
+  '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
+  '/blog/quanto-custa-ter-carro': typeof BlogQuantoCustaTerCarroRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
   '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
@@ -185,6 +228,11 @@ export interface FileRoutesById {
   '/api/fuel-prices': typeof ApiFuelPricesRoute
   '/api/health': typeof ApiHealthRoute
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
+  '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
+  '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
+  '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
+  '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
+  '/blog/quanto-custa-ter-carro': typeof BlogQuantoCustaTerCarroRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
   '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
@@ -208,6 +256,11 @@ export interface FileRouteTypes {
     | '/api/fuel-prices'
     | '/api/health'
     | '/api/vehicle-efficiency'
+    | '/blog/assinaturas-que-valem-a-pena'
+    | '/blog/como-economizar-conta-de-luz'
+    | '/blog/custo-pet-anual'
+    | '/blog/quanto-custa-morar-sozinho'
+    | '/blog/quanto-custa-ter-carro'
     | '/api/locations/cities'
     | '/api/locations/states'
     | '/api/public-data/sources'
@@ -229,6 +282,11 @@ export interface FileRouteTypes {
     | '/api/fuel-prices'
     | '/api/health'
     | '/api/vehicle-efficiency'
+    | '/blog/assinaturas-que-valem-a-pena'
+    | '/blog/como-economizar-conta-de-luz'
+    | '/blog/custo-pet-anual'
+    | '/blog/quanto-custa-morar-sozinho'
+    | '/blog/quanto-custa-ter-carro'
     | '/api/locations/cities'
     | '/api/locations/states'
     | '/api/public-data/sources'
@@ -250,6 +308,11 @@ export interface FileRouteTypes {
     | '/api/fuel-prices'
     | '/api/health'
     | '/api/vehicle-efficiency'
+    | '/blog/assinaturas-que-valem-a-pena'
+    | '/blog/como-economizar-conta-de-luz'
+    | '/blog/custo-pet-anual'
+    | '/blog/quanto-custa-morar-sozinho'
+    | '/blog/quanto-custa-ter-carro'
     | '/api/locations/cities'
     | '/api/locations/states'
     | '/api/public-data/sources'
@@ -272,6 +335,11 @@ export interface RootRouteChildren {
   ApiFuelPricesRoute: typeof ApiFuelPricesRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiVehicleEfficiencyRoute: typeof ApiVehicleEfficiencyRoute
+  BlogAssinaturasQueValemAPenaRoute: typeof BlogAssinaturasQueValemAPenaRoute
+  BlogComoEconomizarContaDeLuzRoute: typeof BlogComoEconomizarContaDeLuzRoute
+  BlogCustoPetAnualRoute: typeof BlogCustoPetAnualRoute
+  BlogQuantoCustaMorarSozinhoRoute: typeof BlogQuantoCustaMorarSozinhoRoute
+  BlogQuantoCustaTerCarroRoute: typeof BlogQuantoCustaTerCarroRoute
   ApiLocationsCitiesRoute: typeof ApiLocationsCitiesRoute
   ApiLocationsStatesRoute: typeof ApiLocationsStatesRoute
   ApiPublicDataSourcesRoute: typeof ApiPublicDataSourcesRoute
@@ -363,6 +431,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/quanto-custa-ter-carro': {
+      id: '/blog/quanto-custa-ter-carro'
+      path: '/blog/quanto-custa-ter-carro'
+      fullPath: '/blog/quanto-custa-ter-carro'
+      preLoaderRoute: typeof BlogQuantoCustaTerCarroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/quanto-custa-morar-sozinho': {
+      id: '/blog/quanto-custa-morar-sozinho'
+      path: '/blog/quanto-custa-morar-sozinho'
+      fullPath: '/blog/quanto-custa-morar-sozinho'
+      preLoaderRoute: typeof BlogQuantoCustaMorarSozinhoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/custo-pet-anual': {
+      id: '/blog/custo-pet-anual'
+      path: '/blog/custo-pet-anual'
+      fullPath: '/blog/custo-pet-anual'
+      preLoaderRoute: typeof BlogCustoPetAnualRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/como-economizar-conta-de-luz': {
+      id: '/blog/como-economizar-conta-de-luz'
+      path: '/blog/como-economizar-conta-de-luz'
+      fullPath: '/blog/como-economizar-conta-de-luz'
+      preLoaderRoute: typeof BlogComoEconomizarContaDeLuzRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/assinaturas-que-valem-a-pena': {
+      id: '/blog/assinaturas-que-valem-a-pena'
+      path: '/blog/assinaturas-que-valem-a-pena'
+      fullPath: '/blog/assinaturas-que-valem-a-pena'
+      preLoaderRoute: typeof BlogAssinaturasQueValemAPenaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/vehicle-efficiency': {
       id: '/api/vehicle-efficiency'
       path: '/api/vehicle-efficiency'
@@ -432,6 +535,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiFuelPricesRoute: ApiFuelPricesRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiVehicleEfficiencyRoute: ApiVehicleEfficiencyRoute,
+  BlogAssinaturasQueValemAPenaRoute: BlogAssinaturasQueValemAPenaRoute,
+  BlogComoEconomizarContaDeLuzRoute: BlogComoEconomizarContaDeLuzRoute,
+  BlogCustoPetAnualRoute: BlogCustoPetAnualRoute,
+  BlogQuantoCustaMorarSozinhoRoute: BlogQuantoCustaMorarSozinhoRoute,
+  BlogQuantoCustaTerCarroRoute: BlogQuantoCustaTerCarroRoute,
   ApiLocationsCitiesRoute: ApiLocationsCitiesRoute,
   ApiLocationsStatesRoute: ApiLocationsStatesRoute,
   ApiPublicDataSourcesRoute: ApiPublicDataSourcesRoute,
