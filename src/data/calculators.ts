@@ -5,8 +5,46 @@ import {
   CreditCard,
   Truck,
   PawPrint,
+  Wallet,
+  HeartPulse,
   type LucideIcon,
 } from "lucide-react";
+
+export type CalculatorCategoryId = "moradia" | "veiculos" | "financas" | "pet";
+
+export interface CategoryMeta {
+  id: CalculatorCategoryId;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+}
+
+export const calculatorCategories: CategoryMeta[] = [
+  {
+    id: "moradia",
+    label: "Casa e moradia",
+    description: "Custos de morar, contas da casa e mudança.",
+    icon: HomeIcon,
+  },
+  {
+    id: "veiculos",
+    label: "Veículos",
+    description: "Quanto custa ter e rodar com um carro.",
+    icon: Car,
+  },
+  {
+    id: "financas",
+    label: "Finanças pessoais",
+    description: "Gastos recorrentes que pesam no orçamento.",
+    icon: Wallet,
+  },
+  {
+    id: "pet",
+    label: "Pets",
+    description: "O custo real de cuidar bem dos animais.",
+    icon: HeartPulse,
+  },
+];
 
 export interface CalculatorMeta {
   slug: string;
@@ -17,6 +55,7 @@ export interface CalculatorMeta {
     | "/calculadora-assinaturas"
     | "/calculadora-custo-mudanca"
     | "/calculadora-custo-pet";
+  category: CalculatorCategoryId;
   title: string;
   shortTitle: string;
   tagline: string;
@@ -31,6 +70,7 @@ export const calculators: CalculatorMeta[] = [
   {
     slug: "custo-carro",
     path: "/calculadora-custo-carro",
+    category: "veiculos",
     title: "Calculadora de custo de carro",
     shortTitle: "Custo de carro",
     tagline: "Quanto seu carro realmente custa por mês",
@@ -56,6 +96,7 @@ export const calculators: CalculatorMeta[] = [
   {
     slug: "morar-sozinho",
     path: "/calculadora-morar-sozinho",
+    category: "moradia",
     title: "Calculadora de custo para morar sozinho",
     shortTitle: "Morar sozinho",
     tagline: "Estime quanto custa sair da casa dos pais",
@@ -81,6 +122,7 @@ export const calculators: CalculatorMeta[] = [
   {
     slug: "conta-de-luz",
     path: "/calculadora-conta-de-luz",
+    category: "moradia",
     title: "Calculadora de conta de luz por aparelho",
     shortTitle: "Conta de luz",
     tagline: "Descubra quais aparelhos pesam na sua conta",
@@ -105,6 +147,7 @@ export const calculators: CalculatorMeta[] = [
   {
     slug: "assinaturas",
     path: "/calculadora-assinaturas",
+    category: "financas",
     title: "Calculadora de gasto com assinaturas",
     shortTitle: "Assinaturas",
     tagline: "Veja o custo total das suas assinaturas",
@@ -128,6 +171,7 @@ export const calculators: CalculatorMeta[] = [
   {
     slug: "custo-mudanca",
     path: "/calculadora-custo-mudanca",
+    category: "moradia",
     title: "Calculadora de custo de mudança residencial",
     shortTitle: "Custo de mudança",
     tagline: "Planeje o orçamento da sua mudança",
@@ -152,6 +196,7 @@ export const calculators: CalculatorMeta[] = [
   {
     slug: "custo-pet",
     path: "/calculadora-custo-pet",
+    category: "pet",
     title: "Calculadora de custo de pet",
     shortTitle: "Custo de pet",
     tagline: "Quanto custa cuidar bem do seu pet",

@@ -15,6 +15,7 @@ import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as MetodologiaRouteImport } from './routes/metodologia'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as CompararRouteImport } from './routes/comparar'
+import { Route as CalculadorasRouteImport } from './routes/calculadoras'
 import { Route as CalculadoraMorarSozinhoRouteImport } from './routes/calculadora-morar-sozinho'
 import { Route as CalculadoraCustoPetRouteImport } from './routes/calculadora-custo-pet'
 import { Route as CalculadoraCustoMudancaRouteImport } from './routes/calculadora-custo-mudanca'
@@ -67,6 +68,11 @@ const ContatoRoute = ContatoRouteImport.update({
 const CompararRoute = CompararRouteImport.update({
   id: '/comparar',
   path: '/comparar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalculadorasRoute = CalculadorasRouteImport.update({
+  id: '/calculadoras',
+  path: '/calculadoras',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CalculadoraMorarSozinhoRoute = CalculadoraMorarSozinhoRouteImport.update({
@@ -196,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/calculadora-custo-mudanca': typeof CalculadoraCustoMudancaRoute
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
+  '/calculadoras': typeof CalculadorasRoute
   '/comparar': typeof CompararRouteWithChildren
   '/contato': typeof ContatoRoute
   '/metodologia': typeof MetodologiaRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/calculadora-custo-mudanca': typeof CalculadoraCustoMudancaRoute
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
+  '/calculadoras': typeof CalculadorasRoute
   '/comparar': typeof CompararRouteWithChildren
   '/contato': typeof ContatoRoute
   '/metodologia': typeof MetodologiaRoute
@@ -259,6 +267,7 @@ export interface FileRoutesById {
   '/calculadora-custo-mudanca': typeof CalculadoraCustoMudancaRoute
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
+  '/calculadoras': typeof CalculadorasRoute
   '/comparar': typeof CompararRouteWithChildren
   '/contato': typeof ContatoRoute
   '/metodologia': typeof MetodologiaRoute
@@ -292,6 +301,7 @@ export interface FileRouteTypes {
     | '/calculadora-custo-mudanca'
     | '/calculadora-custo-pet'
     | '/calculadora-morar-sozinho'
+    | '/calculadoras'
     | '/comparar'
     | '/contato'
     | '/metodologia'
@@ -323,6 +333,7 @@ export interface FileRouteTypes {
     | '/calculadora-custo-mudanca'
     | '/calculadora-custo-pet'
     | '/calculadora-morar-sozinho'
+    | '/calculadoras'
     | '/comparar'
     | '/contato'
     | '/metodologia'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/calculadora-custo-mudanca'
     | '/calculadora-custo-pet'
     | '/calculadora-morar-sozinho'
+    | '/calculadoras'
     | '/comparar'
     | '/contato'
     | '/metodologia'
@@ -386,6 +398,7 @@ export interface RootRouteChildren {
   CalculadoraCustoMudancaRoute: typeof CalculadoraCustoMudancaRoute
   CalculadoraCustoPetRoute: typeof CalculadoraCustoPetRoute
   CalculadoraMorarSozinhoRoute: typeof CalculadoraMorarSozinhoRoute
+  CalculadorasRoute: typeof CalculadorasRoute
   CompararRoute: typeof CompararRouteWithChildren
   ContatoRoute: typeof ContatoRoute
   MetodologiaRoute: typeof MetodologiaRoute
@@ -448,6 +461,13 @@ declare module '@tanstack/react-router' {
       path: '/comparar'
       fullPath: '/comparar'
       preLoaderRoute: typeof CompararRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calculadoras': {
+      id: '/calculadoras'
+      path: '/calculadoras'
+      fullPath: '/calculadoras'
+      preLoaderRoute: typeof CalculadorasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/calculadora-morar-sozinho': {
@@ -640,6 +660,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalculadoraCustoMudancaRoute: CalculadoraCustoMudancaRoute,
   CalculadoraCustoPetRoute: CalculadoraCustoPetRoute,
   CalculadoraMorarSozinhoRoute: CalculadoraMorarSozinhoRoute,
+  CalculadorasRoute: CalculadorasRoute,
   CompararRoute: CompararRouteWithChildren,
   ContatoRoute: ContatoRoute,
   MetodologiaRoute: MetodologiaRoute,
