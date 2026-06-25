@@ -2,7 +2,7 @@ export interface BlogPost {
   slug: string;
   title: string;
   description: string;
-  category: "guia" | "dica" | "educacao" | "noticia";
+  category: "guia" | "dica" | "educacao" | "noticia" | "analise";
   imageUrl: string;
   imageAlt: string;
   author: string;
