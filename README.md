@@ -3,8 +3,15 @@
 Hub de calculadoras brasileiras para estimar custos do dia a dia. A aplicação usa React,
 TypeScript, TanStack Start e Cloudflare Workers.
 
-As 12 páginas públicas são pré-renderizadas no build para entregar conteúdo, metadados e JSON-LD
+As 22 páginas públicas são pré-renderizadas no build para entregar conteúdo, metadados e JSON-LD
 sem depender da execução de JavaScript. As seis calculadoras continuam interativas após hidratação.
+
+**Conteúdo:**
+- 6 calculadoras interativas (custo de carro, morar sozinho, conta de luz, assinaturas, pet, mudança)
+- 5 artigos de blog com FAQ schema (2.500+ palavras cada)
+- 4 comparativas side-by-side (streaming, academia, mudança, energia)
+- 1 hub central de comparações
+- 6 páginas institucionais (sobre, metodologia, privacidade, termos, contato, 404)
 
 ## Requisitos
 
@@ -32,7 +39,7 @@ O gate executa:
 - testes das fórmulas;
 - TypeScript e ESLint;
 - build client e Worker;
-- pré-renderização das 12 rotas;
+- pré-renderização das 22 rotas;
 - smoke test SEO sem JavaScript;
 - dry-run do deploy;
 - auditoria de dependências.
