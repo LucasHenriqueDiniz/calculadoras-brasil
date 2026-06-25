@@ -17,6 +17,7 @@ import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as CompararRouteImport } from './routes/comparar'
 import { Route as CalculadorasRouteImport } from './routes/calculadoras'
 import { Route as CalculadoraMorarSozinhoRouteImport } from './routes/calculadora-morar-sozinho'
+import { Route as CalculadoraIrpf2026RouteImport } from './routes/calculadora-irpf-2026'
 import { Route as CalculadoraCustoPetRouteImport } from './routes/calculadora-custo-pet'
 import { Route as CalculadoraCustoMudancaRouteImport } from './routes/calculadora-custo-mudanca'
 import { Route as CalculadoraCustoCarroRouteImport } from './routes/calculadora-custo-carro'
@@ -32,6 +33,7 @@ import { Route as BlogQuantoCustaTerCarroRouteImport } from './routes/blog/quant
 import { Route as BlogQuantoCustaMorarSozinhoRouteImport } from './routes/blog/quanto-custa-morar-sozinho'
 import { Route as BlogCustoPetAnualRouteImport } from './routes/blog/custo-pet-anual'
 import { Route as BlogComoEconomizarContaDeLuzRouteImport } from './routes/blog/como-economizar-conta-de-luz'
+import { Route as BlogCalculadoraIrpf2026RouteImport } from './routes/blog/calculadora-irpf-2026'
 import { Route as BlogAssinaturasQueValemAPenaRouteImport } from './routes/blog/assinaturas-que-valem-a-pena'
 import { Route as ApiVehicleEfficiencyRouteImport } from './routes/api.vehicle-efficiency'
 import { Route as ApiHealthRouteImport } from './routes/api.health'
@@ -79,6 +81,11 @@ const CalculadorasRoute = CalculadorasRouteImport.update({
 const CalculadoraMorarSozinhoRoute = CalculadoraMorarSozinhoRouteImport.update({
   id: '/calculadora-morar-sozinho',
   path: '/calculadora-morar-sozinho',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalculadoraIrpf2026Route = CalculadoraIrpf2026RouteImport.update({
+  id: '/calculadora-irpf-2026',
+  path: '/calculadora-irpf-2026',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CalculadoraCustoPetRoute = CalculadoraCustoPetRouteImport.update({
@@ -158,6 +165,11 @@ const BlogComoEconomizarContaDeLuzRoute =
     path: '/blog/como-economizar-conta-de-luz',
     getParentRoute: () => rootRouteImport,
   } as any)
+const BlogCalculadoraIrpf2026Route = BlogCalculadoraIrpf2026RouteImport.update({
+  id: '/blog/calculadora-irpf-2026',
+  path: '/blog/calculadora-irpf-2026',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogAssinaturasQueValemAPenaRoute =
   BlogAssinaturasQueValemAPenaRouteImport.update({
     id: '/blog/assinaturas-que-valem-a-pena',
@@ -207,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/calculadora-custo-carro': typeof CalculadoraCustoCarroRoute
   '/calculadora-custo-mudanca': typeof CalculadoraCustoMudancaRoute
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
+  '/calculadora-irpf-2026': typeof CalculadoraIrpf2026Route
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
   '/calculadoras': typeof CalculadorasRoute
   '/comparar': typeof CompararRouteWithChildren
@@ -220,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/api/health': typeof ApiHealthRoute
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
   '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
+  '/blog/calculadora-irpf-2026': typeof BlogCalculadoraIrpf2026Route
   '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
   '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
@@ -240,6 +254,7 @@ export interface FileRoutesByTo {
   '/calculadora-custo-carro': typeof CalculadoraCustoCarroRoute
   '/calculadora-custo-mudanca': typeof CalculadoraCustoMudancaRoute
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
+  '/calculadora-irpf-2026': typeof CalculadoraIrpf2026Route
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
   '/calculadoras': typeof CalculadorasRoute
   '/contato': typeof ContatoRoute
@@ -252,6 +267,7 @@ export interface FileRoutesByTo {
   '/api/health': typeof ApiHealthRoute
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
   '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
+  '/blog/calculadora-irpf-2026': typeof BlogCalculadoraIrpf2026Route
   '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
   '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
@@ -273,6 +289,7 @@ export interface FileRoutesById {
   '/calculadora-custo-carro': typeof CalculadoraCustoCarroRoute
   '/calculadora-custo-mudanca': typeof CalculadoraCustoMudancaRoute
   '/calculadora-custo-pet': typeof CalculadoraCustoPetRoute
+  '/calculadora-irpf-2026': typeof CalculadoraIrpf2026Route
   '/calculadora-morar-sozinho': typeof CalculadoraMorarSozinhoRoute
   '/calculadoras': typeof CalculadorasRoute
   '/comparar': typeof CompararRouteWithChildren
@@ -286,6 +303,7 @@ export interface FileRoutesById {
   '/api/health': typeof ApiHealthRoute
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
   '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
+  '/blog/calculadora-irpf-2026': typeof BlogCalculadoraIrpf2026Route
   '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
   '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
@@ -308,6 +326,7 @@ export interface FileRouteTypes {
     | '/calculadora-custo-carro'
     | '/calculadora-custo-mudanca'
     | '/calculadora-custo-pet'
+    | '/calculadora-irpf-2026'
     | '/calculadora-morar-sozinho'
     | '/calculadoras'
     | '/comparar'
@@ -321,6 +340,7 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/api/vehicle-efficiency'
     | '/blog/assinaturas-que-valem-a-pena'
+    | '/blog/calculadora-irpf-2026'
     | '/blog/como-economizar-conta-de-luz'
     | '/blog/custo-pet-anual'
     | '/blog/quanto-custa-morar-sozinho'
@@ -341,6 +361,7 @@ export interface FileRouteTypes {
     | '/calculadora-custo-carro'
     | '/calculadora-custo-mudanca'
     | '/calculadora-custo-pet'
+    | '/calculadora-irpf-2026'
     | '/calculadora-morar-sozinho'
     | '/calculadoras'
     | '/contato'
@@ -353,6 +374,7 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/api/vehicle-efficiency'
     | '/blog/assinaturas-que-valem-a-pena'
+    | '/blog/calculadora-irpf-2026'
     | '/blog/como-economizar-conta-de-luz'
     | '/blog/custo-pet-anual'
     | '/blog/quanto-custa-morar-sozinho'
@@ -373,6 +395,7 @@ export interface FileRouteTypes {
     | '/calculadora-custo-carro'
     | '/calculadora-custo-mudanca'
     | '/calculadora-custo-pet'
+    | '/calculadora-irpf-2026'
     | '/calculadora-morar-sozinho'
     | '/calculadoras'
     | '/comparar'
@@ -386,6 +409,7 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/api/vehicle-efficiency'
     | '/blog/assinaturas-que-valem-a-pena'
+    | '/blog/calculadora-irpf-2026'
     | '/blog/como-economizar-conta-de-luz'
     | '/blog/custo-pet-anual'
     | '/blog/quanto-custa-morar-sozinho'
@@ -407,6 +431,7 @@ export interface RootRouteChildren {
   CalculadoraCustoCarroRoute: typeof CalculadoraCustoCarroRoute
   CalculadoraCustoMudancaRoute: typeof CalculadoraCustoMudancaRoute
   CalculadoraCustoPetRoute: typeof CalculadoraCustoPetRoute
+  CalculadoraIrpf2026Route: typeof CalculadoraIrpf2026Route
   CalculadoraMorarSozinhoRoute: typeof CalculadoraMorarSozinhoRoute
   CalculadorasRoute: typeof CalculadorasRoute
   CompararRoute: typeof CompararRouteWithChildren
@@ -420,6 +445,7 @@ export interface RootRouteChildren {
   ApiHealthRoute: typeof ApiHealthRoute
   ApiVehicleEfficiencyRoute: typeof ApiVehicleEfficiencyRoute
   BlogAssinaturasQueValemAPenaRoute: typeof BlogAssinaturasQueValemAPenaRoute
+  BlogCalculadoraIrpf2026Route: typeof BlogCalculadoraIrpf2026Route
   BlogComoEconomizarContaDeLuzRoute: typeof BlogComoEconomizarContaDeLuzRoute
   BlogCustoPetAnualRoute: typeof BlogCustoPetAnualRoute
   BlogQuantoCustaMorarSozinhoRoute: typeof BlogQuantoCustaMorarSozinhoRoute
@@ -485,6 +511,13 @@ declare module '@tanstack/react-router' {
       path: '/calculadora-morar-sozinho'
       fullPath: '/calculadora-morar-sozinho'
       preLoaderRoute: typeof CalculadoraMorarSozinhoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calculadora-irpf-2026': {
+      id: '/calculadora-irpf-2026'
+      path: '/calculadora-irpf-2026'
+      fullPath: '/calculadora-irpf-2026'
+      preLoaderRoute: typeof CalculadoraIrpf2026RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/calculadora-custo-pet': {
@@ -592,6 +625,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogComoEconomizarContaDeLuzRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/calculadora-irpf-2026': {
+      id: '/blog/calculadora-irpf-2026'
+      path: '/blog/calculadora-irpf-2026'
+      fullPath: '/blog/calculadora-irpf-2026'
+      preLoaderRoute: typeof BlogCalculadoraIrpf2026RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/assinaturas-que-valem-a-pena': {
       id: '/blog/assinaturas-que-valem-a-pena'
       path: '/blog/assinaturas-que-valem-a-pena'
@@ -678,6 +718,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalculadoraCustoCarroRoute: CalculadoraCustoCarroRoute,
   CalculadoraCustoMudancaRoute: CalculadoraCustoMudancaRoute,
   CalculadoraCustoPetRoute: CalculadoraCustoPetRoute,
+  CalculadoraIrpf2026Route: CalculadoraIrpf2026Route,
   CalculadoraMorarSozinhoRoute: CalculadoraMorarSozinhoRoute,
   CalculadorasRoute: CalculadorasRoute,
   CompararRoute: CompararRouteWithChildren,
@@ -691,6 +732,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiHealthRoute: ApiHealthRoute,
   ApiVehicleEfficiencyRoute: ApiVehicleEfficiencyRoute,
   BlogAssinaturasQueValemAPenaRoute: BlogAssinaturasQueValemAPenaRoute,
+  BlogCalculadoraIrpf2026Route: BlogCalculadoraIrpf2026Route,
   BlogComoEconomizarContaDeLuzRoute: BlogComoEconomizarContaDeLuzRoute,
   BlogCustoPetAnualRoute: BlogCustoPetAnualRoute,
   BlogQuantoCustaMorarSozinhoRoute: BlogQuantoCustaMorarSozinhoRoute,

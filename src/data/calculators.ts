@@ -10,7 +10,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export type CalculatorCategoryId = "moradia" | "veiculos" | "financas" | "pet";
+export type CalculatorCategoryId = "moradia" | "veiculos" | "financas" | "pet" | "impostos";
 
 export interface CategoryMeta {
   id: CalculatorCategoryId;
@@ -44,6 +44,12 @@ export const calculatorCategories: CategoryMeta[] = [
     description: "O custo real de cuidar bem dos animais.",
     icon: HeartPulse,
   },
+  {
+    id: "impostos",
+    label: "Impostos e tributos",
+    description: "Simuladores de IRPF, INSS, salário líquido e impostos pessoais.",
+    icon: CreditCard,
+  },
 ];
 
 export interface CalculatorMeta {
@@ -54,7 +60,8 @@ export interface CalculatorMeta {
     | "/calculadora-conta-de-luz"
     | "/calculadora-assinaturas"
     | "/calculadora-custo-mudanca"
-    | "/calculadora-custo-pet";
+    | "/calculadora-custo-pet"
+    | "/calculadora-irpf-2026";
   category: CalculatorCategoryId;
   title: string;
   shortTitle: string;
@@ -216,6 +223,34 @@ export const calculators: CalculatorMeta[] = [
       "Tipo de ração (padrão, premium, super premium)",
       "Frequência de banho/tosa",
       "Plano de saúde pet (sim/não)",
+    ],
+  },
+  {
+    slug: "irpf-2026",
+    path: "/calculadora-irpf-2026",
+    category: "impostos",
+    title: "Calculadora IRPF 2026",
+    shortTitle: "IRPF 2026",
+    tagline: "Calcule seu imposto de renda e alíquota efetiva",
+    description:
+      "Simule sua declaração de IRPF 2026. Inclua dependentes, deduções com educação e saúde, e veja quanto você deve ao leão.",
+    icon: CreditCard,
+    intro:
+      "O Imposto de Renda Pessoa Física (IRPF) afeta ~50 milhões de brasileiros, mas poucos entendem como funciona. Esta calculadora segue as regras progressivas da Receita Federal para 2026, considerando dependentes, deduções permitidas (educação, saúde, previdência) e regime tributário (completo ou simplificado).",
+    whatItDoes: [
+      "Calcula o IRPF anual baseado nas alíquotas progressivas de 2026.",
+      "Considera desconto INSS na fonte (retenção).",
+      "Aplica deduções com educação (até R$ 3.561,50), saúde e previdência complementar.",
+      "Desconta R$ 2.275 por dependente na base imponível.",
+      "Compara regime completo vs. simplificado (20,5% de dedução fixa).",
+      "Mostra alíquota marginal e efetiva do seu imposto.",
+    ],
+    inputs: [
+      "Renda bruta anual (salário, bônus, 13º)",
+      "Número de dependentes",
+      "Gastos anuais com educação e saúde",
+      "Contribuição com previdência complementar",
+      "Regime tributário (completo ou simplificado)",
     ],
   },
 ];

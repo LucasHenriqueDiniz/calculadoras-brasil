@@ -155,6 +155,80 @@ export const blogPosts: Record<string, BlogPost> = {
     ],
     faqs: [],
   },
+
+  "calculadora-irpf-2026": {
+    slug: "calculadora-irpf-2026",
+    title: "Calculadora IRPF 2026: Quanto Você Deve Pagar",
+    description:
+      "Guia completo sobre IRPF 2026. Entenda as alíquotas progressivas, deduções permitidas, dependentes e como calcular seu imposto de renda.",
+    category: "guia",
+    imageUrl: "/blog/irpf-2026.jpg",
+    imageAlt: "Calculadora IRPF 2026 - Imposto de Renda",
+    author: "Calcule Brasil",
+    publishedAt: "2026-06-25",
+    updatedAt: "2026-06-25",
+    readingTime: 12,
+    keywords: [
+      "calculadora IRPF 2026",
+      "imposto de renda pessoa física",
+      "alíquota IRPF 2026",
+      "deduções IRPF permitidas",
+      "dependentes IRPF",
+      "quanto pagar de imposto",
+    ],
+    faqs: [
+      {
+        question: "Como funciona o cálculo do IRPF 2026?",
+        answer:
+          "O IRPF segue uma tabela progressiva: até R$ 21.503/ano isento, depois 7,5% até 15%, 22,5% e 27,5% nas maiores rendas. Você deduz INSS, deduções permitidas (educação, saúde, previdência) e dependentes antes de aplicar a alíquota.",
+      },
+      {
+        question: "Qual é a alíquota IRPF para cada faixa salarial?",
+        answer:
+          "Até R$ 21.503/ano: 0% (isento). De R$ 21.503 a R$ 33.503: 7,5%. De R$ 33.503 a R$ 44.694: 15%. De R$ 44.694 a R$ 55.472: 22,5%. Acima de R$ 55.472: 27,5%. Essas faixas foram atualizadas em 2026.",
+      },
+      {
+        question: "Dependentes reduzem meu IRPF?",
+        answer:
+          "Sim, cada dependente reduz R$ 2.275 da base imponível em 2026. Cônjuge, filhos até 21 anos (ou 24 se estudante), pais, irmãos menores contam. A redução é significativa se tiver vários dependentes.",
+      },
+      {
+        question: "Educação é dedutível no IRPF?",
+        answer:
+          "Sim. Gastos com educação (pública, privada, uniforme, transporte escolar) são dedutíveis até o limite de R$ 3.561,50/ano em 2026. Inclua sua educação e de dependentes.",
+      },
+      {
+        question: "Saúde é dedutível no IRPF?",
+        answer:
+          "Sim, completamente. Sem limite legal: consultas, exames, medicamentos, hospitais, plano de saúde, dentista — tudo entra. Mantenha comprovantes de todas as despesas.",
+      },
+      {
+        question: "Vale a pena usar o regime simplificado?",
+        answer:
+          "Depende. Regime simplificado: dedução fixa de 20,5% da renda bruta. Regime completo: deduções reais (educação, saúde, previdência). Se tem muitos gastos dedutíveis, completo vale mais. Nossa calculadora compara para você.",
+      },
+      {
+        question: "Quando devo declarar IRPF?",
+        answer:
+          "A declaração de 2026 é feita em 2027 (entre março e abril). Precisa declarar se teve renda > R$ 28.559,70 ou atividade profissional. Fique atento aos prazos divulgados pela Receita Federal.",
+      },
+      {
+        question: "Como funciona o desconto INSS na calculadora?",
+        answer:
+          "Se empregado CLT, o INSS (8-11%) é retido na folha de pagamento automaticamente. A calculadora desconta 10% como média. Autônomos pagam diretamente à Receita Federal (alíquota conforme a categoria).",
+      },
+      {
+        question: "Previdência complementar é dedutível?",
+        answer:
+          "Sim, até o limite de R$ 63.454/ano em 2026 (aproximadamente 13% da renda bruta). Contribuições a PGBL, VGBL, fundos de pensão entram como deduções.",
+      },
+      {
+        question: "E se meu resultado for negativo? Ganho restituição?",
+        answer:
+          "Sim! Se o valor calculado for negativo, você tem direito à restituição (devolução de imposto pago em excesso). A Receita Federal restitui em até 3 parcelas mensais.",
+      },
+    ],
+  },
 };
 
 export function getBlogPost(slug: string): BlogPost | undefined {
