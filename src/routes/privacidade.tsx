@@ -16,6 +16,12 @@ const sections: Section[] = [
   { id: "cookies", label: "Cookies", title: "Cookies e medição de audiência", icon: Cookie },
   { id: "publicidade", label: "Publicidade", title: "Publicidade", icon: Megaphone },
   {
+    id: "anuncios-personalizados",
+    label: "Anúncios personalizados",
+    title: "Anúncios personalizados",
+    icon: Megaphone,
+  },
+  {
     id: "direitos",
     label: "Direitos (LGPD)",
     title: "Direitos do titular (LGPD)",
@@ -120,6 +126,46 @@ function PrivacidadePage() {
 
             <SectionCard section={sections[3]}>
               <p>
+                Os anúncios exibidos no Calcule Brasil são personalizados com base no seu histórico de navegação
+                e interesses, através de cookies e tecnologias similares. Isso é feito por plataformas como Google AdSense
+                para melhorar a relevância dos anúncios que você vê.
+              </p>
+              <p>
+                <strong>Você pode controlar essas preferências:</strong>
+              </p>
+              <ul className="ml-4 space-y-2">
+                <li>
+                  • Bloqueie cookies nas configurações do seu navegador a qualquer momento
+                </li>
+                <li>
+                  • Acesse{" "}
+                  <a
+                    href="https://myaccount.google.com/data-and-privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-primary underline underline-offset-2"
+                  >
+                    Google Account → Dados e Privacidade
+                  </a>{" "}
+                  para gerenciar sua atividade
+                </li>
+                <li>
+                  • Visite{" "}
+                  <a
+                    href="https://adssettings.google.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-primary underline underline-offset-2"
+                  >
+                    Google Ads Settings
+                  </a>{" "}
+                  para ver e ajustar suas preferências de anúncios
+                </li>
+              </ul>
+            </SectionCard>
+
+            <SectionCard section={sections[4]}>
+              <p>
                 Você pode solicitar informações sobre o tratamento de dados pelo nosso site
                 escrevendo para o canal indicado na{" "}
                 <Link to="/contato" className="text-primary underline underline-offset-2">
@@ -130,7 +176,7 @@ function PrivacidadePage() {
               </p>
             </SectionCard>
 
-            <SectionCard section={sections[4]}>
+            <SectionCard section={sections[5]}>
               <p>
                 Esta política pode ser atualizada para refletir mudanças nas ferramentas que usamos.
                 Recomendamos revisá-la periodicamente.

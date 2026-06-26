@@ -125,6 +125,39 @@ function SobrePage() {
           </ul>
         </section>
 
+        {/* Criador */}
+        <section className="mt-12 flex items-start gap-4 rounded-2xl border border-border bg-surface p-7 shadow-[var(--shadow-card)] sm:p-8">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
+            <BookOpen className="h-5 w-5" aria-hidden />
+          </span>
+          <div>
+            <h2 className="font-display text-xl text-foreground">Quem criou isso</h2>
+            <p className="mt-2 text-pretty leading-relaxed text-foreground/85">
+              <strong>Lucas Henrique Diniz Ostroski</strong> — desenvolvedor full-stack com interesse em finanças pessoais
+              e educação financeira. Criou o Calcule Brasil para ajudar brasileiros a tomar decisões informadas sobre
+              custos do dia a dia.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <a
+                href="https://www.linkedin.com/in/lucas-diniz-ostroski/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary/30 hover:bg-primary-soft"
+              >
+                LinkedIn
+              </a>
+              <a
+                href="https://github.com/LucasHenriqueDiniz/calculadoras-brasil"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary/30 hover:bg-primary-soft"
+              >
+                GitHub
+              </a>
+            </div>
+          </div>
+        </section>
+
         {/* Sustentação */}
         <section className="mt-12 flex items-start gap-4 rounded-2xl border border-border bg-surface p-7 shadow-[var(--shadow-card)] sm:p-8">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
