@@ -7,7 +7,10 @@ export const Route = createFileRoute("/blog/tabela-irpf-2026-completa")({
   head: () => ({
     meta: [
       { title: "Tabela IRPF 2026 Completa | Calcule Brasil" },
-      { name: "description", content: "Tabela de alíquotas IRPF 2026, deduções dependentes, limites de isenção." },
+      {
+        name: "description",
+        content: "Tabela de alíquotas IRPF 2026, deduções dependentes, limites de isenção.",
+      },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/blog/tabela-irpf-2026-completa") }],
   }),
@@ -18,7 +21,11 @@ function BlogPost() {
   return (
     <PageShell>
       <article>
-        <PageHeader eyebrow="referência • 5 min" title="Tabela IRPF 2026 Completa" description="Todos os valores, alíquotas e limites do IRPF 2026." />
+        <PageHeader
+          eyebrow="referência • 5 min"
+          title="Tabela IRPF 2026 Completa"
+          description="Todos os valores, alíquotas e limites do IRPF 2026."
+        />
         <Prose>
           <h2>Alíquotas IRPF 2026</h2>
           <table>
@@ -50,10 +57,18 @@ function BlogPost() {
 
           <h2>Valores Deduções 2026</h2>
           <ul>
-            <li><strong>Por dependente:</strong> R$ 2.275</li>
-            <li><strong>Educação:</strong> Até R$ 3.561,50</li>
-            <li><strong>Saúde:</strong> Sem limite</li>
-            <li><strong>Previdência complementar:</strong> Até 13% da renda bruta</li>
+            <li>
+              <strong>Por dependente:</strong> R$ 2.275
+            </li>
+            <li>
+              <strong>Educação:</strong> Até R$ 3.561,50
+            </li>
+            <li>
+              <strong>Saúde:</strong> Sem limite
+            </li>
+            <li>
+              <strong>Previdência complementar:</strong> Até 13% da renda bruta
+            </li>
           </ul>
 
           <h2>Limite de Isenção</h2>

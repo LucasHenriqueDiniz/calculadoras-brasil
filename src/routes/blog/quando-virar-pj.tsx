@@ -7,7 +7,10 @@ export const Route = createFileRoute("/blog/quando-virar-pj")({
   head: () => ({
     meta: [
       { title: "Quando Vale a Pena Virar PJ? | Calcule Brasil" },
-      { name: "description", content: "Análise: em que momento é vantajoso sair de CLT e se tornar PJ." },
+      {
+        name: "description",
+        content: "Análise: em que momento é vantajoso sair de CLT e se tornar PJ.",
+      },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/blog/quando-virar-pj") }],
   }),
@@ -18,7 +21,11 @@ function BlogPost() {
   return (
     <PageShell>
       <article>
-        <PageHeader eyebrow="guia • 7 min" title="Quando Vale a Pena Virar PJ?" description="Critérios para decidir entre permanecer CLT ou virar PJ." />
+        <PageHeader
+          eyebrow="guia • 7 min"
+          title="Quando Vale a Pena Virar PJ?"
+          description="Critérios para decidir entre permanecer CLT ou virar PJ."
+        />
         <Prose>
           <h2>Quando PJ Não Vale</h2>
           <ul>
@@ -38,10 +45,16 @@ function BlogPost() {
           </ul>
 
           <h2>A Regra dos 30%</h2>
-          <p>PJ precisa ganhar ~30% a mais em bruto que CLT para ter o mesmo ganho líquido. Use nossa calculadora para validar.</p>
+          <p>
+            PJ precisa ganhar ~30% a mais em bruto que CLT para ter o mesmo ganho líquido. Use nossa
+            calculadora para validar.
+          </p>
 
           <h2>Cuidados com PJ Mascarado</h2>
-          <p>Se trabalha para 1 cliente, 40h/semana, sem flexibilidade de horário: é CLT disfarçado. Receita Federal pode reclassificar e cobrar retroativo.</p>
+          <p>
+            Se trabalha para 1 cliente, 40h/semana, sem flexibilidade de horário: é CLT disfarçado.
+            Receita Federal pode reclassificar e cobrar retroativo.
+          </p>
         </Prose>
         <RelatedCalculators />
       </article>

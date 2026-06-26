@@ -503,7 +503,8 @@ export const blogPosts: Record<string, BlogPost> = {
   "simplificado-vs-completo": {
     slug: "simplificado-vs-completo",
     title: "IRPF Simplificado vs Completo: Qual Escolher?",
-    description: "Comparação: regime simplificado (20,5% dedução fixa) vs completo (deduções reais).",
+    description:
+      "Comparação: regime simplificado (20,5% dedução fixa) vs completo (deduções reais).",
     category: "guia",
     imageUrl: "/blog/regimes.jpg",
     imageAlt: "Comparação de regimes IRPF",

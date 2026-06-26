@@ -8,11 +8,7 @@ interface RelatedContentProps {
   maxItems?: number;
 }
 
-export function RelatedContent({
-  category,
-  excludeSlug,
-  maxItems = 4,
-}: RelatedContentProps) {
+export function RelatedContent({ category, excludeSlug, maxItems = 4 }: RelatedContentProps) {
   const relatedCalcs = calculators
     .filter((c) => c.category === category && c.slug !== excludeSlug)
     .slice(0, maxItems);

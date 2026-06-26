@@ -64,15 +64,14 @@ export function organizationSchema() {
     name: "Calcule Brasil",
     url: SITE_URL,
     logo: absoluteUrl("/apple-touch-icon.png"),
-    description: "Hub de calculadoras brasileiras para finanças pessoais, impostos e custos do dia a dia",
+    description:
+      "Hub de calculadoras brasileiras para finanças pessoais, impostos e custos do dia a dia",
     inLanguage: "pt-BR",
     sameAs: [],
   };
 }
 
-export function faqPageSchema(
-  faqs: Array<{ question: string; answer: string }>
-) {
+export function faqPageSchema(faqs: Array<{ question: string; answer: string }>) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",

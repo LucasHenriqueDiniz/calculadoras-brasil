@@ -7,7 +7,10 @@ export const Route = createFileRoute("/blog/aposentadoria-early-retirement")({
   head: () => ({
     meta: [
       { title: "Aposentadoria Antecipada: Quanto Poupar? | Calcule Brasil" },
-      { name: "description", content: "Estratégia FIRE: quanto poupar para se aposentar cedo e viver de renda." },
+      {
+        name: "description",
+        content: "Estratégia FIRE: quanto poupar para se aposentar cedo e viver de renda.",
+      },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/blog/aposentadoria-early-retirement") }],
   }),
@@ -18,10 +21,16 @@ function BlogPost() {
   return (
     <PageShell>
       <article>
-        <PageHeader eyebrow="guia • 8 min" title="Aposentadoria Antecipada: Quanto Poupar?" description="Estratégia FIRE para se aposentar cedo." />
+        <PageHeader
+          eyebrow="guia • 8 min"
+          title="Aposentadoria Antecipada: Quanto Poupar?"
+          description="Estratégia FIRE para se aposentar cedo."
+        />
         <Prose>
           <h2>Regra 4%</h2>
-          <p>Se você poup ar R$ 1 milhão, pode gastar R$ 40 mil/ano de forma sustentável (4% ao ano).</p>
+          <p>
+            Se você poup ar R$ 1 milhão, pode gastar R$ 40 mil/ano de forma sustentável (4% ao ano).
+          </p>
 
           <h2>Quanto Poupar?</h2>
           <p>Se gasta R$ 30 mil/mês: precisa de R$ 9 milhões aplicados (30k × 12 ÷ 0.04)</p>
