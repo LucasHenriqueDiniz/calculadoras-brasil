@@ -29,6 +29,9 @@ _worker.bundle
 .env.*
 !.env.example
 
+# Audit artifacts
+calculadorasbrasil.com.br-audit/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
