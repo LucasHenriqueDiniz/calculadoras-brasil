@@ -126,17 +126,16 @@ function PrivacidadePage() {
 
             <SectionCard section={sections[3]}>
               <p>
-                Os anúncios exibidos no Calcule Brasil são personalizados com base no seu histórico de navegação
-                e interesses, através de cookies e tecnologias similares. Isso é feito por plataformas como Google AdSense
-                para melhorar a relevância dos anúncios que você vê.
+                Os anúncios exibidos no Calcule Brasil são personalizados com base no seu histórico
+                de navegação e interesses, através de cookies e tecnologias similares. Isso é feito
+                por plataformas como Google AdSense para melhorar a relevância dos anúncios que você
+                vê.
               </p>
               <p>
                 <strong>Você pode controlar essas preferências:</strong>
               </p>
               <ul className="ml-4 space-y-2">
-                <li>
-                  • Bloqueie cookies nas configurações do seu navegador a qualquer momento
-                </li>
+                <li>• Bloqueie cookies nas configurações do seu navegador a qualquer momento</li>
                 <li>
                   • Acesse{" "}
                   <a

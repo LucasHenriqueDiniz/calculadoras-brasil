@@ -133,9 +133,9 @@ function SobrePage() {
           <div>
             <h2 className="font-display text-xl text-foreground">Quem criou isso</h2>
             <p className="mt-2 text-pretty leading-relaxed text-foreground/85">
-              <strong>Lucas Henrique Diniz Ostroski</strong> — desenvolvedor full-stack com interesse em finanças pessoais
-              e educação financeira. Criou o Calcule Brasil para ajudar brasileiros a tomar decisões informadas sobre
-              custos do dia a dia.
+              <strong>Lucas Henrique Diniz Ostroski</strong> — desenvolvedor full-stack com
+              interesse em finanças pessoais e educação financeira. Criou o Calcule Brasil para
+              ajudar brasileiros a tomar decisões informadas sobre custos do dia a dia.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <a
