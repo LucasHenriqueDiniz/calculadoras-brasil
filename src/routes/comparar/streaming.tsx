@@ -82,8 +82,8 @@ function StreamingComparison() {
 
         <Prose>
           <p>
-            Escolher entre streaming é uma questão de custo + qualidade + catálogo. Não é só preço
-            — é para quanto valor você paga.
+            Escolher entre streaming é uma questão de custo + qualidade + catálogo. Não é só preço —
+            é para quanto valor você paga.
           </p>
 
           <h2>Tabela de Comparação</h2>
@@ -148,8 +148,8 @@ function StreamingComparison() {
             <strong>Se quer séries boas:</strong> HBO Max é especialista.
           </p>
           <p>
-            <strong>Regra dos 70%:</strong> Se assiste menos de 70% do conteúdo disponível, não
-            vale a pena. Cancele e volte quando tiver novo conteúdo.
+            <strong>Regra dos 70%:</strong> Se assiste menos de 70% do conteúdo disponível, não vale
+            a pena. Cancele e volte quando tiver novo conteúdo.
           </p>
 
           <h2>Impacto no orçamento mensal</h2>

@@ -32,22 +32,18 @@ function BlogPost() {
   return (
     <PageShell>
       <article>
-        <PageHeader
-          eyebrow="Análise SEO"
-          title={post.title}
-          description={post.description}
-        />
+        <PageHeader eyebrow="Análise SEO" title={post.title} description={post.description} />
 
         <Prose>
           <p>
-            Netflix, Disney+, Spotify, Academia, Pacote de telefone... Você contrata uma coisa
-            por mês e não percebe que tem 10+ assinaturas comendo seu salário.
+            Netflix, Disney+, Spotify, Academia, Pacote de telefone... Você contrata uma coisa por
+            mês e não percebe que tem 10+ assinaturas comendo seu salário.
           </p>
 
           <h2>Quanto você realmente gasta com assinaturas?</h2>
           <p>
-            A média do brasileiro é R$ 500-1.000/mês em assinaturas. Para algumas pessoas, é
-            mais. Vamos ver as mais comuns:
+            A média do brasileiro é R$ 500-1.000/mês em assinaturas. Para algumas pessoas, é mais.
+            Vamos ver as mais comuns:
           </p>
 
           <table>
@@ -127,15 +123,13 @@ function BlogPost() {
               antes de comprometer.
             </li>
             <li>
-              <strong>Avalie anualmente.</strong> Cada 3-6 meses, revise quais você realmente
-              usa.
+              <strong>Avalie anualmente.</strong> Cada 3-6 meses, revise quais você realmente usa.
             </li>
             <li>
               <strong>Cancele sem culpa.</strong> Você pode reativar depois. Não é final.
             </li>
             <li>
-              <strong>Procure combos.</strong> Pacote telefone + TV + internet pode ser mais
-              barato.
+              <strong>Procure combos.</strong> Pacote telefone + TV + internet pode ser mais barato.
             </li>
           </ol>
 

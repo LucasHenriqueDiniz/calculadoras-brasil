@@ -48,31 +48,30 @@ function BlogPost() {
           <p>
             Você receberá seu salário em 2026, mas quanto realmente fica para você depois de todos
             os descontos? O IRPF (Imposto de Renda Pessoa Física) afeta mais de 50 milhões de
-            brasileiros, mas muitos ainda não entendem como funciona. Neste guia, explicamos passo
-            a passo como calcular seu imposto de renda e mostramos como nossa calculadora simplifica
+            brasileiros, mas muitos ainda não entendem como funciona. Neste guia, explicamos passo a
+            passo como calcular seu imposto de renda e mostramos como nossa calculadora simplifica
             tudo isso.
           </p>
 
           <h2>O que é IRPF e por que você deve entender</h2>
           <p>
             O IRPF é o imposto que você paga sobre sua renda pessoal — seja salário, bônus,
-            rendimento de investimentos ou outras receitas. A Receita Federal cobra esse imposto
-            de forma progressiva: quanto mais você ganha, maior a alíquota.
+            rendimento de investimentos ou outras receitas. A Receita Federal cobra esse imposto de
+            forma progressiva: quanto mais você ganha, maior a alíquota.
           </p>
-          <p>
-            Entender seu IRPF ajuda você a:
-          </p>
+          <p>Entender seu IRPF ajuda você a:</p>
           <ul>
             <li>
               <strong>Planejar seu orçamento:</strong> saber quanto do seu salário bruto realmente
               vira líquido
             </li>
             <li>
-              <strong>Identificar deduções:</strong> saber quais gastos você pode descontar (educação,
-              saúde, previdência)
+              <strong>Identificar deduções:</strong> saber quais gastos você pode descontar
+              (educação, saúde, previdência)
             </li>
             <li>
-              <strong>Escolher o melhor regime:</strong> decidir entre regime completo ou simplificado
+              <strong>Escolher o melhor regime:</strong> decidir entre regime completo ou
+              simplificado
             </li>
             <li>
               <strong>Preparar a declaração:</strong> ter os números prontos quando chegar o período
@@ -134,8 +133,8 @@ function BlogPost() {
             cálculo do IRPF.
           </p>
           <p>
-            Se você é autônomo, contribuinte individual ou PJ, você mesmo paga o INSS diretamente
-            à Receita Federal.
+            Se você é autônomo, contribuinte individual ou PJ, você mesmo paga o INSS diretamente à
+            Receita Federal.
           </p>
 
           <h2>Dependentes reduzem seu imposto</h2>
@@ -150,8 +149,8 @@ function BlogPost() {
             <li>Enteados e equiparados</li>
           </ul>
           <p>
-            <strong>Exemplo:</strong> se sua base imponível é R$ 50.000 e você tem 2 dependentes,
-            a base reduz em R$ 4.550 (2 × R$ 2.275), ficando em R$ 45.450 para cálculo do imposto.
+            <strong>Exemplo:</strong> se sua base imponível é R$ 50.000 e você tem 2 dependentes, a
+            base reduz em R$ 4.550 (2 × R$ 2.275), ficando em R$ 45.450 para cálculo do imposto.
           </p>
 
           <h2>Deduções que reduzem sua base de cálculo</h2>
@@ -184,9 +183,7 @@ function BlogPost() {
           </p>
 
           <h3>Regime Completo (Deduções Reais)</h3>
-          <p>
-            Você deduz os gastos reais com educação, saúde e previdência. Melhor se:
-          </p>
+          <p>Você deduz os gastos reais com educação, saúde e previdência. Melhor se:</p>
           <ul>
             <li>Tem filhos em escola privada cara</li>
             <li>Tem despesas médicas/odontológicas altas</li>
@@ -210,9 +207,7 @@ function BlogPost() {
           </p>
 
           <h2>Exemplo prático: quanto você paga</h2>
-          <p>
-            Vamos simular o caso de uma pessoa que ganha R$ 60.000/ano:
-          </p>
+          <p>Vamos simular o caso de uma pessoa que ganha R$ 60.000/ano:</p>
           <ul>
             <li>Renda bruta anual: R$ 60.000</li>
             <li>Desconto INSS (10%): R$ 6.000</li>
@@ -248,9 +243,7 @@ function BlogPost() {
           </p>
 
           <h2>Quando você deve declarar IRPF</h2>
-          <p>
-            Você é obrigado a declarar IRPF se:
-          </p>
+          <p>Você é obrigado a declarar IRPF se:</p>
           <ul>
             <li>Recebeu renda &gt; R$ 28.559,70 no ano</li>
             <li>Teve atividade profissional (autônomo, PJ)</li>
@@ -259,14 +252,12 @@ function BlogPost() {
             <li>Vive no exterior, mas é residente fiscal brasileiro</li>
           </ul>
           <p>
-            <strong>Calendário:</strong> a declaração de 2026 é feita em 2027, normalmente de
-            março a abril. Fique atento aos prazos que a Receita Federal divulga anualmente.
+            <strong>Calendário:</strong> a declaração de 2026 é feita em 2027, normalmente de março
+            a abril. Fique atento aos prazos que a Receita Federal divulga anualmente.
           </p>
 
           <h2>Use a calculadora IRPF para seu caso</h2>
-          <p>
-            Simular seu imposto manualmente é complicado. Use nossa calculadora IRPF 2026:
-          </p>
+          <p>Simular seu imposto manualmente é complicado. Use nossa calculadora IRPF 2026:</p>
           <ul>
             <li>Informe sua renda bruta anual</li>
             <li>Adicione dependentes</li>

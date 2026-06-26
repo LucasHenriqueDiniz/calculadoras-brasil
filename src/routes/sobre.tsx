@@ -1,13 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  BookOpen,
-  CircleSlash,
-  Eye,
-  Gift,
-  Megaphone,
-  ShieldCheck,
-} from "lucide-react";
+import { ArrowRight, BookOpen, CircleSlash, Eye, Gift, Megaphone, ShieldCheck } from "lucide-react";
 import { PageShell, PageHeader } from "@/components/layout/PageShell";
 import { absoluteUrl } from "@/lib/site";
 

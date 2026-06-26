@@ -9,7 +9,8 @@ interface StructuredFaq {
 interface CalculatorStructuredDataOptions {
   name: string;
   description: string;
-  path: string;
+  path?: string;
+  url?: string;
   applicationCategory: "FinanceApplication" | "UtilitiesApplication";
   faq: StructuredFaq[];
 }
@@ -18,10 +19,11 @@ export function calculatorStructuredData({
   name,
   description,
   path,
+  url,
   applicationCategory,
   faq,
 }: CalculatorStructuredDataOptions) {
-  const pageUrl = absoluteUrl(path);
+  const pageUrl = url ?? absoluteUrl(path ?? "/");
 
   return [
     {

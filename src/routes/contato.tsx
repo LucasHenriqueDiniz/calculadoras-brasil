@@ -1,12 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  Lightbulb,
-  Mail,
-  Handshake,
-  ShieldCheck,
-  Clock,
-} from "lucide-react";
+import { ArrowRight, Lightbulb, Mail, Handshake, ShieldCheck, Clock } from "lucide-react";
 import { PageShell, PageHeader } from "@/components/layout/PageShell";
 import { absoluteUrl } from "@/lib/site";
 
@@ -74,8 +67,8 @@ function ContatoPage() {
             </span>
             <h2 className="mt-5 font-display text-xl text-foreground">E-mail de contato</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              É o canal oficial para qualquer assunto. Escreva quando quiser — respondemos por
-              ordem de chegada.
+              É o canal oficial para qualquer assunto. Escreva quando quiser — respondemos por ordem
+              de chegada.
             </p>
             <a
               href={`mailto:${EMAIL}`}

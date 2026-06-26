@@ -1,17 +1,28 @@
 # Calcule Brasil
 
-Hub de calculadoras brasileiras para estimar custos do dia a dia. A aplicação usa React,
-TypeScript, TanStack Start e Cloudflare Workers.
+Hub de calculadoras brasileiras para estimar custos do dia a dia, impostos e decisões financeiras comuns no Brasil. A aplicação usa React, TypeScript, TanStack Start e Cloudflare Workers.
 
-As 22 páginas públicas são pré-renderizadas no build para entregar conteúdo, metadados e JSON-LD
-sem depender da execução de JavaScript. As seis calculadoras continuam interativas após hidratação.
+As 38 páginas públicas são pré-renderizadas no build para entregar conteúdo, metadados e JSON-LD sem depender da execução de JavaScript. As calculadoras continuam interativas após hidratação.
 
 **Conteúdo:**
-- 6 calculadoras interativas (custo de carro, morar sozinho, conta de luz, assinaturas, pet, mudança)
-- 5 artigos de blog com FAQ schema (2.500+ palavras cada)
-- 4 comparativas side-by-side (streaming, academia, mudança, energia)
-- 1 hub central de comparações
-- 6 páginas institucionais (sobre, metodologia, privacidade, termos, contato, 404)
+
+- 12 calculadoras interativas: custo de carro, morar sozinho, conta de luz, assinaturas, pet, mudança, IRPF 2026, salário líquido, INSS autônomo, CLT vs PJ, previdência complementar e benefícios fiscais.
+- 15 artigos de blog com conteúdo educativo e suporte a clusters SEO.
+- 4 comparativas side-by-side: streaming, academia, mudança e energia.
+- 1 hub central de comparações.
+- 6 páginas institucionais: sobre, metodologia, privacidade, termos, contato e 404.
+
+## Metadados do repositório
+
+Sugestão de descrição curta para GitHub:
+
+> Calculadoras brasileiras de finanças pessoais, impostos e custos do dia a dia com React, TanStack Start e Cloudflare Workers.
+
+Sugestão de tópicos/tags:
+
+```text
+brasil, calculadora, finanças-pessoais, imposto-de-renda, irpf, salário-líquido, inss, clt-vs-pj, react, typescript, tanstack-start, cloudflare-workers, seo, json-ld
+```
 
 ## Requisitos
 
@@ -39,7 +50,7 @@ O gate executa:
 - testes das fórmulas;
 - TypeScript e ESLint;
 - build client e Worker;
-- pré-renderização das 22 rotas;
+- pré-renderização das 38 rotas públicas;
 - smoke test SEO sem JavaScript;
 - dry-run do deploy;
 - auditoria de dependências.
@@ -59,12 +70,9 @@ O build gera:
 - `dist/server`: Worker do TanStack Start;
 - `dist/client/sitemap.xml`: sitemap gerado da lista central em `src/lib/seo-pages.ts`.
 
-O alvo de produção é Cloudflare Workers. O ambiente `preview` usa o Worker
-`calcule-brasil-preview`; produção usa `calcule-brasil`.
+O alvo de produção é Cloudflare Workers. O ambiente `preview` usa o Worker `calcule-brasil-preview`; produção usa `calcule-brasil`.
 
-`npm run preview` sobe uma prévia local do build para validação antes do deploy. O primeiro deploy
-remoto deve ser feito com `npm run deploy:preview`; use `npm run deploy` apenas após validar o
-Worker de preview, APIs, sitemap, 404 e headers.
+`npm run preview` sobe uma prévia local do build para validação antes do deploy. O primeiro deploy remoto deve ser feito com `npm run deploy:preview`; use `npm run deploy` apenas após validar o Worker de preview, APIs, sitemap, 404 e headers.
 
 ## Variáveis e segredos
 
@@ -91,8 +99,7 @@ As integrações públicas são rotas de servidor do TanStack Start:
 - `GET /api/locations/states`
 - `GET /api/locations/cities?uf=RS`
 
-ANP e ANEEL possuem timeout, limite de resposta, cache no edge e fallback manual. Inmetro e
-municípios do IBGE permanecem fora do escopo atual.
+ANP e ANEEL possuem timeout, limite de resposta, cache no edge e fallback manual. Inmetro e municípios do IBGE permanecem fora do escopo atual.
 
 ## SEO
 
@@ -103,8 +110,15 @@ municípios do IBGE permanecem fora do escopo atual.
 - imagem social 1200×630 com menos de 500 KB;
 - autoria institucional e data de revisão visíveis.
 
-O `FAQPage` é mantido por organização semântica e consumo por sistemas de IA, não como promessa de
-rich result do Google.
+O `FAQPage` é mantido por organização semântica e consumo por sistemas de IA, não como promessa de rich result do Google.
+
+## Instruções para agentes
+
+`CLAUDE.md` é a fonte canônica de instruções para agentes neste projeto. Arquivos como `CODEX.md`, `AGENTS.md` e `.codex/README.md` existem apenas para redirecionar ferramentas para `CLAUDE.md`.
+
+## Licença
+
+Este projeto está licenciado sob a licença MIT. Veja `LICENSE`.
 
 ## Adicionar uma calculadora
 

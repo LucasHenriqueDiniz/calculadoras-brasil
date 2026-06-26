@@ -88,7 +88,9 @@ export function calculateSalarioLiquido(input: SalarioLiquidoInput): SalarioLiqu
   const descSindicato = input.temSindicato ? input.salarioBrutoMensal * 0.0033 : 0; // 1 hora aprox
 
   // 6. Vale Transporte (desconta do bruto)
-  const descValeTransporte = input.temValeTransporte ? Math.min(input.salarioBrutoMensal * 0.06, 250) : 0;
+  const descValeTransporte = input.temValeTransporte
+    ? Math.min(input.salarioBrutoMensal * 0.06, 250)
+    : 0;
 
   // 7. Salário Líquido
   const salarioLiquidoMensal =

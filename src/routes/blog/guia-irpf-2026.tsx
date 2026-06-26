@@ -60,9 +60,7 @@ function BlogPost() {
             fonte. O governo utiliza o IRPF para financiar serviços públicos, e entender como ele
             funciona permite que você planeje melhor suas finanças.
           </p>
-          <p>
-            Conhecer o IRPF ajuda você a:
-          </p>
+          <p>Conhecer o IRPF ajuda você a:</p>
           <ul>
             <li>Calcular corretamente quanto do seu salário bruto fica para você</li>
             <li>Identificar deduções que legalmente podem reduzir seu imposto</li>
@@ -156,9 +154,7 @@ function BlogPost() {
             <li>Irmãos e irmãs menores a seu cargo</li>
             <li>Enteados e equiparados</li>
           </ul>
-          <p>
-            Exemplo: com 2 filhos, você deduz R$ 4.550 (2 × R$ 2.275) da base imponível.
-          </p>
+          <p>Exemplo: com 2 filhos, você deduz R$ 4.550 (2 × R$ 2.275) da base imponível.</p>
 
           <h2>Deduções que reduzem imposto</h2>
 
@@ -240,9 +236,7 @@ function BlogPost() {
           </ul>
 
           <h2>Quando você é obrigado a declarar</h2>
-          <p>
-            Você DEVE declarar IRPF se:
-          </p>
+          <p>Você DEVE declarar IRPF se:</p>
           <ul>
             <li>Recebeu renda &gt; R$ 28.559,70 no ano</li>
             <li>Teve atividade profissional (autônomo, PJ)</li>
@@ -275,8 +269,8 @@ function BlogPost() {
           </p>
           <p>
             Se tem dúvidas sobre valores muito altos, situações complexas (PJ, herança, bens no
-            exterior), consulte um contador ou a Receita Federal. Mas para a maioria dos
-            brasileiros que recebem salário, este guia e a calculadora são suficientes.
+            exterior), consulte um contador ou a Receita Federal. Mas para a maioria dos brasileiros
+            que recebem salário, este guia e a calculadora são suficientes.
           </p>
         </Prose>
 

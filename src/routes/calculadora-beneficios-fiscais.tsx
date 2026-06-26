@@ -11,6 +11,7 @@ import {
   type BeneficiosFiscaisInput,
 } from "@/lib/calculators/beneficiosFiscais";
 import { absoluteUrl } from "@/lib/site";
+import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
 
 const DEFAULTS: BeneficiosFiscaisInput = {
@@ -30,15 +31,20 @@ export const Route = createFileRoute("/calculadora-beneficios-fiscais")({
       },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/calculadora-beneficios-fiscais") }],
+    scripts: calculatorStructuredData({
+      name: "Calculadora Benefícios Fiscais",
+      description:
+        "Veja economia com vale refeição e vale transporte. Simule impacto fiscal de benefícios não tributáveis.",
+      path: "/calculadora-beneficios-fiscais",
+      applicationCategory: "FinanceApplication",
+      faq: [],
+    }),
   }),
   component: Calculator,
 });
 
 function Calculator() {
-  const [input, setInput] = usePersistedState<BeneficiosFiscaisInput>(
-    "beneficios-input",
-    DEFAULTS
-  );
+  const [input, setInput] = usePersistedState<BeneficiosFiscaisInput>("beneficios-input", DEFAULTS);
   const result = useMemo(() => calculateBeneficiosFiscais(input), [input]);
 
   return (
@@ -111,8 +117,7 @@ function Calculator() {
           {
             label: "Salário bruto necessário para igualar",
             value: formatBRL(result.comparacao.emDinheiro),
-            subtext:
-              "Quanto teria que receber a mais em salário para ter o mesmo em líquido",
+            subtext: "Quanto teria que receber a mais em salário para ter o mesmo em líquido",
           },
         ]}
       />
@@ -131,8 +136,7 @@ function Calculator() {
           },
           {
             question: "Vale transporte tem limite?",
-            answer:
-              "Até 6% do seu salário bruto. Empresa pode descontar se exceder esse valor.",
+            answer: "Até 6% do seu salário bruto. Empresa pode descontar se exceder esse valor.",
           },
         ]}
       />

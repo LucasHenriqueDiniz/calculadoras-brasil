@@ -1,12 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  Copyright,
-  FileText,
-  Gavel,
-  RefreshCw,
-  ShieldAlert,
-  UserCog,
-} from "lucide-react";
+import { Copyright, FileText, Gavel, RefreshCw, ShieldAlert, UserCog } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { PageShell, PageHeader } from "@/components/layout/PageShell";
 import { absoluteUrl } from "@/lib/site";
@@ -38,7 +31,12 @@ const sections: Section[] = [
     title: "4. Propriedade intelectual",
     icon: Copyright,
   },
-  { id: "mudancas", label: "Mudanças no serviço", title: "5. Mudanças no serviço", icon: RefreshCw },
+  {
+    id: "mudancas",
+    label: "Mudanças no serviço",
+    title: "5. Mudanças no serviço",
+    icon: RefreshCw,
+  },
   { id: "foro", label: "Foro", title: "6. Foro", icon: Gavel },
 ];
 

@@ -3,11 +3,7 @@ import { useMemo, useState } from "react";
 import { CreditCard } from "lucide-react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
 import { CurrencyInput, NumberInput, SelectField } from "@/components/calculator/fields";
-import {
-  DisclaimerBox,
-  ResultSummaryCard,
-  BreakdownTable,
-} from "@/components/calculator/results";
+import { DisclaimerBox, ResultSummaryCard, BreakdownTable } from "@/components/calculator/results";
 import { CopyResultButton, ResetButton, ShareResultButton } from "@/components/calculator/actions";
 import { FAQSection, type FAQItem } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
@@ -106,7 +102,7 @@ export const Route = createFileRoute("/calculadora-salario-liquido")({
 function SalarioLiquidoCalculator() {
   const [input, setInput] = usePersistedState<SalarioLiquidoInput>(
     "salario-liquido-input",
-    DEFAULTS
+    DEFAULTS,
   );
   const result = useMemo(() => calculateSalarioLiquido(input), [input]);
 
@@ -233,7 +229,8 @@ function SalarioLiquidoCalculator() {
           },
           {
             label: "Desconto vale transporte",
-            value: result.descValeTransporte > 0 ? `- ${formatBRL(result.descValeTransporte)}` : "R$ 0",
+            value:
+              result.descValeTransporte > 0 ? `- ${formatBRL(result.descValeTransporte)}` : "R$ 0",
           },
           {
             label: "Salário líquido",

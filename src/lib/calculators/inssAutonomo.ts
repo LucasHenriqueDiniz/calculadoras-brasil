@@ -31,7 +31,8 @@ export function calculateInssAutonomi(input: InssAutonomiInput): InssAutonomiRes
   const contribuicaoSimplificada = ganhoAnualBruto * 0.11;
 
   // Definir regime ótimo
-  const escolhaOtima = contribuicaoSimplificada < contribuicaoContributinte ? "simplificada" : "contributinte";
+  const escolhaOtima =
+    contribuicaoSimplificada < contribuicaoContributinte ? "simplificada" : "contributinte";
   const contribuicaoEscolhida =
     escolhaOtima === "simplificada" ? contribuicaoSimplificada : contribuicaoContributinte;
   const economiaAnual = Math.abs(contribuicaoContributinte - contribuicaoSimplificada);

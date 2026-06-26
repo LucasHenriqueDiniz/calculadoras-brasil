@@ -127,8 +127,7 @@ function BlogPost() {
           <h2>Dicas de economia</h2>
           <ol>
             <li>
-              <strong>Compartilhe um imóvel.</strong> Dividir aluguel + contas reduz custos em
-              40%.
+              <strong>Compartilhe um imóvel.</strong> Dividir aluguel + contas reduz custos em 40%.
             </li>
             <li>
               <strong>Cozinhe em casa.</strong> Comida caseira é 60% mais barata que comer fora.

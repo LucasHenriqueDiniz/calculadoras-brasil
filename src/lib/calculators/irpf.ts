@@ -93,10 +93,7 @@ export function calculateIrpf(input: IrpfInput): IrpfResult {
 
   if (input.regimeSimplificado) {
     // Regime Simplificado: dedução fixa de 20,5% da renda bruta (até o máximo permitido)
-    baseCalculoSimplificada = Math.max(
-      rendaBrutaAnual * (1 - SIMPLIFIED_DEDUCTION_RATE),
-      0
-    );
+    baseCalculoSimplificada = Math.max(rendaBrutaAnual * (1 - SIMPLIFIED_DEDUCTION_RATE), 0);
     const baseImponvelSimplificada = Math.max(baseCalculoSimplificada - descDependentes, 0);
 
     // Aplicar tabela ao resultado

@@ -18,6 +18,7 @@ interface NumberFieldProps extends BaseProps {
   suffix?: ReactNode;
   prefix?: ReactNode;
   decimals?: number;
+  placeholder?: string;
 }
 
 function FieldWrap({
@@ -55,6 +56,7 @@ export function NumberInput({
   max,
   step = 1,
   suffix,
+  placeholder,
 }: NumberFieldProps) {
   const reactId = useId();
   const inputId = id ?? reactId;
@@ -68,6 +70,7 @@ export function NumberInput({
           min={min}
           max={max}
           step={step}
+          placeholder={placeholder}
           value={Number.isFinite(value) ? value : 0}
           onChange={(e) => {
             const n = Number(e.target.value);
@@ -86,7 +89,15 @@ export function NumberInput({
   );
 }
 
-export function CurrencyInput({ label, hint, id, value, onChange, min = 0 }: NumberFieldProps) {
+export function CurrencyInput({
+  label,
+  hint,
+  id,
+  value,
+  onChange,
+  min = 0,
+  placeholder,
+}: NumberFieldProps) {
   const reactId = useId();
   const inputId = id ?? reactId;
   return (
@@ -99,6 +110,7 @@ export function CurrencyInput({ label, hint, id, value, onChange, min = 0 }: Num
           id={inputId}
           type="text"
           inputMode="decimal"
+          placeholder={placeholder}
           value={Number.isFinite(value) ? value.toString().replace(".", ",") : "0"}
           onChange={(e) => {
             const n = parseBRNumber(e.target.value);
@@ -138,6 +150,27 @@ export function SelectField({ label, hint, id, value, onChange, options }: Selec
           </option>
         ))}
       </select>
+    </FieldWrap>
+  );
+}
+
+interface CheckboxFieldProps extends BaseProps {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}
+
+export function CheckboxField({ label, hint, id, checked, onChange }: CheckboxFieldProps) {
+  const reactId = useId();
+  const inputId = id ?? reactId;
+  return (
+    <FieldWrap htmlFor={inputId} label={label} hint={hint}>
+      <Input
+        id={inputId}
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        className="h-4 w-4"
+      />
     </FieldWrap>
   );
 }

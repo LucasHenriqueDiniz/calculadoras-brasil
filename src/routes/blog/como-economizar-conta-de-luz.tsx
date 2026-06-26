@@ -32,16 +32,12 @@ function BlogPost() {
   return (
     <PageShell>
       <article>
-        <PageHeader
-          eyebrow="Dica SEO"
-          title={post.title}
-          description={post.description}
-        />
+        <PageHeader eyebrow="Dica SEO" title={post.title} description={post.description} />
 
         <Prose>
           <p>
-            A conta de luz chega e assusta. Mas muitos dos custos são evitáveis. Aqui estão 10
-            dicas práticas para reduzir sua fatura.
+            A conta de luz chega e assusta. Mas muitos dos custos são evitáveis. Aqui estão 10 dicas
+            práticas para reduzir sua fatura.
           </p>
 
           <h2>Os aparelhos que mais consomem</h2>
@@ -88,14 +84,10 @@ function BlogPost() {
           <p>Cada 5 minutos menos = economia de R$ 10-15/mês com chuveiro elétrico.</p>
 
           <h3>2. Usar ar-condicionado com moderação</h3>
-          <p>
-            Ar ligado 24h custa ~R$ 600/mês. Ligar apenas à noite reduz em 70%.
-          </p>
+          <p>Ar ligado 24h custa ~R$ 600/mês. Ligar apenas à noite reduz em 70%.</p>
 
           <h3>3. Desligar aparelhos da tomada</h3>
-          <p>
-            Carregadores, TVs em standby, videogames: consomem ~5% da sua conta sem fazer nada.
-          </p>
+          <p>Carregadores, TVs em standby, videogames: consomem ~5% da sua conta sem fazer nada.</p>
 
           <h3>4. Usar lâmpadas LED</h3>
           <p>Consome 80% menos que incandescente. Economia em 6 meses.</p>
@@ -107,9 +99,7 @@ function BlogPost() {
           </p>
 
           <h3>6. Lavar roupa com água fria</h3>
-          <p>
-            Máquina com água quente custa 3x mais. 80% da energia é para aquecimento.
-          </p>
+          <p>Máquina com água quente custa 3x mais. 80% da energia é para aquecimento.</p>
 
           <h3>7. Usar forno/fogão ao máximo</h3>
           <p>
@@ -117,14 +107,10 @@ function BlogPost() {
           </p>
 
           <h3>8. Abrir geladeira com moderação</h3>
-          <p>
-            Cada abertura faz o compressor trabalhar extra. Organize para abrir menos vezes.
-          </p>
+          <p>Cada abertura faz o compressor trabalhar extra. Organize para abrir menos vezes.</p>
 
           <h3>9. Manutenção do ar-condicionado</h3>
-          <p>
-            Filtro sujo aumenta consumo em 20%. Limpe mensalmente.
-          </p>
+          <p>Filtro sujo aumenta consumo em 20%. Limpe mensalmente.</p>
 
           <h3>10. Usar medidor/calculadora</h3>
           <p>

@@ -175,10 +175,7 @@ function IrpfCalculator() {
         />
       </FormSection>
 
-      <FormSection
-        title="Deduções permitidas"
-        description="Gastos que reduzem sua base de cálculo"
-      >
+      <FormSection title="Deduções permitidas" description="Gastos que reduzem sua base de cálculo">
         <CurrencyInput
           label="Gastos com educação (anual)"
           placeholder="Escola, universidade, material"
@@ -261,7 +258,7 @@ function IrpfCalculator() {
             label: "Deduções (educação, saúde, previdência)",
             value: `- ${formatBRL(result.totalDeducoes)}`,
             subtext: `Educação: ${formatBRL(result.deducaoEducacao)} | Saúde: ${formatBRL(
-              result.deducaoSaude
+              result.deducaoSaude,
             )} | Previdência: ${formatBRL(result.deducaoPrevidenciaComplementar)}`,
           },
           {
@@ -310,7 +307,7 @@ function IrpfCalculator() {
         <ShareResultButton
           title="Meu IRPF 2026"
           text={`Calculei meu IRPF 2026 em ${formatBRL(
-            Math.abs(result.irpfCalculado)
+            Math.abs(result.irpfCalculado),
           )} (alíquota efetiva: ${result.aliquotaEfetiva.toFixed(2)}%)`}
         />
         <ResetButton onClick={handleReset} />

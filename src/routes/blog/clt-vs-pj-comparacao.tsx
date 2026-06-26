@@ -87,17 +87,13 @@ function BlogPost() {
           </ul>
 
           <h2>Comparativo Financeiro</h2>
-          <p>
-            Salário CLT bruto: R$ 5.000
-          </p>
+          <p>Salário CLT bruto: R$ 5.000</p>
           <ul>
             <li>Benefícios (vale + 13º diluído): ~R$ 800/mês</li>
             <li>INSS (11%) + IRPF (~8%): -R$ 950</li>
             <li>Líquido + benefícios: R$ 4.850</li>
           </ul>
-          <p>
-            PJ equivalente: R$ 6.500 (para igualar 13º e benefícios)
-          </p>
+          <p>PJ equivalente: R$ 6.500 (para igualar 13º e benefícios)</p>
           <ul>
             <li>INSS (20%) + IRPF (~15%) + contador: -R$ 2.600</li>
             <li>Líquido: R$ 3.900</li>
@@ -108,9 +104,7 @@ function BlogPost() {
           </p>
 
           <h2>Use a Calculadora CLT vs PJ</h2>
-          <p>
-            Simule seu caso específico. Qual salário em PJ iguala seu ganho em CLT?
-          </p>
+          <p>Simule seu caso específico. Qual salário em PJ iguala seu ganho em CLT?</p>
 
           <Button asChild className="my-6" size="lg">
             <a href="/calculadora-clt-vs-pj">Simular CLT vs PJ</a>

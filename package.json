@@ -1,6 +1,24 @@
 {
   "name": "calcule-brasil",
   "private": true,
+  "description": "Calculadoras brasileiras de finanças pessoais, impostos e custos do dia a dia.",
+  "license": "MIT",
+  "keywords": [
+    "brasil",
+    "calculadora",
+    "financas-pessoais",
+    "imposto-de-renda",
+    "irpf",
+    "salario-liquido",
+    "inss",
+    "clt-vs-pj",
+    "react",
+    "typescript",
+    "tanstack-start",
+    "cloudflare-workers",
+    "seo",
+    "json-ld"
+  ],
   "sideEffects": false,
   "type": "module",
   "scripts": {

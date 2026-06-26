@@ -98,8 +98,8 @@ function ComparationHub() {
             Compare custos lado a lado
           </h1>
           <p className="mt-5 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            Muitas decisões financeiras são uma escolha entre opções. Aqui você vê preço,
-            comodidade e custo-benefício real — não só o número mais barato.
+            Muitas decisões financeiras são uma escolha entre opções. Aqui você vê preço, comodidade
+            e custo-benefício real — não só o número mais barato.
           </p>
         </div>
       </section>

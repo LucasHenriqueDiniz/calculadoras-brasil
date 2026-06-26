@@ -4,9 +4,14 @@ import { formatBRL } from "@/lib/format";
 
 interface ResultSummaryCardProps {
   title: string;
-  value: string;
+  value?: string;
   description?: string;
   tone?: "primary" | "neutral";
+  mainValue?: string;
+  mainLabel?: string;
+  secondaryValue?: string;
+  secondaryLabel?: string;
+  resultColor?: "positive" | "negative" | "warning" | "neutral";
 }
 
 export function ResultSummaryCard({
@@ -14,19 +19,33 @@ export function ResultSummaryCard({
   value,
   description,
   tone = "neutral",
+  mainValue,
+  mainLabel,
+  secondaryValue,
+  secondaryLabel,
+  resultColor,
 }: ResultSummaryCardProps) {
-  if (tone === "primary") {
+  const displayValue = value ?? mainValue ?? "";
+  const displayDescription = description ?? mainLabel;
+  const displayTone = tone === "primary" || resultColor ? "primary" : "neutral";
+  if (displayTone === "primary") {
     return (
       <div className="min-w-0 overflow-hidden rounded-2xl border border-primary/20 bg-primary p-5 text-primary-foreground shadow-[var(--shadow-panel)]">
         <p className="text-xs font-semibold uppercase tracking-wide text-primary-foreground/80">
           {title}
         </p>
         <p className="mt-2 break-words font-display text-[clamp(1.75rem,7vw,2.25rem)] font-bold leading-tight [overflow-wrap:anywhere]">
-          {value}
+          {displayValue}
         </p>
-        {description ? (
+        {displayDescription ? (
           <p className="mt-2 text-sm text-primary-foreground/85 [overflow-wrap:anywhere]">
-            {description}
+            {displayDescription}
+          </p>
+        ) : null}
+        {secondaryValue ? (
+          <p className="mt-2 text-xs text-primary-foreground/75 [overflow-wrap:anywhere]">
+            {secondaryLabel ? `${secondaryLabel}: ` : ""}
+            {secondaryValue}
           </p>
         ) : null}
       </div>
@@ -37,10 +56,18 @@ export function ResultSummaryCard({
     <div className="min-w-0 rounded-xl border border-border bg-surface p-4 shadow-[var(--shadow-card)]">
       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</p>
       <p className="mt-1.5 break-words font-display text-[clamp(1.125rem,4.5vw,1.375rem)] font-semibold leading-tight text-foreground [overflow-wrap:anywhere]">
-        {value}
+        {displayValue}
       </p>
-      {description ? (
-        <p className="mt-1 text-xs text-muted-foreground [overflow-wrap:anywhere]">{description}</p>
+      {displayDescription ? (
+        <p className="mt-1 text-xs text-muted-foreground [overflow-wrap:anywhere]">
+          {displayDescription}
+        </p>
+      ) : null}
+      {secondaryValue ? (
+        <p className="mt-1 text-xs text-muted-foreground [overflow-wrap:anywhere]">
+          {secondaryLabel ? `${secondaryLabel}: ` : ""}
+          {secondaryValue}
+        </p>
       ) : null}
     </div>
   );
@@ -77,9 +104,55 @@ export function buildColorMap(rows: BreakdownRow[]): Record<string, string> {
   return map;
 }
 
-export function BreakdownTable({ rows, caption }: { rows: BreakdownRow[]; caption?: string }) {
-  const total = rows.reduce((s, r) => s + r.monthly, 0);
-  const colorMap = buildColorMap(rows);
+interface LegacyBreakdownItem {
+  label: string;
+  value: string;
+  subtext?: string;
+  isFinal?: boolean;
+}
+
+export function BreakdownTable({
+  rows,
+  caption,
+  title,
+  items,
+}: {
+  rows?: BreakdownRow[];
+  caption?: string;
+  title?: string;
+  items?: LegacyBreakdownItem[];
+}) {
+  if (!rows && items) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]">
+        {title ? (
+          <p className="border-b border-border bg-muted/50 px-4 py-3 text-sm font-semibold text-foreground">
+            {title}
+          </p>
+        ) : null}
+        <dl className="divide-y divide-border/60">
+          {items.map((item) => (
+            <div
+              key={`${item.label}-${item.value}`}
+              className={`grid gap-1 px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto] ${item.isFinal ? "bg-primary-soft/35 font-semibold" : ""}`}
+            >
+              <dt className="text-sm text-foreground">{item.label}</dt>
+              <dd className="text-sm font-medium tabular-nums text-foreground sm:text-right">
+                {item.value}
+              </dd>
+              {item.subtext ? (
+                <dd className="text-xs text-muted-foreground sm:col-span-2">{item.subtext}</dd>
+              ) : null}
+            </div>
+          ))}
+        </dl>
+      </div>
+    );
+  }
+
+  const tableRows = rows ?? [];
+  const total = tableRows.reduce((s, r) => s + r.monthly, 0);
+  const colorMap = buildColorMap(tableRows);
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]">
       <div className="overflow-x-auto">
@@ -94,7 +167,7 @@ export function BreakdownTable({ rows, caption }: { rows: BreakdownRow[]; captio
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => {
+            {tableRows.map((r) => {
               const pct = total > 0 ? (r.monthly / total) * 100 : 0;
               const color = colorMap[r.key] ?? "var(--color-muted-foreground)";
               return (
@@ -351,11 +424,12 @@ export function DisclaimerBox({ children }: { children: ReactNode }) {
   );
 }
 
-export function WarningList({ warnings }: { warnings: string[] }) {
-  if (warnings.length === 0) return null;
+export function WarningList({ warnings, items }: { warnings?: string[]; items?: string[] }) {
+  const list = warnings ?? items ?? [];
+  if (list.length === 0) return null;
   return (
     <ul className="space-y-2.5 rounded-2xl border border-warning/30 bg-warning/10 p-4 text-sm leading-relaxed text-foreground/85">
-      {warnings.map((w) => (
+      {list.map((w) => (
         <li key={w} className="flex items-start gap-2.5">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden />
           <span>{w}</span>

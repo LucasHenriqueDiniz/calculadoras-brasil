@@ -11,6 +11,7 @@ import {
   type PrevidenciaComplementarInput,
 } from "@/lib/calculators/previdenciaComplementar";
 import { absoluteUrl } from "@/lib/site";
+import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
 
 const DEFAULTS: PrevidenciaComplementarInput = {
@@ -31,6 +32,14 @@ export const Route = createFileRoute("/calculadora-previdencia-complementar")({
       },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/calculadora-previdencia-complementar") }],
+    scripts: calculatorStructuredData({
+      name: "Calculadora Previdência Complementar",
+      description:
+        "Simule contribuição PGBL/VGBL. Reduza IRPF agora e acumule para aposentadoria complementar. Projete seu saldo em 10, 20, 30 anos.",
+      path: "/calculadora-previdencia-complementar",
+      applicationCategory: "FinanceApplication",
+      faq: [],
+    }),
   }),
   component: Calculator,
 });
@@ -38,7 +47,7 @@ export const Route = createFileRoute("/calculadora-previdencia-complementar")({
 function Calculator() {
   const [input, setInput] = usePersistedState<PrevidenciaComplementarInput>(
     "previdencia-input",
-    DEFAULTS
+    DEFAULTS,
   );
   const result = useMemo(() => calculatePrevidenciaComplementar(input), [input]);
 
@@ -82,7 +91,7 @@ function Calculator() {
             ? result.montanteFinal10anos
             : input.anosAteAposentadoria <= 20
               ? result.montanteFinal20anos
-              : result.montanteFinal30anos
+              : result.montanteFinal30anos,
         )}
         mainLabel={`em ${input.anosAteAposentadoria} anos`}
         secondaryValue={formatBRL(result.economiaIrpfAnual)}

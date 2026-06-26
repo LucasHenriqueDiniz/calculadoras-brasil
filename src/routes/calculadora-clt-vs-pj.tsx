@@ -8,6 +8,7 @@ import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { formatBRL } from "@/lib/format";
 import { calculateCltVsPj, type CltVsPjInput } from "@/lib/calculators/cltVsPj";
 import { absoluteUrl } from "@/lib/site";
+import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
 
 const DEFAULTS: CltVsPjInput = {
@@ -28,6 +29,14 @@ export const Route = createFileRoute("/calculadora-clt-vs-pj")({
       },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/calculadora-clt-vs-pj") }],
+    scripts: calculatorStructuredData({
+      name: "Calculadora CLT vs PJ 2026",
+      description:
+        "Compare ganho líquido: CLT vs PJ. Descubra quanto você precisa ganhar como PJ para igualar sua CLT com benefícios.",
+      path: "/calculadora-clt-vs-pj",
+      applicationCategory: "FinanceApplication",
+      faq: [],
+    }),
   }),
   component: Calculator,
 });

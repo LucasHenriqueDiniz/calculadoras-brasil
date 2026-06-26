@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 const DONE_CLASS = "border-success/40 bg-success/10 text-success hover:bg-success/15";
 
-export function CopyResultButton({ text }: { text: string }) {
+export function CopyResultButton({ text, value }: { text?: string; value?: string }) {
   const [copied, setCopied] = useState(false);
   return (
     <Button
@@ -15,7 +15,7 @@ export function CopyResultButton({ text }: { text: string }) {
       className={cn("transition-colors", copied && DONE_CLASS)}
       onClick={async () => {
         try {
-          await navigator.clipboard.writeText(text);
+          await navigator.clipboard.writeText(text ?? value ?? "");
           setCopied(true);
           setTimeout(() => setCopied(false), 1800);
         } catch {
@@ -55,14 +55,14 @@ export function ShareResultButton({ title, text }: { title: string; text: string
   );
 }
 
-export function ResetButton({ onReset }: { onReset: () => void }) {
+export function ResetButton({ onReset, onClick }: { onReset?: () => void; onClick?: () => void }) {
   return (
     <Button
       type="button"
       variant="ghost"
       size="sm"
       className="text-muted-foreground hover:text-foreground"
-      onClick={onReset}
+      onClick={onReset ?? onClick}
     >
       <RotateCcw className="h-4 w-4" /> Restaurar valores padrão
     </Button>

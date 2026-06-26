@@ -58,9 +58,7 @@ export const Route = createFileRoute("/blog/quanto-custa-ter-carro")({
       { property: "article:modified_time", content: post.updatedAt },
       { property: "article:author", content: post.author },
     ],
-    links: [
-      { rel: "canonical", href: absoluteUrl(`/blog/${post.slug}`) },
-    ],
+    links: [{ rel: "canonical", href: absoluteUrl(`/blog/${post.slug}`) }],
     scripts: [
       { type: "application/ld+json", children: JSON.stringify(articleSchema) },
       { type: "application/ld+json", children: JSON.stringify(faqSchema) },
@@ -83,8 +81,8 @@ function BlogPost() {
           {/* INTRODUÇÃO */}
           <p>
             Muitas pessoas focam apenas na parcela do financiamento e esquecem que ter um carro
-            envolve bem mais: combustível, IPVA, seguro, manutenção preventiva, pneus, revisões
-            e a depreciação natural do veículo.
+            envolve bem mais: combustível, IPVA, seguro, manutenção preventiva, pneus, revisões e a
+            depreciação natural do veículo.
           </p>
 
           <p>
@@ -110,9 +108,8 @@ function BlogPost() {
           </ul>
 
           <p>
-            Mas isso varia bastante conforme o carro, a cidade, o uso e seus hábitos. Por isso
-            temos a{" "}
-            <a href="/calculadora-custo-carro">calculadora de custo de carro</a> — basta colocar
+            Mas isso varia bastante conforme o carro, a cidade, o uso e seus hábitos. Por isso temos
+            a <a href="/calculadora-custo-carro">calculadora de custo de carro</a> — basta colocar
             seus números e vê o resultado personalizado.
           </p>
 
@@ -120,9 +117,7 @@ function BlogPost() {
           <h2>Os 8 componentes do custo de um carro</h2>
 
           <h3>1. Combustível (25-35% do custo)</h3>
-          <p>
-            É o custo mais visível. Quem roda 800 km por mês e o carro faz 10 km/l vai gastar:
-          </p>
+          <p>É o custo mais visível. Quem roda 800 km por mês e o carro faz 10 km/l vai gastar:</p>
           <ul>
             <li>800 km ÷ 10 km/l = 80 litros/mês</li>
             <li>80 litros × R$ 6,00 = R$ 480/mês (se gasolina)</li>
@@ -139,20 +134,18 @@ function BlogPost() {
             <li>Carro de R$ 100.000 × 3% = R$ 3.000/ano = R$ 250/mês</li>
           </ul>
           <p>
-            Dica: em alguns estados há desconto se você renovar licença antes do prazo. Verifique
-            na sua região.
+            Dica: em alguns estados há desconto se você renovar licença antes do prazo. Verifique na
+            sua região.
           </p>
 
           <h3>3. Licenciamento (LICV)</h3>
           <p>
-            Cobrado anualmente, mas às vezes é bundle com IPVA. Custa entre R$ 150 e R$ 250 por
-            ano (R$ 12-20/mês).
+            Cobrado anualmente, mas às vezes é bundle com IPVA. Custa entre R$ 150 e R$ 250 por ano
+            (R$ 12-20/mês).
           </p>
 
           <h3>4. Seguro (8-15% do custo)</h3>
-          <p>
-            Só o DPVAT é obrigatório (R$ 150-200/ano). Mas seguro completo é recomendado:
-          </p>
+          <p>Só o DPVAT é obrigatório (R$ 150-200/ano). Mas seguro completo é recomendado:</p>
           <ul>
             <li>Carro popular: R$ 80-150/mês</li>
             <li>Carro intermediário: R$ 120-250/mês</li>
@@ -178,14 +171,14 @@ function BlogPost() {
             <li>R$ 800 ÷ 48 meses = R$ 16-17/mês</li>
           </ul>
           <p>
-            Estacionamento em SP/RJ: R$ 50-300/mês dependendo da região. Em cidades menores,
-            pode ser zero.
+            Estacionamento em SP/RJ: R$ 50-300/mês dependendo da região. Em cidades menores, pode
+            ser zero.
           </p>
 
           <h3>7. Multas e Infrações (Variável)</h3>
           <p>
-            Não é gastar que você quer, mas acontece. Se receber 2-3 multas/ano (R$ 200-500
-            cada), são ~R$ 40-125/mês.
+            Não é gastar que você quer, mas acontece. Se receber 2-3 multas/ano (R$ 200-500 cada),
+            são ~R$ 40-125/mês.
           </p>
 
           <h3>8. Depreciação (30-40% do custo total!)</h3>
@@ -199,8 +192,8 @@ function BlogPost() {
             <li>5-8% nos anos 5+</li>
           </ul>
           <p>
-            Exemplo: Um carro de R$ 50.000 que depreciamos 8% ao ano custa R$ 4.000/ano = R$
-            333/mês só em depreciação. E é o custo mais ignorado!
+            Exemplo: Um carro de R$ 50.000 que depreciamos 8% ao ano custa R$ 4.000/ano = R$ 333/mês
+            só em depreciação. E é o custo mais ignorado!
           </p>
 
           {/* COMPARAÇÃO POR TIPO DE CARRO */}
@@ -259,30 +252,27 @@ function BlogPost() {
 
           <h3>2. Mantenha pneus calibrados</h3>
           <p>
-            Pneus com pressão incorreta aumentam consumo de combustível em 3-5%. Custa zero
-            checar mensalmente.
+            Pneus com pressão incorreta aumentam consumo de combustível em 3-5%. Custa zero checar
+            mensalmente.
           </p>
 
           <h3>3. Faça revisões preventivas no prazo</h3>
           <p>
-            Uma troca de óleo custa R$ 200. Um motor danificado custa R$ 5.000. Dá para ver
-            qual é mais caro.
+            Uma troca de óleo custa R$ 200. Um motor danificado custa R$ 5.000. Dá para ver qual é
+            mais caro.
           </p>
 
           <h3>4. Compare seguros anualmente</h3>
           <p>
-            Seguro é competitivo. Trocar de seguradora a cada 12 meses pode economizar R$ 50-100
-            por mês (R$ 600-1.200/ano).
+            Seguro é competitivo. Trocar de seguradora a cada 12 meses pode economizar R$ 50-100 por
+            mês (R$ 600-1.200/ano).
           </p>
 
           <h3>5. Use a calculadora antes de comprar</h3>
           <p>
-            Use nossa{" "}
-            <a href="/calculadora-custo-carro">
-              calculadora de custo de carro
-            </a>{" "}
-            para simular quanto cada modelo custa. Alguns carros parecem baratos na concessionária
-            mas custam muito mais ao mês.
+            Use nossa <a href="/calculadora-custo-carro">calculadora de custo de carro</a> para
+            simular quanto cada modelo custa. Alguns carros parecem baratos na concessionária mas
+            custam muito mais ao mês.
           </p>
 
           {/* CTA */}
@@ -311,8 +301,8 @@ function BlogPost() {
           {/* CONCLUSÃO */}
           <h2>Conclusão</h2>
           <p>
-            Ter um carro no Brasil custa entre R$ 1.200 e R$ 2.500 por mês (ou mais, dependendo
-            do modelo). O segredo é planejar.
+            Ter um carro no Brasil custa entre R$ 1.200 e R$ 2.500 por mês (ou mais, dependendo do
+            modelo). O segredo é planejar.
           </p>
 
           <p>
@@ -348,9 +338,7 @@ function BlogPost() {
                 className="block rounded-lg border border-border p-4 hover:border-primary hover:bg-surface"
               >
                 <h4 className="font-semibold">Quanto custa morar sozinho</h4>
-                <p className="text-sm text-muted-foreground">
-                  Guia completo para sair de casa
-                </p>
+                <p className="text-sm text-muted-foreground">Guia completo para sair de casa</p>
               </a>
             </li>
           </ul>

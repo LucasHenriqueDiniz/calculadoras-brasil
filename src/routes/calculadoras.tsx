@@ -33,9 +33,7 @@ function CalculadorasPage() {
     const q = query.trim().toLowerCase();
     if (!q) return calculators;
     return calculators.filter((c) =>
-      [c.shortTitle, c.title, c.tagline, c.description].some((t) =>
-        t.toLowerCase().includes(q),
-      ),
+      [c.shortTitle, c.title, c.tagline, c.description].some((t) => t.toLowerCase().includes(q)),
     );
   }, [query]);
 

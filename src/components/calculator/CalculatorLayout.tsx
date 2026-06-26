@@ -9,8 +9,8 @@ interface CalculatorLayoutProps {
   /** Rótulo curto exibido na trilha de navegação. Padrão: title. */
   breadcrumbLabel?: string;
   description?: string;
-  form: ReactNode;
-  result: ReactNode;
+  form?: ReactNode;
+  result?: ReactNode;
   children?: ReactNode;
 }
 
@@ -36,14 +36,24 @@ export function CalculatorLayout({
 
       <PageHeader eyebrow={eyebrow} title={title} description={description} />
 
-      <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_23rem] lg:gap-8">
-          <div className="min-w-0">{form}</div>
-          <aside className="lg:sticky lg:top-24 lg:self-start">{result}</aside>
-        </div>
-      </section>
+      {form || result ? (
+        <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_23rem] lg:gap-8">
+            <div className="min-w-0">{form}</div>
+            <aside className="lg:sticky lg:top-24 lg:self-start">{result}</aside>
+          </div>
+        </section>
+      ) : null}
 
-      {children}
+      {children ? (
+        form || result ? (
+          children
+        ) : (
+          <section className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 sm:py-10">
+            {children}
+          </section>
+        )
+      ) : null}
     </PageShell>
   );
 }

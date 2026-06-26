@@ -111,7 +111,6 @@ const FAQ: FAQItem[] = [
   },
 ];
 
-
 export const Route = createFileRoute("/calculadora-morar-sozinho")({
   head: () => ({
     meta: [

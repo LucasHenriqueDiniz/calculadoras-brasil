@@ -20,9 +20,7 @@ export interface BeneficiosFiscaisResult {
   };
 }
 
-export function calculateBeneficiosFiscais(
-  input: BeneficiosFiscaisInput
-): BeneficiosFiscaisResult {
+export function calculateBeneficiosFiscais(input: BeneficiosFiscaisInput): BeneficiosFiscaisResult {
   // Benefícios não tributáveis
   const beneficiosTotalMensal = input.valeRefeicaoMensal + input.valeTransporteMensal;
   const beneficiosTotalAnual = beneficiosTotalMensal * 12;

@@ -83,7 +83,7 @@ export function calculateCltVsPj(input: CltVsPjInput): CltVsPjResult {
   }
 
   const diferenca = pjLiquido - cltComBeneficios;
-  const percentualDiferenca = ((diferenca / cltComBeneficios) * 100).toFixed(2);
+  const percentualDiferenca = Number(((diferenca / cltComBeneficios) * 100).toFixed(2));
 
   return {
     salarioCltBruto: input.salarioCltBruto,
@@ -92,7 +92,7 @@ export function calculateCltVsPj(input: CltVsPjInput): CltVsPjResult {
     cltComBeneficios,
     pjLiquido,
     diferenca,
-    percentualDiferenca: parseFloat(percentualDiferenca),
+    percentualDiferenca,
     pjNecessaria,
     analise: {
       cltMelhor: cltComBeneficios > pjLiquido,

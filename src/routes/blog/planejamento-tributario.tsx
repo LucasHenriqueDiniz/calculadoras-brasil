@@ -47,8 +47,8 @@ function BlogPost() {
 
           <h2>Previdência Complementar</h2>
           <p>
-            Contribuindo até R$ 63.454/ano (13% da renda bruta) em PGBL ou VGBL, você reduz seu
-            IRPF hoje e constrói poupança para aposentadoria. Ganho duplo.
+            Contribuindo até R$ 63.454/ano (13% da renda bruta) em PGBL ou VGBL, você reduz seu IRPF
+            hoje e constrói poupança para aposentadoria. Ganho duplo.
           </p>
 
           <h2>Regime Simplificado</h2>

@@ -8,6 +8,7 @@ import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { formatBRL } from "@/lib/format";
 import { calculateInssAutonomi, type InssAutonomiInput } from "@/lib/calculators/inssAutonomo";
 import { absoluteUrl } from "@/lib/site";
+import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
 
 const DEFAULTS: InssAutonomiInput = {
@@ -28,6 +29,14 @@ export const Route = createFileRoute("/calculadora-inss-autonomo")({
       },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/calculadora-inss-autonomo") }],
+    scripts: calculatorStructuredData({
+      name: "Calculadora INSS Autônomo 2026",
+      description:
+        "Simule sua contribuição INSS como autônomo: 20% vs 11% simplificado. Veja quanto contribuir e impacto na aposentadoria.",
+      path: "/calculadora-inss-autonomo",
+      applicationCategory: "FinanceApplication",
+      faq: [],
+    }),
   }),
   component: Calculator,
 });
@@ -59,7 +68,11 @@ function Calculator() {
 
       <ResultSummaryCard
         title="Sua Contribuição INSS"
-        mainValue={formatBRL(result.escolhaOtima === "simplificada" ? result.contribuicaoInssSimplificada : result.contribuicaoInssContributinte)}
+        mainValue={formatBRL(
+          result.escolhaOtima === "simplificada"
+            ? result.contribuicaoInssSimplificada
+            : result.contribuicaoInssContributinte,
+        )}
         mainLabel="Contribuição anual recomendada"
         secondaryValue={result.escolhaOtima}
         secondaryLabel="Regime indicado"

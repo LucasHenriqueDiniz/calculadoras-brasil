@@ -32,16 +32,12 @@ function BlogPost() {
   return (
     <PageShell>
       <article>
-        <PageHeader
-          eyebrow="Guia SEO"
-          title={post.title}
-          description={post.description}
-        />
+        <PageHeader eyebrow="Guia SEO" title={post.title} description={post.description} />
 
         <Prose>
           <p>
-            Ter um pet é amor, mas também é dinheiro. Ração, veterinário, vacinas, banho... O
-            custo pode surpreender.
+            Ter um pet é amor, mas também é dinheiro. Ração, veterinário, vacinas, banho... O custo
+            pode surpreender.
           </p>
 
           <h2>Custo anual médio de um pet</h2>
@@ -90,9 +86,7 @@ function BlogPost() {
           <h2>Breakdown dos custos</h2>
 
           <h3>Ração</h3>
-          <p>
-            Maior custo contínuo. Varia bastante conforme marca (premium vs populares) e porte.
-          </p>
+          <p>Maior custo contínuo. Varia bastante conforme marca (premium vs populares) e porte.</p>
 
           <h3>Veterinário</h3>
           <ul>
@@ -103,9 +97,7 @@ function BlogPost() {
           </ul>
 
           <h3>Banho e tosa</h3>
-          <p>
-            R$ 50-150 por sessão, 1-2x ao mês = R$ 600-3.600/ano.
-          </p>
+          <p>R$ 50-150 por sessão, 1-2x ao mês = R$ 600-3.600/ano.</p>
 
           <h3>Brinquedos, cama, coleira</h3>
           <p>R$ 300-600/ano</p>

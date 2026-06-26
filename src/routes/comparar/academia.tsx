@@ -20,7 +20,10 @@ const comparisonData = {
     },
     { feature: "Flexibilidade de horário", items: ["Fixa", "Total", "Total"] },
     { feature: "Privacidade", items: ["Baixa", "Alta", "Alta"] },
-    { feature: "Acompanhamento personal", items: ["Extra R$ 50-100/aula", "Caro", "R$ 50-150/mês"] },
+    {
+      feature: "Acompanhamento personal",
+      items: ["Extra R$ 50-100/aula", "Caro", "R$ 50-150/mês"],
+    },
   ],
 };
 

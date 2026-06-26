@@ -46,9 +46,8 @@ function BlogPost() {
         <Prose>
           <p>
             Seu salário bruto chegou na folha de pagamento, mas o que você realmente recebe é bem
-            menor. Desaparecem IRPF, INSS, sindicato e outras deduções. Entender de onde saem
-            esses descontos ajuda você a planejar melhor suas finanças e negociar com mais
-            informação.
+            menor. Desaparecem IRPF, INSS, sindicato e outras deduções. Entender de onde saem esses
+            descontos ajuda você a planejar melhor suas finanças e negociar com mais informação.
           </p>
 
           <h2>De onde saem os descontos?</h2>
@@ -71,20 +70,18 @@ function BlogPost() {
 
           <h3>Sindicato (Opcional)</h3>
           <p>
-            Mensalidade sindical, geralmente 1 hora/mês de trabalho. Opcional, mas muitos
-            convenios coletivos definem automaticamente.
+            Mensalidade sindical, geralmente 1 hora/mês de trabalho. Opcional, mas muitos convenios
+            coletivos definem automaticamente.
           </p>
 
           <h3>Vale Refeição/Transporte (Não é tributável)</h3>
           <p>
-            Benefício fornecido pelo empregador, não reduz salário bruto. Usa créditos pré-pagos
-            em cartão.
+            Benefício fornecido pelo empregador, não reduz salário bruto. Usa créditos pré-pagos em
+            cartão.
           </p>
 
           <h2>Exemplopratico: do bruto ao líquido</h2>
-          <p>
-            Vamos simular um salário de R$ 5.000 brutos:
-          </p>
+          <p>Vamos simular um salário de R$ 5.000 brutos:</p>
           <ul>
             <li>Salário bruto: R$ 5.000</li>
             <li>Desconto INSS (11%): -R$ 550</li>
@@ -93,9 +90,7 @@ function BlogPost() {
             <li>Desconto sindicato (1 hora): -R$ 20</li>
             <li>Salário líquido aproximado: R$ 4.096</li>
           </ul>
-          <p>
-            Você recebe ~18% menos que o bruto. No final do ano, ajusta o IRPF na declaração.
-          </p>
+          <p>Você recebe ~18% menos que o bruto. No final do ano, ajusta o IRPF na declaração.</p>
 
           <h2>Como calcular seu salário líquido</h2>
           <p>

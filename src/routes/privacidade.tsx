@@ -1,12 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  Cookie,
-  Database,
-  Megaphone,
-  RefreshCw,
-  ShieldCheck,
-  UserCheck,
-} from "lucide-react";
+import { Cookie, Database, Megaphone, RefreshCw, ShieldCheck, UserCheck } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { PageShell, PageHeader } from "@/components/layout/PageShell";
 import { absoluteUrl } from "@/lib/site";
@@ -22,7 +15,12 @@ const sections: Section[] = [
   { id: "dados", label: "Dados das calculadoras", title: "Dados que você informa", icon: Database },
   { id: "cookies", label: "Cookies", title: "Cookies e medição de audiência", icon: Cookie },
   { id: "publicidade", label: "Publicidade", title: "Publicidade", icon: Megaphone },
-  { id: "direitos", label: "Direitos (LGPD)", title: "Direitos do titular (LGPD)", icon: UserCheck },
+  {
+    id: "direitos",
+    label: "Direitos (LGPD)",
+    title: "Direitos do titular (LGPD)",
+    icon: UserCheck,
+  },
   { id: "alteracoes", label: "Alterações", title: "Alterações nesta política", icon: RefreshCw },
 ];
 

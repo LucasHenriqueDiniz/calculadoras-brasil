@@ -22,7 +22,7 @@ export interface PrevidenciaComplementarResult {
 }
 
 export function calculatePrevidenciaComplementar(
-  input: PrevidenciaComplementarInput
+  input: PrevidenciaComplementarInput,
 ): PrevidenciaComplementarResult {
   const contribuicaoAnual = input.contribuicaoMensalPgbl * 12;
   const tasaRetornoDecimal = input.tasaRetornoAnual / 100;
