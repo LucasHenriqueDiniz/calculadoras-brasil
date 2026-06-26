@@ -50,9 +50,9 @@ export function RelatedContent({
           <h3 className="mb-4 text-lg font-semibold">Leia Também</h3>
           <div className="grid gap-4 md:grid-cols-2">
             {relatedPosts.map((post) => (
-              <Link
+              <a
                 key={post.slug}
-                to={`/blog/${post.slug}`}
+                href={`/blog/${post.slug}`}
                 className="rounded-lg border border-gray-200 p-4 transition hover:border-blue-500 hover:shadow-md"
               >
                 <h4 className="font-semibold text-gray-900">{post.title}</h4>
@@ -60,7 +60,7 @@ export function RelatedContent({
                 <span className="mt-3 inline-block text-xs text-gray-500">
                   {post.readingTime} min de leitura
                 </span>
-              </Link>
+              </a>
             ))}
           </div>
         </div>
