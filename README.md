@@ -12,18 +12,6 @@ As 38 páginas públicas são pré-renderizadas no build para entregar conteúdo
 - 1 hub central de comparações.
 - 6 páginas institucionais: sobre, metodologia, privacidade, termos, contato e 404.
 
-## Metadados do repositório
-
-Sugestão de descrição curta para GitHub:
-
-> Calculadoras brasileiras de finanças pessoais, impostos e custos do dia a dia com React, TanStack Start e Cloudflare Workers.
-
-Sugestão de tópicos/tags:
-
-```text
-brasil, calculadora, finanças-pessoais, imposto-de-renda, irpf, salário-líquido, inss, clt-vs-pj, react, typescript, tanstack-start, cloudflare-workers, seo, json-ld
-```
-
 ## Requisitos
 
 - Node.js 22.12 ou superior
@@ -111,10 +99,6 @@ ANP e ANEEL possuem timeout, limite de resposta, cache no edge e fallback manual
 - autoria institucional e data de revisão visíveis.
 
 O `FAQPage` é mantido por organização semântica e consumo por sistemas de IA, não como promessa de rich result do Google.
-
-## Instruções para agentes
-
-`CLAUDE.md` é a fonte canônica de instruções para agentes neste projeto. Arquivos como `CODEX.md`, `AGENTS.md` e `.codex/README.md` existem apenas para redirecionar ferramentas para `CLAUDE.md`.
 
 ## Licença
 
