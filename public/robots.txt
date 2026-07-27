@@ -16,4 +16,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://calculadorasbrasil.com.br/sitemap.xml
+Sitemap: https://calculebrasil.com/sitemap.xml

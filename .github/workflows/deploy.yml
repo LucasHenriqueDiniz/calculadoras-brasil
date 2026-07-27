@@ -47,6 +47,6 @@ jobs:
                 repo: context.repo.repo,
                 deployment_id: d.data.id,
                 state: 'success',
-                environment_url: 'https://calculadorasbrasil.com.br'
+                environment_url: 'https://calculebrasil.com'
               })
             })

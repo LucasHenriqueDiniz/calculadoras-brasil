@@ -18,14 +18,11 @@
 - **Resolve:** `ADS-AUTHOR-01` (Blocker)
 - **Status:** LIVE ✅
 
-### 2. ✅ Labels de Anúncios (ADS-PROG-03, ADS-UX-06)
-- **Arquivo:** `/src/components/ads/AdLabel.tsx` (novo)
-- **Componentes criados:**
-  - `<AdLabel variant="top|inline" />` — Label claro "Anúncio"
-  - `<AdContainer>` — Wrapper com styling apropriado
-- **Uso:** Implementar antes de adicionar ad-code
+### 2. ✅ Auto Ads (ADS-PROG-03, ADS-UX-06)
+- **Arquivo:** `src/routes/__root.tsx`
+- **Decisão:** o site usa Google Auto Ads (posicionamento automático), então não há ad-slots manuais nem componentes de label — o próprio Google decide onde e como rotular cada anúncio.
 - **Resolve:** `ADS-PROG-03`, `ADS-UX-06`
-- **Status:** Pronto para uso ✅
+- **Status:** LIVE ✅
 
 ### 3. ✅ Privacy Policy Melhorada (ADS-PRIV-10)
 - **Arquivo:** `/src/routes/privacidade.tsx`
@@ -208,15 +205,8 @@
 7. Aguardar revisão (tipicamente 1-3 dias)
 
 ### Pós-Aprovação
-1. Criar `public/ads.txt` com seu Google publisher ID
-2. Implementar ad-slots usando componentes criados:
-   ```tsx
-   import { AdContainer, AdLabel } from "@/components/ads/AdLabel";
-   
-   <AdContainer label="Anúncio">
-     {/* Google ad-code aqui */}
-   </AdContainer>
-   ```
+1. ✅ `public/ads.txt` criado com o publisher ID
+2. ✅ Auto ads: script do `adsbygoogle.js` carregado globalmente em `src/routes/__root.tsx` (sem ad-slots manuais — os componentes `AdLabel`/`AdContainer` foram removidos por não serem necessários com Auto Ads)
 3. Testar ads no site live
 4. Monitorar performance no AdSense dashboard
 
