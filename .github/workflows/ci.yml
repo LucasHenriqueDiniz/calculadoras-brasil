@@ -42,3 +42,22 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run test 2>/dev/null || true
+
+  build:
+    name: Build Verification
+    needs: [typecheck, lint, test]
+    if: always() && (needs.typecheck.result == 'success' || needs.typecheck.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-brasil-calculadoras
+          path: dist/
+          retention-days: 5
