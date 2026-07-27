@@ -3,18 +3,45 @@ import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
 import { FAQSection } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { absoluteUrl } from "@/lib/site";
+import { getBlogPost } from "@/lib/blog";
+
+const post = getBlogPost("deducoes-irpf-esqueca")!;
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: post.faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: { "@type": "Answer", text: faq.answer },
+  })),
+};
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: post.title,
+  description: post.description,
+  datePublished: post.publishedAt,
+  dateModified: post.updatedAt,
+  author: { "@type": "Organization", name: post.author },
+};
 
 export const Route = createFileRoute("/blog/deducoes-irpf-esqueca")({
   head: () => ({
     meta: [
-      { title: "Deduções IRPF que Você Esquece de Descontar | Calcule Brasil" },
-      {
-        name: "description",
-        content:
-          "Descubra deduções IRPF que muitos brasileiros esquecem: educação, saúde, previdência, dependentes. Reduza seu imposto legalmente.",
-      },
+      { title: `${post.title} | Calcule Brasil` },
+      { name: "description", content: post.description },
+      { name: "keywords", content: post.keywords.join(", ") },
+      { property: "og:title", content: post.title },
+      { property: "og:description", content: post.description },
+      { property: "og:type", content: "article" },
     ],
-    links: [{ rel: "canonical", href: absoluteUrl("/blog/deducoes-irpf-esqueca") }],
+    links: [{ rel: "canonical", href: absoluteUrl(`/blog/${post.slug}`) }],
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify(articleSchema) },
+      { type: "application/ld+json", children: JSON.stringify(faqSchema) },
+    ],
   }),
   component: BlogPost,
 });
@@ -24,9 +51,9 @@ function BlogPost() {
     <PageShell>
       <article>
         <PageHeader
-          eyebrow="guia • 8 min"
-          title="Deduções IRPF que Você Esquece de Descontar"
-          description="Muitos brasileiros pagam IRPF desnecessariamente porque desconhecem deduções permitidas. Descubra as 5 principais."
+          eyebrow={`${post.category} • ${post.readingTime} min`}
+          title={post.title}
+          description={post.description}
         />
 
         <Prose>
@@ -80,7 +107,7 @@ function BlogPost() {
           </p>
         </Prose>
 
-        <FAQSection items={[]} />
+        <FAQSection items={post.faqs} />
         <RelatedCalculators />
       </article>
     </PageShell>

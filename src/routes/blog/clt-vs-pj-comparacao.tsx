@@ -8,6 +8,16 @@ import { getBlogPost } from "@/lib/blog";
 
 const post = getBlogPost("clt-vs-pj-comparacao")!;
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: post.faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: { "@type": "Answer", text: faq.answer },
+  })),
+};
+
 const articleSchema = {
   "@context": "https://schema.org",
   "@type": "Article",
@@ -23,9 +33,16 @@ export const Route = createFileRoute("/blog/clt-vs-pj-comparacao")({
     meta: [
       { title: `${post.title} | Calcule Brasil` },
       { name: "description", content: post.description },
+      { name: "keywords", content: post.keywords.join(", ") },
+      { property: "og:title", content: post.title },
+      { property: "og:description", content: post.description },
+      { property: "og:type", content: "article" },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(`/blog/${post.slug}`) }],
-    scripts: [{ type: "application/ld+json", children: JSON.stringify(articleSchema) }],
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify(articleSchema) },
+      { type: "application/ld+json", children: JSON.stringify(faqSchema) },
+    ],
   }),
   component: BlogPost,
 });
