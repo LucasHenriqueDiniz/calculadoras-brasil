@@ -8,24 +8,19 @@ on:
 jobs:
   deploy:
     name: Deploy
-    needs: build
-    if: success()
     runs-on: ubuntu-latest
     permissions:
       contents: read
       deployments: write
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'pnpm'
-      - run: pnpm install
-      - run: pnpm run build
-      
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
@@ -52,6 +47,6 @@ jobs:
                 repo: context.repo.repo,
                 deployment_id: d.data.id,
                 state: 'success',
-                environment_url: 'https://calculadorasbrasil.com.br'
+                environment_url: 'https://calculebrasil.com'
               })
             })

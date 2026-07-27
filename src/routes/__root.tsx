@@ -11,6 +11,8 @@ import {
 import appCss from "@/styles.css?url";
 import { SITE_URL } from "@/lib/site";
 
+const ADSENSE_PUBLISHER_ID = "pub-2600827684802809";
+
 const siteSchema = {
   "@context": "https://schema.org",
   "@graph": [
@@ -119,6 +121,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "manifest", href: "/site.webmanifest" },
     ],
     scripts: [
+      {
+        src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-${ADSENSE_PUBLISHER_ID}`,
+        async: true,
+        crossOrigin: "anonymous",
+      },
       {
         type: "application/ld+json",
         children: JSON.stringify(siteSchema),
