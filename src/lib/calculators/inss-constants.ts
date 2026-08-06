@@ -8,23 +8,26 @@
  */
 
 /** Ano-base da tabela abaixo. Exibido junto das estimativas. */
-export const INSS_ANO_REFERENCIA = 2024;
+export const INSS_ANO_REFERENCIA = 2026;
 
 /** Salário mínimo nacional do ano de referência (piso do salário de contribuição). */
-export const SALARIO_MINIMO = 1412.0;
+export const SALARIO_MINIMO = 1621.0;
 
 /** Teto do salário de contribuição do RGPS no ano de referência. */
-export const TETO_INSS = 7786.02;
+export const TETO_INSS = 8475.55;
 
 /**
  * Faixas progressivas de contribuição do segurado empregado.
  * `ate` é o limite superior da faixa; a alíquota incide apenas sobre a parcela
  * do salário que cai dentro da faixa (cálculo marginal, não cumulativo).
+ *
+ * Conferência: aplicadas ao teto, estas faixas resultam em contribuição máxima
+ * de R$ 988,09, que é o desconto máximo divulgado para 2026.
  */
 export const INSS_FAIXAS_EMPREGADO = [
-  { ate: 1412.0, aliquota: 0.075 },
-  { ate: 2666.68, aliquota: 0.09 },
-  { ate: 4000.03, aliquota: 0.12 },
+  { ate: 1621.0, aliquota: 0.075 },
+  { ate: 2902.84, aliquota: 0.09 },
+  { ate: 4354.27, aliquota: 0.12 },
   { ate: TETO_INSS, aliquota: 0.14 },
 ] as const;
 

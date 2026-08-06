@@ -132,11 +132,17 @@ function BlogPost() {
             Social). Se você é empregado CLT:
           </p>
           <ul>
-            <li>Faixa 1 (até R$ 1.412,00): 7,7%</li>
-            <li>Faixa 2 (R$ 1.412,01 a R$ 2.666,68): 9%</li>
-            <li>Faixa 3 (R$ 2.666,69 a R$ 4.000,03): 12%</li>
-            <li>Faixa 4 (acima de R$ 4.000,03): 14% (com limite de contribuição)</li>
+            <li>Faixa 1 (até R$ 1.621,00): 7,5%</li>
+            <li>Faixa 2 (R$ 1.621,01 a R$ 2.902,84): 9%</li>
+            <li>Faixa 3 (R$ 2.902,85 a R$ 4.354,27): 12%</li>
+            <li>Faixa 4 (R$ 4.354,28 até o teto de R$ 8.475,55): 14%</li>
           </ul>
+          <p>
+            As alíquotas são <strong>progressivas</strong>: cada percentual incide apenas sobre a
+            parcela do salário dentro da respectiva faixa, e não sobre o salário inteiro. Quem ganha
+            acima do teto contribui sobre o teto, o que resulta em um desconto máximo de R$ 988,09
+            por mês.
+          </p>
           <p>
             Este INSS é retido automaticamente pelo seu empregador, reduzindo sua base de cálculo
             para o IRPF.

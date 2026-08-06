@@ -166,14 +166,19 @@ describe("calculadoras principais", () => {
 
 describe("INSS: contribuição progressiva do empregado", () => {
   it("aplica a alíquota apenas sobre a parcela dentro de cada faixa", () => {
-    // 1412 * 7,5% = 105,90 — primeira faixa isolada.
-    expect(calcularInssEmpregado(1412)).toBeCloseTo(105.9, 2);
+    // 1621 * 7,5% = 121,575 — primeira faixa isolada.
+    expect(calcularInssEmpregado(1621)).toBeCloseTo(121.575, 3);
 
-    // 105,90 + (2666,68 - 1412) * 9% = 105,90 + 112,92 = 218,82
-    expect(calcularInssEmpregado(2666.68)).toBeCloseTo(218.82, 2);
+    // 121,575 + (2902,84 - 1621) * 9% = 121,575 + 115,366 = 236,94
+    expect(calcularInssEmpregado(2902.84)).toBeCloseTo(236.94, 2);
 
-    // 218,82 + (4000,03 - 2666,68) * 12% = 218,82 + 160,00 = 378,82
-    expect(calcularInssEmpregado(4000.03)).toBeCloseTo(378.82, 2);
+    // 236,94 + (4354,27 - 2902,84) * 12% = 236,94 + 174,17 = 411,11
+    expect(calcularInssEmpregado(4354.27)).toBeCloseTo(411.11, 2);
+  });
+
+  it("bate com o desconto máximo divulgado para o teto de 2026", () => {
+    // Valor de referência publicado para 2026: R$ 988,09.
+    expect(calcularInssEmpregado(TETO_INSS)).toBeCloseTo(988.09, 2);
   });
 
   it("nunca cobra mais que a contribuição do teto", () => {
