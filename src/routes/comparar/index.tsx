@@ -161,6 +161,30 @@ function ComparationHub() {
           })}
         </ul>
 
+        <div className="mt-14 space-y-5 text-pretty leading-relaxed text-foreground/85">
+          <h2 className="font-display text-2xl text-foreground">Como usamos estas comparações</h2>
+          <p>
+            Cada comparação parte de uma pergunta que aparece com frequência no orçamento doméstico:
+            compensa contratar ou fazer por conta própria, assinar ou cancelar, investir agora ou
+            adiar. Em vez de apontar um vencedor único, mostramos em que cenário cada opção costuma
+            fazer sentido — porque a resposta muda conforme renda, tempo disponível, tolerância a
+            risco e quanto tempo você pretende ficar com a decisão.
+          </p>
+          <p>
+            As faixas de preço citadas são referências de mercado em capitais brasileiras, revisadas
+            periodicamente, e servem para dimensionar a ordem de grandeza da decisão. Elas variam
+            por região, fornecedor e época do ano, então funcionam como ponto de partida, não como
+            cotação. Sempre que uma comparação depende de regra legal ou tributária, indicamos a
+            fonte oficial no fim da página.
+          </p>
+          <p>
+            O caminho que recomendamos é ler a comparação para entender quais variáveis pesam na
+            decisão e, em seguida, rodar a calculadora correspondente com os seus próprios números.
+            O conteúdo é educativo e não substitui orientação profissional de contador, advogado ou
+            especialista da área em questão.
+          </p>
+        </div>
+
         <div className="mt-12 rounded-2xl border border-border bg-surface p-8 text-center shadow-[var(--shadow-card)]">
           <h2 className="font-display text-xl font-semibold text-foreground">
             Não encontrou a comparação que procura?

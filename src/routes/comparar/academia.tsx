@@ -2,7 +2,61 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
 import { ComparisonChart } from "@/components/ComparisonChart";
+import { FAQSection } from "@/components/calculator/FAQSection";
+import { SourcesList } from "@/components/content/SourcesList";
 import { absoluteUrl } from "@/lib/site";
+import { comparisonStructuredData } from "@/lib/structured-data";
+
+const REVIEWED_AT = "agosto de 2026";
+
+const FAQ = [
+  {
+    question: "Academia é sempre mais cara que treinar em casa?",
+    answer:
+      "No custo mensal recorrente, quase sempre sim. Mas a comparação justa inclui o investimento inicial do treino em casa — halteres, barra, anilhas, colchonete e eventualmente um banco somam facilmente R$ 1.500 a R$ 3.000. Esse equipamento se paga em um a dois anos de mensalidade, desde que você mantenha a frequência.",
+  },
+  {
+    question: "Quais custos além da mensalidade a academia tem?",
+    answer:
+      "Taxa de matrícula e taxa de anuidade cobradas uma vez por ano, transporte ou combustível e estacionamento, e às vezes armário e avaliação física. Em planos com fidelidade há ainda a multa por cancelamento antecipado. Some tudo antes de comparar com as outras modalidades: o custo real costuma ficar 20% a 30% acima da mensalidade anunciada.",
+  },
+  {
+    question: "Vale a pena o plano anual com fidelidade?",
+    answer:
+      "O desconto é real, em geral de 20% a 40% sobre o plano mensal, mas ele transfere o risco para você: se parar de ir, continua pagando ou paga multa. Uma regra prática é começar no plano mensal e migrar para o anual só depois de sustentar três meses de frequência constante.",
+  },
+  {
+    question: "Aulas online substituem o acompanhamento presencial?",
+    answer:
+      "Para condicionamento geral, mobilidade e treinos com peso corporal, funcionam bem e custam bem menos. Para treino de força com cargas altas, correção de técnica e reabilitação, o acompanhamento presencial faz diferença de segurança, não só de resultado. Muita gente combina as duas coisas: online na maior parte da semana e algumas sessões presenciais por mês.",
+  },
+  {
+    question: "Como decidir sem errar muito?",
+    answer:
+      "Teste antes de assinar. A maioria das academias oferece aula experimental, e plataformas online costumam ter período gratuito. Acompanhe sua frequência real por um mês e escolha a modalidade que você conseguiu manter — o plano mais barato que você abandona é sempre mais caro que o plano usado.",
+  },
+];
+
+const SOURCES = [
+  {
+    label: "Organização Mundial da Saúde — Diretrizes de atividade física",
+    href: "https://www.who.int/publications/i/item/9789240015128",
+    note: "recomendação de 150 a 300 minutos semanais de atividade moderada",
+  },
+  {
+    label: "Ministério da Saúde — Guia de Atividade Física para a População Brasileira",
+    href: "https://www.gov.br/saude/pt-br/composicao/saps/promocao-da-saude/guia-de-atividade-fisica",
+    note: "orientações oficiais de prática de atividade física",
+  },
+  {
+    label: "Código de Defesa do Consumidor (Lei 8.078/1990)",
+    href: "https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm",
+    note: "regras sobre contratos de fidelidade e cancelamento",
+  },
+];
+
+const DESCRIPTION =
+  "Academia, treino em casa ou aulas online: compare custo mensal, investimento inicial em equipamento, taxas escondidas e em que situação cada modalidade compensa.";
 
 const comparisonData = {
   title: "Academia: Preço e Resultados",
@@ -31,15 +85,18 @@ export const Route = createFileRoute("/comparar/academia")({
   head: () => ({
     meta: [
       { title: "Academia vs Treino em Casa vs Online | Calcule Brasil" },
-      {
-        name: "description",
-        content:
-          "Compare: academia x treino em casa x aulas online. Preço, resultados, motivação. Qual compensa mais?",
-      },
+      { name: "description", content: DESCRIPTION },
       { property: "og:title", content: "Academia vs Treino em Casa: Qual vale mais?" },
+      { property: "og:description", content: DESCRIPTION },
       { property: "og:url", content: absoluteUrl("/comparar/academia") },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/comparar/academia") }],
+    scripts: comparisonStructuredData({
+      name: "Academia vs Treino em Casa vs Online",
+      description: DESCRIPTION,
+      path: "/comparar/academia",
+      faq: FAQ,
+    }),
   }),
   component: AcademyComparison,
 });
@@ -65,7 +122,18 @@ function AcademyComparison() {
         </div>
 
         <Prose>
-          <p>A decisão não é só preço, mas preço + resultados + consistência.</p>
+          <p>
+            A comparação entre academia, treino em casa e aulas online raramente se resolve só no
+            preço da mensalidade. O que determina o custo por treino efetivo é a combinação de três
+            fatores: quanto você desembolsa por mês, quanto investiu de uma vez em equipamento e com
+            que frequência você realmente treina. Uma mensalidade de R$ 100 usada quatro vezes por
+            semana sai bem mais barata por sessão do que R$ 60 usados duas vezes por mês.
+          </p>
+          <p>
+            As faixas de preço abaixo são referências de mercado em capitais brasileiras e variam
+            bastante por região e por rede. Use-as como ponto de partida e substitua pelos valores
+            que você encontrou perto de casa.
+          </p>
 
           <h2>Tabela de Comparação</h2>
           <ComparisonChart {...comparisonData} />
@@ -99,30 +167,82 @@ function AcademyComparison() {
             <li>❌ Menos personalizado</li>
           </ul>
 
-          <h2>Qual Vale Mais?</h2>
+          <h2>Os custos que não aparecem na mensalidade</h2>
           <p>
-            <strong>Se está começando:</strong> Academia. A comunidade ajuda a manter consistência
-            (65% desistem em casa sozinhos).
+            Ao comparar propostas, some sempre os mesmos itens em cada modalidade. Na academia, além
+            da mensalidade: taxa de matrícula, anuidade, transporte ou combustível, estacionamento e
+            eventualmente armário. Em contratos com fidelidade, considere também a multa caso
+            precise cancelar antes do prazo — ela transforma uma economia aparente em custo
+            afundado.
           </p>
           <p>
-            <strong>Se já treina há 1+ ano:</strong> Treino em casa é mais barato (economiza R$
-            800-2.400/ano).
+            No treino em casa, o gasto relevante é o investimento inicial. Um conjunto básico
+            funcional — colchonete, elásticos, um par de halteres ajustáveis e uma barra fixa — sai
+            entre R$ 500 e R$ 1.500. Um setup mais completo, com banco e anilhas, passa dos R$
+            3.000. Esse valor não se repete todo mês, mas precisa ser diluído no cálculo para a
+            comparação ficar honesta.
           </p>
           <p>
-            <strong>Se precisa flexibilidade:</strong> Aulas online. Melhor custo-benefício.
+            Nas aulas online, o custo costuma ser previsível, mas quase sempre exige algum
+            equipamento mínimo em casa e uma conexão estável.
           </p>
 
-          <h2>Custo anual</h2>
+          <h2>Custo anual e por treino</h2>
           <ul>
-            <li>Academia: R$ 960-2.400/ano</li>
-            <li>Treino em Casa: R$ 0-1.200/ano (se comprar equipamento)</li>
-            <li>Online: R$ 600-1.800/ano</li>
+            <li>
+              <strong>Academia:</strong> R$ 960 a R$ 2.400 por ano em mensalidades, mais R$ 100 a R$
+              400 de taxas e deslocamento.
+            </li>
+            <li>
+              <strong>Treino em casa:</strong> R$ 500 a R$ 3.000 de equipamento no primeiro ano, e
+              perto de zero nos anos seguintes.
+            </li>
+            <li>
+              <strong>Aulas online:</strong> R$ 600 a R$ 1.800 por ano, mais o equipamento mínimo.
+            </li>
           </ul>
-
           <p>
-            Em 5 anos: Academia = R$ 5.000-12.000. Treino em casa = R$ 2.000-4.000 (se consistente).
+            O número que realmente compara as três é o <strong>custo por treino</strong>: divida o
+            gasto anual pelo número de sessões que você fez no ano. Quem treina três vezes por
+            semana faz cerca de 150 sessões anuais; a mesma mensalidade de R$ 150 sai a R$ 12 por
+            treino nesse ritmo e a R$ 60 por treino para quem vai uma vez por semana.
           </p>
+
+          <h2>Em que situação cada uma compensa</h2>
+          <p>
+            <strong>Se está começando:</strong> a academia tende a ajudar, porque o ambiente, o
+            horário definido e a presença de instrutores facilitam criar rotina — e o acesso a
+            equipamento variado reduz a chance de você travar por não saber o que fazer.
+          </p>
+          <p>
+            <strong>Se já treina de forma constante há mais de um ano:</strong> o treino em casa
+            costuma ser o mais econômico no médio prazo, já que você conhece seus exercícios e o
+            equipamento se paga.
+          </p>
+          <p>
+            <strong>Se o problema é horário:</strong> aulas online resolvem a restrição de agenda e
+            eliminam o deslocamento, com custo intermediário.
+          </p>
+          <p>
+            <strong>Se o objetivo envolve carga alta ou reabilitação:</strong> vale priorizar o
+            acompanhamento presencial, mesmo custando mais, por segurança de execução.
+          </p>
+
+          <h2>Limitações desta comparação</h2>
+          <p>
+            Esta página compara custo e conveniência, não resultado fisiológico — a modalidade mais
+            eficaz é, em larga medida, a que você consegue manter. Os valores citados são
+            estimativas de mercado e variam por cidade e por rede. Nada aqui substitui orientação de
+            profissional de educação física, especialmente se você tem alguma condição de saúde ou
+            está retomando os treinos depois de um período parado.
+          </p>
+
+          <SourcesList items={SOURCES} reviewedAt={REVIEWED_AT} />
         </Prose>
+
+        <div className="mx-auto mt-12 max-w-3xl px-4 pb-12 sm:px-6">
+          <FAQSection items={FAQ} />
+        </div>
       </article>
     </PageShell>
   );

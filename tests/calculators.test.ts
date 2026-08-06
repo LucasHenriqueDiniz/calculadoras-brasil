@@ -5,6 +5,12 @@ import { calculateElectricityBill } from "../src/lib/calculators/electricityBill
 import { calculateSubscriptions } from "../src/lib/calculators/subscriptions";
 import { calculateMovingCost } from "../src/lib/calculators/movingCost";
 import { calculatePetCost } from "../src/lib/calculators/petCost";
+import { calculateInssAutonomo } from "../src/lib/calculators/inssAutonomo";
+import {
+  calcularInssEmpregado,
+  SALARIO_MINIMO,
+  TETO_INSS,
+} from "../src/lib/calculators/inss-constants";
 
 describe("calculadoras principais", () => {
   it("calcula o cenário de custo de carro", () => {
@@ -155,5 +161,115 @@ describe("calculadoras principais", () => {
     expect(result.monthlyFoodKg).toBe(6);
     expect(result.foodPackageDurationDays).toBe(50);
     expect(result.monthlyTotal).toBe(70);
+  });
+});
+
+describe("INSS: contribuição progressiva do empregado", () => {
+  it("aplica a alíquota apenas sobre a parcela dentro de cada faixa", () => {
+    // 1412 * 7,5% = 105,90 — primeira faixa isolada.
+    expect(calcularInssEmpregado(1412)).toBeCloseTo(105.9, 2);
+
+    // 105,90 + (2666,68 - 1412) * 9% = 105,90 + 112,92 = 218,82
+    expect(calcularInssEmpregado(2666.68)).toBeCloseTo(218.82, 2);
+
+    // 218,82 + (4000,03 - 2666,68) * 12% = 218,82 + 160,00 = 378,82
+    expect(calcularInssEmpregado(4000.03)).toBeCloseTo(378.82, 2);
+  });
+
+  it("nunca cobra mais que a contribuição do teto", () => {
+    const noTeto = calcularInssEmpregado(TETO_INSS);
+    expect(calcularInssEmpregado(50_000)).toBeCloseTo(noTeto, 2);
+    // A contribuição máxima fica bem abaixo de 20% do teto.
+    expect(noTeto).toBeLessThan(TETO_INSS * 0.2);
+  });
+
+  it("mantém a alíquota efetiva progressiva e abaixo de 14%", () => {
+    const salario = 5000;
+    const aliquotaEfetiva = calcularInssEmpregado(salario) / salario;
+    expect(aliquotaEfetiva).toBeGreaterThan(0.075);
+    expect(aliquotaEfetiva).toBeLessThan(0.14);
+  });
+});
+
+describe("INSS autônomo", () => {
+  it("cobra 20% sobre a renda e 11% sempre sobre o salário mínimo", () => {
+    const result = calculateInssAutonomo({
+      ganhoMensalBruto: 3000,
+      mesesContribuidos: 0,
+      sexo: "masculino",
+    });
+
+    expect(result.salarioContribuicao).toBe(3000);
+    expect(result.planoNormal.contribuicaoMensal).toBeCloseTo(600, 2);
+    // O plano simplificado não acompanha a renda: 11% do salário mínimo.
+    expect(result.planoSimplificado.contribuicaoMensal).toBeCloseTo(SALARIO_MINIMO * 0.11, 2);
+    expect(result.planoSimplificado.contaTempoDeContribuicao).toBe(false);
+  });
+
+  it("limita o salário de contribuição ao piso e ao teto", () => {
+    const acimaDoTeto = calculateInssAutonomo({
+      ganhoMensalBruto: 30_000,
+      mesesContribuidos: 0,
+      sexo: "masculino",
+    });
+    expect(acimaDoTeto.salarioContribuicao).toBe(TETO_INSS);
+    expect(acimaDoTeto.limitadoPeloTeto).toBe(true);
+
+    const abaixoDoPiso = calculateInssAutonomo({
+      ganhoMensalBruto: 800,
+      mesesContribuidos: 0,
+      sexo: "masculino",
+    });
+    expect(abaixoDoPiso.salarioContribuicao).toBe(SALARIO_MINIMO);
+    expect(abaixoDoPiso.elevadoAoPiso).toBe(true);
+  });
+
+  it("não estima benefício antes do tempo mínimo de contribuição", () => {
+    const result = calculateInssAutonomo({
+      ganhoMensalBruto: 5000,
+      mesesContribuidos: 10 * 12,
+      sexo: "masculino",
+    });
+    expect(result.tempoMinimoAtingido).toBe(false);
+    expect(result.estimativaBeneficioNormal).toBe(0);
+  });
+
+  it("aplica 60% da média mais 2% por ano excedente (EC 103/2019)", () => {
+    const result = calculateInssAutonomo({
+      ganhoMensalBruto: 5000,
+      mesesContribuidos: 25 * 12,
+      sexo: "masculino",
+    });
+    // 20 anos de carência + 5 anos excedentes = 60% + 10% = 70%
+    expect(result.tempoMinimoAtingido).toBe(true);
+    expect(result.percentualMediaAplicado).toBe(70);
+    expect(result.estimativaBeneficioNormal).toBeCloseTo(3500, 2);
+  });
+
+  it("usa carência menor para mulheres", () => {
+    const result = calculateInssAutonomo({
+      ganhoMensalBruto: 5000,
+      mesesContribuidos: 15 * 12,
+      sexo: "feminino",
+    });
+    expect(result.tempoMinimoContribuicao).toBe(15);
+    expect(result.tempoMinimoAtingido).toBe(true);
+    expect(result.percentualMediaAplicado).toBe(60);
+  });
+
+  it("nunca estima benefício abaixo do mínimo nem acima do teto", () => {
+    const alto = calculateInssAutonomo({
+      ganhoMensalBruto: 30_000,
+      mesesContribuidos: 40 * 12,
+      sexo: "masculino",
+    });
+    expect(alto.estimativaBeneficioNormal).toBeLessThanOrEqual(TETO_INSS);
+
+    const baixo = calculateInssAutonomo({
+      ganhoMensalBruto: SALARIO_MINIMO,
+      mesesContribuidos: 20 * 12,
+      sexo: "masculino",
+    });
+    expect(baixo.estimativaBeneficioNormal).toBeGreaterThanOrEqual(SALARIO_MINIMO);
   });
 });
