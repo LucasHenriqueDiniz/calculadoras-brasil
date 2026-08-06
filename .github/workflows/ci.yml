@@ -41,7 +41,7 @@ jobs:
           node-version: '22'
           cache: 'npm'
       - run: npm ci
-      - run: npm run test 2>/dev/null || true
+      - run: npm run test
 
   build:
     name: Build Verification

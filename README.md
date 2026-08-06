@@ -62,6 +62,8 @@ O alvo de produção é Cloudflare Workers. O ambiente `preview` usa o Worker `c
 
 `npm run preview` sobe uma prévia local do build para validação antes do deploy. O primeiro deploy remoto deve ser feito com `npm run deploy:preview`; use `npm run deploy` apenas após validar o Worker de preview, APIs, sitemap, 404 e headers.
 
+O deploy automático é feito pelo **Cloudflare Workers Builds**, conectado ao repositório: cada push constrói e publica direto pela Cloudflare. Os comandos acima continuam válidos para deploy manual a partir da máquina local. O GitHub Actions não faz deploy — roda apenas o CI (typecheck, lint, testes e verificação de build).
+
 ## Variáveis e segredos
 
 Variáveis não sensíveis ficam em `wrangler.jsonc`:
