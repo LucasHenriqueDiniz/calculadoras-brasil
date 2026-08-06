@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
 import { CurrencyInput, NumberInput } from "@/components/calculator/fields";
-import { ResultSummaryCard, BreakdownTable } from "@/components/calculator/results";
+import { ResultSummaryCard, BreakdownTable, DisclaimerBox } from "@/components/calculator/results";
 import { FAQSection } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { formatBRL } from "@/lib/format";
@@ -20,24 +20,50 @@ const DEFAULTS: BeneficiosFiscaisInput = {
   aliquotaIrpfEstimada: 15,
 };
 
+const DESCRIPTION =
+  "Quanto valem de verdade vale-refeição, vale-alimentação e vale-transporte: veja o equivalente em salário bruto necessário para chegar ao mesmo líquido.";
+
+const FAQ = [
+  {
+    question: "Vale-refeição e vale-transporte reduzem o IRPF?",
+    answer:
+      "Eles não entram na base de cálculo do IRPF nem do INSS quando concedidos nas condições previstas na legislação, então o efeito prático é o mesmo de uma renda isenta. Não é uma dedução na declaração: é um valor que simplesmente não é tributado, por isso um benefício de R$ 500 costuma valer mais que R$ 500 de aumento salarial.",
+  },
+  {
+    question: "Existe um limite de valor para o vale-refeição?",
+    answer:
+      "Não há um teto em reais fixado em lei para a concessão. O que a legislação define são as condições de natureza não salarial do benefício, hoje concentradas nas regras do Programa de Alimentação do Trabalhador e nas alterações trazidas pela Lei 14.442/2022 — entre elas a exigência de que o valor seja usado apenas para alimentação. Valores muito acima do padrão de mercado da função podem ser questionados como salário disfarçado.",
+  },
+  {
+    question: "Como funciona o desconto do vale-transporte?",
+    answer:
+      "A empresa pode descontar do empregado até 6% do salário-base a título de vale-transporte, e arca com o que exceder esse percentual. Se o custo total do deslocamento for menor que 6% do salário, o desconto fica limitado ao custo real. O benefício é de adesão opcional: o empregado pode recusá-lo.",
+  },
+  {
+    question: "Vale-refeição e vale-alimentação são a mesma coisa?",
+    answer:
+      "Não. O vale-refeição destina-se a refeições prontas em restaurantes e similares, e o vale-alimentação à compra de gêneros em supermercados. Desde a Lei 14.442/2022 os valores não podem ser desviados para outras finalidades, e a portabilidade entre operadoras de cartão foi facilitada.",
+  },
+  {
+    question: "Vale a pena trocar benefício por aumento de salário?",
+    answer:
+      "Quase nunca em valores equivalentes. Como o benefício não sofre incidência de INSS nem de IRPF, seria preciso um aumento bruto consideravelmente maior para chegar ao mesmo líquido — é exatamente esse número que a calculadora mostra. Por outro lado, salário maior aumenta a base de FGTS, 13º, férias e da futura aposentadoria, o que o benefício não faz.",
+  },
+];
+
 export const Route = createFileRoute("/calculadora-beneficios-fiscais")({
   head: () => ({
     meta: [
       { title: "Calculadora Benefícios Fiscais | Calcule Brasil" },
-      {
-        name: "description",
-        content:
-          "Veja economia com vale refeição e vale transporte. Simule impacto fiscal de benefícios não tributáveis.",
-      },
+      { name: "description", content: DESCRIPTION },
     ],
     links: [{ rel: "canonical", href: absoluteUrl("/calculadora-beneficios-fiscais") }],
     scripts: calculatorStructuredData({
       name: "Calculadora Benefícios Fiscais",
-      description:
-        "Veja economia com vale refeição e vale transporte. Simule impacto fiscal de benefícios não tributáveis.",
+      description: DESCRIPTION,
       path: "/calculadora-beneficios-fiscais",
       applicationCategory: "FinanceApplication",
-      faq: [],
+      faq: FAQ,
     }),
   }),
   component: Calculator,
@@ -57,13 +83,13 @@ function Calculator() {
           label="Vale refeição mensal"
           value={input.valeRefeicaoMensal}
           onChange={(v) => setInput({ ...input, valeRefeicaoMensal: v })}
-          hint="Média brasileira: ~R$ 360/mês"
+          hint="Informe o valor que consta no seu holerite"
         />
         <CurrencyInput
           label="Vale transporte mensal"
           value={input.valeTransporteMensal}
           onChange={(v) => setInput({ ...input, valeTransporteMensal: v })}
-          hint="Geralmente até 6% do salário"
+          hint="A empresa pode descontar até 6% do salário-base a esse título"
         />
       </FormSection>
 
@@ -122,24 +148,17 @@ function Calculator() {
         ]}
       />
 
-      <FAQSection
-        items={[
-          {
-            question: "Vale refeição e transporte reduzem IRPF?",
-            answer:
-              "Indiretamente. São benefícios não tributáveis, então não entram na base de cálculo do IRPF. É como se você economizasse imposto.",
-          },
-          {
-            question: "Qual é o limite de vale refeição?",
-            answer:
-              "Não há limite legal, mas a Receita considera comum até R$ 360/mês. Acima disso, pode haver questionamento.",
-          },
-          {
-            question: "Vale transporte tem limite?",
-            answer: "Até 6% do seu salário bruto. Empresa pode descontar se exceder esse valor.",
-          },
-        ]}
-      />
+      <DisclaimerBox>
+        <p>
+          A estimativa considera que os benefícios informados são concedidos nas condições que
+          afastam a incidência de INSS e IRPF. Regras específicas de convenção coletiva, benefícios
+          pagos em dinheiro e situações em que a verba é considerada de natureza salarial podem
+          mudar o resultado. Trata-se de conteúdo educativo, não de orientação tributária
+          individual.
+        </p>
+      </DisclaimerBox>
+
+      <FAQSection items={FAQ} />
 
       <RelatedCalculators excludeSlug="beneficios-fiscais" />
     </CalculatorLayout>

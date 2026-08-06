@@ -181,7 +181,7 @@ function IrpfCalculator() {
           placeholder="Escola, universidade, material"
           value={input.deducaoEducacao}
           onChange={(value) => setInput({ ...input, deducaoEducacao: value })}
-          hint={`Até R$ ${formatBRL(3561.5)}/ano. Inclua sua educação e de dependentes.`}
+          hint={`Até ${formatBRL(3561.5)}/ano. Inclua sua educação e de dependentes.`}
         />
         <CurrencyInput
           label="Gastos com saúde (anual)"
@@ -195,7 +195,7 @@ function IrpfCalculator() {
           placeholder="PGBL, VGBL, fundo de pensão"
           value={input.deducaoPrevidenciaComplementar}
           onChange={(value) => setInput({ ...input, deducaoPrevidenciaComplementar: value })}
-          hint={`Até R$ ${formatBRL(63454)}/ano (13% da renda bruta).`}
+          hint={`Até ${formatBRL(63454)}/ano (13% da renda bruta).`}
         />
       </FormSection>
 

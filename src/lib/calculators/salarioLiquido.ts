@@ -3,6 +3,8 @@
  * Converte salário bruto em líquido considerando IRPF, INSS, sindicato
  */
 
+import { calcularInssEmpregado } from "./inss-constants";
+
 export interface SalarioLiquidoInput {
   salarioBrutoMensal: number;
   dependentes: number;
@@ -38,23 +40,12 @@ export interface SalarioLiquidoResult {
   };
 }
 
-// Faixas de INSS 2026 (empregado)
-const INSS_FAIXAS = [
-  { max: 1412.0, rate: 0.077 },
-  { max: 2666.68, rate: 0.09 },
-  { max: 4000.03, rate: 0.12 },
-  { max: Infinity, rate: 0.14 },
-];
-
 export function calculateSalarioLiquido(input: SalarioLiquidoInput): SalarioLiquidoResult {
   const salarioBrutoAnual = input.salarioBrutoMensal * 12;
 
-  // 1. Calcular INSS empregado
-  let descInssEmpregado = 0;
-  for (const faixa of INSS_FAIXAS) {
-    const valor = Math.min(input.salarioBrutoMensal, faixa.max);
-    descInssEmpregado += valor * faixa.rate;
-  }
+  // 1. INSS do empregado: progressivo por faixa e limitado ao teto do RGPS.
+  //    Cada alíquota incide apenas sobre a parcela do salário dentro da faixa.
+  const descInssEmpregado = calcularInssEmpregado(input.salarioBrutoMensal);
 
   // 2. Base para IRPF após INSS
   const baseParaIrpf = input.salarioBrutoMensal - descInssEmpregado;
