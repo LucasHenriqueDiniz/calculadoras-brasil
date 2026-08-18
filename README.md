@@ -1,3 +1,7 @@
+<p align="center">
+  <img src=".github/banner.png" alt="Calcule Brasil" width="100%" />
+</p>
+
 # Calcule Brasil
 
 Hub de calculadoras brasileiras para estimar custos do dia a dia, impostos e decisões financeiras comuns no Brasil. A aplicação usa React, TypeScript, TanStack Start e Cloudflare Workers.
