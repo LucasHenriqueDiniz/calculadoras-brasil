@@ -24,5 +24,12 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
+  {
+    // Componentes gerados do shadcn/ui: por design cada arquivo exporta o componente
+    // e suas variants (badgeVariants, buttonVariants…) no mesmo modulo. A regra pede
+    // o contrario, e reescrever arquivos vendorizados so os faz divergir do upstream.
+    files: ["src/components/ui/**/*.{ts,tsx}"],
+    rules: { "react-refresh/only-export-components": "off" },
+  },
   eslintPluginPrettier,
 );

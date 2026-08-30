@@ -1,3 +1,4 @@
+import { buildColorMap, type BreakdownRow } from "@/lib/chart-colors";
 import { useState, type ReactNode } from "react";
 import { AlertTriangle, Info, PieChart } from "lucide-react";
 import { formatBRL } from "@/lib/format";
@@ -73,36 +74,7 @@ export function ResultSummaryCard({
   );
 }
 
-export interface BreakdownRow {
-  key: string;
-  label: string;
-  monthly: number;
-  annual: number;
-}
-
-const CHART_COLORS = [
-  "var(--color-chart-1)",
-  "var(--color-chart-2)",
-  "var(--color-chart-3)",
-  "var(--color-chart-4)",
-  "var(--color-chart-5)",
-  "var(--color-chart-6)",
-  "var(--color-chart-7)",
-  "var(--color-chart-8)",
-];
-
-/**
- * Mapeia cada categoria (por key) para uma cor estável, ordenando por valor.
- * Tanto o gráfico quanto a tabela usam as mesmas linhas, garantindo cores consistentes.
- */
-export function buildColorMap(rows: BreakdownRow[]): Record<string, string> {
-  const sorted = [...rows].filter((r) => r.monthly > 0).sort((a, b) => b.monthly - a.monthly);
-  const map: Record<string, string> = {};
-  sorted.forEach((r, i) => {
-    map[r.key] = CHART_COLORS[i % CHART_COLORS.length];
-  });
-  return map;
-}
+export type { BreakdownRow };
 
 interface LegacyBreakdownItem {
   label: string;
