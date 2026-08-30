@@ -36,3 +36,17 @@ o CI verde.
 
 Nota sobre Node: o pnpm 11 exige **Node ≥ 22.13** (usa `node:sqlite`). O
 `.nvmrc` deste repo pede 24.19.0.
+
+## Duas armadilhas do dashboard
+
+**"Retry build" não usa a configuração atual.** Ele repete o build com o
+snapshot de configuração daquele build. Corrigir o comando e mandar repetir um
+build antigo falha idêntico, e o log ainda mostra o comando velho — o que faz
+parecer que a correção não pegou. Para testar uma mudança de configuração, é
+preciso um build novo, disparado por push.
+
+**A mudança leva um tempo para valer.** Um push feito poucos minutos depois de
+salvar ainda pode rodar com o comando anterior. Se o build falhar logo após uma
+mudança de configuração, conferir no log qual comando foi realmente executado
+(`Executing user build command: ...`) antes de concluir que a correção está
+errada.
