@@ -20,7 +20,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .node-version
+          node-version-file: .nvmrc
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm run typecheck
@@ -33,7 +33,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .node-version
+          node-version-file: .nvmrc
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm run lint
@@ -46,7 +46,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .node-version
+          node-version-file: .nvmrc
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm run test
@@ -60,7 +60,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .node-version
+          node-version-file: .nvmrc
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
