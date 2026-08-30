@@ -6,56 +6,64 @@ on:
   pull_request:
     branches: [main, develop]
 
+# Cada job repete o mesmo preâmbulo de propósito: são quatro runners
+# independentes, e o build depende dos três primeiros terem passado.
+# A action de pnpm não recebe 'version' — ela lê o campo packageManager do
+# package.json, que é o que mantém o CI e as máquinas locais na mesma versão.
+
 jobs:
   typecheck:
     name: TypeScript Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run typecheck
+          node-version-file: .node-version
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run typecheck
 
   lint:
     name: ESLint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run lint
+          node-version-file: .node-version
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
 
   test:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run test 2>/dev/null || true
+          node-version-file: .node-version
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run test
 
   build:
     name: Build Verification
     needs: [typecheck, lint, test]
-    if: always() && (needs.typecheck.result == 'success' || needs.typecheck.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build
+          node-version-file: .node-version
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
       - uses: actions/upload-artifact@v4
         with:
           name: dist-brasil-calculadoras
