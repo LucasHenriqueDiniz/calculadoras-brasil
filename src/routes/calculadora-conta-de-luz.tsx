@@ -1,3 +1,4 @@
+import { buildColorMap } from "@/lib/chart-colors";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { LoaderCircle, Plus, Table as TableIcon, Trash2 } from "lucide-react";
@@ -5,7 +6,6 @@ import { CalculatorLayout, FormSection } from "@/components/calculator/Calculato
 import { SearchableSelectField } from "@/components/calculator/SearchableSelectField";
 import { NumberInput, SelectField } from "@/components/calculator/fields";
 import {
-  buildColorMap,
   DisclaimerBox,
   ResultSummaryCard,
   SimpleBarChart,
