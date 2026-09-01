@@ -36,8 +36,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:seo": "node tests/seo-smoke.mjs",
-    "audit": "npm audit",
-    "check": "npm run cf:types:check && npm test && npm run typecheck && npm run lint && npm run build && npm run test:seo && npm run worker:dry-run && npm audit",
+    "audit": "pnpm audit",
+    "check": "pnpm run cf:types:check && pnpm test && pnpm run typecheck && pnpm run lint && pnpm run build && pnpm run test:seo && pnpm run worker:dry-run && pnpm audit",
     "format": "prettier --write ."
   },
   "dependencies": {
