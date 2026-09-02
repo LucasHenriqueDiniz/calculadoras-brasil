@@ -15,7 +15,7 @@ export async function respondWithEdgeCache(
       console.warn(
         JSON.stringify({
           event: "edge_cache_write_error",
-          message: error instanceof Error ? error.message : "Erro desconhecido",
+          message: error instanceof Error ? error.message : "Unknown error",
         }),
       );
     }

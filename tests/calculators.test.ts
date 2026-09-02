@@ -166,7 +166,7 @@ describe("core calculators", () => {
 
 describe("INSS: progressive employee contribution", () => {
   it("applies the rate only to the slice inside each bracket", () => {
-    // 1621 * 7,5% = 121,575 — primeira faixa isolada.
+    // 1621 * 7,5% = 121,575 — first bracket in isolation.
     expect(calcularInssEmpregado(1621)).toBeCloseTo(121.575, 3);
 
     // 121,575 + (2902,84 - 1621) * 9% = 121,575 + 115,366 = 236,94

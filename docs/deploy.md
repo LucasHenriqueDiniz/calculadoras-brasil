@@ -1,52 +1,52 @@
 # Deploy
 
-Este Worker é publicado pelo **Workers Builds** da Cloudflare, disparado por push
-no Git. Não há GitHub Action de deploy: o `ci.yml` só verifica.
+This Worker is published by Cloudflare **Workers Builds**, triggered by a push
+to Git. There is no deploy GitHub Action: `ci.yml` only verifies.
 
-## O que está configurado no dashboard
+## What is configured in the dashboard
 
-Estas quatro linhas **não vivem no repositório** — moram em Workers & Pages →
-`calcule-brasil` → Settings → Builds. Estão anotadas aqui porque config
-invisível é config que quebra sem ninguém ver: a migração de npm para pnpm
-derrubou o build justamente porque o comando dizia `npm ci` e nada no repo
-denunciava isso.
+These four lines **do not live in the repository** — they live in Workers & Pages →
+`calcule-brasil` → Settings → Builds. They are written down here because
+invisible config is config that breaks without anyone seeing it: the migration
+from npm to pnpm broke the build precisely because the command said `npm ci` and
+nothing in the repo gave that away.
 
-| campo | valor |
+| field | value |
 |---|---|
 | Build command | `pnpm run build` |
 | Deploy command | `npx wrangler deploy` |
 | Version command | `npx wrangler versions upload` |
 | Root directory | `/` |
 
-O **Deploy command** roda em push na branch de produção. O **Version command**
-roda em pull request e sobe uma versão sem promovê-la — é o que faz o check
-"Workers Builds" aparecer nos PRs.
+The **Deploy command** runs on a push to the production branch. The **Version
+command** runs on a pull request and uploads a version without promoting it —
+that is what makes the "Workers Builds" check appear on PRs.
 
-O passo de install é automático e **não** faz parte do build command: a
-Cloudflare detecta o `pnpm-lock.yaml`, lê o campo `packageManager` do
-`package.json` e roda a mesma versão que as máquinas locais. O log confirma
-(`Done in 16.2s using pnpm v11.24.0`). Por isso o build command chama só o
-build — um `install` ali seria a segunda instalação da mesma árvore.
+The install step is automatic and is **not** part of the build command:
+Cloudflare detects `pnpm-lock.yaml`, reads the `packageManager` field of
+`package.json` and runs the same version the local machines run. The log
+confirms it (`Done in 16.2s using pnpm v11.24.0`). That is why the build command
+only calls the build — an `install` there would be a second install of the same
+tree.
 
-## Ao mudar de gerenciador de pacotes ou de versão de Node
+## When changing package manager or Node version
 
-Mexer no `packageManager` ou no `.nvmrc` **não** atualiza o dashboard. Conferir
-as quatro linhas acima na mesma mudança, ou o deploy quebra depois do merge, com
-o CI verde.
+Touching `packageManager` or `.nvmrc` does **not** update the dashboard. Check
+the four lines above in the same change, or the deploy breaks after the merge
+with CI green.
 
-Nota sobre Node: o pnpm 11 exige **Node ≥ 22.13** (usa `node:sqlite`). O
-`.nvmrc` deste repo pede 24.19.0.
+A note on Node: pnpm 11 requires **Node ≥ 22.13** (it uses `node:sqlite`). This
+repo's `.nvmrc` asks for 24.19.0.
 
-## Duas armadilhas do dashboard
+## Two dashboard traps
 
-**"Retry build" não usa a configuração atual.** Ele repete o build com o
-snapshot de configuração daquele build. Corrigir o comando e mandar repetir um
-build antigo falha idêntico, e o log ainda mostra o comando velho — o que faz
-parecer que a correção não pegou. Para testar uma mudança de configuração, é
-preciso um build novo, disparado por push.
+**"Retry build" does not use the current configuration.** It repeats the build
+with that build's configuration snapshot. Fixing the command and retrying an old
+build fails identically, and the log still shows the old command — which makes
+it look like the fix did not take. To test a configuration change you need a new
+build, triggered by a push.
 
-**A mudança leva um tempo para valer.** Um push feito poucos minutos depois de
-salvar ainda pode rodar com o comando anterior. Se o build falhar logo após uma
-mudança de configuração, conferir no log qual comando foi realmente executado
-(`Executing user build command: ...`) antes de concluir que a correção está
-errada.
+**A change takes a while to take effect.** A push made a few minutes after
+saving may still run with the previous command. If the build fails right after a
+configuration change, check in the log which command actually ran
+(`Executing user build command: ...`) before concluding that the fix is wrong.

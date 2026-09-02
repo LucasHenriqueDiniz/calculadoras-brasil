@@ -42,7 +42,7 @@ export const Route = createFileRoute("/api/fuel-prices")({
               JSON.stringify({
                 event: "public_data_error",
                 source: "ANP",
-                message: error instanceof Error ? error.message : "Erro desconhecido",
+                message: error instanceof Error ? error.message : "Unknown error",
               }),
             );
             return unavailable(

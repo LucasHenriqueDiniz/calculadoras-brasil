@@ -44,7 +44,7 @@ function Home() {
         />
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
           <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
-            {/* Texto */}
+            {/* Text */}
             <div>
               <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-soft px-3 py-1 text-xs font-semibold text-primary">
                 <Sparkles className="h-3.5 w-3.5" aria-hidden /> Gratuito • Sem cadastro
@@ -72,7 +72,7 @@ function Home() {
               </div>
             </div>
 
-            {/* Card de exemplo */}
+            {/* Example card */}
             <div className="relative lg:pl-6">
               <div className="rounded-3xl border border-border bg-background/70 p-6 shadow-[var(--shadow-card-hover)] sm:p-7">
                 <div className="flex items-center justify-between">
@@ -119,7 +119,7 @@ function Home() {
         </div>
       </section>
 
-      {/* Calculadoras */}
+      {/* Calculators */}
       <section id="calculadoras" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
         <div className="mb-10 max-w-2xl">
           <h2 className="font-display text-2xl text-foreground sm:text-3xl">
@@ -162,7 +162,7 @@ function Home() {
         </ul>
       </section>
 
-      {/* Por que confiar */}
+      {/* Why trust us */}
       <section className="border-t border-border bg-surface">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
           <div className="mb-10 max-w-2xl">

@@ -51,7 +51,7 @@ export const Route = createFileRoute("/api/energy-tariffs")({
               JSON.stringify({
                 event: "public_data_error",
                 source: "ANEEL",
-                message: error instanceof Error ? error.message : "Erro desconhecido",
+                message: error instanceof Error ? error.message : "Unknown error",
               }),
             );
             return unavailable(

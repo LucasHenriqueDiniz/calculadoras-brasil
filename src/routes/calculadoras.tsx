@@ -53,7 +53,7 @@ function CalculadorasPage() {
       />
 
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        {/* Busca + atalhos de categoria */}
+        {/* Search + category shortcuts */}
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:max-w-sm">
             <Search
@@ -84,7 +84,7 @@ function CalculadorasPage() {
           </nav>
         </div>
 
-        {/* Grupos por categoria */}
+        {/* Groups by category */}
         {categoriesWithItems.length === 0 ? (
           <p className="mt-16 rounded-2xl border border-dashed border-border bg-surface px-6 py-16 text-center text-muted-foreground">
             Nenhuma calculadora encontrada para{" "}
@@ -147,7 +147,7 @@ function CalculadorasPage() {
           </div>
         )}
 
-        {/* Sugestão de novas calculadoras */}
+        {/* Suggest new calculators */}
         <div className="mt-16 flex flex-col items-start gap-4 rounded-2xl border border-border bg-surface p-6 shadow-[var(--shadow-card)] sm:flex-row sm:items-center sm:justify-between sm:p-8">
           <div>
             <h2 className="font-display text-lg text-foreground">Faltou alguma calculadora?</h2>

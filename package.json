@@ -1,7 +1,7 @@
 {
   "name": "calcule-brasil",
   "private": true,
-  "description": "Calculadoras brasileiras de finanças pessoais, impostos e custos do dia a dia.",
+  "description": "Brazilian calculators for personal finance, taxes and day-to-day costs.",
   "license": "MIT",
   "keywords": [
     "brasil",

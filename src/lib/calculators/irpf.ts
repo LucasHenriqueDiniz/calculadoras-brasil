@@ -55,10 +55,10 @@ const SIMPLIFIED_DEDUCTION_RATE = 0.205; // simplified deduction: up to 20.5% of
 export function calculateIrpf(input: IrpfInput): IrpfResult {
   // basic validation
   if (input.rendaBrutaAnual < 0) {
-    throw new Error("Renda bruta não pode ser negativa");
+    throw new Error("Gross income cannot be negative");
   }
   if (input.dependentes < 0) {
-    throw new Error("Número de dependentes não pode ser negativo");
+    throw new Error("Number of dependants cannot be negative");
   }
 
   const { rendaBrutaAnual } = input;

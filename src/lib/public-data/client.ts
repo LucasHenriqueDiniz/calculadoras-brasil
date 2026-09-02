@@ -12,7 +12,7 @@ async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
   });
 
   const data = (await response.json()) as T;
-  if (!response.ok) throw new Error("Fonte pública indisponível.");
+  if (!response.ok) throw new Error("Public source unavailable.");
   return data;
 }
 

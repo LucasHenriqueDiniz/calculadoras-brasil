@@ -22,7 +22,7 @@ export function Footer() {
   return (
     <footer className="mt-20 border-t border-border bg-surface">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-12">
-        {/* Marca */}
+        {/* Brand */}
         <div className="md:col-span-4">
           <Link to="/" className="flex items-center gap-2" aria-label="Calcule Brasil — Início">
             <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground">
@@ -45,7 +45,7 @@ export function Footer() {
           </a>
         </div>
 
-        {/* Calculadoras */}
+        {/* Calculators */}
         <div className="md:col-span-4">
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Calculadoras
@@ -67,7 +67,7 @@ export function Footer() {
           </Link>
         </div>
 
-        {/* Institucional + Legal */}
+        {/* Institutional + legal */}
         <div className="grid grid-cols-2 gap-8 md:col-span-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">

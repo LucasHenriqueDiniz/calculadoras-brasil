@@ -79,7 +79,7 @@ export async function fetchAneelDistributors(uf: string): Promise<EnergyDistribu
   });
   const payload = JSON.parse(decodeUtf8(bytes)) as AneelResponse;
   if (!payload.success || !payload.result?.records) {
-    throw new Error("A API de dados abertos da ANEEL retornou uma resposta inválida.");
+    throw new Error("The ANEEL open-data API returned an invalid response.");
   }
 
   const today = new Date().toISOString().slice(0, 10);
@@ -119,7 +119,7 @@ export async function fetchAneelTariff(
   });
   const payload = JSON.parse(decodeUtf8(bytes)) as AneelResponse;
   if (!payload.success || !payload.result?.records) {
-    throw new Error("A API de dados abertos da ANEEL retornou uma resposta inválida.");
+    throw new Error("The ANEEL open-data API returned an invalid response.");
   }
 
   const today = new Date().toISOString().slice(0, 10);

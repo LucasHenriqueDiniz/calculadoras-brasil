@@ -60,7 +60,7 @@ function ContatoPage() {
 
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-          {/* Cartão principal de e-mail */}
+          {/* Primary email card */}
           <div className="flex flex-col rounded-2xl border border-border bg-surface p-7 shadow-[var(--shadow-card)] sm:p-8">
             <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary-soft text-primary">
               <Mail className="h-6 w-6" aria-hidden />
@@ -83,7 +83,7 @@ function ContatoPage() {
             </p>
           </div>
 
-          {/* Tópicos */}
+          {/* Topics */}
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
             {topics.map((topic) => {
               const Icon = topic.icon;
@@ -114,7 +114,7 @@ function ContatoPage() {
           </div>
         </div>
 
-        {/* Aviso final */}
+        {/* Closing notice */}
         <div className="mt-8 rounded-2xl border border-border bg-muted/40 p-6 text-sm leading-relaxed text-muted-foreground">
           O Calcule Brasil é um projeto independente e informativo. Não prestamos aconselhamento
           financeiro, jurídico ou veterinário individual. Para entender como tratamos seus dados,
