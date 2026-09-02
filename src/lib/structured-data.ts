@@ -56,7 +56,7 @@ export function calculatorStructuredData({
     },
   ];
 
-  // Um FAQPage sem perguntas é inválido para o Google — só emitimos quando há FAQ.
+  // A FAQPage with no questions is invalid for Google, so emit it only when there are FAQs.
   if (faq.length > 0) {
     schemas.push({
       type: "application/ld+json",
@@ -83,8 +83,8 @@ interface ComparisonStructuredDataOptions {
 }
 
 /**
- * Dados estruturados das páginas de comparação: artigo editorial + trilha de
- * navegação + FAQ (esta última apenas quando há perguntas cadastradas).
+ * Structured data for the comparison pages: editorial article + breadcrumb
+ * trail + FAQ (the last one only when questions are registered).
  */
 export function comparisonStructuredData({
   name,

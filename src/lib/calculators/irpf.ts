@@ -1,7 +1,7 @@
 /**
  * IRPF 2026 Calculator
- * Calcula o Imposto de Renda Pessoa Física (IRPF) baseado na legislação brasileira 2026
- * Reference: Tabela progressiva IRPF 2026 (atualizada 01/01/2026)
+ * Computes Brazilian personal income tax (IRPF) under the 2026 legislation.
+ * Reference: IRPF 2026 progressive table (updated 01/01/2026).
  */
 
 export interface IrpfInput {
@@ -31,8 +31,8 @@ export interface IrpfResult {
   parcelasRestituicao?: number;
 }
 
-// Tabela progressiva IRPF 2026 (vigência 01/01/2026)
-// Alíquotas e deduções por faixa de renda
+// IRPF 2026 progressive table (in force from 01/01/2026).
+// Rates and deductions per income bracket.
 const IRPF_TABLE_2026 = [
   { min: 0, max: 21503.34, rate: 0.0, deduction: 0 },
   { min: 21503.35, max: 33503.34, rate: 0.075, deduction: 1612.75 },
@@ -41,80 +41,81 @@ const IRPF_TABLE_2026 = [
   { min: 55471.75, max: Infinity, rate: 0.275, deduction: 10432.32 },
 ];
 
-// Constantes 2026
-const INSS_RATE = 0.1; // Taxa INSS empregado (8-11%, usamos 10% média)
-const DEDUCTION_PER_DEPENDENT = 2275.0; // Valor por dependente em 2026
-const MAX_DEDUCTION_EDUCATION = 3561.5; // Limite de deduções com educação
-const MAX_DEDUCTION_HEALTH = 2666.67; // Limite de deduções com saúde (não há limite oficial, usamos como referência)
-const SIMPLIFIED_DEDUCTION_RATE = 0.205; // Dedução simplificada: até 20,5% da renda bruta
+// 2026 constants
+const INSS_RATE = 0.1; // employee INSS rate (8-11%; 10% used as the average)
+const DEDUCTION_PER_DEPENDENT = 2275.0; // amount per dependant in 2026
+const MAX_DEDUCTION_EDUCATION = 3561.5; // cap on education deductions
+const MAX_DEDUCTION_HEALTH = 2666.67; // cap on health deductions (no official cap exists; used as a reference)
+const SIMPLIFIED_DEDUCTION_RATE = 0.205; // simplified deduction: up to 20.5% of gross income
 
 /**
- * Calcula o IRPF de pessoa física
- * Segue as regras progressivas da Receita Federal para 2026
+ * Computes personal income tax.
+ * Follows the Receita Federal progressive rules for 2026.
  */
 export function calculateIrpf(input: IrpfInput): IrpfResult {
-  // Validações básicas
+  // basic validation
   if (input.rendaBrutaAnual < 0) {
-    throw new Error("Renda bruta não pode ser negativa");
+    throw new Error("Gross income cannot be negative");
   }
   if (input.dependentes < 0) {
-    throw new Error("Número de dependentes não pode ser negativo");
+    throw new Error("Number of dependants cannot be negative");
   }
 
   const { rendaBrutaAnual } = input;
 
-  // 1. Calcular desconto INSS (retenção na fonte)
-  // Variação: se autônomo, já paga INSS como contribuição; se empregado, é retido
+  // 1. INSS deduction (withheld at source).
+  // Variation: a self-employed worker already pays INSS as a contribution; an
+  // employee has it withheld.
   const descInss = rendaBrutaAnual * INSS_RATE;
 
-  // 2. Base tributável após INSS
+  // 2. taxable base after INSS
   const basePosInss = rendaBrutaAnual - descInss;
 
-  // 3. Determinar deduções permitidas
+  // 3. determine the allowed deductions
   const deducaoEducacao = Math.min(input.deducaoEducacao, MAX_DEDUCTION_EDUCATION);
   const deducaoSaude = Math.min(input.deducaoSaude, MAX_DEDUCTION_HEALTH);
   const deducaoPrevidenciaComplementar = Math.max(input.deducaoPrevidenciaComplementar, 0);
 
   const totalDeducoes = deducaoEducacao + deducaoSaude + deducaoPrevidenciaComplementar;
 
-  // 4. Base de cálculo completa
+  // 4. full calculation base
   const baseCalculoCompleta = Math.max(basePosInss - totalDeducoes, 0);
 
-  // 5. Desconto com dependentes (R$ 2.275 por dependente em 2026)
+  // 5. dependant deduction (R$ 2.275 per dependant in 2026)
   const descDependentes = input.dependentes * DEDUCTION_PER_DEPENDENT;
 
-  // 6. Base imponível (base completa menos dependentes)
+  // 6. assessable base (full base minus dependants)
   const baseImponivel = Math.max(baseCalculoCompleta - descDependentes, 0);
 
-  // 7. Calcular IRPF conforme regime
+  // 7. compute IRPF according to the chosen regime
   let irpfCalculado = 0;
   let aliquotaMarginal = "Isento";
   let baseCalculoSimplificada = 0;
 
   if (input.regimeSimplificado) {
-    // Regime Simplificado: dedução fixa de 20,5% da renda bruta (até o máximo permitido)
+    // simplified regime: flat 20.5% deduction of gross income, up to the allowed cap
     baseCalculoSimplificada = Math.max(rendaBrutaAnual * (1 - SIMPLIFIED_DEDUCTION_RATE), 0);
     const baseImponvelSimplificada = Math.max(baseCalculoSimplificada - descDependentes, 0);
 
-    // Aplicar tabela ao resultado
+    // apply the table to the result
     const { rate, deduction } = findTaxBracket(baseImponvelSimplificada);
     irpfCalculado = Math.max(baseImponvelSimplificada * rate - deduction, 0);
     aliquotaMarginal = rate > 0 ? `${(rate * 100).toFixed(1)}%` : "Isento";
   } else {
-    // Regime Completo: deduções itemizadas
+    // full regime: itemised deductions
     baseCalculoSimplificada = baseCalculoCompleta;
     const { rate, deduction } = findTaxBracket(baseImponivel);
     irpfCalculado = Math.max(baseImponivel * rate - deduction, 0);
     aliquotaMarginal = rate > 0 ? `${(rate * 100).toFixed(1)}%` : "Isento";
   }
 
-  // 8. Calcular alíquota efetiva
+  // 8. effective rate
   const aliquotaEfetiva = rendaBrutaAnual > 0 ? (irpfCalculado / rendaBrutaAnual) * 100 : 0;
 
-  // 9. IRPF devido (se negativo, é restituição)
+  // 9. tax due (a negative value is a refund)
   const irpfDevido = irpfCalculado;
 
-  // 10. Número de parcelas de restituição (se houver)
+  // 10. number of refund instalments, if any
   const parcelasRestituicao = irpfDevido < 0 ? 3 : undefined;
 
   return {
@@ -137,7 +138,7 @@ export function calculateIrpf(input: IrpfInput): IrpfResult {
 }
 
 /**
- * Encontra a faixa de alíquota apropriada para a base imponível
+ * Finds the rate bracket that applies to the assessable base.
  */
 function findTaxBracket(baseImponivel: number): { rate: number; deduction: number } {
   if (baseImponivel <= 0) {
@@ -150,14 +151,14 @@ function findTaxBracket(baseImponivel: number): { rate: number; deduction: numbe
     }
   }
 
-  // Se passar de todos os ranges (improvável), retorna a última faixa
+  // past every range (unlikely): fall back to the last bracket
   const lastBracket = IRPF_TABLE_2026[IRPF_TABLE_2026.length - 1];
   return { rate: lastBracket.rate, deduction: lastBracket.deduction };
 }
 
 /**
- * Formata um valor monetário para exibição
- * (Este helper será reutilizado de @/lib/format em tempo de execução)
+ * Formats a monetary value for display.
+ * (This helper is meant to be reused from @/lib/format at runtime.)
  */
 export function formatIrpfValue(value: number): string {
   return `R$ ${value.toLocaleString("pt-BR", {

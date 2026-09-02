@@ -199,7 +199,7 @@ interface Slice {
   color: string;
 }
 
-/** Donut em SVG puro — seguro para SSR. Realça o segmento ativo no hover. */
+/** Plain-SVG donut, safe for SSR. Highlights the active segment on hover. */
 function Donut({
   segments,
   total,
@@ -303,7 +303,7 @@ export function SimpleBarChart({ rows, title }: { rows: BreakdownRow[]; title: s
   const filtered = rows.filter((r) => r.monthly > 0).sort((a, b) => b.monthly - a.monthly);
   const colorMap = buildColorMap(rows);
 
-  // Agrupa categorias pequenas em "Outros" para manter o donut limpo.
+  // Group small categories under "Outros" to keep the donut readable.
   const MAX_SLICES = 6;
   const main = filtered.slice(0, MAX_SLICES);
   const rest = filtered.slice(MAX_SLICES);

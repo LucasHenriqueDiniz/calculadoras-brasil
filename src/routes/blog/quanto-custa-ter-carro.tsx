@@ -78,7 +78,7 @@ function BlogPost() {
         />
 
         <Prose>
-          {/* INTRODUÇÃO */}
+          {/* INTRODUCTION */}
           <p>
             Muitas pessoas focam apenas na parcela do financiamento e esquecem que ter um carro
             envolve bem mais: combustível, IPVA, seguro, manutenção preventiva, pneus, revisões e a
@@ -90,7 +90,7 @@ function BlogPost() {
             você imagina.
           </p>
 
-          {/* RESUMO EXECUTIVO */}
+          {/* EXECUTIVE SUMMARY */}
           <h2>Quanto custa ter um carro? (Resumo rápido)</h2>
           <ul>
             <li>
@@ -113,7 +113,7 @@ function BlogPost() {
             seus números e vê o resultado personalizado.
           </p>
 
-          {/* BREAKDOWN DOS CUSTOS */}
+          {/* COST BREAKDOWN */}
           <h2>Os 8 componentes do custo de um carro</h2>
 
           <h3>1. Combustível (25-35% do custo)</h3>
@@ -196,7 +196,7 @@ function BlogPost() {
             só em depreciação. E é o custo mais ignorado!
           </p>
 
-          {/* COMPARAÇÃO POR TIPO DE CARRO */}
+          {/* COMPARISON BY CAR TYPE */}
           <h2>Custo mensal por tipo de carro</h2>
           <table>
             <thead>
@@ -241,7 +241,7 @@ function BlogPost() {
             </tbody>
           </table>
 
-          {/* 5 DICAS DE ECONOMIA */}
+          {/* 5 SAVING TIPS */}
           <h2>5 dicas para economizar no custo do carro</h2>
 
           <h3>1. Escolha bem na hora de comprar</h3>
@@ -298,7 +298,7 @@ function BlogPost() {
             </div>
           ))}
 
-          {/* CONCLUSÃO */}
+          {/* CONCLUSION */}
           <h2>Conclusão</h2>
           <p>
             Ter um carro no Brasil custa entre R$ 1.200 e R$ 2.500 por mês (ou mais, dependendo do

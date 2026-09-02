@@ -85,7 +85,7 @@ function MetodologiaPage() {
 
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <div className="lg:grid lg:grid-cols-[16rem_1fr] lg:gap-12">
-          {/* Índice */}
+          {/* Table of contents */}
           <nav aria-label="Índice da metodologia" className="mb-10 lg:mb-0">
             <div className="lg:sticky lg:top-24">
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
@@ -107,7 +107,7 @@ function MetodologiaPage() {
             </div>
           </nav>
 
-          {/* Conteúdo */}
+          {/* Content */}
           <div className="space-y-6">
             <SectionCard section={sections[0]}>
               <ul className="list-disc space-y-2 pl-5">

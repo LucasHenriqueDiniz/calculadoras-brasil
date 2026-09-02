@@ -112,11 +112,11 @@ async function findLatestWorkbookUrl(): Promise<string> {
       /href=["']([^"']*resumo_semanal_lpc_(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})\.xlsx)["']/gi,
     ),
   ].sort((a, b) => b[3].localeCompare(a[3]));
-  if (!links[0]) throw new Error("A ANP não publicou uma planilha semanal reconhecível.");
+  if (!links[0]) throw new Error("ANP has not published a recognisable weekly spreadsheet.");
 
   const url = new URL(links[0][1], ANP_PAGE);
   if (url.hostname !== "www.gov.br" || !url.pathname.startsWith("/anp/")) {
-    throw new Error("A planilha encontrada não pertence ao domínio oficial da ANP.");
+    throw new Error("The spreadsheet found does not belong to the official ANP domain.");
   }
   return url.toString();
 }
@@ -155,7 +155,7 @@ export async function fetchAnpFuelPrice(uf: string, fuel: string): Promise<FuelP
   const sharedStringsFile = files["xl/sharedStrings.xml"];
   const statesSheet = findStatesSheet(files);
   if (!sharedStringsFile || !statesSheet) {
-    throw new Error("A estrutura da planilha semanal da ANP mudou.");
+    throw new Error("The structure of the ANP weekly spreadsheet has changed.");
   }
 
   const sharedStrings = readSharedStrings(decodeUtf8(sharedStringsFile));

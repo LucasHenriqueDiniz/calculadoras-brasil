@@ -25,9 +25,10 @@ export default tseslint.config(
     },
   },
   {
-    // Componentes gerados do shadcn/ui: por design cada arquivo exporta o componente
-    // e suas variants (badgeVariants, buttonVariants…) no mesmo modulo. A regra pede
-    // o contrario, e reescrever arquivos vendorizados so os faz divergir do upstream.
+    // Generated shadcn/ui components: by design each file exports the component
+    // and its variants (badgeVariants, buttonVariants…) from the same module. The
+    // rule asks for the opposite, and rewriting vendored files only makes them
+    // diverge from upstream.
     files: ["src/components/ui/**/*.{ts,tsx}"],
     rules: { "react-refresh/only-export-components": "off" },
   },

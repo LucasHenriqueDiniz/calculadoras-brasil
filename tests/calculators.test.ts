@@ -12,8 +12,8 @@ import {
   TETO_INSS,
 } from "../src/lib/calculators/inss-constants";
 
-describe("calculadoras principais", () => {
-  it("calcula o cenário de custo de carro", () => {
+describe("core calculators", () => {
+  it("computes the car cost scenario", () => {
     const result = calculateCarCost({
       monthlyKm: 800,
       cityConsumptionKmL: 10,
@@ -42,7 +42,7 @@ describe("calculadoras principais", () => {
     expect(result.costPerKm).toBeCloseTo(1.98, 1);
   });
 
-  it("não divide por zero no custo do carro", () => {
+  it("does not divide by zero in the car cost", () => {
     const result = calculateCarCost({
       monthlyKm: 0,
       cityConsumptionKmL: 0,
@@ -68,7 +68,7 @@ describe("calculadoras principais", () => {
     expect(Number.isNaN(result.monthlyTotal)).toBe(false);
   });
 
-  it("calcula morar sozinho e alerta orçamento negativo", () => {
+  it("computes living alone and flags a negative budget", () => {
     const result = calculateLivingAloneCost({
       rent: 1200,
       condoFee: 250,
@@ -96,7 +96,7 @@ describe("calculadoras principais", () => {
     expect(result.financialStatus).toBe("critical");
   });
 
-  it("calcula consumo elétrico com quantidade", () => {
+  it("computes electricity use with a quantity", () => {
     const result = calculateElectricityBill({
       tariff: 1,
       appliances: [
@@ -107,7 +107,7 @@ describe("calculadoras principais", () => {
     expect(result.totalCostPerMonth).toBe(60);
   });
 
-  it("normaliza assinaturas mensais, anuais, semanais e trimestrais", () => {
+  it("normalises monthly, yearly, weekly and quarterly subscriptions", () => {
     const result = calculateSubscriptions([
       { id: "a", name: "Streaming", category: "A", value: 50, cycle: "monthly", keep: true },
       { id: "b", name: "Anual", category: "B", value: 120, cycle: "annual", keep: true },
@@ -119,7 +119,7 @@ describe("calculadoras principais", () => {
     expect(result.monthlySavings).toBe(30);
   });
 
-  it("soma mudança e contingência", () => {
+  it("adds up the move and its contingency", () => {
     const result = calculateMovingCost({
       truckAndLabor: 1200,
       packingMaterials: 200,
@@ -140,7 +140,7 @@ describe("calculadoras principais", () => {
     expect(result.total).toBe(5830);
   });
 
-  it("calcula ração por pacote e rateia custos anuais do pet", () => {
+  it("computes food per bag and spreads the pet's yearly costs", () => {
     const result = calculatePetCost({
       foodPackagePrice: 100,
       foodPackageWeightKg: 10,
@@ -164,9 +164,9 @@ describe("calculadoras principais", () => {
   });
 });
 
-describe("INSS: contribuição progressiva do empregado", () => {
-  it("aplica a alíquota apenas sobre a parcela dentro de cada faixa", () => {
-    // 1621 * 7,5% = 121,575 — primeira faixa isolada.
+describe("INSS: progressive employee contribution", () => {
+  it("applies the rate only to the slice inside each bracket", () => {
+    // 1621 * 7,5% = 121,575 — first bracket in isolation.
     expect(calcularInssEmpregado(1621)).toBeCloseTo(121.575, 3);
 
     // 121,575 + (2902,84 - 1621) * 9% = 121,575 + 115,366 = 236,94
@@ -176,19 +176,19 @@ describe("INSS: contribuição progressiva do empregado", () => {
     expect(calcularInssEmpregado(4354.27)).toBeCloseTo(411.11, 2);
   });
 
-  it("bate com o desconto máximo divulgado para o teto de 2026", () => {
-    // Valor de referência publicado para 2026: R$ 988,09.
+  it("matches the maximum deduction published for the 2026 ceiling", () => {
+    // Reference value published for 2026: R$ 988,09.
     expect(calcularInssEmpregado(TETO_INSS)).toBeCloseTo(988.09, 2);
   });
 
-  it("nunca cobra mais que a contribuição do teto", () => {
+  it("never charges more than the contribution at the ceiling", () => {
     const noTeto = calcularInssEmpregado(TETO_INSS);
     expect(calcularInssEmpregado(50_000)).toBeCloseTo(noTeto, 2);
-    // A contribuição máxima fica bem abaixo de 20% do teto.
+    // The maximum contribution sits well below 20% of the ceiling.
     expect(noTeto).toBeLessThan(TETO_INSS * 0.2);
   });
 
-  it("mantém a alíquota efetiva progressiva e abaixo de 14%", () => {
+  it("keeps the effective rate progressive and below 14%", () => {
     const salario = 5000;
     const aliquotaEfetiva = calcularInssEmpregado(salario) / salario;
     expect(aliquotaEfetiva).toBeGreaterThan(0.075);
@@ -196,8 +196,8 @@ describe("INSS: contribuição progressiva do empregado", () => {
   });
 });
 
-describe("INSS autônomo", () => {
-  it("cobra 20% sobre a renda e 11% sempre sobre o salário mínimo", () => {
+describe("self-employed INSS", () => {
+  it("charges 20% of the income and 11% always of the minimum wage", () => {
     const result = calculateInssAutonomo({
       ganhoMensalBruto: 3000,
       mesesContribuidos: 0,
@@ -206,12 +206,12 @@ describe("INSS autônomo", () => {
 
     expect(result.salarioContribuicao).toBe(3000);
     expect(result.planoNormal.contribuicaoMensal).toBeCloseTo(600, 2);
-    // O plano simplificado não acompanha a renda: 11% do salário mínimo.
+    // The simplified plan does not follow the income: 11% of the minimum wage.
     expect(result.planoSimplificado.contribuicaoMensal).toBeCloseTo(SALARIO_MINIMO * 0.11, 2);
     expect(result.planoSimplificado.contaTempoDeContribuicao).toBe(false);
   });
 
-  it("limita o salário de contribuição ao piso e ao teto", () => {
+  it("clamps the contribution salary to the floor and the ceiling", () => {
     const acimaDoTeto = calculateInssAutonomo({
       ganhoMensalBruto: 30_000,
       mesesContribuidos: 0,
@@ -229,7 +229,7 @@ describe("INSS autônomo", () => {
     expect(abaixoDoPiso.elevadoAoPiso).toBe(true);
   });
 
-  it("não estima benefício antes do tempo mínimo de contribuição", () => {
+  it("estimates no benefit before the minimum contribution time", () => {
     const result = calculateInssAutonomo({
       ganhoMensalBruto: 5000,
       mesesContribuidos: 10 * 12,
@@ -239,19 +239,19 @@ describe("INSS autônomo", () => {
     expect(result.estimativaBeneficioNormal).toBe(0);
   });
 
-  it("aplica 60% da média mais 2% por ano excedente (EC 103/2019)", () => {
+  it("applies 60% of the average plus 2% per extra year (EC 103/2019)", () => {
     const result = calculateInssAutonomo({
       ganhoMensalBruto: 5000,
       mesesContribuidos: 25 * 12,
       sexo: "masculino",
     });
-    // 20 anos de carência + 5 anos excedentes = 60% + 10% = 70%
+    // 20 years of requirement + 5 extra years = 60% + 10% = 70%
     expect(result.tempoMinimoAtingido).toBe(true);
     expect(result.percentualMediaAplicado).toBe(70);
     expect(result.estimativaBeneficioNormal).toBeCloseTo(3500, 2);
   });
 
-  it("usa carência menor para mulheres", () => {
+  it("uses the shorter requirement for women", () => {
     const result = calculateInssAutonomo({
       ganhoMensalBruto: 5000,
       mesesContribuidos: 15 * 12,
@@ -262,7 +262,7 @@ describe("INSS autônomo", () => {
     expect(result.percentualMediaAplicado).toBe(60);
   });
 
-  it("nunca estima benefício abaixo do mínimo nem acima do teto", () => {
+  it("never estimates a benefit below the floor or above the ceiling", () => {
     const alto = calculateInssAutonomo({
       ganhoMensalBruto: 30_000,
       mesesContribuidos: 40 * 12,

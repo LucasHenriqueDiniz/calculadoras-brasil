@@ -1,7 +1,7 @@
 {
   "name": "calcule-brasil",
   "private": true,
-  "description": "Calculadoras brasileiras de finanças pessoais, impostos e custos do dia a dia.",
+  "description": "Brazilian calculators for personal finance, taxes and day-to-day costs.",
   "license": "MIT",
   "keywords": [
     "brasil",
@@ -38,7 +38,8 @@
     "test:seo": "node tests/seo-smoke.mjs",
     "audit": "pnpm audit",
     "check": "pnpm run cf:types:check && pnpm test && pnpm run typecheck && pnpm run lint && pnpm run build && pnpm run test:seo && pnpm run worker:dry-run && pnpm audit",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prepare": "git config --get core.hooksPath >/dev/null 2>&1 || git config core.hooksPath .githooks 2>/dev/null || true"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",

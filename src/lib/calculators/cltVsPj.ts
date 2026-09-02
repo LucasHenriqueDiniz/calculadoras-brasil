@@ -23,12 +23,12 @@ export interface CltVsPjResult {
 }
 
 export function calculateCltVsPj(input: CltVsPjInput): CltVsPjResult {
-  // CLT Cálculo (Simplificado)
+  // CLT calculation (simplified)
   const inssPercentualClt = 0.11;
   const descInss = input.salarioCltBruto * inssPercentualClt;
   const baseParaIrpfClt = input.salarioCltBruto - descInss;
 
-  // IRPF estimado CLT
+  // estimated CLT income tax
   let descIrpfClt = 0;
   if (baseParaIrpfClt * 12 > 55471.75) {
     descIrpfClt = (baseParaIrpfClt * 12 * 0.275 - 10432.32) / 12;
@@ -38,16 +38,16 @@ export function calculateCltVsPj(input: CltVsPjInput): CltVsPjResult {
 
   const salarioCltLiquido = input.salarioCltBruto - descInss - descIrpfClt;
 
-  // Benefícios CLT (13º + FGTS + Vale diluído)
-  const beneficiosClt = input.salarioCltBruto * (1 / 12 + 0.15); // ~27% anualizado
+  // CLT benefits (13th salary + FGTS + allowances, amortised)
+  const beneficiosClt = input.salarioCltBruto * (1 / 12 + 0.15); // ~27% annualised
   const cltComBeneficios = salarioCltLiquido + beneficiosClt;
 
-  // PJ Cálculo
+  // PJ calculation
   const inssPercentualPj = 0.2;
   const descInssPj = input.propostaPjMensal * inssPercentualPj;
   const baseParaIrpfPj = input.propostaPjMensal - descInssPj - input.despesasDedutivelsPj;
 
-  // IRPF estimado PJ
+  // estimated PJ income tax
   let descIrpfPj = 0;
   if (baseParaIrpfPj * 12 > 55471.75) {
     descIrpfPj = (baseParaIrpfPj * 12 * 0.275 - 10432.32) / 12;
@@ -55,13 +55,13 @@ export function calculateCltVsPj(input: CltVsPjInput): CltVsPjResult {
     descIrpfPj = (baseParaIrpfPj * 12 * 0.225 - 7633.69) / 12;
   }
 
-  // Desconto contador (estimado 5%)
+  // accountant fee (estimated at 5%)
   const descContador = input.propostaPjMensal * 0.05;
 
   const pjLiquido = input.propostaPjMensal - descInssPj - descIrpfPj - descContador;
 
-  // Cálculo de quanto PJ precisa ganhar para igualar CLT
-  // Aproximação iterativa simplificada
+  // How much a PJ needs to earn to match the CLT package.
+  // Simplified iterative approximation.
   let pjNecessaria = input.propostaPjMensal;
   for (let i = 0; i < 10; i++) {
     const inssTemp = pjNecessaria * 0.2;

@@ -7,8 +7,8 @@ export interface SourceItem {
 }
 
 /**
- * Lista de fontes consultadas em uma página editorial. Deixa explícito de onde
- * vêm as faixas de preço e as regras citadas, e quando o conteúdo foi revisado.
+ * List of sources consulted by an editorial page. Makes it explicit where the
+ * price ranges and quoted rules come from, and when the content was reviewed.
  */
 export function SourcesList({
   items,

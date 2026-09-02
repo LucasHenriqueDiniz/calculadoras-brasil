@@ -10,11 +10,11 @@ export async function fetchBounded(
 
   try {
     const response = await fetch(input, { ...init, signal: controller.signal });
-    if (!response.ok) throw new Error(`Fonte externa respondeu HTTP ${response.status}.`);
+    if (!response.ok) throw new Error(`Upstream source answered HTTP ${response.status}.`);
 
     const declaredLength = Number(response.headers.get("content-length"));
     if (Number.isFinite(declaredLength) && declaredLength > maxBytes) {
-      throw new Error("Fonte externa excedeu o tamanho permitido.");
+      throw new Error("Upstream source exceeded the allowed size.");
     }
 
     if (!response.body) return { response, bytes: new Uint8Array() };
@@ -30,7 +30,7 @@ export async function fetchBounded(
       total += value.byteLength;
       if (total > maxBytes) {
         await reader.cancel();
-        throw new Error("Fonte externa excedeu o tamanho permitido.");
+        throw new Error("Upstream source exceeded the allowed size.");
       }
       chunks.push(value);
     }

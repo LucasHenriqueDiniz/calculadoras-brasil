@@ -63,7 +63,7 @@ function SobrePage() {
       />
 
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
-        {/* História */}
+        {/* Story */}
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="rounded-2xl border border-border bg-surface p-7 shadow-[var(--shadow-card)] sm:p-8">
             <h2 className="font-display text-xl text-foreground">Por que existimos</h2>
@@ -84,7 +84,7 @@ function SobrePage() {
           </div>
         </div>
 
-        {/* Promessas */}
+        {/* Promises */}
         <section className="mt-12">
           <h2 className="font-display text-2xl text-foreground">O que prometemos</h2>
           <ul className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -112,7 +112,7 @@ function SobrePage() {
           </ul>
         </section>
 
-        {/* O que não fazemos */}
+        {/* What we do not do */}
         <section className="mt-12 rounded-2xl border border-border bg-muted/40 p-7 sm:p-8">
           <h2 className="font-display text-xl text-foreground">O que não fazemos</h2>
           <ul className="mt-4 space-y-3">
@@ -125,7 +125,7 @@ function SobrePage() {
           </ul>
         </section>
 
-        {/* Criador */}
+        {/* Creator */}
         <section className="mt-12 flex items-start gap-4 rounded-2xl border border-border bg-surface p-7 shadow-[var(--shadow-card)] sm:p-8">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
             <BookOpen className="h-5 w-5" aria-hidden />
@@ -158,7 +158,7 @@ function SobrePage() {
           </div>
         </section>
 
-        {/* Sustentação */}
+        {/* Funding */}
         <section className="mt-12 flex items-start gap-4 rounded-2xl border border-border bg-surface p-7 shadow-[var(--shadow-card)] sm:p-8">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
             <Megaphone className="h-5 w-5" aria-hidden />

@@ -78,7 +78,7 @@
 :root {
   --radius: 0.75rem;
 
-  /* Areia clara para fundo, verde confiança para marca */
+  /* Light sand for the background, trust green for the brand */
   --background: oklch(0.985 0.012 95);
   --foreground: oklch(0.21 0.025 160);
   --surface: oklch(1 0 0);
@@ -114,7 +114,7 @@
   --input: oklch(0.92 0.013 95);
   --ring: oklch(0.5 0.13 155);
 
-  /* Paleta de gráficos: verdes/teal da marca + dourado de apoio */
+  /* Chart palette: the brand greens/teals plus a supporting gold */
   --chart-1: oklch(0.5 0.13 155);
   --chart-2: oklch(0.62 0.12 175);
   --chart-3: oklch(0.7 0.13 130);

@@ -6,7 +6,7 @@ import { SITE_REVIEW_DATE, SITE_REVIEW_DATE_LABEL } from "@/lib/seo-pages";
 interface CalculatorLayoutProps {
   eyebrow?: string;
   title: string;
-  /** Rótulo curto exibido na trilha de navegação. Padrão: title. */
+  /** Short label shown in the breadcrumb trail. Defaults to title. */
   breadcrumbLabel?: string;
   description?: string;
   form?: ReactNode;

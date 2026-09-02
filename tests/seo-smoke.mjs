@@ -99,16 +99,16 @@ function schemaTypes(value, result = new Set()) {
 async function waitForServer(child) {
   const deadline = Date.now() + 30_000;
   while (Date.now() < deadline) {
-    if (child.exitCode !== null) throw new Error(`Preview encerrou com código ${child.exitCode}.`);
+    if (child.exitCode !== null) throw new Error(`Preview exited with code ${child.exitCode}.`);
     try {
       const response = await fetch(BASE_URL, { redirect: "manual" });
       if (response.status < 500) return;
     } catch {
-      // Aguarda o preview ficar disponível.
+      // Wait for the preview to become available.
     }
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
-  throw new Error("Preview não iniciou em até 30 segundos.");
+  throw new Error("Preview did not start within 30 seconds.");
 }
 
 const preview = spawn(
@@ -137,12 +137,12 @@ try {
     const response = await fetch(`${BASE_URL}${path}`, {
       headers: { "user-agent": "seo-smoke-test" },
     });
-    assert.equal(response.status, 200, `${path} deve retornar HTTP 200`);
+    assert.equal(response.status, 200, `${path} must return HTTP 200`);
 
     const html = await response.text();
     const title = decodeHtml(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.trim() ?? "");
-    assert.ok(title, `${path} deve conter title`);
-    assert.ok(!titles.has(title), `${path} deve ter title exclusivo`);
+    assert.ok(title, `${path} must have a title`);
+    assert.ok(!titles.has(title), `${path} must have a unique title`);
     titles.add(title);
 
     const description = readAttribute(
@@ -150,72 +150,76 @@ try {
       /<meta\b[^>]*name=["']description["'][^>]*>/i,
       "content",
     );
-    assert.ok(description && description.length >= 50, `${path} deve conter meta description`);
+    assert.ok(description && description.length >= 50, `${path} must have a meta description`);
 
     const canonical = readAttribute(html, /<link\b[^>]*rel=["']canonical["'][^>]*>/i, "href");
-    assert.equal(canonical, `${CANONICAL_ORIGIN}${path}`, `${path} deve ter canonical absoluto`);
+    assert.equal(
+      canonical,
+      `${CANONICAL_ORIGIN}${path}`,
+      `${path} must have an absolute canonical`,
+    );
 
     const h1Count = (html.match(/<h1\b/gi) ?? []).length;
-    assert.equal(h1Count, 1, `${path} deve conter exatamente um H1`);
-    assert.ok(textContent(html).length >= 300, `${path} deve conter conteúdo textual no HTML`);
+    assert.equal(h1Count, 1, `${path} must have exactly one H1`);
+    assert.ok(textContent(html).length >= 300, `${path} must carry text content in the HTML`);
 
     const jsonLdBlocks = [
       ...html.matchAll(
         /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi,
       ),
     ];
-    assert.ok(jsonLdBlocks.length >= 1, `${path} deve conter JSON-LD`);
+    assert.ok(jsonLdBlocks.length >= 1, `${path} must carry JSON-LD`);
     const schemas = jsonLdBlocks.map((match) => JSON.parse(decodeHtml(match[1])));
     const types = schemas.reduce((all, schema) => schemaTypes(schema, all), new Set());
-    assert.ok(types.has("WebSite"), `${path} deve relacionar o WebSite`);
-    assert.ok(types.has("Organization"), `${path} deve relacionar a Organization`);
+    assert.ok(types.has("WebSite"), `${path} must declare WebSite`);
+    assert.ok(types.has("Organization"), `${path} must declare Organization`);
 
     if (CALCULATOR_ROUTES.has(path)) {
-      assert.ok(types.has("WebApplication"), `${path} deve conter WebApplication`);
-      assert.ok(types.has("BreadcrumbList"), `${path} deve conter BreadcrumbList`);
-      assert.ok(types.has("FAQPage"), `${path} deve conter FAQPage`);
+      assert.ok(types.has("WebApplication"), `${path} must declare WebApplication`);
+      assert.ok(types.has("BreadcrumbList"), `${path} must declare BreadcrumbList`);
+      assert.ok(types.has("FAQPage"), `${path} must declare FAQPage`);
       assert.match(html, /<time\b[^>]*datetime=["']2026-06-23["']/i);
     }
   }
 
-  const missing = await fetch(`${BASE_URL}/rota-que-nao-existe`, { redirect: "manual" });
-  assert.equal(missing.status, 404, "URL desconhecida deve retornar HTTP 404");
+  const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
+  assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 
   const invalidFuel = await fetch(`${BASE_URL}/api/fuel-prices`);
-  assert.equal(invalidFuel.status, 400, "API de combustível inválida deve retornar HTTP 400");
+  assert.equal(invalidFuel.status, 400, "The fuel API must return HTTP 400 on invalid input");
 
   const invalidVehicle = await fetch(`${BASE_URL}/api/vehicle-efficiency`);
-  assert.equal(invalidVehicle.status, 400, "API veicular inválida deve retornar HTTP 400");
+  assert.equal(invalidVehicle.status, 400, "The vehicle API must return HTTP 400 on invalid input");
 
   const health = await fetch(`${BASE_URL}/api/health`);
-  assert.equal(health.status, 200, "health check deve retornar HTTP 200");
+  assert.equal(health.status, 200, "The health check must return HTTP 200");
   const healthPayload = await health.json();
   assert.equal(healthPayload.runtime, "cloudflare-workers");
 
   const states = await fetch(`${BASE_URL}/api/locations/states`);
-  assert.equal(states.status, 200, "API de UFs deve retornar HTTP 200");
+  assert.equal(states.status, 200, "The states API must return HTTP 200");
   const statesPayload = await states.json();
-  assert.equal(statesPayload.states.length, 27, "API de UFs deve manter as 27 unidades");
+  assert.equal(statesPayload.states.length, 27, "The states API must keep all 27 states");
 
   const sitemapResponse = await fetch(`${BASE_URL}/sitemap.xml`);
-  assert.equal(sitemapResponse.status, 200, "sitemap.xml deve estar disponível");
+  assert.equal(sitemapResponse.status, 200, "sitemap.xml must be available");
   const sitemap = await sitemapResponse.text();
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
   assert.deepEqual(
     locations,
     PUBLIC_ROUTES.map((path) => `${CANONICAL_ORIGIN}${path}`),
-    `sitemap deve conter exatamente as ${PUBLIC_ROUTES.length} URLs canônicas`,
+    `the sitemap must carry exactly the ${PUBLIC_ROUTES.length} canonical URLs`,
   );
 
   const ogPath = new URL("../public/og-image.png", import.meta.url);
   const og = await readFile(ogPath);
   const ogStats = await stat(ogPath);
-  assert.equal(og.toString("ascii", 1, 4), "PNG", "OG image deve ser PNG");
-  assert.equal(og.readUInt32BE(16), 1200, "OG image deve ter 1200 px de largura");
-  assert.equal(og.readUInt32BE(20), 630, "OG image deve ter 630 px de altura");
-  assert.ok(ogStats.size < 500_000, "OG image deve ter menos de 500 KB");
+  assert.equal(og.toString("ascii", 1, 4), "PNG", "The OG image must be a PNG");
+  assert.equal(og.readUInt32BE(16), 1200, "The OG image must be 1200 px wide");
+  assert.equal(og.readUInt32BE(20), 630, "The OG image must be 630 px tall");
+  assert.ok(ogStats.size < 500_000, "The OG image must be under 500 KB");
 
-  console.log(`SEO smoke test aprovado para ${PUBLIC_ROUTES.length} rotas.`);
+  console.log(`SEO smoke test passed for ${PUBLIC_ROUTES.length} routes.`);
 } catch (error) {
   console.error(previewOutput);
   throw error;

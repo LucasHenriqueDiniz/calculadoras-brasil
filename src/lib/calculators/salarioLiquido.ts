@@ -1,6 +1,6 @@
 /**
- * Calculadora de Salário Líquido
- * Converte salário bruto em líquido considerando IRPF, INSS, sindicato
+ * Net salary calculator.
+ * Turns a gross salary into a net one, accounting for IRPF, INSS and union dues.
  */
 
 import { calcularInssEmpregado } from "./inss-constants";
@@ -43,25 +43,25 @@ export interface SalarioLiquidoResult {
 export function calculateSalarioLiquido(input: SalarioLiquidoInput): SalarioLiquidoResult {
   const salarioBrutoAnual = input.salarioBrutoMensal * 12;
 
-  // 1. INSS do empregado: progressivo por faixa e limitado ao teto do RGPS.
-  //    Cada alíquota incide apenas sobre a parcela do salário dentro da faixa.
+  // 1. employee INSS: progressive per bracket and capped at the RGPS ceiling.
+  //    Each rate applies only to the slice of the salary inside its bracket.
   const descInssEmpregado = calcularInssEmpregado(input.salarioBrutoMensal);
 
-  // 2. Base para IRPF após INSS
+  // 2. IRPF base after INSS
   const baseParaIrpf = input.salarioBrutoMensal - descInssEmpregado;
 
-  // 3. Deduções anuais (para cálculo do IRPF anual)
+  // 3. annual deductions, for the annual IRPF calculation
   const deducaoEducacao = Math.min(input.deducaoEducacao, 3561.5);
   const deducaoSaude = input.deducaoSaude;
   const totalDeducoes = deducaoEducacao + deducaoSaude + input.deducaoPrevidenciaComplementar;
 
-  // 4. Calcular IRPF mensal estimado (simplificação: dividir cálculo anual por 12)
+  // 4. estimated monthly IRPF (simplification: the annual figure divided by 12)
   const basePosInssAnual = (input.salarioBrutoMensal - descInssEmpregado) * 12;
   const baseCalculoAnual = Math.max(basePosInssAnual - totalDeducoes, 0);
   const descDependentes = input.dependentes * 2275;
   const baseImponivel = Math.max(baseCalculoAnual - descDependentes, 0);
 
-  // Aplicar alíquota progressiva (simplificação)
+  // apply the progressive rate (simplified)
   let descIrpfAnual = 0;
   if (baseImponivel > 55471.75) {
     descIrpfAnual = baseImponivel * 0.275 - 10432.32;
@@ -75,15 +75,15 @@ export function calculateSalarioLiquido(input: SalarioLiquidoInput): SalarioLiqu
 
   const descIrpfEstimado = Math.max(descIrpfAnual / 12, 0);
 
-  // 5. Sindicato
-  const descSindicato = input.temSindicato ? input.salarioBrutoMensal * 0.0033 : 0; // 1 hora aprox
+  // 5. union dues
+  const descSindicato = input.temSindicato ? input.salarioBrutoMensal * 0.0033 : 0; // roughly one hour of pay
 
-  // 6. Vale Transporte (desconta do bruto)
+  // 6. transport allowance, deducted from the gross
   const descValeTransporte = input.temValeTransporte
     ? Math.min(input.salarioBrutoMensal * 0.06, 250)
     : 0;
 
-  // 7. Salário Líquido
+  // 7. net salary
   const salarioLiquidoMensal =
     input.salarioBrutoMensal -
     descInssEmpregado -
@@ -91,12 +91,12 @@ export function calculateSalarioLiquido(input: SalarioLiquidoInput): SalarioLiqu
     descSindicato -
     descValeTransporte;
 
-  // 8. Benefícios não tributáveis
-  const beneficiosNaoTributaveis = input.temValeRefeicao ? 360 : 0; // Aprox R$ 360/mês em vale refeição
+  // 8. non-taxable benefits
+  const beneficiosNaoTributaveis = input.temValeRefeicao ? 360 : 0; // roughly R$ 360/month in meal allowance
 
-  // 9. Economia com dependentes e deduções
-  const economiaComDependentes = descDependentes / 12; // Estimado mensal
-  const economiaComDeducoes = totalDeducoes / 12; // Estimado mensal
+  // 9. savings from dependants and deductions
+  const economiaComDependentes = descDependentes / 12; // monthly estimate
+  const economiaComDeducoes = totalDeducoes / 12; // monthly estimate
 
   const aliquotaEfetivaIrpf =
     input.salarioBrutoMensal > 0 ? (descIrpfEstimado / input.salarioBrutoMensal) * 100 : 0;

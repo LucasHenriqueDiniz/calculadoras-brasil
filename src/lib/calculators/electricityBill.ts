@@ -1,18 +1,18 @@
 export interface ApplianceInput {
   id: string;
   name: string;
-  /** Potência em watts */
+  /** Power draw in watts. */
   watts: number;
-  /** Horas de uso por dia */
+  /** Hours of use per day. */
   hoursPerDay: number;
-  /** Dias de uso por mês */
+  /** Days of use per month. */
   daysPerMonth: number;
-  /** Quantidade do mesmo aparelho */
+  /** How many of the same appliance. */
   quantity: number;
 }
 
 export interface ElectricityInput {
-  /** Tarifa em R$ por kWh, já com impostos */
+  /** Tariff in R$ per kWh, taxes included. */
   tariff: number;
   appliances: ApplianceInput[];
 }
@@ -117,7 +117,7 @@ export function calculateElectricityBill(input: ElectricityInput): ElectricityRe
   };
 }
 
-/** Catálogo de aparelhos comuns com potência média em watts. */
+/** Catalogue of common appliances with their average power draw in watts. */
 export const APPLIANCE_PRESETS: {
   name: string;
   watts: number;

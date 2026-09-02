@@ -27,11 +27,11 @@ export function calculatePrevidenciaComplementar(
   const contribuicaoAnual = input.contribuicaoMensalPgbl * 12;
   const tasaRetornoDecimal = input.tasaRetornoAnual / 100;
 
-  // Economia de IRPF (contribuição dedutível)
+  // IRPF savings (deductible contribution)
   const economiaIrpfMensal = input.contribuicaoMensalPgbl * (input.aliquotaIrpfAtual / 100);
   const economiaIrpfAnual = economiaIrpfMensal * 12;
 
-  // Projeção de saldo
+  // balance projection
   let saldo = 0;
   const projecao: Array<{ ano: number; saldo: number; rendimento: number }> = [];
 
@@ -43,7 +43,7 @@ export function calculatePrevidenciaComplementar(
     }
   }
 
-  // Montar os valores finais por períodos
+  // assemble the final values per period
   let montante10 = 0,
     montante20 = 0,
     montante30 = 0;
@@ -54,7 +54,7 @@ export function calculatePrevidenciaComplementar(
     if (p.ano === 30) montante30 = p.saldo;
   }
 
-  // Se não atingiu 10/20/30 anos, calcular manualmente
+  // 10/20/30 years not reached: compute it by hand
   saldo = 0;
   for (let ano = 1; ano <= 30; ano++) {
     const rendimento = saldo * tasaRetornoDecimal;
@@ -64,7 +64,7 @@ export function calculatePrevidenciaComplementar(
     if (ano === 30) montante30 = saldo;
   }
 
-  // Saldo final no período escolhido
+  // final balance for the chosen period
   saldo = 0;
   for (let ano = 1; ano <= input.anosAteAposentadoria; ano++) {
     const rendimento = saldo * tasaRetornoDecimal;

@@ -42,3 +42,11 @@ calculadorasbrasil.com.br-audit/
 *.njsproj
 *.sln
 *.sw?
+
+# Claude Code's local permission file. NEVER commit it: allow-rules accumulate by
+# clicking, and a rule that allowlists a command with a token in it puts that token
+# in the repo.
+**/.claude/settings.local.json
+
+# derived board — regenerate with /hexagram:board, never track it
+.kanban.json
