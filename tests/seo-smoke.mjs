@@ -104,7 +104,7 @@ async function waitForServer(child) {
       const response = await fetch(BASE_URL, { redirect: "manual" });
       if (response.status < 500) return;
     } catch {
-      // Aguarda o preview ficar disponível.
+      // Wait for the preview to become available.
     }
     await new Promise((resolve) => setTimeout(resolve, 250));
   }

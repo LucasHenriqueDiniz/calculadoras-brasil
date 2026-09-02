@@ -19,13 +19,13 @@ As 38 páginas públicas são pré-renderizadas no build para entregar conteúdo
 ## Requisitos
 
 - Node.js 22.12 ou superior
-- npm
+- pnpm (a versão exata fica no campo `packageManager` do `package.json`)
 
 ## Desenvolvimento
 
 ```bash
-npm ci
-npm run dev
+pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
 O servidor local inicia em `http://localhost:8080`.
@@ -33,7 +33,7 @@ O servidor local inicia em `http://localhost:8080`.
 ## Validação
 
 ```bash
-npm run check
+pnpm run check
 ```
 
 O gate executa:
@@ -50,10 +50,10 @@ O gate executa:
 ## Build e deploy
 
 ```bash
-npm run build
-npm run preview
-npm run deploy:preview
-npm run deploy
+pnpm run build
+pnpm run preview
+pnpm run deploy:preview
+pnpm run deploy
 ```
 
 O build gera:
@@ -64,7 +64,7 @@ O build gera:
 
 O alvo de produção é Cloudflare Workers. O ambiente `preview` usa o Worker `calcule-brasil-preview`; produção usa `calcule-brasil`.
 
-`npm run preview` sobe uma prévia local do build para validação antes do deploy. O primeiro deploy remoto deve ser feito com `npm run deploy:preview`; use `npm run deploy` apenas após validar o Worker de preview, APIs, sitemap, 404 e headers.
+`pnpm run preview` sobe uma prévia local do build para validação antes do deploy. O primeiro deploy remoto deve ser feito com `pnpm run deploy:preview`; use `pnpm run deploy` apenas após validar o Worker de preview, APIs, sitemap, 404 e headers.
 
 O deploy automático é feito pelo **Cloudflare Workers Builds**, conectado ao repositório: cada push constrói e publica direto pela Cloudflare. Os comandos acima continuam válidos para deploy manual a partir da máquina local. O GitHub Actions não faz deploy — roda apenas o CI (typecheck, lint, testes e verificação de build).
 
@@ -117,4 +117,4 @@ Este projeto está licenciado sob a licença MIT. Veja `LICENSE`.
 3. Crie a rota em `src/routes/`.
 4. Inclua conteúdo editorial, FAQ e dados estruturados.
 5. Registre a URL em `src/lib/seo-pages.ts`.
-6. Execute `npm run check`.
+6. Execute `pnpm run check`.

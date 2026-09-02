@@ -49,7 +49,7 @@ const PROSE_TYPOGRAPHY =
 
 interface ProseProps {
   children: ReactNode;
-  /** Quando definido, recolhe o conteúdo em um accordion com este rótulo. */
+  /** When set, collapses the content into an accordion carrying this label. */
   collapsibleTitle?: string;
 }
 

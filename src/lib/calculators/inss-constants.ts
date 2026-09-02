@@ -1,28 +1,28 @@
 /**
- * Parâmetros de referência do INSS usados pelas calculadoras.
+ * INSS reference parameters used by the calculators.
  *
- * IMPORTANTE: são valores de referência que precisam ser revisados sempre que o
- * salário mínimo e a tabela de contribuição forem reajustados. As calculadoras
- * do site apresentam estimativas educativas — o valor oficial é sempre o apurado
- * pelo INSS/Receita Federal.
+ * IMPORTANT: these are reference values and must be reviewed every time the
+ * minimum wage and the contribution table are adjusted. The site's calculators
+ * show educational estimates — the official amount is always the one assessed by
+ * INSS/Receita Federal.
  */
 
-/** Ano-base da tabela abaixo. Exibido junto das estimativas. */
+/** Base year of the table below. Shown alongside the estimates. */
 export const INSS_ANO_REFERENCIA = 2026;
 
-/** Salário mínimo nacional do ano de referência (piso do salário de contribuição). */
+/** National minimum wage for the reference year (floor of the contribution salary). */
 export const SALARIO_MINIMO = 1621.0;
 
-/** Teto do salário de contribuição do RGPS no ano de referência. */
+/** RGPS contribution-salary ceiling for the reference year. */
 export const TETO_INSS = 8475.55;
 
 /**
- * Faixas progressivas de contribuição do segurado empregado.
- * `ate` é o limite superior da faixa; a alíquota incide apenas sobre a parcela
- * do salário que cai dentro da faixa (cálculo marginal, não cumulativo).
+ * Progressive contribution brackets for an employed insured worker.
+ * `ate` is the upper bound of the bracket; the rate applies only to the slice of
+ * the salary that falls inside the bracket (marginal, not cumulative).
  *
- * Conferência: aplicadas ao teto, estas faixas resultam em contribuição máxima
- * de R$ 988,09, que é o desconto máximo divulgado para 2026.
+ * Cross-check: applied to the ceiling, these brackets yield a maximum
+ * contribution of R$ 988,09, which is the maximum deduction published for 2026.
  */
 export const INSS_FAIXAS_EMPREGADO = [
   { ate: 1621.0, aliquota: 0.075 },
@@ -32,8 +32,8 @@ export const INSS_FAIXAS_EMPREGADO = [
 ] as const;
 
 /**
- * Contribuição progressiva do segurado empregado, respeitando o teto.
- * Cada faixa incide apenas sobre a parcela do salário contida nela.
+ * Progressive contribution of an employed insured worker, capped at the ceiling.
+ * Each bracket applies only to the slice of the salary it contains.
  */
 export function calcularInssEmpregado(salarioBrutoMensal: number): number {
   const base = Math.min(Math.max(salarioBrutoMensal, 0), TETO_INSS);
@@ -51,8 +51,8 @@ export function calcularInssEmpregado(salarioBrutoMensal: number): number {
 }
 
 /**
- * Salário de contribuição do contribuinte individual: a renda declarada,
- * limitada ao piso (salário mínimo) e ao teto do RGPS.
+ * Contribution salary of a self-employed contributor: the declared income,
+ * clamped between the floor (minimum wage) and the RGPS ceiling.
  */
 export function salarioDeContribuicao(rendaMensal: number): number {
   return Math.min(Math.max(rendaMensal, SALARIO_MINIMO), TETO_INSS);

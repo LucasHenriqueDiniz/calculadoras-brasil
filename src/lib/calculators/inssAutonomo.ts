@@ -1,20 +1,20 @@
 /**
- * Calculadora de contribuição do INSS para autônomos (contribuinte individual).
+ * INSS contribution calculator for self-employed workers (contribuinte individual).
  *
- * Regras consideradas:
- * - Plano normal: 20% sobre o salário de contribuição, limitado ao piso
- *   (salário mínimo) e ao teto do RGPS. Dá acesso a todos os benefícios e conta
- *   tempo para aposentadoria por tempo de contribuição.
- * - Plano simplificado (Lei 12.470/2011): 11% sobre o salário mínimo, e não
- *   sobre a renda. Em contrapartida, dá direito apenas a benefícios no valor de
- *   um salário mínimo e NÃO conta tempo para aposentadoria por tempo de
- *   contribuição — para isso é preciso complementar a diferença (9%) com juros.
- * - Quem presta serviço a empresa tem 11% retidos na fonte pelo tomador, e a
- *   empresa recolhe a parte patronal; a dedução de 45% da contribuição patronal
- *   não é tratada aqui.
+ * Rules covered:
+ * - Standard plan: 20% of the contribution salary, clamped between the floor
+ *   (minimum wage) and the RGPS ceiling. Grants access to every benefit and
+ *   counts towards length-of-contribution retirement.
+ * - Simplified plan (Lei 12.470/2011): 11% of the minimum wage, not of the
+ *   income. In exchange it only entitles the worker to benefits worth one
+ *   minimum wage and does NOT count towards length-of-contribution retirement —
+ *   that requires topping up the 9% difference plus interest.
+ * - Someone providing services to a company has 11% withheld at source by the
+ *   payer, and the company pays the employer share; the 45% deduction of the
+ *   employer contribution is not handled here.
  *
- * Todos os resultados são estimativas educativas. O valor oficial da
- * contribuição e do benefício é sempre o apurado pelo INSS.
+ * Every result is an educational estimate. The official contribution and benefit
+ * amounts are always the ones assessed by INSS.
  */
 
 import {
@@ -27,41 +27,41 @@ import {
 export type PlanoInss = "normal" | "simplificado";
 
 export interface InssAutonomoInput {
-  /** Renda mensal bruta declarada como autônomo. */
+  /** Gross monthly income declared as self-employed. */
   ganhoMensalBruto: number;
-  /** Meses de contribuição já acumulados. */
+  /** Contribution months already accumulated. */
   mesesContribuidos: number;
-  /** Sexo define a carência mínima de tempo de contribuição (EC 103/2019). */
+  /** Sex sets the minimum length-of-contribution requirement (EC 103/2019). */
   sexo: "masculino" | "feminino";
 }
 
 export interface InssAutonomoResult {
   anoReferencia: number;
   ganhoMensalBruto: number;
-  /** Base efetiva do plano normal, já limitada ao piso e ao teto. */
+  /** Effective base of the standard plan, already clamped to floor and ceiling. */
   salarioContribuicao: number;
-  /** Indica que a renda ultrapassou o teto e a base foi limitada. */
+  /** Signals that the income exceeded the ceiling and the base was capped. */
   limitadoPeloTeto: boolean;
-  /** Indica que a renda ficou abaixo do piso e a base foi elevada ao mínimo. */
+  /** Signals that the income fell below the floor and the base was raised to it. */
   elevadoAoPiso: boolean;
 
   planoNormal: PlanoDetalhe;
   planoSimplificado: PlanoDetalhe;
 
-  /** Diferença de custo anual entre os dois planos. */
+  /** Annual cost difference between the two plans. */
   diferencaCustoAnual: number;
 
   mesesContribuidos: number;
   anosContribuidos: number;
-  /** Carência de tempo de contribuição aplicável (em anos). */
+  /** Applicable length-of-contribution requirement, in years. */
   tempoMinimoContribuicao: number;
-  /** Estimativa do benefício no plano normal, pela regra da EC 103/2019. */
+  /** Benefit estimate for the standard plan, under the EC 103/2019 rule. */
   estimativaBeneficioNormal: number;
-  /** Benefício do plano simplificado é sempre um salário mínimo. */
+  /** The simplified plan's benefit is always one minimum wage. */
   estimativaBeneficioSimplificado: number;
-  /** Percentual da média aplicado na estimativa do plano normal. */
+  /** Percentage of the average applied in the standard-plan estimate. */
   percentualMediaAplicado: number;
-  /** Falso enquanto o tempo mínimo de contribuição ainda não foi atingido. */
+  /** False while the minimum contribution time has not been reached yet. */
   tempoMinimoAtingido: boolean;
 }
 
@@ -77,10 +77,10 @@ export interface PlanoDetalhe {
 const ALIQUOTA_NORMAL = 0.2;
 const ALIQUOTA_SIMPLIFICADA = 0.11;
 
-/** EC 103/2019: 20 anos para homens, 15 para mulheres, no contribuinte individual. */
+/** EC 103/2019: 20 years for men, 15 for women, for a self-employed contributor. */
 const TEMPO_MINIMO_ANOS = { masculino: 20, feminino: 15 } as const;
 
-/** EC 103/2019: 60% da média + 2% por ano que exceder o tempo mínimo. */
+/** EC 103/2019: 60% of the average + 2% per year beyond the minimum time. */
 const PERCENTUAL_BASE = 60;
 const PERCENTUAL_POR_ANO_EXCEDENTE = 2;
 
@@ -120,8 +120,8 @@ export function calculateInssAutonomo(input: InssAutonomoInput): InssAutonomoRes
     100,
   );
 
-  // A média real considera todos os salários de contribuição desde 07/1994.
-  // Aqui usamos o salário de contribuição atual como aproximação da média.
+  // The real average considers every contribution salary since 07/1994.
+  // Here the current contribution salary stands in as an approximation.
   const beneficioBruto = salarioContribuicao * (percentualMediaAplicado / 100);
   const estimativaBeneficioNormal = tempoMinimoAtingido
     ? Math.min(Math.max(beneficioBruto, SALARIO_MINIMO), TETO_INSS)

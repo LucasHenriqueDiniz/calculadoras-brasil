@@ -6,13 +6,13 @@ on:
   pull_request:
     branches: [main, develop]
 
-# Cada job repete o mesmo preâmbulo de propósito: são quatro runners
-# independentes: typecheck, lint e testes não dependem um do outro.
-# O build NÃO está aqui — o Workers Builds constrói e publica a cada push,
-# e reporta como check no commit. Repetir `vite build` aqui descobriria a
-# mesma coisa duas vezes.
-# A action de pnpm não recebe 'version' — ela lê o campo packageManager do
-# package.json, que é o que mantém o CI e as máquinas locais na mesma versão.
+# Every job repeats the same preamble on purpose: these are independent
+# runners, and typecheck, lint and tests do not depend on one another.
+# The build is NOT here — Workers Builds compiles and publishes on every push
+# and reports back as a commit check. Running `vite build` here would discover
+# the same thing twice.
+# The pnpm action is given no 'version' — it reads the packageManager field of
+# package.json, which is what keeps CI and local machines on the same version.
 
 jobs:
   typecheck:

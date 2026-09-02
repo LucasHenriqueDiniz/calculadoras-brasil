@@ -8,16 +8,16 @@ Calcule Brasil é um hub de calculadoras brasileiras para custos do dia a dia, i
 
 ## Comandos principais
 
-- Instalar dependências: `npm ci`
-- Desenvolvimento local: `npm run dev`
-- Testes unitários: `npm test`
-- Typecheck: `npm run typecheck`
-- Lint: `npm run lint`
-- Build: `npm run build`
-- Smoke SEO: `npm run test:seo`
-- Gate completo: `npm run check`
+- Instalar dependências: `pnpm install --frozen-lockfile`
+- Desenvolvimento local: `pnpm run dev`
+- Testes unitários: `pnpm test`
+- Typecheck: `pnpm run typecheck`
+- Lint: `pnpm run lint`
+- Build: `pnpm run build`
+- Smoke SEO: `pnpm run test:seo`
+- Gate completo: `pnpm run check`
 
-Quando possível, rode pelo menos `npm run typecheck`, `npm test`, `npm run build` e `npm run test:seo` após mudanças em rotas, SEO, calculadoras ou dados estruturados.
+Quando possível, rode pelo menos `pnpm run typecheck`, `pnpm test`, `pnpm run build` e `pnpm run test:seo` após mudanças em rotas, SEO, calculadoras ou dados estruturados.
 
 ## Convenções de implementação
 

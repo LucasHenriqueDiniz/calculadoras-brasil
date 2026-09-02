@@ -21,21 +21,21 @@ export interface BeneficiosFiscaisResult {
 }
 
 export function calculateBeneficiosFiscais(input: BeneficiosFiscaisInput): BeneficiosFiscaisResult {
-  // Benefícios não tributáveis
+  // non-taxable benefits
   const beneficiosTotalMensal = input.valeRefeicaoMensal + input.valeTransporteMensal;
   const beneficiosTotalAnual = beneficiosTotalMensal * 12;
 
-  // Economia de IRPF (se recebesse em dinheiro, pagaria IRPF sobre)
+  // IRPF savings (taken as cash, this amount would be taxed)
   const economiaIrpfMensal = beneficiosTotalMensal * (input.aliquotaIrpfEstimada / 100);
   const economiaIrpfAnual = economiaIrpfMensal * 12;
 
-  // Simulação: equivalente em salário bruto
-  // Se você recebe em benefícios, não desconta IRPF
-  // Se recebesse em dinheiro, teria que descontar
-  const salarioLiquidoSemBeneficios = 0; // Referência
-  const salarioLiquidoComBeneficios = beneficiosTotalMensal; // O que você não paga imposto
+  // Simulation: the equivalent in gross salary.
+  // Received as benefits, nothing is withheld for IRPF;
+  // received as cash, it would be.
+  const salarioLiquidoSemBeneficios = 0; // reference point
+  const salarioLiquidoComBeneficios = beneficiosTotalMensal; // the untaxed part
 
-  // Quanto de salário bruto seria necessário para ter o mesmo em líquido
+  // Gross salary needed to end up with the same net amount
   const rendaBrutaNecessaria = beneficiosTotalMensal / (1 - input.aliquotaIrpfEstimada / 100);
 
   return {

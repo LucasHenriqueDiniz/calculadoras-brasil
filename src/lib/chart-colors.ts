@@ -1,9 +1,9 @@
 /**
- * Cores de gráfico e o mapa categoria → cor.
+ * Chart colours and the category-to-colour map.
  *
- * Vive fora de components/calculator/results.tsx porque aquele arquivo exporta
- * componentes: misturar helpers puros com componentes quebra o fast refresh, que
- * só consegue recarregar um módulo quando tudo que ele exporta é componente.
+ * This lives outside components/calculator/results.tsx because that file exports
+ * components: mixing pure helpers with components breaks fast refresh, which can
+ * only reload a module when everything it exports is a component.
  */
 
 export interface BreakdownRow {
@@ -25,8 +25,8 @@ const CHART_COLORS = [
 ];
 
 /**
- * Mapeia cada categoria (por key) para uma cor estável, ordenando por valor.
- * Tanto o gráfico quanto a tabela usam as mesmas linhas, garantindo cores consistentes.
+ * Maps each category (by key) to a stable colour, ordered by value.
+ * Chart and table share the same rows, which keeps the colours consistent.
  */
 export function buildColorMap(rows: BreakdownRow[]): Record<string, string> {
   const sorted = [...rows].filter((r) => r.monthly > 0).sort((a, b) => b.monthly - a.monthly);

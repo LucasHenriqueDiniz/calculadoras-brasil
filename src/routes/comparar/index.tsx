@@ -10,9 +10,9 @@ interface Comparison {
   title: string;
   description: string;
   icon: LucideIcon;
-  /** Opções comparadas lado a lado. */
+  /** Options compared side by side. */
   options: string[];
-  /** Métrica de apoio mostrada no rodapé do card. */
+  /** Supporting metric shown in the card footer. */
   highlight: string;
   highlightLabel: string;
 }

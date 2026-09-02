@@ -4,7 +4,7 @@ import { ChevronRight, Home } from "lucide-react";
 
 export interface Crumb {
   label: string;
-  /** Caminho do TanStack Router. Quando ausente, é o item atual (sem link). */
+  /** TanStack Router path. When absent, this is the current item and gets no link. */
   to?: string;
 }
 
