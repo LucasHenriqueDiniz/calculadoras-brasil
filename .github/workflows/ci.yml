@@ -7,7 +7,10 @@ on:
     branches: [main, develop]
 
 # Cada job repete o mesmo preâmbulo de propósito: são quatro runners
-# independentes, e o build depende dos três primeiros terem passado.
+# independentes: typecheck, lint e testes não dependem um do outro.
+# O build NÃO está aqui — o Workers Builds constrói e publica a cada push,
+# e reporta como check no commit. Repetir `vite build` aqui descobriria a
+# mesma coisa duas vezes.
 # A action de pnpm não recebe 'version' — ela lê o campo packageManager do
 # package.json, que é o que mantém o CI e as máquinas locais na mesma versão.
 
@@ -51,21 +54,3 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run test
 
-  build:
-    name: Build Verification
-    needs: [typecheck, lint, test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run build
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist-brasil-calculadoras
-          path: dist/
-          retention-days: 5
