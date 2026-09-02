@@ -41,3 +41,15 @@ Quando possível, rode pelo menos `pnpm run typecheck`, `pnpm test`, `pnpm run b
 - Não trocar a arquitetura para Next.js, Remix ou `src/pages/`.
 - Mantenha textos e UX em português do Brasil.
 - Conteúdo financeiro/tributário deve ser educativo, com linguagem clara e sem promessa de valor oficial final.
+## Commit hook
+
+`.githooks/commit-msg` strips AI attribution trailers from commit messages. Git does not version
+`.git/hooks`, so what makes the hook run is one line of local config — and a fresh clone does not
+have it. The root `prepare` script sets it on `pnpm install`, and only when nothing else claims it:
+
+```
+git config --get core.hooksPath >/dev/null 2>&1 || git config core.hooksPath .githooks
+```
+
+If you already point `core.hooksPath` somewhere else, the script leaves your value alone and this
+repo's hook stays inert — wire it by hand, or move the file into whatever directory you do use.
