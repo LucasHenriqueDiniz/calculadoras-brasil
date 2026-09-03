@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
+import { CalculatorLayout } from "@/components/calculator/CalculatorLayout";
 import { CurrencyInput, SelectField } from "@/components/calculator/fields";
 import {
   DisclaimerBox,

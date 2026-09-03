@@ -1,14 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { CreditCard } from "lucide-react";
+import { useMemo } from "react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
-import { CurrencyInput, NumberInput, SelectField } from "@/components/calculator/fields";
+import { CurrencyInput, NumberInput } from "@/components/calculator/fields";
 import { DisclaimerBox, ResultSummaryCard, BreakdownTable } from "@/components/calculator/results";
 import { CopyResultButton, ResetButton, ShareResultButton } from "@/components/calculator/actions";
 import { FAQSection, type FAQItem } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { Prose } from "@/components/layout/PageShell";
-import { Button } from "@/components/ui/button";
 import { formatBRL } from "@/lib/format";
 import {
   calculateSalarioLiquido,

@@ -155,14 +155,3 @@ function findTaxBracket(baseImponivel: number): { rate: number; deduction: numbe
   const lastBracket = IRPF_TABLE_2026[IRPF_TABLE_2026.length - 1];
   return { rate: lastBracket.rate, deduction: lastBracket.deduction };
 }
-
-/**
- * Formats a monetary value for display.
- * (This helper is meant to be reused from @/lib/format at runtime.)
- */
-export function formatIrpfValue(value: number): string {
-  return `R$ ${value.toLocaleString("pt-BR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
