@@ -55,12 +55,12 @@ decision and a separate plan.
 ## The risk being bought
 
 Refactoring a TanStack Start route component touches hydration and
-prerendering: these 38 pages are prerendered at build time and the calculators
+prerendering: these 49 pages are prerendered at build time and the calculators
 become interactive after hydration. A hook moved across a component boundary
 changes when it runs.
 
 The safety net already exists and is not obvious: `pnpm run test:seo` builds,
-boots the preview server and asserts the prerendered HTML of all 38 public
+boots the preview server and asserts the prerendered HTML of all 49 public
 routes. Every page slice below leans on it, and it is the reason a page can be
 refactored here without a component test suite.
 

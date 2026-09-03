@@ -40,16 +40,25 @@ calcularInssEmpregado(salarioBrutoMensal)  salarioDeContribuicao(rendaMensal)
 
 ## Done when
 
+Two separate blocks, because chaining them lets a failing test print the
+passing string. Run the suite first:
+
 ```
-pnpm run typecheck && pnpm test && \
-  grep -rniE 'aliquota|deducao|salario|contribuicao|beneficio' src/lib/calculators/inss-constants.ts; \
-  echo "grep-exit=$?"
+pnpm run typecheck && pnpm test && echo "checks-ok"
 ```
 
-Output must say `Tests  17 passed (17)`, report no typecheck errors, and end
-with `grep-exit=1` — grep exiting 1 means it found nothing, which is the
-assertion. Any matching line printed above it is a remaining Portuguese
-identifier.
+`checks-ok` is only reached when both exit 0, so its absence is the failure —
+the vitest summary must read `Tests  17 passed (17)` with no typecheck errors.
+Then, as its own command, so `$?` is the grep's and not a leftover from above:
+
+```
+grep -rniE 'aliquota|deducao|salario|contribuicao|beneficio' \
+  src/lib/calculators/inss-constants.ts; echo "grep-exit=$?"
+```
+
+Must print no matching lines and end with `grep-exit=1` — grep exiting 1 means
+it found nothing, which is the assertion. Today it prints the 12 Portuguese
+lines listed under *Delivers* and ends with `grep-exit=0`.
 
 ## If stuck
 

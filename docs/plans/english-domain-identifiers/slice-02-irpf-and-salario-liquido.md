@@ -59,17 +59,26 @@ with a mismatched shape is a broken form.
 
 ## Done when
 
+Two separate blocks, because chaining them lets a failing test print the
+passing string. Run the suite first:
+
 ```
-pnpm run typecheck && pnpm test && \
-  grep -rniE 'aliquota|deducao|salario|contribuicao|beneficio' \
-    src/lib/calculators/irpf.ts src/lib/calculators/salarioLiquido.ts; \
-  echo "grep-exit=$?"
+pnpm run typecheck && pnpm test && echo "checks-ok"
 ```
 
-Output must end with `grep-exit=1`, report no typecheck errors, and the vitest
-summary must show a test count **higher** than the 17 passing today — this
-slice adds the value tests listed above, so an unchanged count means they were
-not written.
+`checks-ok` is only reached when both exit 0. No typecheck errors, and the
+vitest summary must show a test count **higher** than the 17 passing today —
+this slice adds the value tests listed above, so an unchanged count means they
+were not written. Then, as its own command, so `$?` is the grep's:
+
+```
+grep -rniE 'aliquota|deducao|salario|contribuicao|beneficio' \
+  src/lib/calculators/irpf.ts src/lib/calculators/salarioLiquido.ts
+echo "grep-exit=$?"
+```
+
+Must print no matching lines and end with `grep-exit=1`. Today both files match
+and it ends with `grep-exit=0`.
 
 ## If stuck
 

@@ -45,15 +45,25 @@ literal and keep the key.
 
 ## Done when
 
+Two separate blocks, because chaining them lets a failing test print the
+passing string. Run the suite first:
+
 ```
-pnpm run typecheck && pnpm test && \
-  grep -rniE 'aliquota|deducao|salario|contribuicao|beneficio' \
-    src/lib/calculators/inssAutonomo.ts; \
-  echo "grep-exit=$?"
+pnpm run typecheck && pnpm test && echo "checks-ok"
 ```
 
-Output must end with `grep-exit=1` and the vitest summary must report all tests
-passing with no expected-value edits in the existing INSS cases.
+`checks-ok` is only reached when both exit 0, and the vitest summary must
+report all tests passing with no expected-value edits in the existing INSS
+cases. Then, as its own command, so `$?` is the grep's:
+
+```
+grep -rniE 'aliquota|deducao|salario|contribuicao|beneficio' \
+  src/lib/calculators/inssAutonomo.ts
+echo "grep-exit=$?"
+```
+
+Must print no matching lines and end with `grep-exit=1`. Today it matches and
+ends with `grep-exit=0`.
 
 ## If stuck
 

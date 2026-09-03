@@ -35,7 +35,8 @@ thing to test — there is no fixture, no clock, no network.
 ## Why it matters more than the count suggests
 
 `/calculadora-salario-liquido` carries `priority: 0.95` in
-`src/lib/seo-pages.ts`, the highest of the 38 public pages, and
+`src/lib/seo-pages.ts` — the highest of the 49 public pages after the home
+page's `priority: 1`, tied with `/calculadora-irpf-2026` — and
 `/calculadora-irpf-2026` is the product's other headline page. The two
 calculators the site is ranked for are the two with no proof they compute
 anything correctly. A wrong INSS bracket or a wrong deduction cap would ship

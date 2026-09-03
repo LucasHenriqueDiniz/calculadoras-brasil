@@ -35,7 +35,7 @@ the cheapest evidence that nobody has been reading them:
 - The three persisted keys to bump, same reasoning as slice 2:
   `"clt-vs-pj-input"` (`src/routes/calculadora-clt-vs-pj.tsx:76`),
   `"beneficios-input"` (`src/routes/calculadora-beneficios-fiscais.tsx:73`),
-  `"previdencia-input"` (`src/routes/calculadora-previdencia-complementar.tsx:79`).
+  `"previdencia-input"` (`src/routes/calculadora-previdencia-complementar.tsx:80`).
 
 ## Tests
 
@@ -47,15 +47,24 @@ the cheapest evidence that nobody has been reading them:
 
 ## Done when
 
+Two separate blocks, because chaining them lets a failing test print the
+passing string. Run the suite first:
+
 ```
-pnpm run typecheck && pnpm test && \
-  grep -rniE 'aliquota|deducao|salario|contribuicao|beneficio' src/lib/calculators/; \
-  echo "grep-exit=$?"
+pnpm run typecheck && pnpm test && echo "checks-ok"
 ```
 
-Output must end with `grep-exit=1` with **no matching lines printed at all** —
-this is the directory-wide check, down from the 154 lines across 7 files that
-match today. Typecheck clean, vitest summary all passing.
+`checks-ok` is only reached when both exit 0: typecheck clean, vitest summary
+all passing. Then, as its own command, so `$?` is the grep's:
+
+```
+grep -rniE 'aliquota|deducao|salario|contribuicao|beneficio' src/lib/calculators/
+echo "grep-exit=$?"
+```
+
+Must end with `grep-exit=1` and **no matching lines printed at all** — this is
+the directory-wide check, down from the 154 lines across 7 files that match
+today.
 
 ## If stuck
 

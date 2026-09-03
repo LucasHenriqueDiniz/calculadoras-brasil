@@ -25,7 +25,7 @@ that pays is the appliance list: a presentational child taking the array and an
   proven the `Done when` measurement command works on this repo.
 - `pnpm run test:seo` working locally before the change, as the baseline. It
   builds, boots a preview server on 127.0.0.1:4173 and asserts prerendered HTML
-  for all 38 public routes — it is the safety net this slice depends on, so run
+  for all 49 public routes — it is the safety net this slice depends on, so run
   it green **first**, not only after.
 
 ## Tests
@@ -55,7 +55,9 @@ Must print a number below 200 — it prints `559` today. Then:
 pnpm run typecheck && pnpm run lint && pnpm run build && pnpm run test:seo
 ```
 
-`test:seo` must exit 0 with no assertion failure on any of the 38 routes. A
+`test:seo` must exit 0 and print `SEO smoke test passed for 49 routes.` — the
+count `PUBLIC_ROUTES` in `tests/seo-smoke.mjs` carries today, with no assertion
+failure on any of them. A
 build that succeeds but a `test:seo` that fails means the page stopped
 prerendering, which is the exact failure this refactor can cause.
 
