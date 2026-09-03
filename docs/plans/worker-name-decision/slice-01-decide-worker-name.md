@@ -54,13 +54,19 @@ the next audit stops re-raising it.
 **If renamed:**
 
 ```
-grep -n '"name"' wrangler.jsonc && pnpm run worker:dry-run
+grep -nE '"name": "[a-z0-9]+(-[a-z0-9]+)*-[a-z0-9]+-[a-z0-9]+-prod"' wrangler.jsonc &&
+grep -nE '"name": "[a-z0-9]+(-[a-z0-9]+)*-[a-z0-9]+-[a-z0-9]+-preview"' wrangler.jsonc &&
+pnpm run worker:dry-run
 ```
 
-Line 3 must show the new `<owner>-<project>-<resource>-prod` name, line 17 the
-matching preview name, and `worker:dry-run` must exit 0 — today those two lines
-read `calcule-brasil` and `calcule-brasil-preview`. Followed by
-`curl -sI https://calculebrasil.com | head -1` returning `HTTP/2 200`.
+Each grep must print its line — line 3 the new
+`<owner>-<project>-<resource>-prod` name, line 17 the matching preview name —
+and the chain must exit 0. It exits 1 today: the two names read
+`calcule-brasil` and `calcule-brasil-preview`, both short of the four segments
+the convention asks for, so neither pattern matches. Matching the shape is
+what makes this a measurement: a bare `grep -n '"name"'` exits 0 for having
+found the key, whatever its value, and so passed with the old name. Followed
+by `curl -sI https://calculebrasil.com | head -1` returning `HTTP/2 200`.
 
 **If not renamed:**
 

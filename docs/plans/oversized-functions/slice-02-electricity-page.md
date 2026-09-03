@@ -44,12 +44,20 @@ that pays is the appliance list: a presentational child taking the array and an
 ## Done when
 
 ```
-awk '$0 ~ "^(export )?function ElectricityPage\\(" {s=NR;f=1} \
-     f{d+=gsub(/\{/,"{")-gsub(/\}/,"}"); if(d<=0 && NR>s){print NR-s+1; exit}}' \
+awk '$0 ~ "^(export )?(default )?(const|function) ElectricityPage[ ]*[=(]" {s=NR;f=1} \
+     f && !n {d+=gsub(/\{/,"{")-gsub(/\}/,"}"); if(d<=0 && NR>s){n=NR-s+1; print n}} \
+     END{if(!s){print "ElectricityPage: signature not found"; exit 1} \
+         if(!n){print "ElectricityPage: closing brace not found"; exit 1} \
+         exit (n<200 ? 0 : 1)}' \
   src/routes/calculadora-conta-de-luz.tsx
 ```
 
-Must print a number below 200 — it prints `559` today. Then:
+Prints the line count and exits 0 only when it is below 200 — today it prints
+`559` and exits 1. The pattern also matches `const ElectricityPage = () =>`,
+so an honest conversion to an arrow function is still measured; and when
+neither form is found the command prints
+`ElectricityPage: signature not found` and exits 1, instead of printing
+nothing and exiting 0 as the old `function ElectricityPage(` anchor did. Then:
 
 ```
 pnpm run typecheck && pnpm run lint && pnpm run build && pnpm run test:seo

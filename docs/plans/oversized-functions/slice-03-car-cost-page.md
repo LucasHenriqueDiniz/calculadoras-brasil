@@ -48,12 +48,20 @@ lifting it into a named hook is most of the line count on its own.
 ## Done when
 
 ```
-awk '$0 ~ "^(export )?function CarCostPage\\(" {s=NR;f=1} \
-     f{d+=gsub(/\{/,"{")-gsub(/\}/,"}"); if(d<=0 && NR>s){print NR-s+1; exit}}' \
+awk '$0 ~ "^(export )?(default )?(const|function) CarCostPage[ ]*[=(]" {s=NR;f=1} \
+     f && !n {d+=gsub(/\{/,"{")-gsub(/\}/,"}"); if(d<=0 && NR>s){n=NR-s+1; print n}} \
+     END{if(!s){print "CarCostPage: signature not found"; exit 1} \
+         if(!n){print "CarCostPage: closing brace not found"; exit 1} \
+         exit (n<200 ? 0 : 1)}' \
   src/routes/calculadora-custo-carro.tsx
 ```
 
-Must print a number below 200 — it prints `477` today. Then:
+Prints the line count and exits 0 only when it is below 200 — today it prints
+`477` and exits 1. The pattern also matches `const CarCostPage = () =>`, so an
+honest conversion to an arrow function is still measured; and when neither
+form is found the command prints `CarCostPage: signature not found` and exits
+1, instead of printing nothing and exiting 0 as the old
+`function CarCostPage(` anchor did. Then:
 
 ```
 pnpm run typecheck && pnpm run lint && pnpm run build && pnpm run test:seo

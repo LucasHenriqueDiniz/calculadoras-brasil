@@ -38,12 +38,20 @@ format the older calculators do not, so nothing about the key needs touching.
 ## Done when
 
 ```
-awk '$0 ~ "^(export )?function LivingAlonePage\\(" {s=NR;f=1} \
-     f{d+=gsub(/\{/,"{")-gsub(/\}/,"}"); if(d<=0 && NR>s){print NR-s+1; exit}}' \
+awk '$0 ~ "^(export )?(default )?(const|function) LivingAlonePage[ ]*[=(]" {s=NR;f=1} \
+     f && !n {d+=gsub(/\{/,"{")-gsub(/\}/,"}"); if(d<=0 && NR>s){n=NR-s+1; print n}} \
+     END{if(!s){print "LivingAlonePage: signature not found"; exit 1} \
+         if(!n){print "LivingAlonePage: closing brace not found"; exit 1} \
+         exit (n<200 ? 0 : 1)}' \
   src/routes/calculadora-morar-sozinho.tsx
 ```
 
-Must print a number below 200 — it prints `314` today. Then:
+Prints the line count and exits 0 only when it is below 200 — today it prints
+`314` and exits 1. The pattern also matches `const LivingAlonePage = () =>`,
+so an honest conversion to an arrow function is still measured; and when
+neither form is found the command prints
+`LivingAlonePage: signature not found` and exits 1, instead of printing
+nothing and exiting 0 as the old `function LivingAlonePage(` anchor did. Then:
 
 ```
 pnpm run typecheck && pnpm run lint && pnpm run build && pnpm run test:seo
