@@ -3,7 +3,6 @@ import { ArrowRight } from "lucide-react";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
 import { absoluteUrl } from "@/lib/site";
 import { getBlogPost } from "@/lib/blog";
-import { Button } from "@/components/ui/button";
 
 const POST_SLUG = "quanto-custa-ter-carro";
 const post = getBlogPost(POST_SLUG)!;

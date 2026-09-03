@@ -1,13 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { CreditCard } from "lucide-react";
+import { useMemo } from "react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
-import {
-  CurrencyInput,
-  NumberInput,
-  SelectField,
-  CheckboxField,
-} from "@/components/calculator/fields";
+import { CurrencyInput, NumberInput, SelectField } from "@/components/calculator/fields";
 import {
   DisclaimerBox,
   ResultSummaryCard,
@@ -18,8 +12,7 @@ import { CopyResultButton, ResetButton, ShareResultButton } from "@/components/c
 import { FAQSection, type FAQItem } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { Prose } from "@/components/layout/PageShell";
-import { Button } from "@/components/ui/button";
-import { formatBRL, parseBRNumber } from "@/lib/format";
+import { formatBRL } from "@/lib/format";
 import { calculateIrpf, type IrpfInput } from "@/lib/calculators/irpf";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";

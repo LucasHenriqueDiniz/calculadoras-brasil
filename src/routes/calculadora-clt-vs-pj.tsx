@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
-import { CurrencyInput, NumberInput } from "@/components/calculator/fields";
+import { CurrencyInput } from "@/components/calculator/fields";
 import { ResultSummaryCard, BreakdownTable, DisclaimerBox } from "@/components/calculator/results";
 import { FAQSection } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";

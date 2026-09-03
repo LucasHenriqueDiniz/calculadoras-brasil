@@ -23,7 +23,6 @@ export interface BeneficiosFiscaisResult {
 export function calculateBeneficiosFiscais(input: BeneficiosFiscaisInput): BeneficiosFiscaisResult {
   // non-taxable benefits
   const beneficiosTotalMensal = input.valeRefeicaoMensal + input.valeTransporteMensal;
-  const beneficiosTotalAnual = beneficiosTotalMensal * 12;
 
   // IRPF savings (taken as cash, this amount would be taxed)
   const economiaIrpfMensal = beneficiosTotalMensal * (input.aliquotaIrpfEstimada / 100);
