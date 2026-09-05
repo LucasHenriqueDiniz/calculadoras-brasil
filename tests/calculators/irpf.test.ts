@@ -9,15 +9,15 @@ import { INSS_CEILING, calculateEmployeeInss } from "../../src/lib/calculators/i
  */
 const BRACKET_BOUNDARIES = [29145.6, 33919.8, 45012.6, 55976.16];
 
-const NO_DEDUCTIONS: Omit<IrpfInput, "rendaBrutaAnual"> = {
-  dependentes: 0,
-  deducaoEducacao: 0,
-  deducaoSaude: 0,
-  deducaoPrevidenciaComplementar: 0,
-  regimeSimplificado: false,
+const NO_DEDUCTIONS: Omit<IrpfInput, "grossAnnualIncome"> = {
+  dependants: 0,
+  educationDeduction: 0,
+  healthDeduction: 0,
+  supplementaryPensionDeduction: 0,
+  simplifiedRegime: false,
 };
 
-function irpf(input: Partial<IrpfInput> & { rendaBrutaAnual: number }) {
+function irpf(input: Partial<IrpfInput> & { grossAnnualIncome: number }) {
   return calculateIrpf({ ...NO_DEDUCTIONS, ...input });
 }
 
@@ -37,7 +37,7 @@ function incomeForBase(base: number): number {
 
   for (let step = 0; step < 200; step += 1) {
     const middle = (low + high) / 2;
-    if (irpf({ rendaBrutaAnual: middle }).baseImponivel < base) {
+    if (irpf({ grossAnnualIncome: middle }).assessableBase < base) {
       low = middle;
     } else {
       high = middle;
@@ -50,13 +50,13 @@ function incomeForBase(base: number): number {
 /**
  * The tax the TABLE produces, before the Lei 15.270/2025 reduction.
  *
- * ⚠️ Deliberately not `irpfCalculado`. The reduction zeroes the tax below
+ * ⚠️ Deliberately not `calculatedTax`. The reduction zeroes the tax below
  * R$ 60.000 of income, and every boundary here sits under that — so asserting
  * continuity on the final figure would compare 0 to 0 at two of the four
  * boundaries and pass while proving nothing.
  */
 function taxAtBase(base: number): number {
-  return irpf({ rendaBrutaAnual: incomeForBase(base) }).irpfPelaTabela;
+  return irpf({ grossAnnualIncome: incomeForBase(base) }).taxFromTable;
 }
 
 describe("calculateIrpf — exemption band", () => {
@@ -67,7 +67,7 @@ describe("calculateIrpf — exemption band", () => {
   });
 
   it("reports the exempt band as 'Isento' rather than a percentage", () => {
-    expect(irpf({ rendaBrutaAnual: 10_000 }).aliquotaMarginal).toBe("Isento");
+    expect(irpf({ grossAnnualIncome: 10_000 }).marginalRate).toBe("Isento");
   });
 });
 
@@ -109,7 +109,7 @@ describe("calculateIrpf — the progressive table is self-consistent", () => {
    */
   it("applies a rate to every base, and that rate never goes down", () => {
     const marginalRateAt = (base: number) =>
-      Number.parseFloat(irpf({ rendaBrutaAnual: incomeForBase(base) }).aliquotaMarginal) || 0;
+      Number.parseFloat(irpf({ grossAnnualIncome: incomeForBase(base) }).marginalRate) || 0;
 
     let previous = 0;
 
@@ -127,87 +127,95 @@ describe("calculateIrpf — INSS withheld", () => {
   it("never deducts more INSS than the RGPS ceiling allows", () => {
     const annualCeiling = calculateEmployeeInss(INSS_CEILING) * 12;
 
-    expect(irpf({ rendaBrutaAnual: 500_000 }).descInss).toBeLessThanOrEqual(annualCeiling + 0.01);
+    expect(irpf({ grossAnnualIncome: 500_000 }).inssWithheld).toBeLessThanOrEqual(
+      annualCeiling + 0.01,
+    );
   });
 
   it("deducts the progressive contribution below the ceiling, not a flat rate", () => {
-    const rendaBrutaAnual = 50_000;
-    const expected = calculateEmployeeInss(rendaBrutaAnual / 12) * 12;
+    const grossAnnualIncome = 50_000;
+    const expected = calculateEmployeeInss(grossAnnualIncome / 12) * 12;
 
-    expect(irpf({ rendaBrutaAnual }).descInss).toBeCloseTo(expected, 2);
+    expect(irpf({ grossAnnualIncome }).inssWithheld).toBeCloseTo(expected, 2);
 
     // The point of the change: this is NOT the 10% the module used to charge.
-    expect(irpf({ rendaBrutaAnual }).descInss).not.toBeCloseTo(5_000, 2);
+    expect(irpf({ grossAnnualIncome }).inssWithheld).not.toBeCloseTo(5_000, 2);
   });
 });
 
 describe("calculateIrpf — itemised deductions", () => {
   it("caps education at the documented limit", () => {
-    expect(irpf({ rendaBrutaAnual: 100_000, deducaoEducacao: 1_000 }).deducaoEducacao).toBe(1_000);
-    expect(irpf({ rendaBrutaAnual: 100_000, deducaoEducacao: 99_999 }).deducaoEducacao).toBe(
-      3561.5,
+    expect(irpf({ grossAnnualIncome: 100_000, educationDeduction: 1_000 }).educationDeduction).toBe(
+      1_000,
     );
+    expect(
+      irpf({ grossAnnualIncome: 100_000, educationDeduction: 99_999 }).educationDeduction,
+    ).toBe(3561.5);
   });
 
   it("caps health, which the module itself flags as having no legal cap", () => {
-    expect(irpf({ rendaBrutaAnual: 100_000, deducaoSaude: 1_000 }).deducaoSaude).toBe(1_000);
-    expect(irpf({ rendaBrutaAnual: 100_000, deducaoSaude: 99_999 }).deducaoSaude).toBe(2666.67);
+    expect(irpf({ grossAnnualIncome: 100_000, healthDeduction: 1_000 }).healthDeduction).toBe(
+      1_000,
+    );
+    expect(irpf({ grossAnnualIncome: 100_000, healthDeduction: 99_999 }).healthDeduction).toBe(
+      2666.67,
+    );
   });
 
   it("does not cap supplementary pension, and floors it at zero", () => {
     expect(
-      irpf({ rendaBrutaAnual: 100_000, deducaoPrevidenciaComplementar: 50_000 })
-        .deducaoPrevidenciaComplementar,
+      irpf({ grossAnnualIncome: 100_000, supplementaryPensionDeduction: 50_000 })
+        .supplementaryPensionDeduction,
     ).toBe(50_000);
     expect(
-      irpf({ rendaBrutaAnual: 100_000, deducaoPrevidenciaComplementar: -5_000 })
-        .deducaoPrevidenciaComplementar,
+      irpf({ grossAnnualIncome: 100_000, supplementaryPensionDeduction: -5_000 })
+        .supplementaryPensionDeduction,
     ).toBe(0);
   });
 
   it("sums the three capped amounts, not the three raw ones", () => {
     const result = irpf({
-      rendaBrutaAnual: 100_000,
-      deducaoEducacao: 99_999,
-      deducaoSaude: 99_999,
-      deducaoPrevidenciaComplementar: 5_000,
+      grossAnnualIncome: 100_000,
+      educationDeduction: 99_999,
+      healthDeduction: 99_999,
+      supplementaryPensionDeduction: 5_000,
     });
 
-    expect(result.totalDeducoes).toBeCloseTo(3561.5 + 2666.67 + 5_000, 2);
+    expect(result.totalDeductions).toBeCloseTo(3561.5 + 2666.67 + 5_000, 2);
   });
 
   it("never drives the calculation base below zero", () => {
-    const result = irpf({ rendaBrutaAnual: 10_000, deducaoPrevidenciaComplementar: 999_999 });
+    const result = irpf({ grossAnnualIncome: 10_000, supplementaryPensionDeduction: 999_999 });
 
-    expect(result.baseCalculoCompleta).toBe(0);
-    expect(result.irpfCalculado).toBe(0);
+    expect(result.fullCalculationBase).toBe(0);
+    expect(result.calculatedTax).toBe(0);
   });
 });
 
 describe("calculateIrpf — dependants", () => {
   it("deducts a flat amount per dependant, uncapped in count", () => {
-    expect(irpf({ rendaBrutaAnual: 100_000, dependentes: 0 }).descDependentes).toBe(0);
-    expect(irpf({ rendaBrutaAnual: 100_000, dependentes: 1 }).descDependentes).toBeCloseTo(
+    expect(irpf({ grossAnnualIncome: 100_000, dependants: 0 }).dependantAllowance).toBe(0);
+    expect(irpf({ grossAnnualIncome: 100_000, dependants: 1 }).dependantAllowance).toBeCloseTo(
       2275.08,
       2,
     );
-    expect(irpf({ rendaBrutaAnual: 100_000, dependentes: 3 }).descDependentes).toBeCloseTo(
+    expect(irpf({ grossAnnualIncome: 100_000, dependants: 3 }).dependantAllowance).toBeCloseTo(
       6825.24,
       2,
     );
   });
 
   it("lowers the tax as dependants are added", () => {
-    const none = irpf({ rendaBrutaAnual: 100_000, dependentes: 0 }).irpfCalculado;
-    const one = irpf({ rendaBrutaAnual: 100_000, dependentes: 1 }).irpfCalculado;
-    const three = irpf({ rendaBrutaAnual: 100_000, dependentes: 3 }).irpfCalculado;
+    const none = irpf({ grossAnnualIncome: 100_000, dependants: 0 }).calculatedTax;
+    const one = irpf({ grossAnnualIncome: 100_000, dependants: 1 }).calculatedTax;
+    const three = irpf({ grossAnnualIncome: 100_000, dependants: 3 }).calculatedTax;
 
     expect(one).toBeLessThan(none);
     expect(three).toBeLessThan(one);
   });
 
   it("rejects a negative dependant count", () => {
-    expect(() => irpf({ rendaBrutaAnual: 100_000, dependentes: -1 })).toThrow(
+    expect(() => irpf({ grossAnnualIncome: 100_000, dependants: -1 })).toThrow(
       /dependants cannot be negative/i,
     );
   });
@@ -215,11 +223,11 @@ describe("calculateIrpf — dependants", () => {
 
 describe("calculateIrpf — the two regimes", () => {
   it("computes both regimes for the same input", () => {
-    const full = irpf({ rendaBrutaAnual: 100_000, regimeSimplificado: false });
-    const simplified = irpf({ rendaBrutaAnual: 100_000, regimeSimplificado: true });
+    const full = irpf({ grossAnnualIncome: 100_000, simplifiedRegime: false });
+    const simplified = irpf({ grossAnnualIncome: 100_000, simplifiedRegime: true });
 
-    expect(Number.isFinite(full.irpfCalculado)).toBe(true);
-    expect(Number.isFinite(simplified.irpfCalculado)).toBe(true);
+    expect(Number.isFinite(full.calculatedTax)).toBe(true);
+    expect(Number.isFinite(simplified.calculatedTax)).toBe(true);
   });
 
   /**
@@ -228,11 +236,11 @@ describe("calculateIrpf — the two regimes", () => {
    * high incomes the difference is the whole point of the cap existing.
    */
   it("caps the simplified discount instead of scaling it without limit", () => {
-    const modest = irpf({ rendaBrutaAnual: 100_000, regimeSimplificado: true });
-    const large = irpf({ rendaBrutaAnual: 1_000_000, regimeSimplificado: true });
+    const modest = irpf({ grossAnnualIncome: 100_000, simplifiedRegime: true });
+    const large = irpf({ grossAnnualIncome: 1_000_000, simplifiedRegime: true });
 
-    const modestDiscount = 100_000 - modest.baseCalculoSimplificada;
-    const largeDiscount = 1_000_000 - large.baseCalculoSimplificada;
+    const modestDiscount = 100_000 - modest.simplifiedCalculationBase;
+    const largeDiscount = 1_000_000 - large.simplifiedCalculationBase;
 
     expect(largeDiscount).toBeCloseTo(modestDiscount, 2);
   });
@@ -243,56 +251,56 @@ describe("calculateIrpf — the two regimes", () => {
    * See docs/research/2026-09-04-irpf-2026-table/research.md, Findings 5.
    */
   it("discounts exactly 20% where the ceiling does not bind", () => {
-    const rendaBrutaAnual = 50_000;
-    const result = irpf({ rendaBrutaAnual, regimeSimplificado: true });
+    const grossAnnualIncome = 50_000;
+    const result = irpf({ grossAnnualIncome, simplifiedRegime: true });
 
     // 20% of 50.000 is 10.000, well under the 17.640 ceiling.
-    expect(rendaBrutaAnual - result.baseCalculoSimplificada).toBeCloseTo(10_000, 2);
+    expect(grossAnnualIncome - result.simplifiedCalculationBase).toBeCloseTo(10_000, 2);
   });
 
   it("ignores dependants under the simplified regime", () => {
-    const none = irpf({ rendaBrutaAnual: 100_000, regimeSimplificado: true, dependentes: 0 });
-    const two = irpf({ rendaBrutaAnual: 100_000, regimeSimplificado: true, dependentes: 2 });
+    const none = irpf({ grossAnnualIncome: 100_000, simplifiedRegime: true, dependants: 0 });
+    const two = irpf({ grossAnnualIncome: 100_000, simplifiedRegime: true, dependants: 2 });
 
-    expect(two.irpfCalculado).toBe(none.irpfCalculado);
+    expect(two.calculatedTax).toBe(none.calculatedTax);
   });
 });
 
 describe("calculateIrpf — the Lei 15.270/2025 reduction", () => {
   it("zeroes the tax at and below R$ 60.000 under the simplified regime", () => {
-    for (const rendaBrutaAnual of [40_000, 59_999, 60_000]) {
-      expect(irpf({ rendaBrutaAnual, regimeSimplificado: true }).irpfDevido).toBe(0);
+    for (const grossAnnualIncome of [40_000, 59_999, 60_000]) {
+      expect(irpf({ grossAnnualIncome, simplifiedRegime: true }).taxDue).toBe(0);
     }
   });
 
   it("matches the statute's formula in the middle of the phase-out band", () => {
     // 8.429,73 − 0,095575 × 70.000 = 1.739,48
-    expect(irpf({ rendaBrutaAnual: 70_000 }).reducaoLei15270).toBeCloseTo(1739.48, 2);
+    expect(irpf({ grossAnnualIncome: 70_000 }).reductionLei15270).toBeCloseTo(1739.48, 2);
   });
 
   it("has phased out to nothing by R$ 88.200", () => {
-    const atLimit = irpf({ rendaBrutaAnual: 88_200 });
-    const above = irpf({ rendaBrutaAnual: 88_201 });
+    const atLimit = irpf({ grossAnnualIncome: 88_200 });
+    const above = irpf({ grossAnnualIncome: 88_201 });
 
-    expect(atLimit.reducaoLei15270).toBeLessThan(0.02);
-    expect(above.reducaoLei15270).toBe(0);
-    expect(above.irpfDevido).toBeCloseTo(above.irpfPelaTabela, 2);
+    expect(atLimit.reductionLei15270).toBeLessThan(0.02);
+    expect(above.reductionLei15270).toBe(0);
+    expect(above.taxDue).toBeCloseTo(above.taxFromTable, 2);
   });
 
   it("never reduces by more than the tax the table produced", () => {
-    for (let rendaBrutaAnual = 20_000; rendaBrutaAnual <= 120_000; rendaBrutaAnual += 500) {
-      const result = irpf({ rendaBrutaAnual });
+    for (let grossAnnualIncome = 20_000; grossAnnualIncome <= 120_000; grossAnnualIncome += 500) {
+      const result = irpf({ grossAnnualIncome });
 
-      expect(result.reducaoLei15270).toBeLessThanOrEqual(result.irpfPelaTabela + 1e-9);
-      expect(result.irpfDevido).toBeGreaterThanOrEqual(0);
+      expect(result.reductionLei15270).toBeLessThanOrEqual(result.taxFromTable + 1e-9);
+      expect(result.taxDue).toBeGreaterThanOrEqual(0);
     }
   });
 
   it("leaves the tax rising with income across the whole phase-out band", () => {
     let previous = -Infinity;
 
-    for (let rendaBrutaAnual = 55_000; rendaBrutaAnual <= 95_000; rendaBrutaAnual += 1) {
-      const tax = irpf({ rendaBrutaAnual, regimeSimplificado: true }).irpfDevido;
+    for (let grossAnnualIncome = 55_000; grossAnnualIncome <= 95_000; grossAnnualIncome += 1) {
+      const tax = irpf({ grossAnnualIncome, simplifiedRegime: true }).taxDue;
       expect(tax).toBeGreaterThanOrEqual(previous - 1e-9);
       previous = tax;
     }
@@ -311,31 +319,31 @@ describe("calculateIrpf — the Lei 15.270/2025 reduction", () => {
    * endorsement: see docs/research/2026-09-04-irpf-2026-table/research.md.
    */
   it("carries the statute's own R$ 1,08 step at R$ 60.000 under the itemised regime", () => {
-    const below = irpf({ rendaBrutaAnual: 60_000 });
-    const above = irpf({ rendaBrutaAnual: 60_000.01 });
+    const below = irpf({ grossAnnualIncome: 60_000 });
+    const above = irpf({ grossAnnualIncome: 60_000.01 });
 
-    expect(above.reducaoLei15270 - below.reducaoLei15270).toBeCloseTo(1.08, 2);
-    expect(below.irpfDevido - above.irpfDevido).toBeCloseTo(1.08, 2);
+    expect(above.reductionLei15270 - below.reductionLei15270).toBeCloseTo(1.08, 2);
+    expect(below.taxDue - above.taxDue).toBeCloseTo(1.08, 2);
   });
 });
 
 describe("calculateIrpf — degenerate input", () => {
   it("returns zeros for zero income without producing NaN", () => {
-    const result = irpf({ rendaBrutaAnual: 0 });
+    const result = irpf({ grossAnnualIncome: 0 });
 
-    expect(result.irpfCalculado).toBe(0);
-    expect(result.irpfDevido).toBe(0);
-    expect(result.aliquotaEfetiva).toBe(0);
-    expect(Number.isNaN(result.aliquotaEfetiva)).toBe(false);
+    expect(result.calculatedTax).toBe(0);
+    expect(result.taxDue).toBe(0);
+    expect(result.effectiveRate).toBe(0);
+    expect(Number.isNaN(result.effectiveRate)).toBe(false);
   });
 
   it("rejects negative income rather than returning a negative tax", () => {
-    expect(() => irpf({ rendaBrutaAnual: -1 })).toThrow(/income cannot be negative/i);
+    expect(() => irpf({ grossAnnualIncome: -1 })).toThrow(/income cannot be negative/i);
   });
 
   it("never returns a negative tax due", () => {
-    for (const rendaBrutaAnual of [0, 1, 10_000, 50_000, 250_000]) {
-      expect(irpf({ rendaBrutaAnual }).irpfDevido).toBeGreaterThanOrEqual(0);
+    for (const grossAnnualIncome of [0, 1, 10_000, 50_000, 250_000]) {
+      expect(irpf({ grossAnnualIncome }).taxDue).toBeGreaterThanOrEqual(0);
     }
   });
 });

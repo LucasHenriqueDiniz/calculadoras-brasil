@@ -8,6 +8,9 @@
  * the monthly incidence table and the monthly Lei 15.270/2025 reduction, both of
  * which differ from their annual counterparts by more than a factor of twelve.
  *
+ * Both axes meet here, so every field that could be read either way says which
+ * one it is. Where a name carries no axis, the doc comment above it does.
+ *
  * The rules themselves live in `irpf-constants.ts`, alongside their sources.
  */
 
@@ -22,79 +25,79 @@ import {
 } from "./irpf-constants";
 import { roundToCentavos } from "./money";
 
-export interface SalarioLiquidoInput {
-  salarioBrutoMensal: number;
+export interface NetSalaryInput {
+  monthlyGrossSalary: number;
   /** Annual amounts: they feed the annual deduction chain, not the monthly one. */
-  dependentes: number;
-  deducaoEducacao: number;
-  deducaoSaude: number;
-  deducaoPrevidenciaComplementar: number;
-  temValeRefeicao: boolean;
-  temValeTransporte: boolean;
-  temSindicato: boolean;
+  dependants: number;
+  educationDeduction: number;
+  healthDeduction: number;
+  supplementaryPensionDeduction: number;
+  hasMealAllowance: boolean;
+  hasTransportAllowance: boolean;
+  hasUnionDue: boolean;
   /**
    * Desconto simplificado instead of the itemised deductions above. It replaces
-   * every one of them, dependants included — see `calculateSalarioLiquido`.
+   * every one of them, dependants included — see `calculateNetSalary`.
    */
-  regimeSimplificado: boolean;
+  simplifiedRegime: boolean;
 }
 
-export interface SalarioLiquidoResult {
-  salarioBrutoMensal: number;
-  salarioBrutoAnual: number;
-  descInssEmpregado: number;
-  baseParaIrpf: number;
+export interface NetSalaryResult {
+  monthlyGrossSalary: number;
+  annualGrossSalary: number;
+  inssWithheld: number;
+  monthlyBaseAfterInss: number;
   /** Annual total of the three itemised deductions, after their caps and floors. */
-  totalDeducoes: number;
+  totalDeductions: number;
   /** Annual dependant allowance. Reported even under the simplified regime, where it does not apply. */
-  descDependentes: number;
+  dependantAllowance: number;
   /** Annual itemised assessable base. Not what the simplified regime taxes. */
-  baseImponivel: number;
+  annualAssessableBase: number;
   /** The monthly base actually taken to the table, whichever regime is in force. */
-  baseImponivelMensal: number;
+  monthlyAssessableBase: number;
   /** What the monthly table produces, before the Lei 15.270/2025 reduction. */
-  irpfPelaTabela: number;
+  taxFromTable: number;
   /** The monthly Lei 15.270/2025 reduction applied, never more than the tax due. */
-  reducaoLei15270: number;
-  descIrpfEstimado: number;
-  descSindicato: number;
-  descValeTransporte: number;
-  salarioLiquidoMensal: number;
-  salarioLiquidoAnual: number;
-  beneficiosNaoTributaveis: number;
-  rendimentoTotalMensal: number;
-  aliquotaEfetivaIrpf: number;
-  economia: {
-    comDependentes: number;
-    comDeducoes: number;
+  reductionLei15270: number;
+  estimatedIrpfWithheld: number;
+  unionDue: number;
+  transportAllowanceDeduction: number;
+  monthlyNetSalary: number;
+  annualNetSalary: number;
+  nonTaxableBenefits: number;
+  totalMonthlyIncome: number;
+  effectiveIrpfRate: number;
+  savings: {
+    fromDependants: number;
+    fromDeductions: number;
     total: number;
   };
 }
 
-export function calculateSalarioLiquido(input: SalarioLiquidoInput): SalarioLiquidoResult {
-  const salarioBrutoMensal = Math.max(input.salarioBrutoMensal, 0);
-  const salarioBrutoAnual = salarioBrutoMensal * 12;
+export function calculateNetSalary(input: NetSalaryInput): NetSalaryResult {
+  const monthlyGrossSalary = Math.max(input.monthlyGrossSalary, 0);
+  const annualGrossSalary = monthlyGrossSalary * 12;
 
   // 1. employee INSS: progressive per bracket and capped at the RGPS ceiling.
   //    Each rate applies only to the slice of the salary inside its bracket.
-  const descInssEmpregado = calculateEmployeeInss(salarioBrutoMensal);
+  const inssWithheld = calculateEmployeeInss(monthlyGrossSalary);
 
   // 2. IRPF base after INSS
-  const baseParaIrpf = salarioBrutoMensal - descInssEmpregado;
+  const monthlyBaseAfterInss = monthlyGrossSalary - inssWithheld;
 
   // 3. annual itemised deductions.
   //    Health is uncapped on purpose: no official ceiling was found for it.
-  const deducaoEducacao = Math.min(
-    Math.max(input.deducaoEducacao, 0),
+  const educationDeduction = Math.min(
+    Math.max(input.educationDeduction, 0),
     MAX_DEDUCTION_EDUCATION_ANNUAL,
   );
-  const deducaoSaude = Math.max(input.deducaoSaude, 0);
-  const deducaoPrevidenciaComplementar = Math.max(input.deducaoPrevidenciaComplementar, 0);
-  const totalDeducoes = deducaoEducacao + deducaoSaude + deducaoPrevidenciaComplementar;
+  const healthDeduction = Math.max(input.healthDeduction, 0);
+  const supplementaryPensionDeduction = Math.max(input.supplementaryPensionDeduction, 0);
+  const totalDeductions = educationDeduction + healthDeduction + supplementaryPensionDeduction;
 
-  const baseCalculoAnual = Math.max(baseParaIrpf * 12 - totalDeducoes, 0);
-  const descDependentes = Math.max(input.dependentes, 0) * DEDUCTION_PER_DEPENDENT_ANNUAL;
-  const baseImponivel = Math.max(baseCalculoAnual - descDependentes, 0);
+  const annualCalculationBase = Math.max(monthlyBaseAfterInss * 12 - totalDeductions, 0);
+  const dependantAllowance = Math.max(input.dependants, 0) * DEDUCTION_PER_DEPENDENT_ANNUAL;
+  const annualAssessableBase = Math.max(annualCalculationBase - dependantAllowance, 0);
 
   // 4. the monthly base the table is applied to.
   //
@@ -104,16 +107,16 @@ export function calculateSalarioLiquido(input: SalarioLiquidoInput): SalarioLiqu
   //    The Receita's own worked example confirms the shape: R$ 5.000,00 less the
   //    R$ 607,20 ceiling gives a base of R$ 4.392,80 — the gross less the ceiling,
   //    with no INSS taken off first.
-  const baseImponivelMensal = input.regimeSimplificado
+  const monthlyAssessableBase = input.simplifiedRegime
     ? Math.max(
-        salarioBrutoMensal -
+        monthlyGrossSalary -
           Math.min(
-            salarioBrutoMensal * SIMPLIFIED_DEDUCTION_RATE_MONTHLY,
+            monthlyGrossSalary * SIMPLIFIED_DEDUCTION_RATE_MONTHLY,
             MAX_SIMPLIFIED_DEDUCTION_MONTHLY,
           ),
         0,
       )
-    : baseImponivel / 12;
+    : annualAssessableBase / 12;
 
   // 5. monthly IRPF withheld: the table, then the reduction on top of it.
   //
@@ -123,57 +126,63 @@ export function calculateSalarioLiquido(input: SalarioLiquidoInput): SalarioLiqu
   //    yields 312,89000000000004 where the law says 312,89, the R$ 312,89 cap
   //    then fails to cover it, and a salary the statute declares exempt is
   //    withheld a sliver of tax.
-  const { rate, deduction } = findMonthlyTaxBracket(baseImponivelMensal);
-  const irpfPelaTabela = roundToCentavos(Math.max(baseImponivelMensal * rate - deduction, 0));
-  const reducaoLei15270 = roundToCentavos(
-    monthlyReductionLei15270(salarioBrutoMensal, irpfPelaTabela),
+  const { rate, deduction } = findMonthlyTaxBracket(monthlyAssessableBase);
+  const taxFromTable = roundToCentavos(Math.max(monthlyAssessableBase * rate - deduction, 0));
+  const reductionLei15270 = roundToCentavos(
+    monthlyReductionLei15270(monthlyGrossSalary, taxFromTable),
   );
-  const descIrpfEstimado = roundToCentavos(Math.max(irpfPelaTabela - reducaoLei15270, 0));
+  const estimatedIrpfWithheld = roundToCentavos(Math.max(taxFromTable - reductionLei15270, 0));
 
   // 6. union dues
-  const descSindicato = input.temSindicato ? salarioBrutoMensal * 0.0033 : 0; // roughly one hour of pay
+  const unionDue = input.hasUnionDue ? monthlyGrossSalary * 0.0033 : 0; // roughly one hour of pay
 
   // 7. transport allowance, deducted from the gross
-  const descValeTransporte = input.temValeTransporte ? Math.min(salarioBrutoMensal * 0.06, 250) : 0;
+  const transportAllowanceDeduction = input.hasTransportAllowance
+    ? Math.min(monthlyGrossSalary * 0.06, 250)
+    : 0;
 
   // 8. net salary
-  const salarioLiquidoMensal =
-    salarioBrutoMensal - descInssEmpregado - descIrpfEstimado - descSindicato - descValeTransporte;
+  const monthlyNetSalary =
+    monthlyGrossSalary -
+    inssWithheld -
+    estimatedIrpfWithheld -
+    unionDue -
+    transportAllowanceDeduction;
 
   // 9. non-taxable benefits
-  const beneficiosNaoTributaveis = input.temValeRefeicao ? 360 : 0; // roughly R$ 360/month in meal allowance
+  const nonTaxableBenefits = input.hasMealAllowance ? 360 : 0; // roughly R$ 360/month in meal allowance
 
   // 10. monthly share of what the itemised deductions took off the base.
   //     Zero under the simplified regime, where neither of them reduces anything.
-  const economiaComDependentes = input.regimeSimplificado ? 0 : descDependentes / 12;
-  const economiaComDeducoes = input.regimeSimplificado ? 0 : totalDeducoes / 12;
+  const savingsFromDependants = input.simplifiedRegime ? 0 : dependantAllowance / 12;
+  const savingsFromDeductions = input.simplifiedRegime ? 0 : totalDeductions / 12;
 
-  const aliquotaEfetivaIrpf =
-    salarioBrutoMensal > 0 ? (descIrpfEstimado / salarioBrutoMensal) * 100 : 0;
+  const effectiveIrpfRate =
+    monthlyGrossSalary > 0 ? (estimatedIrpfWithheld / monthlyGrossSalary) * 100 : 0;
 
   return {
-    salarioBrutoMensal,
-    salarioBrutoAnual,
-    descInssEmpregado,
-    baseParaIrpf,
-    totalDeducoes,
-    descDependentes,
-    baseImponivel,
-    baseImponivelMensal,
-    irpfPelaTabela,
-    reducaoLei15270,
-    descIrpfEstimado,
-    descSindicato,
-    descValeTransporte,
-    salarioLiquidoMensal,
-    salarioLiquidoAnual: salarioLiquidoMensal * 12,
-    beneficiosNaoTributaveis,
-    rendimentoTotalMensal: salarioLiquidoMensal + beneficiosNaoTributaveis,
-    aliquotaEfetivaIrpf,
-    economia: {
-      comDependentes: economiaComDependentes,
-      comDeducoes: economiaComDeducoes,
-      total: economiaComDependentes + economiaComDeducoes,
+    monthlyGrossSalary,
+    annualGrossSalary,
+    inssWithheld,
+    monthlyBaseAfterInss,
+    totalDeductions,
+    dependantAllowance,
+    annualAssessableBase,
+    monthlyAssessableBase,
+    taxFromTable,
+    reductionLei15270,
+    estimatedIrpfWithheld,
+    unionDue,
+    transportAllowanceDeduction,
+    monthlyNetSalary,
+    annualNetSalary: monthlyNetSalary * 12,
+    nonTaxableBenefits,
+    totalMonthlyIncome: monthlyNetSalary + nonTaxableBenefits,
+    effectiveIrpfRate,
+    savings: {
+      fromDependants: savingsFromDependants,
+      fromDeductions: savingsFromDeductions,
+      total: savingsFromDependants + savingsFromDeductions,
     },
   };
 }

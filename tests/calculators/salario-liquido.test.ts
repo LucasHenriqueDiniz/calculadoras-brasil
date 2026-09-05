@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  calculateSalarioLiquido,
-  type SalarioLiquidoInput,
-} from "../../src/lib/calculators/salarioLiquido";
+import { calculateNetSalary, type NetSalaryInput } from "../../src/lib/calculators/salarioLiquido";
 import { IRPF_MONTHLY_TABLE_2026 } from "../../src/lib/calculators/irpf-constants";
 import { calculateIrpf } from "../../src/lib/calculators/irpf";
 import { INSS_CEILING, calculateEmployeeInss } from "../../src/lib/calculators/inss-constants";
@@ -70,19 +67,19 @@ function publishedBracketProbes(): Array<{ base: number; rate: number }> {
   return probes;
 }
 
-const NO_DEDUCTIONS: Omit<SalarioLiquidoInput, "salarioBrutoMensal"> = {
-  dependentes: 0,
-  deducaoEducacao: 0,
-  deducaoSaude: 0,
-  deducaoPrevidenciaComplementar: 0,
-  temValeRefeicao: false,
-  temValeTransporte: false,
-  temSindicato: false,
-  regimeSimplificado: false,
+const NO_DEDUCTIONS: Omit<NetSalaryInput, "monthlyGrossSalary"> = {
+  dependants: 0,
+  educationDeduction: 0,
+  healthDeduction: 0,
+  supplementaryPensionDeduction: 0,
+  hasMealAllowance: false,
+  hasTransportAllowance: false,
+  hasUnionDue: false,
+  simplifiedRegime: false,
 };
 
-function salario(input: Partial<SalarioLiquidoInput> & { salarioBrutoMensal: number }) {
-  return calculateSalarioLiquido({ ...NO_DEDUCTIONS, ...input });
+function netSalary(input: Partial<NetSalaryInput> & { monthlyGrossSalary: number }) {
+  return calculateNetSalary({ ...NO_DEDUCTIONS, ...input });
 }
 
 /**
@@ -101,7 +98,7 @@ function grossForBase(base: number): number {
 
   for (let step = 0; step < 200; step += 1) {
     const middle = (low + high) / 2;
-    if (salario({ salarioBrutoMensal: middle }).baseImponivelMensal < base) {
+    if (netSalary({ monthlyGrossSalary: middle }).monthlyAssessableBase < base) {
       low = middle;
     } else {
       high = middle;
@@ -114,71 +111,71 @@ function grossForBase(base: number): number {
 /**
  * The tax the TABLE produces, before the Lei 15.270/2025 reduction.
  *
- * ⚠️ Deliberately not `descIrpfEstimado`. The reduction zeroes the withholding
+ * ⚠️ Deliberately not `estimatedIrpfWithheld`. The reduction zeroes the withholding
  * below R$ 5.000 of gross salary, and every bracket boundary here sits under
  * that — so asserting continuity on the final figure would compare 0 to 0 at
  * every boundary and pass while proving nothing.
  */
 function taxAtBase(base: number): number {
-  return salario({ salarioBrutoMensal: grossForBase(base) }).irpfPelaTabela;
+  return netSalary({ monthlyGrossSalary: grossForBase(base) }).taxFromTable;
 }
 
-describe("calculateSalarioLiquido — the ordinary case", () => {
+describe("calculateNetSalary — the ordinary case", () => {
   /**
    * One salary, the whole breakdown. Every figure below was produced by running
    * the module, but each is reachable by hand from the published 2026 tables,
    * which is what makes it an assertion rather than a snapshot.
    */
-  const result = salario({
-    salarioBrutoMensal: 6000,
-    dependentes: 1,
-    deducaoEducacao: 3000,
-    deducaoSaude: 1200,
-    deducaoPrevidenciaComplementar: 2400,
+  const result = netSalary({
+    monthlyGrossSalary: 6000,
+    dependants: 1,
+    educationDeduction: 3000,
+    healthDeduction: 1200,
+    supplementaryPensionDeduction: 2400,
   });
 
   it("withholds the progressive INSS contribution", () => {
-    expect(result.descInssEmpregado).toBeCloseTo(641.51, 2);
-    expect(result.baseParaIrpf).toBeCloseTo(5358.49, 2);
+    expect(result.inssWithheld).toBeCloseTo(641.51, 2);
+    expect(result.monthlyBaseAfterInss).toBeCloseTo(5358.49, 2);
   });
 
   it("sums the annual itemised deductions and the dependant allowance", () => {
-    expect(result.totalDeducoes).toBeCloseTo(3000 + 1200 + 2400, 2);
-    expect(result.descDependentes).toBeCloseTo(2275.08, 2);
-    expect(result.baseImponivel).toBeCloseTo(55426.75, 2);
+    expect(result.totalDeductions).toBeCloseTo(3000 + 1200 + 2400, 2);
+    expect(result.dependantAllowance).toBeCloseTo(2275.08, 2);
+    expect(result.annualAssessableBase).toBeCloseTo(55426.75, 2);
   });
 
   it("taxes the monthly share of that base, then applies the reduction", () => {
-    expect(result.baseImponivelMensal).toBeCloseTo(4618.9, 2);
-    expect(result.irpfPelaTabela).toBeCloseTo(363.76, 2);
-    expect(result.reducaoLei15270).toBeCloseTo(179.75, 2);
-    expect(result.descIrpfEstimado).toBeCloseTo(184.01, 2);
+    expect(result.monthlyAssessableBase).toBeCloseTo(4618.9, 2);
+    expect(result.taxFromTable).toBeCloseTo(363.76, 2);
+    expect(result.reductionLei15270).toBeCloseTo(179.75, 2);
+    expect(result.estimatedIrpfWithheld).toBeCloseTo(184.01, 2);
   });
 
   it("arrives at the net salary and the effective rate", () => {
     // 6.000,00 gross, less 641,5144 of INSS and 184,01 of IRPF.
-    expect(result.salarioLiquidoMensal).toBeCloseTo(5174.4756, 4);
-    expect(result.salarioLiquidoAnual).toBeCloseTo(5174.4756 * 12, 4);
-    expect(result.aliquotaEfetivaIrpf).toBeCloseTo(3.0668, 4);
+    expect(result.monthlyNetSalary).toBeCloseTo(5174.4756, 4);
+    expect(result.annualNetSalary).toBeCloseTo(5174.4756 * 12, 4);
+    expect(result.effectiveIrpfRate).toBeCloseTo(3.0668, 4);
   });
 
   it("reports the monthly share of what the deductions took off the base", () => {
-    expect(result.economia.comDependentes).toBeCloseTo(189.59, 2);
-    expect(result.economia.comDeducoes).toBeCloseTo(550, 2);
-    expect(result.economia.total).toBeCloseTo(739.59, 2);
+    expect(result.savings.fromDependants).toBeCloseTo(189.59, 2);
+    expect(result.savings.fromDeductions).toBeCloseTo(550, 2);
+    expect(result.savings.total).toBeCloseTo(739.59, 2);
   });
 });
 
-describe("calculateSalarioLiquido — INSS", () => {
+describe("calculateNetSalary — INSS", () => {
   it("stops at the RGPS ceiling instead of scaling with the salary", () => {
     const ceilingContribution = calculateEmployeeInss(INSS_CEILING);
 
     expect(ceilingContribution).toBeCloseTo(988.09, 2);
-    expect(salario({ salarioBrutoMensal: INSS_CEILING }).descInssEmpregado).toBeCloseTo(
+    expect(netSalary({ monthlyGrossSalary: INSS_CEILING }).inssWithheld).toBeCloseTo(
       ceilingContribution,
       2,
     );
-    expect(salario({ salarioBrutoMensal: 50_000 }).descInssEmpregado).toBeCloseTo(
+    expect(netSalary({ monthlyGrossSalary: 50_000 }).inssWithheld).toBeCloseTo(
       ceilingContribution,
       2,
     );
@@ -194,13 +191,13 @@ describe("calculateSalarioLiquido — INSS", () => {
    * = `121,575 + 115,3656 + 131,6592` = R$ 368,5998.
    */
   it("charges each bracket only on the slice of the salary inside it", () => {
-    expect(salario({ salarioBrutoMensal: 4000 }).descInssEmpregado).toBeCloseTo(368.5998, 4);
+    expect(netSalary({ monthlyGrossSalary: 4000 }).inssWithheld).toBeCloseTo(368.5998, 4);
     // A cumulative reading of the same table would take 12% of the whole salary.
-    expect(salario({ salarioBrutoMensal: 4000 }).descInssEmpregado).not.toBeCloseTo(480, 2);
+    expect(netSalary({ monthlyGrossSalary: 4000 }).inssWithheld).not.toBeCloseTo(480, 2);
   });
 });
 
-describe("calculateSalarioLiquido — the monthly table is the published one", () => {
+describe("calculateNetSalary — the monthly table is the published one", () => {
   /**
    * The assertion the rest of this file rests on. Bound for bound and parcel for
    * parcel against the publication, because continuity and monotonicity are
@@ -216,7 +213,7 @@ describe("calculateSalarioLiquido — the monthly table is the published one", (
    * actually reaches, and that each base lands in the bracket the publication
    * puts it in.
    *
-   * Asserted on `irpfPelaTabela` for the reason `taxAtBase` records: the final
+   * Asserted on `taxFromTable` for the reason `taxAtBase` records: the final
    * withholding is flattened to zero across this whole range by the reduction, so
    * a wrong parcel or a moved boundary leaves no trace in it.
    */
@@ -276,24 +273,24 @@ describe("calculateSalarioLiquido — the monthly table is the published one", (
    * less. Swept across the whole band where the table and the reduction interact.
    */
   it.each([false, true])(
-    "leaves the net salary rising with the gross (regimeSimplificado=%s)",
-    (regimeSimplificado) => {
+    "leaves the net salary rising with the gross (simplifiedRegime=%s)",
+    (simplifiedRegime) => {
       let previousNet = -Infinity;
       let previousTax = -Infinity;
 
-      for (let salarioBrutoMensal = 0; salarioBrutoMensal <= 12_000; salarioBrutoMensal += 0.25) {
-        const result = salario({ salarioBrutoMensal, regimeSimplificado });
+      for (let monthlyGrossSalary = 0; monthlyGrossSalary <= 12_000; monthlyGrossSalary += 0.25) {
+        const result = netSalary({ monthlyGrossSalary, simplifiedRegime });
 
-        expect(result.descIrpfEstimado).toBeGreaterThanOrEqual(previousTax);
-        expect(result.salarioLiquidoMensal).toBeGreaterThanOrEqual(previousNet);
-        previousTax = result.descIrpfEstimado;
-        previousNet = result.salarioLiquidoMensal;
+        expect(result.estimatedIrpfWithheld).toBeGreaterThanOrEqual(previousTax);
+        expect(result.monthlyNetSalary).toBeGreaterThanOrEqual(previousNet);
+        previousTax = result.estimatedIrpfWithheld;
+        previousNet = result.monthlyNetSalary;
       }
     },
   );
 });
 
-describe("calculateSalarioLiquido — the Lei 15.270/2025 reduction", () => {
+describe("calculateNetSalary — the Lei 15.270/2025 reduction", () => {
   /**
    * The worked example in
    * docs/research/2026-09-04-irpf-2026-table/research.md, Findings §4: a gross of
@@ -302,12 +299,12 @@ describe("calculateSalarioLiquido — the Lei 15.270/2025 reduction", () => {
    * statute grants in its first band, so the withholding is zero by construction.
    */
   it("reproduces the statute's own first-band figure at R$ 5.000", () => {
-    const result = salario({ salarioBrutoMensal: 5000, regimeSimplificado: true });
+    const result = netSalary({ monthlyGrossSalary: 5000, simplifiedRegime: true });
 
-    expect(result.baseImponivelMensal).toBeCloseTo(4392.8, 2);
-    expect(result.irpfPelaTabela).toBeCloseTo(312.89, 2);
-    expect(result.reducaoLei15270).toBeCloseTo(312.89, 2);
-    expect(result.descIrpfEstimado).toBe(0);
+    expect(result.monthlyAssessableBase).toBeCloseTo(4392.8, 2);
+    expect(result.taxFromTable).toBeCloseTo(312.89, 2);
+    expect(result.reductionLei15270).toBeCloseTo(312.89, 2);
+    expect(result.estimatedIrpfWithheld).toBe(0);
   });
 
   /**
@@ -319,37 +316,37 @@ describe("calculateSalarioLiquido — the Lei 15.270/2025 reduction", () => {
    * kind of error that is invisible without a case that pins the difference.
    */
   it("applies the phase-out coefficient to the gross salary, not to the base", () => {
-    const result = salario({ salarioBrutoMensal: 6000 });
+    const result = netSalary({ monthlyGrossSalary: 6000 });
 
-    expect(result.reducaoLei15270).toBeCloseTo(179.75, 2);
-    expect(result.reducaoLei15270).not.toBeCloseTo(
-      978.62 - 0.133145 * result.baseImponivelMensal,
+    expect(result.reductionLei15270).toBeCloseTo(179.75, 2);
+    expect(result.reductionLei15270).not.toBeCloseTo(
+      978.62 - 0.133145 * result.monthlyAssessableBase,
       2,
     );
   });
 
   it("exempts an ordinary salary that the old annual table charged for", () => {
     // Before the fix this salary was withheld R$ 189,90 a month.
-    expect(salario({ salarioBrutoMensal: 4000 }).descIrpfEstimado).toBe(0);
-    expect(salario({ salarioBrutoMensal: 3000 }).descIrpfEstimado).toBe(0);
-    expect(salario({ salarioBrutoMensal: 2500 }).descIrpfEstimado).toBe(0);
+    expect(netSalary({ monthlyGrossSalary: 4000 }).estimatedIrpfWithheld).toBe(0);
+    expect(netSalary({ monthlyGrossSalary: 3000 }).estimatedIrpfWithheld).toBe(0);
+    expect(netSalary({ monthlyGrossSalary: 2500 }).estimatedIrpfWithheld).toBe(0);
   });
 
   it("has phased out to nothing by R$ 7.350", () => {
-    expect(salario({ salarioBrutoMensal: 7350 }).reducaoLei15270).toBeLessThan(0.01);
-    expect(salario({ salarioBrutoMensal: 7351 }).reducaoLei15270).toBe(0);
+    expect(netSalary({ monthlyGrossSalary: 7350 }).reductionLei15270).toBeLessThan(0.01);
+    expect(netSalary({ monthlyGrossSalary: 7351 }).reductionLei15270).toBe(0);
 
-    const above = salario({ salarioBrutoMensal: 9000 });
-    expect(above.reducaoLei15270).toBe(0);
-    expect(above.descIrpfEstimado).toBeCloseTo(above.irpfPelaTabela, 6);
+    const above = netSalary({ monthlyGrossSalary: 9000 });
+    expect(above.reductionLei15270).toBe(0);
+    expect(above.estimatedIrpfWithheld).toBeCloseTo(above.taxFromTable, 6);
   });
 
   it("never reduces by more than the tax the table produced", () => {
-    for (let salarioBrutoMensal = 1000; salarioBrutoMensal <= 12_000; salarioBrutoMensal += 50) {
-      const result = salario({ salarioBrutoMensal });
+    for (let monthlyGrossSalary = 1000; monthlyGrossSalary <= 12_000; monthlyGrossSalary += 50) {
+      const result = netSalary({ monthlyGrossSalary });
 
-      expect(result.reducaoLei15270).toBeLessThanOrEqual(result.irpfPelaTabela + 1e-9);
-      expect(result.descIrpfEstimado).toBeGreaterThanOrEqual(0);
+      expect(result.reductionLei15270).toBeLessThanOrEqual(result.taxFromTable + 1e-9);
+      expect(result.estimatedIrpfWithheld).toBeGreaterThanOrEqual(0);
     }
   });
 
@@ -367,41 +364,43 @@ describe("calculateSalarioLiquido — the Lei 15.270/2025 reduction", () => {
    * drifted, the step would grow past the rounding and show up here.
    */
   it("keeps the statute's own band-boundary step below the centavo at R$ 5.000", () => {
-    const below = salario({ salarioBrutoMensal: 5000 });
-    const above = salario({ salarioBrutoMensal: 5000.01 });
+    const below = netSalary({ monthlyGrossSalary: 5000 });
+    const above = netSalary({ monthlyGrossSalary: 5000.01 });
 
-    expect(above.reducaoLei15270).toBe(below.reducaoLei15270);
-    expect(above.descIrpfEstimado).toBe(below.descIrpfEstimado);
+    expect(above.reductionLei15270).toBe(below.reductionLei15270);
+    expect(above.estimatedIrpfWithheld).toBe(below.estimatedIrpfWithheld);
   });
 });
 
-describe("calculateSalarioLiquido — dependants and itemised deductions", () => {
+describe("calculateNetSalary — dependants and itemised deductions", () => {
   it("deducts the 2026 annual allowance per dependant, uncapped in count", () => {
-    expect(salario({ salarioBrutoMensal: 8000, dependentes: 0 }).descDependentes).toBe(0);
-    expect(salario({ salarioBrutoMensal: 8000, dependentes: 1 }).descDependentes).toBeCloseTo(
+    expect(netSalary({ monthlyGrossSalary: 8000, dependants: 0 }).dependantAllowance).toBe(0);
+    expect(netSalary({ monthlyGrossSalary: 8000, dependants: 1 }).dependantAllowance).toBeCloseTo(
       2275.08,
       2,
     );
-    expect(salario({ salarioBrutoMensal: 8000, dependentes: 3 }).descDependentes).toBeCloseTo(
+    expect(netSalary({ monthlyGrossSalary: 8000, dependants: 3 }).dependantAllowance).toBeCloseTo(
       6825.24,
       2,
     );
   });
 
   it("lowers the withholding as dependants are added", () => {
-    const none = salario({ salarioBrutoMensal: 8000, dependentes: 0 }).descIrpfEstimado;
-    const one = salario({ salarioBrutoMensal: 8000, dependentes: 1 }).descIrpfEstimado;
-    const three = salario({ salarioBrutoMensal: 8000, dependentes: 3 }).descIrpfEstimado;
+    const none = netSalary({ monthlyGrossSalary: 8000, dependants: 0 }).estimatedIrpfWithheld;
+    const one = netSalary({ monthlyGrossSalary: 8000, dependants: 1 }).estimatedIrpfWithheld;
+    const three = netSalary({ monthlyGrossSalary: 8000, dependants: 3 }).estimatedIrpfWithheld;
 
     expect(one).toBeLessThan(none);
     expect(three).toBeLessThan(one);
   });
 
   it("caps education at the documented annual limit", () => {
-    expect(salario({ salarioBrutoMensal: 8000, deducaoEducacao: 1000 }).totalDeducoes).toBe(1000);
-    expect(salario({ salarioBrutoMensal: 8000, deducaoEducacao: 99_999 }).totalDeducoes).toBe(
-      3561.5,
+    expect(netSalary({ monthlyGrossSalary: 8000, educationDeduction: 1000 }).totalDeductions).toBe(
+      1000,
     );
+    expect(
+      netSalary({ monthlyGrossSalary: 8000, educationDeduction: 99_999 }).totalDeductions,
+    ).toBe(3561.5);
   });
 
   /**
@@ -410,44 +409,46 @@ describe("calculateSalarioLiquido — dependants and itemised deductions", () =>
    * invent one.
    */
   it("does not cap health expenses", () => {
-    expect(salario({ salarioBrutoMensal: 8000, deducaoSaude: 40_000 }).totalDeducoes).toBe(40_000);
+    expect(netSalary({ monthlyGrossSalary: 8000, healthDeduction: 40_000 }).totalDeductions).toBe(
+      40_000,
+    );
   });
 
   it("floors every deduction at zero rather than letting one raise the tax", () => {
-    const result = salario({
-      salarioBrutoMensal: 8000,
-      deducaoEducacao: -1000,
-      deducaoSaude: -1000,
-      deducaoPrevidenciaComplementar: -1000,
-      dependentes: -2,
+    const result = netSalary({
+      monthlyGrossSalary: 8000,
+      educationDeduction: -1000,
+      healthDeduction: -1000,
+      supplementaryPensionDeduction: -1000,
+      dependants: -2,
     });
 
-    expect(result.totalDeducoes).toBe(0);
-    expect(result.descDependentes).toBe(0);
-    expect(result.descIrpfEstimado).toBeCloseTo(
-      salario({ salarioBrutoMensal: 8000 }).descIrpfEstimado,
+    expect(result.totalDeductions).toBe(0);
+    expect(result.dependantAllowance).toBe(0);
+    expect(result.estimatedIrpfWithheld).toBeCloseTo(
+      netSalary({ monthlyGrossSalary: 8000 }).estimatedIrpfWithheld,
       6,
     );
   });
 
   it("never drives the calculation base below zero", () => {
-    const result = salario({
-      salarioBrutoMensal: 3000,
-      deducaoPrevidenciaComplementar: 999_999,
+    const result = netSalary({
+      monthlyGrossSalary: 3000,
+      supplementaryPensionDeduction: 999_999,
     });
 
-    expect(result.baseImponivel).toBe(0);
-    expect(result.baseImponivelMensal).toBe(0);
-    expect(result.descIrpfEstimado).toBe(0);
+    expect(result.annualAssessableBase).toBe(0);
+    expect(result.monthlyAssessableBase).toBe(0);
+    expect(result.estimatedIrpfWithheld).toBe(0);
   });
 });
 
-describe("calculateSalarioLiquido — the two regimes", () => {
+describe("calculateNetSalary — the two regimes", () => {
   it("discounts exactly 20% of the gross where the monthly ceiling does not bind", () => {
     // 20% of R$ 3.000 is R$ 600, just under the R$ 607,20 monthly ceiling.
-    const result = salario({ salarioBrutoMensal: 3000, regimeSimplificado: true });
+    const result = netSalary({ monthlyGrossSalary: 3000, simplifiedRegime: true });
 
-    expect(3000 - result.baseImponivelMensal).toBeCloseTo(600, 2);
+    expect(3000 - result.monthlyAssessableBase).toBeCloseTo(600, 2);
   });
 
   /**
@@ -467,24 +468,24 @@ describe("calculateSalarioLiquido — the two regimes", () => {
    * it. If an edit moves the rate or the ceiling apart, the inference stops being
    * free and this fails.
    *
-   * (They do differ in `baseImponivelMensal` below R$ 3.036 — R$ 800,00 against
+   * (They do differ in `monthlyAssessableBase` below R$ 3.036 — R$ 800,00 against
    * R$ 392,80 at a gross of R$ 1.000 — which is why the pin is on the tax.)
    */
   it("withholds what a flat R$ 607,20 reading of the ceiling would", () => {
-    for (let salarioBrutoMensal = 0; salarioBrutoMensal <= 8000; salarioBrutoMensal += 6.25) {
-      const result = salario({ salarioBrutoMensal, regimeSimplificado: true });
-      const flatCeilingReading = officialTableTax(Math.max(salarioBrutoMensal - 607.2, 0));
+    for (let monthlyGrossSalary = 0; monthlyGrossSalary <= 8000; monthlyGrossSalary += 6.25) {
+      const result = netSalary({ monthlyGrossSalary, simplifiedRegime: true });
+      const flatCeilingReading = officialTableTax(Math.max(monthlyGrossSalary - 607.2, 0));
 
-      expect(result.irpfPelaTabela, `gross R$ ${salarioBrutoMensal}`).toBe(flatCeilingReading);
+      expect(result.taxFromTable, `gross R$ ${monthlyGrossSalary}`).toBe(flatCeilingReading);
     }
   });
 
   it("caps the simplified discount instead of scaling it without limit", () => {
-    const modest = salario({ salarioBrutoMensal: 8000, regimeSimplificado: true });
-    const large = salario({ salarioBrutoMensal: 40_000, regimeSimplificado: true });
+    const modest = netSalary({ monthlyGrossSalary: 8000, simplifiedRegime: true });
+    const large = netSalary({ monthlyGrossSalary: 40_000, simplifiedRegime: true });
 
-    expect(8000 - modest.baseImponivelMensal).toBeCloseTo(607.2, 2);
-    expect(40_000 - large.baseImponivelMensal).toBeCloseTo(607.2, 2);
+    expect(8000 - modest.monthlyAssessableBase).toBeCloseTo(607.2, 2);
+    expect(40_000 - large.monthlyAssessableBase).toBeCloseTo(607.2, 2);
   });
 
   /**
@@ -493,88 +494,89 @@ describe("calculateSalarioLiquido — the two regimes", () => {
    * See docs/research/2026-09-04-irpf-2026-table/research.md, Findings §5.
    */
   it("ignores dependants and itemised deductions under the simplified regime", () => {
-    const bare = salario({ salarioBrutoMensal: 15_000, regimeSimplificado: true });
-    const loaded = salario({
-      salarioBrutoMensal: 15_000,
-      regimeSimplificado: true,
-      dependentes: 3,
-      deducaoEducacao: 3000,
-      deducaoSaude: 10_000,
-      deducaoPrevidenciaComplementar: 20_000,
+    const bare = netSalary({ monthlyGrossSalary: 15_000, simplifiedRegime: true });
+    const loaded = netSalary({
+      monthlyGrossSalary: 15_000,
+      simplifiedRegime: true,
+      dependants: 3,
+      educationDeduction: 3000,
+      healthDeduction: 10_000,
+      supplementaryPensionDeduction: 20_000,
     });
 
-    expect(loaded.descIrpfEstimado).toBe(bare.descIrpfEstimado);
+    expect(loaded.estimatedIrpfWithheld).toBe(bare.estimatedIrpfWithheld);
     // Still reported, so the page can explain what the regime gave up.
-    expect(loaded.descDependentes).toBeCloseTo(6825.24, 2);
-    expect(loaded.totalDeducoes).toBeCloseTo(33_000, 2);
+    expect(loaded.dependantAllowance).toBeCloseTo(6825.24, 2);
+    expect(loaded.totalDeductions).toBeCloseTo(33_000, 2);
     // …but claiming a saving from deductions that changed nothing would be a lie.
-    expect(loaded.economia.total).toBe(0);
+    expect(loaded.savings.total).toBe(0);
   });
 
   it("computes a finite withholding under either regime", () => {
-    for (const salarioBrutoMensal of [0, 1621, 5000, 15_000, 50_000]) {
-      for (const regimeSimplificado of [false, true]) {
-        const result = salario({ salarioBrutoMensal, regimeSimplificado });
+    for (const monthlyGrossSalary of [0, 1621, 5000, 15_000, 50_000]) {
+      for (const simplifiedRegime of [false, true]) {
+        const result = netSalary({ monthlyGrossSalary, simplifiedRegime });
 
-        expect(Number.isFinite(result.descIrpfEstimado)).toBe(true);
-        expect(result.descIrpfEstimado).toBeGreaterThanOrEqual(0);
+        expect(Number.isFinite(result.estimatedIrpfWithheld)).toBe(true);
+        expect(result.estimatedIrpfWithheld).toBeGreaterThanOrEqual(0);
       }
     }
   });
 });
 
-describe("calculateSalarioLiquido — benefits and other deductions", () => {
-  const salarioBrutoMensal = 5000;
-  const plain = salario({ salarioBrutoMensal });
+describe("calculateNetSalary — benefits and other deductions", () => {
+  const monthlyGrossSalary = 5000;
+  const plain = netSalary({ monthlyGrossSalary });
 
   it("adds the meal allowance outside the taxable salary", () => {
-    const result = salario({ salarioBrutoMensal, temValeRefeicao: true });
+    const result = netSalary({ monthlyGrossSalary, hasMealAllowance: true });
 
-    expect(result.beneficiosNaoTributaveis).toBe(360);
-    expect(result.salarioLiquidoMensal).toBeCloseTo(plain.salarioLiquidoMensal, 6);
-    expect(result.rendimentoTotalMensal).toBeCloseTo(plain.salarioLiquidoMensal + 360, 6);
+    expect(result.nonTaxableBenefits).toBe(360);
+    expect(result.monthlyNetSalary).toBeCloseTo(plain.monthlyNetSalary, 6);
+    expect(result.totalMonthlyIncome).toBeCloseTo(plain.monthlyNetSalary + 360, 6);
   });
 
   it("takes the transport allowance off the net, capped", () => {
-    const result = salario({ salarioBrutoMensal, temValeTransporte: true });
+    const result = netSalary({ monthlyGrossSalary, hasTransportAllowance: true });
 
-    expect(result.descValeTransporte).toBe(250); // 6% of 5.000 is 300, above the cap
-    expect(salario({ salarioBrutoMensal: 3000, temValeTransporte: true }).descValeTransporte).toBe(
-      180,
-    );
-    expect(result.beneficiosNaoTributaveis).toBe(0);
-    expect(result.salarioLiquidoMensal).toBeCloseTo(plain.salarioLiquidoMensal - 250, 6);
+    expect(result.transportAllowanceDeduction).toBe(250); // 6% of 5.000 is 300, above the cap
+    expect(
+      netSalary({ monthlyGrossSalary: 3000, hasTransportAllowance: true })
+        .transportAllowanceDeduction,
+    ).toBe(180);
+    expect(result.nonTaxableBenefits).toBe(0);
+    expect(result.monthlyNetSalary).toBeCloseTo(plain.monthlyNetSalary - 250, 6);
   });
 
   it("takes the union due off the net", () => {
-    const result = salario({ salarioBrutoMensal, temSindicato: true });
+    const result = netSalary({ monthlyGrossSalary, hasUnionDue: true });
 
-    expect(result.descSindicato).toBeCloseTo(16.5, 2);
-    expect(result.descValeTransporte).toBe(0);
-    expect(result.beneficiosNaoTributaveis).toBe(0);
-    expect(result.salarioLiquidoMensal).toBeCloseTo(plain.salarioLiquidoMensal - 16.5, 2);
+    expect(result.unionDue).toBeCloseTo(16.5, 2);
+    expect(result.transportAllowanceDeduction).toBe(0);
+    expect(result.nonTaxableBenefits).toBe(0);
+    expect(result.monthlyNetSalary).toBeCloseTo(plain.monthlyNetSalary - 16.5, 2);
   });
 
   it("leaves all three off when none is selected", () => {
-    expect(plain.beneficiosNaoTributaveis).toBe(0);
-    expect(plain.descValeTransporte).toBe(0);
-    expect(plain.descSindicato).toBe(0);
+    expect(plain.nonTaxableBenefits).toBe(0);
+    expect(plain.transportAllowanceDeduction).toBe(0);
+    expect(plain.unionDue).toBe(0);
   });
 
   it("does not let any benefit change the tax", () => {
-    const all = salario({
-      salarioBrutoMensal,
-      temValeRefeicao: true,
-      temValeTransporte: true,
-      temSindicato: true,
+    const all = netSalary({
+      monthlyGrossSalary,
+      hasMealAllowance: true,
+      hasTransportAllowance: true,
+      hasUnionDue: true,
     });
 
-    expect(all.descIrpfEstimado).toBeCloseTo(plain.descIrpfEstimado, 6);
-    expect(all.descInssEmpregado).toBeCloseTo(plain.descInssEmpregado, 6);
+    expect(all.estimatedIrpfWithheld).toBeCloseTo(plain.estimatedIrpfWithheld, 6);
+    expect(all.inssWithheld).toBeCloseTo(plain.inssWithheld, 6);
   });
 });
 
-describe("calculateSalarioLiquido — agrees with calculateIrpf on the table and the deductions", () => {
+describe("calculateNetSalary — agrees with calculateIrpf on the table and the deductions", () => {
   /**
    * The two modules implement the same 2026 table and the same deduction chain on
    * the same inputs. This is the case that catches those two copies drifting
@@ -594,36 +596,36 @@ describe("calculateSalarioLiquido — agrees with calculateIrpf on the table and
    * that disagreement is a product decision, not something a test should settle.
    */
   const shared = {
-    dependentes: 2,
-    deducaoEducacao: 4000,
-    deducaoSaude: 2000,
-    deducaoPrevidenciaComplementar: 1000,
+    dependants: 2,
+    educationDeduction: 4000,
+    healthDeduction: 2000,
+    supplementaryPensionDeduction: 1000,
   };
-  const rendaBrutaAnual = 100_000;
+  const grossAnnualIncome = 100_000;
 
-  const monthly = salario({ ...shared, salarioBrutoMensal: rendaBrutaAnual / 12 });
-  const annual = calculateIrpf({ ...shared, rendaBrutaAnual, regimeSimplificado: false });
+  const monthly = netSalary({ ...shared, monthlyGrossSalary: grossAnnualIncome / 12 });
+  const annual = calculateIrpf({ ...shared, grossAnnualIncome, simplifiedRegime: false });
 
   it("caps education and totals the deductions identically", () => {
-    expect(monthly.totalDeducoes).toBeCloseTo(annual.totalDeducoes, 6);
+    expect(monthly.totalDeductions).toBeCloseTo(annual.totalDeductions, 6);
   });
 
   it("allows the same dependant amount", () => {
-    expect(monthly.descDependentes).toBeCloseTo(annual.descDependentes, 6);
+    expect(monthly.dependantAllowance).toBeCloseTo(annual.dependantAllowance, 6);
   });
 
   it("withholds the same INSS over a year", () => {
-    expect(monthly.descInssEmpregado * 12).toBeCloseTo(annual.descInss, 6);
+    expect(monthly.inssWithheld * 12).toBeCloseTo(annual.inssWithheld, 6);
   });
 
   it("reaches the same annual assessable base", () => {
-    expect(monthly.baseImponivel).toBeCloseTo(annual.baseImponivel, 6);
+    expect(monthly.annualAssessableBase).toBeCloseTo(annual.assessableBase, 6);
   });
 
   /** Keeps this comparison honest about which half of the legislation it reaches. */
   it("sits above both phase-outs, so neither reduction is in play", () => {
-    expect(monthly.reducaoLei15270).toBe(0);
-    expect(annual.reducaoLei15270).toBe(0);
+    expect(monthly.reductionLei15270).toBe(0);
+    expect(annual.reductionLei15270).toBe(0);
   });
 
   /**
@@ -634,13 +636,13 @@ describe("calculateSalarioLiquido — agrees with calculateIrpf on the table and
    * at R$ 0,16.
    */
   it("produces the same tax over a year, to within the parcels' own rounding", () => {
-    expect(monthly.irpfPelaTabela * 12).toBeCloseTo(annual.irpfPelaTabela, 0);
+    expect(monthly.taxFromTable * 12).toBeCloseTo(annual.taxFromTable, 0);
   });
 });
 
-describe("calculateSalarioLiquido — degenerate input", () => {
+describe("calculateNetSalary — degenerate input", () => {
   it("returns zeros for a zero salary without producing NaN", () => {
-    const result = salario({ salarioBrutoMensal: 0 });
+    const result = netSalary({ monthlyGrossSalary: 0 });
 
     for (const [field, value] of Object.entries(result)) {
       if (typeof value === "number") {
@@ -649,18 +651,18 @@ describe("calculateSalarioLiquido — degenerate input", () => {
       }
     }
 
-    expect(result.economia).toEqual({ comDependentes: 0, comDeducoes: 0, total: 0 });
+    expect(result.savings).toEqual({ fromDependants: 0, fromDeductions: 0, total: 0 });
   });
 
   it("clamps a negative salary to zero rather than paying the worker tax back", () => {
-    const result = salario({ salarioBrutoMensal: -5000 });
+    const result = netSalary({ monthlyGrossSalary: -5000 });
 
-    expect(result.salarioBrutoMensal).toBe(0);
-    expect(result.salarioLiquidoMensal).toBe(0);
-    expect(result.descIrpfEstimado).toBe(0);
+    expect(result.monthlyGrossSalary).toBe(0);
+    expect(result.monthlyNetSalary).toBe(0);
+    expect(result.estimatedIrpfWithheld).toBe(0);
   });
 
   it("reports a zero effective rate at a zero salary instead of dividing by zero", () => {
-    expect(salario({ salarioBrutoMensal: 0 }).aliquotaEfetivaIrpf).toBe(0);
+    expect(netSalary({ monthlyGrossSalary: 0 }).effectiveIrpfRate).toBe(0);
   });
 });

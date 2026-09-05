@@ -85,9 +85,10 @@ export const MAX_SIMPLIFIED_DEDUCTION_ANNUAL = 17640.0;
  * subtract the same R$ 607,20. They can never produce a different withholding.
  * They do differ in `baseImponivelMensal` below R$ 3.036 — at a gross of
  * R$ 1.000 this reading gives R$ 800,00 and the flat one R$ 392,80 — but no
- * route renders that field. The equivalence is pinned in
- * tests/calculators/salario-liquido.test.ts, so an edit that moves the rate or
- * the ceiling apart fails there instead of shipping.
+ * route renders that field. The equivalence is pinned by the net-salary
+ * calculator's own suite, in the case named "withholds what a flat R$ 607,20
+ * reading of the ceiling would", so an edit that moves the rate or the ceiling
+ * apart fails there instead of shipping.
  */
 export const SIMPLIFIED_DEDUCTION_RATE_MONTHLY = 0.2;
 

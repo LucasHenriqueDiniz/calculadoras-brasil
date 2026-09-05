@@ -27,12 +27,12 @@ const PAGE_DESCRIPTION =
   "Calcule seu IRPF 2026 de forma fácil. Inclua dependentes, deduções com educação e saúde, e veja o efeito da redução que isenta quem recebe até R$ 5.000 por mês.";
 
 const DEFAULTS: IrpfInput = {
-  rendaBrutaAnual: 48000,
-  dependentes: 0,
-  deducaoEducacao: 0,
-  deducaoSaude: 0,
-  deducaoPrevidenciaComplementar: 0,
-  regimeSimplificado: false,
+  grossAnnualIncome: 48000,
+  dependants: 0,
+  educationDeduction: 0,
+  healthDeduction: 0,
+  supplementaryPensionDeduction: 0,
+  simplifiedRegime: false,
 };
 
 const FAQ: FAQItem[] = [
@@ -136,7 +136,7 @@ export const Route = createFileRoute("/calculadora-irpf-2026")({
 });
 
 function IrpfCalculator() {
-  const [input, setInput] = usePersistedState<IrpfInput>("irpf-2026-input", DEFAULTS);
+  const [input, setInput] = usePersistedState<IrpfInput>("irpf-2026-input-v2", DEFAULTS);
   const result = useMemo(() => calculateIrpf(input), [input]);
 
   const handleReset = () => setInput(DEFAULTS);
@@ -153,15 +153,15 @@ function IrpfCalculator() {
         <CurrencyInput
           label="Renda bruta anual"
           placeholder="Salário + 13º + bônus + rendimentos"
-          value={input.rendaBrutaAnual}
-          onChange={(value) => setInput({ ...input, rendaBrutaAnual: value })}
+          value={input.grossAnnualIncome}
+          onChange={(value) => setInput({ ...input, grossAnnualIncome: value })}
           hint="Valor total que você recebe por ano (antes de descontos)"
         />
         <NumberInput
           label="Número de dependentes"
           placeholder="0"
-          value={input.dependentes}
-          onChange={(value) => setInput({ ...input, dependentes: value })}
+          value={input.dependants}
+          onChange={(value) => setInput({ ...input, dependants: value })}
           min={0}
           max={10}
           hint="Cônjuge, filhos até 21 anos (ou 24 se estudante), pais e irmãos menores"
@@ -172,22 +172,22 @@ function IrpfCalculator() {
         <CurrencyInput
           label="Gastos com educação (anual)"
           placeholder="Escola, universidade, material"
-          value={input.deducaoEducacao}
-          onChange={(value) => setInput({ ...input, deducaoEducacao: value })}
+          value={input.educationDeduction}
+          onChange={(value) => setInput({ ...input, educationDeduction: value })}
           hint={`Até ${formatBRL(3561.5)}/ano. Inclua sua educação e de dependentes.`}
         />
         <CurrencyInput
           label="Gastos com saúde (anual)"
           placeholder="Consultas, exames, medicamentos, plano"
-          value={input.deducaoSaude}
-          onChange={(value) => setInput({ ...input, deducaoSaude: value })}
+          value={input.healthDeduction}
+          onChange={(value) => setInput({ ...input, healthDeduction: value })}
           hint="Sem limite legal. Mantenha comprovantes."
         />
         <CurrencyInput
           label="Contribuição previdência complementar (anual)"
           placeholder="PGBL, VGBL, fundo de pensão"
-          value={input.deducaoPrevidenciaComplementar}
-          onChange={(value) => setInput({ ...input, deducaoPrevidenciaComplementar: value })}
+          value={input.supplementaryPensionDeduction}
+          onChange={(value) => setInput({ ...input, supplementaryPensionDeduction: value })}
           hint={`Até ${formatBRL(63454)}/ano (13% da renda bruta).`}
         />
       </FormSection>
@@ -198,8 +198,8 @@ function IrpfCalculator() {
       >
         <SelectField
           label="Regime de tributação"
-          value={input.regimeSimplificado ? "simplificado" : "completo"}
-          onChange={(value) => setInput({ ...input, regimeSimplificado: value === "simplificado" })}
+          value={input.simplifiedRegime ? "simplificado" : "completo"}
+          onChange={(value) => setInput({ ...input, simplifiedRegime: value === "simplificado" })}
           options={[
             {
               label: "Regime Completo (deduções reais)",
@@ -216,18 +216,18 @@ function IrpfCalculator() {
 
       <ResultSummaryCard
         title="Seu IRPF 2026"
-        mainValue={formatBRL(result.irpfCalculado)}
-        mainLabel={result.irpfCalculado > 0 ? "Você deve pagar" : "Nada a pagar"}
-        secondaryValue={`Alíquota efetiva: ${result.aliquotaEfetiva.toFixed(2)}%`}
+        mainValue={formatBRL(result.calculatedTax)}
+        mainLabel={result.calculatedTax > 0 ? "Você deve pagar" : "Nada a pagar"}
+        secondaryValue={`Alíquota efetiva: ${result.effectiveRate.toFixed(2)}%`}
         secondaryLabel="Do seu rendimento total"
-        resultColor={result.irpfCalculado > 0 ? "negative" : "positive"}
+        resultColor={result.calculatedTax > 0 ? "negative" : "positive"}
       />
 
       <WarningList
         items={[
-          `Alíquota marginal: ${result.aliquotaMarginal}`,
-          `Renda bruta anual: ${formatBRL(result.rendaBrutaAnual)}`,
-          `Desconto INSS (aprox.): ${formatBRL(result.descInss)}`,
+          `Alíquota marginal: ${result.marginalRate}`,
+          `Renda bruta anual: ${formatBRL(result.grossAnnualIncome)}`,
+          `Desconto INSS (aprox.): ${formatBRL(result.inssWithheld)}`,
         ]}
       />
 
@@ -236,70 +236,70 @@ function IrpfCalculator() {
         items={[
           {
             label: "Renda bruta anual",
-            value: formatBRL(result.rendaBrutaAnual),
+            value: formatBRL(result.grossAnnualIncome),
           },
           // The simplified regime replaces every other deduction — INSS, dependants
           // and the itemised three. Listing them under it would show a chain that
           // does not produce the tax printed below it.
-          ...(input.regimeSimplificado
+          ...(input.simplifiedRegime
             ? [
                 {
                   label: "Desconto simplificado",
-                  value: `- ${formatBRL(result.rendaBrutaAnual - result.baseCalculoSimplificada)}`,
+                  value: `- ${formatBRL(result.grossAnnualIncome - result.simplifiedCalculationBase)}`,
                   subtext: "20% da renda bruta, até R$ 17.640,00 — no lugar de todas as deduções",
                 },
                 {
                   label: "Base de cálculo",
-                  value: formatBRL(result.baseCalculoSimplificada),
+                  value: formatBRL(result.simplifiedCalculationBase),
                 },
               ]
             : [
                 {
                   label: "Desconto INSS",
-                  value: `- ${formatBRL(result.descInss)}`,
+                  value: `- ${formatBRL(result.inssWithheld)}`,
                   subtext: "Faixas progressivas, limitado ao teto do RGPS",
                 },
                 {
                   label: "Base após INSS",
-                  value: formatBRL(result.rendaBrutaAnual - result.descInss),
+                  value: formatBRL(result.grossAnnualIncome - result.inssWithheld),
                 },
                 {
                   label: "Deduções (educação, saúde, previdência)",
-                  value: `- ${formatBRL(result.totalDeducoes)}`,
-                  subtext: `Educação: ${formatBRL(result.deducaoEducacao)} | Saúde: ${formatBRL(
-                    result.deducaoSaude,
-                  )} | Previdência: ${formatBRL(result.deducaoPrevidenciaComplementar)}`,
+                  value: `- ${formatBRL(result.totalDeductions)}`,
+                  subtext: `Educação: ${formatBRL(result.educationDeduction)} | Saúde: ${formatBRL(
+                    result.healthDeduction,
+                  )} | Previdência: ${formatBRL(result.supplementaryPensionDeduction)}`,
                 },
                 {
                   label: "Base de cálculo",
-                  value: formatBRL(result.baseCalculoCompleta),
+                  value: formatBRL(result.fullCalculationBase),
                 },
                 {
-                  label: `Desconto por ${input.dependentes} dependente(s)`,
-                  value: `- ${formatBRL(result.descDependentes)}`,
+                  label: `Desconto por ${input.dependants} dependente(s)`,
+                  value: `- ${formatBRL(result.dependantAllowance)}`,
                   subtext: `R$ 2.275,08 por dependente`,
                 },
                 {
                   label: "Base imponível",
-                  value: formatBRL(result.baseImponivel),
+                  value: formatBRL(result.assessableBase),
                 },
               ]),
           {
             label: "IRPF pela tabela",
-            value: formatBRL(result.irpfPelaTabela),
+            value: formatBRL(result.taxFromTable),
           },
-          ...(result.reducaoLei15270 > 0
+          ...(result.reductionLei15270 > 0
             ? [
                 {
                   label: "Redução (Lei 15.270/2025)",
-                  value: `- ${formatBRL(result.reducaoLei15270)}`,
+                  value: `- ${formatBRL(result.reductionLei15270)}`,
                   subtext: "Isenção efetiva para quem recebe até R$ 5.000 por mês",
                 },
               ]
             : []),
           {
             label: "IRPF devido",
-            value: formatBRL(result.irpfCalculado),
+            value: formatBRL(result.calculatedTax),
             isFinal: true,
           },
         ]}
@@ -333,12 +333,12 @@ function IrpfCalculator() {
       </DisclaimerBox>
 
       <div className="flex gap-2">
-        <CopyResultButton value={`IRPF 2026: ${formatBRL(result.irpfCalculado)}`} />
+        <CopyResultButton value={`IRPF 2026: ${formatBRL(result.calculatedTax)}`} />
         <ShareResultButton
           title="Meu IRPF 2026"
           text={`Calculei meu IRPF 2026 em ${formatBRL(
-            result.irpfCalculado,
-          )} (alíquota efetiva: ${result.aliquotaEfetiva.toFixed(2)}%)`}
+            result.calculatedTax,
+          )} (alíquota efetiva: ${result.effectiveRate.toFixed(2)}%)`}
         />
         <ResetButton onClick={handleReset} />
       </div>

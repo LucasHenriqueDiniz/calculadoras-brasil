@@ -8,10 +8,7 @@ import { FAQSection, type FAQItem } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { Prose } from "@/components/layout/PageShell";
 import { formatBRL } from "@/lib/format";
-import {
-  calculateSalarioLiquido,
-  type SalarioLiquidoInput,
-} from "@/lib/calculators/salarioLiquido";
+import { calculateNetSalary, type NetSalaryInput } from "@/lib/calculators/salarioLiquido";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
@@ -20,16 +17,16 @@ const PAGE_TITLE = "Calculadora de Salário Líquido 2026";
 const PAGE_DESCRIPTION =
   "Descubra quanto você realmente recebe. Calcule seu salário líquido descontando IRPF, INSS, sindicato e outros descontos automáticos.";
 
-const DEFAULTS: SalarioLiquidoInput = {
-  salarioBrutoMensal: 5000,
-  dependentes: 0,
-  deducaoEducacao: 0,
-  deducaoSaude: 0,
-  deducaoPrevidenciaComplementar: 0,
-  temValeRefeicao: false,
-  temValeTransporte: false,
-  temSindicato: false,
-  regimeSimplificado: false,
+const DEFAULTS: NetSalaryInput = {
+  monthlyGrossSalary: 5000,
+  dependants: 0,
+  educationDeduction: 0,
+  healthDeduction: 0,
+  supplementaryPensionDeduction: 0,
+  hasMealAllowance: false,
+  hasTransportAllowance: false,
+  hasUnionDue: false,
+  simplifiedRegime: false,
 };
 
 const FAQ: FAQItem[] = [
@@ -98,11 +95,8 @@ export const Route = createFileRoute("/calculadora-salario-liquido")({
 });
 
 function SalarioLiquidoCalculator() {
-  const [input, setInput] = usePersistedState<SalarioLiquidoInput>(
-    "salario-liquido-input",
-    DEFAULTS,
-  );
-  const result = useMemo(() => calculateSalarioLiquido(input), [input]);
+  const [input, setInput] = usePersistedState<NetSalaryInput>("salario-liquido-input-v2", DEFAULTS);
+  const result = useMemo(() => calculateNetSalary(input), [input]);
 
   const handleReset = () => setInput(DEFAULTS);
 
@@ -118,15 +112,15 @@ function SalarioLiquidoCalculator() {
         <CurrencyInput
           label="Salário bruto mensal"
           placeholder="Ex: 5000"
-          value={input.salarioBrutoMensal}
-          onChange={(value) => setInput({ ...input, salarioBrutoMensal: value })}
+          value={input.monthlyGrossSalary}
+          onChange={(value) => setInput({ ...input, monthlyGrossSalary: value })}
           hint="Valor antes de qualquer desconto"
         />
         <NumberInput
           label="Número de dependentes"
           placeholder="0"
-          value={input.dependentes}
-          onChange={(value) => setInput({ ...input, dependentes: value })}
+          value={input.dependants}
+          onChange={(value) => setInput({ ...input, dependants: value })}
           min={0}
           max={10}
           hint="Filhos até 21 anos (ou 24 se estudante), cônjuge, pais"
@@ -140,22 +134,22 @@ function SalarioLiquidoCalculator() {
         <CurrencyInput
           label="Gastos mensais com educação"
           placeholder="0"
-          value={input.deducaoEducacao}
-          onChange={(value) => setInput({ ...input, deducaoEducacao: value })}
+          value={input.educationDeduction}
+          onChange={(value) => setInput({ ...input, educationDeduction: value })}
           hint="Sua educação ou de dependentes (limite: R$ 3.561,50/ano)"
         />
         <CurrencyInput
           label="Gastos mensais com saúde"
           placeholder="0"
-          value={input.deducaoSaude}
-          onChange={(value) => setInput({ ...input, deducaoSaude: value })}
+          value={input.healthDeduction}
+          onChange={(value) => setInput({ ...input, healthDeduction: value })}
           hint="Médico, dentista, medicamentos, plano de saúde (sem limite)"
         />
         <CurrencyInput
           label="Previdência complementar mensal"
           placeholder="0"
-          value={input.deducaoPrevidenciaComplementar}
-          onChange={(value) => setInput({ ...input, deducaoPrevidenciaComplementar: value })}
+          value={input.supplementaryPensionDeduction}
+          onChange={(value) => setInput({ ...input, supplementaryPensionDeduction: value })}
           hint="PGBL, VGBL, fundo de pensão (limite: ~13% da renda bruta)"
         />
       </FormSection>
@@ -168,8 +162,8 @@ function SalarioLiquidoCalculator() {
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              checked={input.temValeRefeicao}
-              onChange={(e) => setInput({ ...input, temValeRefeicao: e.target.checked })}
+              checked={input.hasMealAllowance}
+              onChange={(e) => setInput({ ...input, hasMealAllowance: e.target.checked })}
               className="h-4 w-4"
             />
             <span>Tenho vale refeição (~R$ 360/mês)</span>
@@ -177,8 +171,8 @@ function SalarioLiquidoCalculator() {
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              checked={input.temValeTransporte}
-              onChange={(e) => setInput({ ...input, temValeTransporte: e.target.checked })}
+              checked={input.hasTransportAllowance}
+              onChange={(e) => setInput({ ...input, hasTransportAllowance: e.target.checked })}
               className="h-4 w-4"
             />
             <span>Tenho vale transporte (até 6% do salário)</span>
@@ -186,8 +180,8 @@ function SalarioLiquidoCalculator() {
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              checked={input.temSindicato}
-              onChange={(e) => setInput({ ...input, temSindicato: e.target.checked })}
+              checked={input.hasUnionDue}
+              onChange={(e) => setInput({ ...input, hasUnionDue: e.target.checked })}
               className="h-4 w-4"
             />
             <span>Desconto de sindicato (~1 hora/mês)</span>
@@ -197,15 +191,15 @@ function SalarioLiquidoCalculator() {
 
       <ResultSummaryCard
         title="Seu Salário Líquido"
-        mainValue={formatBRL(result.salarioLiquidoMensal)}
+        mainValue={formatBRL(result.monthlyNetSalary)}
         mainLabel="Salário líquido mensal"
         secondaryValue={
-          result.beneficiosNaoTributaveis > 0
-            ? formatBRL(result.rendimentoTotalMensal)
-            : `${result.aliquotaEfetivaIrpf.toFixed(2)}%`
+          result.nonTaxableBenefits > 0
+            ? formatBRL(result.totalMonthlyIncome)
+            : `${result.effectiveIrpfRate.toFixed(2)}%`
         }
         secondaryLabel={
-          result.beneficiosNaoTributaveis > 0
+          result.nonTaxableBenefits > 0
             ? "Total com benefícios não tributáveis"
             : "Alíquota efetiva de IRPF"
         }
@@ -217,40 +211,42 @@ function SalarioLiquidoCalculator() {
         items={[
           {
             label: "Salário bruto",
-            value: formatBRL(result.salarioBrutoMensal),
+            value: formatBRL(result.monthlyGrossSalary),
           },
           {
             label: "Desconto INSS (7,5% a 14%)",
-            value: `- ${formatBRL(result.descInssEmpregado)}`,
+            value: `- ${formatBRL(result.inssWithheld)}`,
             subtext: "Contribuição para seguridade social",
           },
           {
             label: "Desconto IRPF (retenção)",
-            value: `- ${formatBRL(result.descIrpfEstimado)}`,
-            subtext: `Alíquota efetiva: ${result.aliquotaEfetivaIrpf.toFixed(1)}%`,
+            value: `- ${formatBRL(result.estimatedIrpfWithheld)}`,
+            subtext: `Alíquota efetiva: ${result.effectiveIrpfRate.toFixed(1)}%`,
           },
           {
             label: "Desconto sindicato",
-            value: result.descSindicato > 0 ? `- ${formatBRL(result.descSindicato)}` : "R$ 0",
+            value: result.unionDue > 0 ? `- ${formatBRL(result.unionDue)}` : "R$ 0",
           },
           {
             label: "Desconto vale transporte",
             value:
-              result.descValeTransporte > 0 ? `- ${formatBRL(result.descValeTransporte)}` : "R$ 0",
+              result.transportAllowanceDeduction > 0
+                ? `- ${formatBRL(result.transportAllowanceDeduction)}`
+                : "R$ 0",
           },
           {
             label: "Salário líquido",
-            value: formatBRL(result.salarioLiquidoMensal),
+            value: formatBRL(result.monthlyNetSalary),
             isFinal: true,
           },
           {
             label: "Benefícios não tributáveis (vale refeição)",
-            value: formatBRL(result.beneficiosNaoTributaveis),
+            value: formatBRL(result.nonTaxableBenefits),
             subtext: "Não entra no imposto de renda",
           },
           {
             label: "Ganho total mensal",
-            value: formatBRL(result.rendimentoTotalMensal),
+            value: formatBRL(result.totalMonthlyIncome),
             isFinal: true,
           },
         ]}
@@ -280,10 +276,10 @@ function SalarioLiquidoCalculator() {
       </DisclaimerBox>
 
       <div className="flex gap-2">
-        <CopyResultButton value={`Salário líquido: ${formatBRL(result.salarioLiquidoMensal)}`} />
+        <CopyResultButton value={`Salário líquido: ${formatBRL(result.monthlyNetSalary)}`} />
         <ShareResultButton
           title="Meu salário líquido 2026"
-          text={`Calculei que meu salário líquido é ${formatBRL(result.salarioLiquidoMensal)} (bruto de ${formatBRL(result.salarioBrutoMensal)})`}
+          text={`Calculei que meu salário líquido é ${formatBRL(result.monthlyNetSalary)} (bruto de ${formatBRL(result.monthlyGrossSalary)})`}
         />
         <ResetButton onClick={handleReset} />
       </div>
