@@ -263,6 +263,35 @@ The violations that exist right now.
       Plan: `docs/plans/oversized-functions/`.
 - [ ] **Portuguese identifiers in the domain.** See Divergences.
       Plan: `docs/plans/english-domain-identifiers/`.
+- [ ] **`/calculadora-clt-vs-pj` argues against its own result.** The FAQ says it is common to need
+      "entre 25% e 40% a mais como PJ"; the page above it renders **79%**. Both the FAQ and the
+      disclaimer also invoke the Simples Nacional, which the module does not model at all — it
+      applies the monthly IRPF table plus a flat 20% contribution and a 5% fee. `INSS_RATE_PJ` is
+      uncapped, so a R$ 60.000 invoice is charged R$ 12.000: that is the largest remaining error in
+      `pjNecessaria` and it biases every verdict toward CLT. No source in
+      `docs/research/2026-09-04-irpf-2026-table/research.md` covers pró-labore contributions, so
+      this needs its own research note before either the copy or the model is changed.
+- [ ] **Monthly withholding and the annual adjustment diverge, and no page says so.** For a
+      R$ 6.000 salary `/calculadora-salario-liquido` implies R$ 4.621/year of tax while
+      `/calculadora-irpf-2026` says R$ 5.230. Traced: the tables agree to 14 centavos and the whole
+      gap is the reduction (monthly 179,75 × 12 = 2.157,00 against the annual 1.548,33). Both are
+      correct at their own endpoints — it is genuine statutory divergence, the ajuste anual. A
+      visitor comparing the two pages just sees two numbers. One sentence of copy on each page.
+- [ ] **`/calculadora-salario-liquido` labels annual inputs as monthly.** The fields read "Gastos
+      **mensais** com educação/saúde" and "Previdência complementar **mensal**", and the module
+      consumes them as annual amounts — a 12x error for anyone who fills them. The education hint
+      contradicts its own label in one line: "Gastos mensais… (limite: R$ 3.561,50/**ano**)".
+      Pre-existing, and entangled with the open question of whether those deductions belong in a
+      monthly withholding at all (in law they belong to the annual adjustment).
+- [ ] **Result fields nothing renders.** `cltVsPj.detalhesClt`/`detalhesPj`,
+      `salarioLiquido.irpfPelaTabela`/`reducaoLei15270`/`baseImponivelMensal`,
+      `previdencia.projecao`/`rendimentoTotal`. Two whole input paths are unreachable from the UI
+      too: `CltVsPjInput.dependentes` and `SalarioLiquidoInput.regimeSimplificado` — the latter is
+      a branch this work built, tested and justified for a path no route can reach. Each wants a
+      decision: render it or remove it.
+- [ ] **`previdenciaComplementar` headlines a saving from a rate the visitor cannot set.**
+      `aliquotaIrpfAtual` is hardcoded at 22,5% with no control, yet "Economia IRPF/ano" is shown
+      as though it were the visitor's own figure.
 - [ ] **`ADSENSE-CHECKLIST.md` sits at the repo root**, dated 2026-06-26 with 3 of 7 fixes still
       open. It is a roadmap document living outside `docs/`, and it has not moved in two months.
 - [ ] **No test covers the two adapters.** `aneel.ts` and `anp.ts` parse third-party formats — an
