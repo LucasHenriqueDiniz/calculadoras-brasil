@@ -148,3 +148,10 @@ than assumed: the change was stashed, the same dev server reloaded on `HEAD`, an
 error appeared with the same ids differing the same way. Root cause is `nextId()` using
 `Date.now()` inside a module-scope constant. Recorded in `ARCHITECTURE.md`; not fixed here, because
 a determinism bug is not a refactor and this slice must stay provable on its own.
+
+⚠️ **Correction, later the same day.** The hydration failure recorded above is a **dev-server
+artifact**, not a production bug, and the `nextId()`/`Date.now()` cause given for it was wrong.
+Measured: `<main>`, `<header>` and `<footer>` are byte-identical between SSR and client on a static
+page that also fails; the divergence is in `<head>`, and the divergent element is TanStack Start's
+`data-tanstack-router-dev-styles` link, which does not exist in a production build. The deployed
+preview reports no console error on any page checked. Full trail in `ARCHITECTURE.md`.

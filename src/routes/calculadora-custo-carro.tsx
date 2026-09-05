@@ -23,8 +23,14 @@ import { PublicDataField } from "@/components/public-data/PublicDataField";
 import { Button } from "@/components/ui/button";
 import { getCalculator } from "@/data/calculators";
 import { formatBRL, parseBRNumber } from "@/lib/format";
-import { calculateCarCost, type CarCostInput, type FuelType } from "@/lib/calculators/carCost";
+import {
+  calculateCarCost,
+  type CarCostInput,
+  type CarCostResult,
+  type FuelType,
+} from "@/lib/calculators/carCost";
 import { getFuelPrice } from "@/lib/public-data/client";
+import type { FuelPriceData, PublicDataUnavailable } from "@/lib/public-data/types";
 import { BRAZILIAN_STATES } from "@/lib/public-data/states";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
@@ -79,10 +85,11 @@ const EMPTY_PUBLIC_FIELD: PublicFieldState = {
 const FUEL_REQUESTS: Array<{
   key: FuelPriceKey;
   apiFuel: "gasolina" | "etanol" | "diesel";
+  label: string;
 }> = [
-  { key: "gasolinePrice", apiFuel: "gasolina" },
-  { key: "ethanolPrice", apiFuel: "etanol" },
-  { key: "dieselPrice", apiFuel: "diesel" },
+  { key: "gasolinePrice", apiFuel: "gasolina", label: "Preço da gasolina por litro" },
+  { key: "ethanolPrice", apiFuel: "etanol", label: "Preço do etanol por litro" },
+  { key: "dieselPrice", apiFuel: "diesel", label: "Preço do diesel por litro" },
 ];
 
 const FUEL_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -121,6 +128,147 @@ function writeFuelCache(uf: string, fuel: string, value: CachedFuelPrice) {
   } catch {
     /* localStorage may be unavailable */
   }
+}
+
+type FuelFields = Record<FuelPriceKey, PublicFieldState>;
+
+function emptyFuelFields(): FuelFields {
+  return {
+    gasolinePrice: { ...EMPTY_PUBLIC_FIELD },
+    ethanolPrice: { ...EMPTY_PUBLIC_FIELD },
+    dieselPrice: { ...EMPTY_PUBLIC_FIELD },
+  };
+}
+
+function fieldFromPrice(data: FuelPriceData): Omit<PublicFieldState, "isLoading"> {
+  return {
+    isManual: false,
+    sourceName: data.source,
+    sourceLastUpdated: data.lastUpdated,
+    sourceUrl: data.sourceUrl,
+    sourcePeriod: data.period,
+    isStale: data.isStale,
+    error: null,
+  };
+}
+
+function fieldFromUnavailable(
+  previous: PublicFieldState,
+  data: PublicDataUnavailable,
+): PublicFieldState {
+  return {
+    ...previous,
+    isLoading: false,
+    isManual: true,
+    sourceName: data.source,
+    sourceLastUpdated: data.lastUpdated,
+    sourceUrl:
+      "sourceUrl" in data && typeof data.sourceUrl === "string" ? data.sourceUrl : undefined,
+    isStale: data.isStale ?? false,
+    error: data.notes ?? data.error ?? "Preço público indisponível.",
+  };
+}
+
+function fieldFromNetworkError(previous: PublicFieldState): PublicFieldState {
+  return {
+    ...previous,
+    isLoading: false,
+    isManual: true,
+    error: "Não foi possível consultar a ANP agora.",
+  };
+}
+
+/**
+ * Owns the ANP fuel-price lookup for the page: the per-fuel field states, the
+ * 24h localStorage cache in front of the adapter, and the reload triggered when
+ * the state or the fuel type changes. The UF and the fuel type are arguments
+ * because they live in the page's persisted form state; the loaded price is
+ * handed back through `onPriceLoaded` rather than written here.
+ */
+function useFuelPrices(
+  uf: string,
+  fuelType: FuelType,
+  onPriceLoaded: (key: FuelPriceKey, price: number) => void,
+) {
+  const [fuelFields, setFuelFields] = useState<FuelFields>(emptyFuelFields);
+  const activeFuelRequests = useMemo(() => fuelRequestsFor(fuelType), [fuelType]);
+
+  function patchField(key: FuelPriceKey, next: (previous: PublicFieldState) => PublicFieldState) {
+    setFuelFields((prev) => ({ ...prev, [key]: next(prev[key]) }));
+  }
+
+  /** Serves whatever the cache already holds and returns the requests still needing the network. */
+  function serveFromCache(requests: FuelRequest[]): FuelRequest[] {
+    return requests.filter(({ key, apiFuel }) => {
+      const cached = readFuelCache(uf, apiFuel);
+      if (!cached) return true;
+
+      onPriceLoaded(key, cached.averagePrice);
+      patchField(key, () => ({ ...cached.field, isLoading: false }));
+      return false;
+    });
+  }
+
+  async function fetchPrice({ key, apiFuel }: FuelRequest) {
+    try {
+      const data = await getFuelPrice(uf, apiFuel);
+      if (!data.available) {
+        patchField(key, (previous) => fieldFromUnavailable(previous, data));
+        return;
+      }
+
+      onPriceLoaded(key, data.averagePrice);
+      const field = fieldFromPrice(data);
+      writeFuelCache(uf, apiFuel, {
+        averagePrice: data.averagePrice,
+        field,
+        cachedAt: Date.now(),
+      });
+      patchField(key, () => ({ ...field, isLoading: false }));
+    } catch {
+      patchField(key, fieldFromNetworkError);
+    }
+  }
+
+  async function loadFuelPrices(requests = activeFuelRequests) {
+    const pending = serveFromCache(requests);
+    if (pending.length === 0) return;
+
+    setFuelFields((prev) => ({
+      ...prev,
+      ...Object.fromEntries(
+        pending.map(({ key }) => [key, { ...prev[key], isLoading: true, error: null }]),
+      ),
+    }));
+
+    await Promise.all(pending.map((request) => fetchPrice(request)));
+  }
+
+  useEffect(() => {
+    void loadFuelPrices(activeFuelRequests);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uf, fuelType]);
+
+  function markFuelManual(key: FuelPriceKey) {
+    patchField(key, (previous) => ({
+      ...previous,
+      isLoading: false,
+      isManual: true,
+      error: null,
+    }));
+  }
+
+  function resetFuelFields() {
+    setFuelFields(emptyFuelFields());
+  }
+
+  return {
+    fuelFields,
+    activeFuelRequests,
+    loadFuelPrices,
+    markFuelManual,
+    resetFuelFields,
+  };
 }
 
 const FAQ: FAQItem[] = [
@@ -219,301 +367,108 @@ function CarCostPage() {
     DEFAULTS,
   );
   const [uf, setUf] = usePersistedState("calculadoras-brasil:custo-carro:uf:v1", "SP");
-  const [fuelFields, setFuelFields] = useState<Record<FuelPriceKey, PublicFieldState>>({
-    gasolinePrice: { ...EMPTY_PUBLIC_FIELD },
-    ethanolPrice: { ...EMPTY_PUBLIC_FIELD },
-    dieselPrice: { ...EMPTY_PUBLIC_FIELD },
-  });
-  const result = useMemo(() => calculateCarCost(input), [input]);
-  const activeFuelRequests = useMemo(() => fuelRequestsFor(input.fuelType), [input.fuelType]);
 
   function update<K extends keyof CarCostInput>(key: K, value: CarCostInput[K]) {
     setInput((prev) => ({ ...prev, [key]: value }));
   }
 
+  const fuelPrices = useFuelPrices(uf, input.fuelType, (key, price) => update(key, price));
+  const result = useMemo(() => calculateCarCost(input), [input]);
+
   function updateFuelManually(key: FuelPriceKey, value: string) {
     update(key, parseBRNumber(value));
-    setFuelFields((prev) => ({
-      ...prev,
-      [key]: {
-        ...prev[key],
-        isLoading: false,
-        isManual: true,
-        error: null,
-      },
-    }));
-  }
-
-  async function loadFuelPrices(requests = activeFuelRequests) {
-    const cachedRequests = requests.filter(({ key, apiFuel }) => {
-      const cached = readFuelCache(uf, apiFuel);
-      if (!cached) return true;
-
-      update(key, cached.averagePrice);
-      setFuelFields((prev) => ({
-        ...prev,
-        [key]: {
-          ...cached.field,
-          isLoading: false,
-        },
-      }));
-      return false;
-    });
-
-    if (cachedRequests.length === 0) return;
-
-    setFuelFields((prev) => ({
-      ...prev,
-      ...Object.fromEntries(
-        cachedRequests.map(({ key }) => [key, { ...prev[key], isLoading: true, error: null }]),
-      ),
-    }));
-
-    await Promise.all(
-      cachedRequests.map(async ({ key, apiFuel }) => {
-        try {
-          const data = await getFuelPrice(uf, apiFuel);
-          if (!data.available) {
-            setFuelFields((prev) => ({
-              ...prev,
-              [key]: {
-                ...prev[key],
-                isLoading: false,
-                isManual: true,
-                sourceName: data.source,
-                sourceLastUpdated: data.lastUpdated,
-                sourceUrl:
-                  "sourceUrl" in data && typeof data.sourceUrl === "string"
-                    ? data.sourceUrl
-                    : undefined,
-                isStale: data.isStale ?? false,
-                error: data.notes ?? data.error ?? "Preço público indisponível.",
-              },
-            }));
-            return;
-          }
-
-          update(key, data.averagePrice);
-          const nextField: Omit<PublicFieldState, "isLoading"> = {
-            isManual: false,
-            sourceName: data.source,
-            sourceLastUpdated: data.lastUpdated,
-            sourceUrl: data.sourceUrl,
-            sourcePeriod: data.period,
-            isStale: data.isStale,
-            error: null,
-          };
-          writeFuelCache(uf, apiFuel, {
-            averagePrice: data.averagePrice,
-            field: nextField,
-            cachedAt: Date.now(),
-          });
-          setFuelFields((prev) => ({
-            ...prev,
-            [key]: {
-              ...nextField,
-              isLoading: false,
-            },
-          }));
-        } catch {
-          setFuelFields((prev) => ({
-            ...prev,
-            [key]: {
-              ...prev[key],
-              isLoading: false,
-              isManual: true,
-              error: "Não foi possível consultar a ANP agora.",
-            },
-          }));
-        }
-      }),
-    );
+    fuelPrices.markFuelManual(key);
   }
 
   function reset() {
     setInput(DEFAULTS);
     setUf("SP");
-    setFuelFields({
-      gasolinePrice: { ...EMPTY_PUBLIC_FIELD },
-      ethanolPrice: { ...EMPTY_PUBLIC_FIELD },
-      dieselPrice: { ...EMPTY_PUBLIC_FIELD },
-    });
+    fuelPrices.resetFuelFields();
   }
-
-  useEffect(() => {
-    void loadFuelPrices(activeFuelRequests);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uf, input.fuelType]);
 
   const shareText = `Custo mensal estimado do carro: ${formatBRL(result.monthlyTotal)} (anual: ${formatBRL(result.annualTotal)})${
     result.costPerKm !== null ? ` — ${formatBRL(result.costPerKm)}/km` : ""
   }`;
 
-  const form = (
-    <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
-      <FormSection title="Uso do carro">
-        <NumberInput
-          label="Quilômetros rodados por mês"
-          value={input.monthlyKm}
-          onChange={(v) => update("monthlyKm", v)}
-          suffix="km"
+  return (
+    <CalculatorLayout
+      title="Calculadora de custo de carro no Brasil"
+      description={PAGE_DESCRIPTION}
+      form={
+        <CarCostForm
+          input={input}
+          uf={uf}
+          fuelFields={fuelPrices.fuelFields}
+          activeFuelRequests={fuelPrices.activeFuelRequests}
+          onUpdate={update}
+          onUfChange={setUf}
+          onFuelManualChange={updateFuelManually}
+          onRefreshFuel={() => fuelPrices.loadFuelPrices()}
+          onReset={reset}
         />
-        <PercentageInput
-          label="Percentual de uso na cidade"
-          value={input.cityUsePercent}
-          onChange={(v) => update("cityUsePercent", v)}
-          hint="O restante é considerado uso em estrada."
-        />
-        <NumberInput
-          label="Consumo na cidade (km/l)"
-          value={input.cityConsumptionKmL}
-          onChange={(v) => update("cityConsumptionKmL", v)}
-          step={0.1}
-          suffix="km/l"
-        />
-        <NumberInput
-          label="Consumo na estrada (km/l)"
-          value={input.highwayConsumptionKmL}
-          onChange={(v) => update("highwayConsumptionKmL", v)}
-          step={0.1}
-          suffix="km/l"
-        />
-      </FormSection>
-
-      <FormSection
-        title="Combustível"
-        description="No modo Flex, comparamos gasolina e etanol para indicar o mais barato no seu cenário."
-      >
-        <SelectField
-          label="Estado para consultar preços médios"
-          value={uf}
-          onChange={setUf}
-          options={[...BRAZILIAN_STATES]}
-          hint="A consulta usa médias públicas quando disponíveis. O preço do seu posto pode ser diferente."
-        />
-        <SelectField
-          label="Tipo de combustível"
-          value={input.fuelType}
-          onChange={(v) => update("fuelType", v as FuelType)}
-          options={[
-            { value: "gasoline", label: "Gasolina" },
-            { value: "ethanol", label: "Etanol" },
-            { value: "diesel", label: "Diesel" },
-            { value: "flex", label: "Flex automático (compara gasolina x etanol)" },
-          ]}
-        />
-        <div className="sm:col-span-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => loadFuelPrices(activeFuelRequests)}
-            disabled={activeFuelRequests.some(({ key }) => fuelFields[key].isLoading)}
-            className="w-full"
-          >
-            {activeFuelRequests.some(({ key }) => fuelFields[key].isLoading) ? (
-              <LoaderCircle className="animate-spin" />
-            ) : null}
-            Atualizar preço da ANP
-          </Button>
+      }
+      result={<CarCostResults result={result} shareText={shareText} />}
+    >
+      <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <SimpleBarChart rows={result.breakdown} title="Composição do custo mensal" />
+          <BreakdownTable rows={result.breakdown} caption="Breakdown de custos mensais e anuais" />
         </div>
-        {activeFuelRequests.some(({ key }) => key === "gasolinePrice") ? (
-          <div className="sm:col-span-2">
-            <PublicDataField
-              label="Preço da gasolina por litro"
-              value={input.gasolinePrice}
-              onManualChange={(value) => updateFuelManually("gasolinePrice", value)}
-              {...fuelFields.gasolinePrice}
-              helperText="Valor em R$/litro; você pode editar mesmo após carregar."
-            />
-          </div>
-        ) : null}
-        {activeFuelRequests.some(({ key }) => key === "ethanolPrice") ? (
-          <div className="sm:col-span-2">
-            <PublicDataField
-              label="Preço do etanol por litro"
-              value={input.ethanolPrice}
-              onManualChange={(value) => updateFuelManually("ethanolPrice", value)}
-              {...fuelFields.ethanolPrice}
-              helperText="Valor em R$/litro; você pode editar mesmo após carregar."
-            />
-          </div>
-        ) : null}
-        {activeFuelRequests.some(({ key }) => key === "dieselPrice") ? (
-          <div className="sm:col-span-2">
-            <PublicDataField
-              label="Preço do diesel por litro"
-              value={input.dieselPrice}
-              onManualChange={(value) => updateFuelManually("dieselPrice", value)}
-              {...fuelFields.dieselPrice}
-              helperText="Valor em R$/litro; você pode editar mesmo após carregar."
-            />
-          </div>
-        ) : null}
-      </FormSection>
+      </section>
 
-      <FormSection title="Custos do veículo">
-        <CurrencyInput
-          label="Valor aproximado do carro"
-          value={input.carValue}
-          onChange={(v) => update("carValue", v)}
-        />
-        <PercentageInput
-          label="Depreciação anual estimada"
-          value={input.depreciationAnnualPercent}
-          onChange={(v) => update("depreciationAnnualPercent", v)}
-          hint="Carros novos costumam depreciar entre 8% e 15% ao ano."
-          step={0.5}
-        />
-        <CurrencyInput
-          label="IPVA anual"
-          value={input.ipvaAnnual}
-          onChange={(v) => update("ipvaAnnual", v)}
-        />
-        <CurrencyInput
-          label="Seguro anual"
-          value={input.insuranceAnnual}
-          onChange={(v) => update("insuranceAnnual", v)}
-        />
-        <CurrencyInput
-          label="Licenciamento anual"
-          value={input.licensingAnnual}
-          onChange={(v) => update("licensingAnnual", v)}
-        />
-      </FormSection>
+      <CarCostArticle />
 
-      <FormSection title="Custos de uso">
-        <CurrencyInput
-          label="Manutenção mensal"
-          value={input.maintenanceMonthly}
-          onChange={(v) => update("maintenanceMonthly", v)}
-          hint="Inclui revisões, óleo, peças e mão de obra diluídos por mês."
+      <div className="mx-auto max-w-6xl space-y-10 px-4 pb-16 sm:px-6">
+        <FAQSection items={FAQ} />
+        <RelatedCalculators
+          slugs={["morar-sozinho", "conta-de-luz", "assinaturas", "custo-mudanca"]}
         />
-        <CurrencyInput
-          label="Pneus por ano"
-          value={input.tiresAnnual}
-          onChange={(v) => update("tiresAnnual", v)}
-        />
-        <CurrencyInput
-          label="Estacionamento mensal"
-          value={input.parkingMonthly}
-          onChange={(v) => update("parkingMonthly", v)}
-        />
-        <CurrencyInput
-          label="Pedágios mensais"
-          value={input.tollsMonthly}
-          onChange={(v) => update("tollsMonthly", v)}
-        />
-        <CurrencyInput
-          label="Lavagem mensal"
-          value={input.washingMonthly}
-          onChange={(v) => update("washingMonthly", v)}
-        />
-        <CurrencyInput
-          label="Multas e outros custos mensais"
-          value={input.finesAndOthersMonthly}
-          onChange={(v) => update("finesAndOthersMonthly", v)}
-        />
-      </FormSection>
+      </div>
+    </CalculatorLayout>
+  );
+}
+
+interface CarCostFormProps {
+  input: CarCostInput;
+  uf: string;
+  fuelFields: FuelFields;
+  activeFuelRequests: FuelRequest[];
+  onUpdate: <K extends keyof CarCostInput>(key: K, value: CarCostInput[K]) => void;
+  onUfChange: (uf: string) => void;
+  onFuelManualChange: (key: FuelPriceKey, value: string) => void;
+  onRefreshFuel: () => void;
+  onReset: () => void;
+}
+
+function CarCostForm({
+  input,
+  uf,
+  fuelFields,
+  activeFuelRequests,
+  onUpdate,
+  onUfChange,
+  onFuelManualChange,
+  onRefreshFuel,
+  onReset,
+}: CarCostFormProps) {
+  return (
+    <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
+      <UsageSection input={input} onUpdate={onUpdate} />
+
+      <FuelSection
+        input={input}
+        uf={uf}
+        fuelFields={fuelFields}
+        activeFuelRequests={activeFuelRequests}
+        onUpdate={onUpdate}
+        onUfChange={onUfChange}
+        onFuelManualChange={onFuelManualChange}
+        onRefreshFuel={onRefreshFuel}
+      />
+
+      <VehicleCostsSection input={input} onUpdate={onUpdate} />
+
+      <RunningCostsSection input={input} onUpdate={onUpdate} />
 
       <DisclaimerBox>
         Os valores padrão acima são apenas exemplos editáveis — não representam dados oficiais.
@@ -521,12 +476,197 @@ function CarCostPage() {
       </DisclaimerBox>
 
       <div className="flex flex-wrap gap-2">
-        <ResetButton onReset={reset} />
+        <ResetButton onReset={onReset} />
       </div>
     </form>
   );
+}
 
-  const resultBlock = (
+interface SectionProps {
+  input: CarCostInput;
+  onUpdate: CarCostFormProps["onUpdate"];
+}
+
+function UsageSection({ input, onUpdate }: SectionProps) {
+  return (
+    <FormSection title="Uso do carro">
+      <NumberInput
+        label="Quilômetros rodados por mês"
+        value={input.monthlyKm}
+        onChange={(v) => onUpdate("monthlyKm", v)}
+        suffix="km"
+      />
+      <PercentageInput
+        label="Percentual de uso na cidade"
+        value={input.cityUsePercent}
+        onChange={(v) => onUpdate("cityUsePercent", v)}
+        hint="O restante é considerado uso em estrada."
+      />
+      <NumberInput
+        label="Consumo na cidade (km/l)"
+        value={input.cityConsumptionKmL}
+        onChange={(v) => onUpdate("cityConsumptionKmL", v)}
+        step={0.1}
+        suffix="km/l"
+      />
+      <NumberInput
+        label="Consumo na estrada (km/l)"
+        value={input.highwayConsumptionKmL}
+        onChange={(v) => onUpdate("highwayConsumptionKmL", v)}
+        step={0.1}
+        suffix="km/l"
+      />
+    </FormSection>
+  );
+}
+
+type FuelSectionProps = SectionProps &
+  Pick<
+    CarCostFormProps,
+    | "uf"
+    | "fuelFields"
+    | "activeFuelRequests"
+    | "onUfChange"
+    | "onFuelManualChange"
+    | "onRefreshFuel"
+  >;
+
+function FuelSection({
+  input,
+  uf,
+  fuelFields,
+  activeFuelRequests,
+  onUpdate,
+  onUfChange,
+  onFuelManualChange,
+  onRefreshFuel,
+}: FuelSectionProps) {
+  const isLoading = activeFuelRequests.some(({ key }) => fuelFields[key].isLoading);
+
+  return (
+    <FormSection
+      title="Combustível"
+      description="No modo Flex, comparamos gasolina e etanol para indicar o mais barato no seu cenário."
+    >
+      <SelectField
+        label="Estado para consultar preços médios"
+        value={uf}
+        onChange={onUfChange}
+        options={[...BRAZILIAN_STATES]}
+        hint="A consulta usa médias públicas quando disponíveis. O preço do seu posto pode ser diferente."
+      />
+      <SelectField
+        label="Tipo de combustível"
+        value={input.fuelType}
+        onChange={(v) => onUpdate("fuelType", v as FuelType)}
+        options={[
+          { value: "gasoline", label: "Gasolina" },
+          { value: "ethanol", label: "Etanol" },
+          { value: "diesel", label: "Diesel" },
+          { value: "flex", label: "Flex automático (compara gasolina x etanol)" },
+        ]}
+      />
+      <div className="sm:col-span-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onRefreshFuel}
+          disabled={isLoading}
+          className="w-full"
+        >
+          {isLoading ? <LoaderCircle className="animate-spin" /> : null}
+          Atualizar preço da ANP
+        </Button>
+      </div>
+      {activeFuelRequests.map(({ key, label }) => (
+        <div key={key} className="sm:col-span-2">
+          <PublicDataField
+            label={label}
+            value={input[key]}
+            onManualChange={(value) => onFuelManualChange(key, value)}
+            {...fuelFields[key]}
+            helperText="Valor em R$/litro; você pode editar mesmo após carregar."
+          />
+        </div>
+      ))}
+    </FormSection>
+  );
+}
+
+function VehicleCostsSection({ input, onUpdate }: SectionProps) {
+  return (
+    <FormSection title="Custos do veículo">
+      <CurrencyInput
+        label="Valor aproximado do carro"
+        value={input.carValue}
+        onChange={(v) => onUpdate("carValue", v)}
+      />
+      <PercentageInput
+        label="Depreciação anual estimada"
+        value={input.depreciationAnnualPercent}
+        onChange={(v) => onUpdate("depreciationAnnualPercent", v)}
+        hint="Carros novos costumam depreciar entre 8% e 15% ao ano."
+        step={0.5}
+      />
+      <CurrencyInput
+        label="IPVA anual"
+        value={input.ipvaAnnual}
+        onChange={(v) => onUpdate("ipvaAnnual", v)}
+      />
+      <CurrencyInput
+        label="Seguro anual"
+        value={input.insuranceAnnual}
+        onChange={(v) => onUpdate("insuranceAnnual", v)}
+      />
+      <CurrencyInput
+        label="Licenciamento anual"
+        value={input.licensingAnnual}
+        onChange={(v) => onUpdate("licensingAnnual", v)}
+      />
+    </FormSection>
+  );
+}
+
+function RunningCostsSection({ input, onUpdate }: SectionProps) {
+  return (
+    <FormSection title="Custos de uso">
+      <CurrencyInput
+        label="Manutenção mensal"
+        value={input.maintenanceMonthly}
+        onChange={(v) => onUpdate("maintenanceMonthly", v)}
+        hint="Inclui revisões, óleo, peças e mão de obra diluídos por mês."
+      />
+      <CurrencyInput
+        label="Pneus por ano"
+        value={input.tiresAnnual}
+        onChange={(v) => onUpdate("tiresAnnual", v)}
+      />
+      <CurrencyInput
+        label="Estacionamento mensal"
+        value={input.parkingMonthly}
+        onChange={(v) => onUpdate("parkingMonthly", v)}
+      />
+      <CurrencyInput
+        label="Pedágios mensais"
+        value={input.tollsMonthly}
+        onChange={(v) => onUpdate("tollsMonthly", v)}
+      />
+      <CurrencyInput
+        label="Lavagem mensal"
+        value={input.washingMonthly}
+        onChange={(v) => onUpdate("washingMonthly", v)}
+      />
+      <CurrencyInput
+        label="Multas e outros custos mensais"
+        value={input.finesAndOthersMonthly}
+        onChange={(v) => onUpdate("finesAndOthersMonthly", v)}
+      />
+    </FormSection>
+  );
+}
+
+function CarCostResults({ result, shareText }: { result: CarCostResult; shareText: string }) {
+  return (
     <div className="space-y-3">
       <ResultSummaryCard
         title="Custo mensal total"
@@ -568,125 +708,104 @@ function CarCostPage() {
       </div>
     </div>
   );
+}
 
+function CarCostArticle() {
   return (
-    <CalculatorLayout
-      title="Calculadora de custo de carro no Brasil"
-      description={PAGE_DESCRIPTION}
-      form={form}
-      result={resultBlock}
-    >
-      <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6">
-        <div className="grid gap-4 lg:grid-cols-2">
-          <SimpleBarChart rows={result.breakdown} title="Composição do custo mensal" />
-          <BreakdownTable rows={result.breakdown} caption="Breakdown de custos mensais e anuais" />
-        </div>
-      </section>
+    <Prose collapsibleTitle="Saiba mais sobre o custo de um carro">
+      <h2>O que entra no custo mensal de um carro?</h2>
+      <p>
+        Ter carro envolve muito mais do que abastecer. O custo mensal real inclui combustível, IPVA,
+        seguro, licenciamento, manutenção preventiva, troca de pneus, estacionamento, pedágios e a
+        depreciação — a perda de valor natural do veículo com o tempo.
+      </p>
+      <ul>
+        <li>
+          <strong>Combustível:</strong> varia conforme consumo do carro, preço local e perfil de uso
+          (cidade x estrada).
+        </li>
+        <li>
+          <strong>IPVA:</strong> imposto estadual anual, em geral 2% a 4% do valor venal do veículo.
+        </li>
+        <li>
+          <strong>Seguro:</strong> depende do perfil do motorista, da região e do modelo.
+        </li>
+        <li>
+          <strong>Licenciamento:</strong> taxa anual obrigatória para manter o carro regularizado.
+        </li>
+        <li>
+          <strong>Manutenção:</strong> revisões, troca de óleo, filtros, pastilhas, alinhamento.
+        </li>
+        <li>
+          <strong>Pneus:</strong> troca a cada 40–60 mil km, dependendo do uso.
+        </li>
+        <li>
+          <strong>Estacionamento:</strong> mensalidade fixa ou avulsos no trabalho e em viagens.
+        </li>
+        <li>
+          <strong>Pedágios:</strong> relevantes para quem usa rodovias com frequência.
+        </li>
+        <li>
+          <strong>Depreciação:</strong> perda silenciosa de valor, mas que faz parte do custo real.
+        </li>
+      </ul>
 
-      <Prose collapsibleTitle="Saiba mais sobre o custo de um carro">
-        <h2>O que entra no custo mensal de um carro?</h2>
-        <p>
-          Ter carro envolve muito mais do que abastecer. O custo mensal real inclui combustível,
-          IPVA, seguro, licenciamento, manutenção preventiva, troca de pneus, estacionamento,
-          pedágios e a depreciação — a perda de valor natural do veículo com o tempo.
-        </p>
-        <ul>
-          <li>
-            <strong>Combustível:</strong> varia conforme consumo do carro, preço local e perfil de
-            uso (cidade x estrada).
-          </li>
-          <li>
-            <strong>IPVA:</strong> imposto estadual anual, em geral 2% a 4% do valor venal do
-            veículo.
-          </li>
-          <li>
-            <strong>Seguro:</strong> depende do perfil do motorista, da região e do modelo.
-          </li>
-          <li>
-            <strong>Licenciamento:</strong> taxa anual obrigatória para manter o carro regularizado.
-          </li>
-          <li>
-            <strong>Manutenção:</strong> revisões, troca de óleo, filtros, pastilhas, alinhamento.
-          </li>
-          <li>
-            <strong>Pneus:</strong> troca a cada 40–60 mil km, dependendo do uso.
-          </li>
-          <li>
-            <strong>Estacionamento:</strong> mensalidade fixa ou avulsos no trabalho e em viagens.
-          </li>
-          <li>
-            <strong>Pedágios:</strong> relevantes para quem usa rodovias com frequência.
-          </li>
-          <li>
-            <strong>Depreciação:</strong> perda silenciosa de valor, mas que faz parte do custo
-            real.
-          </li>
-        </ul>
+      <h2>Como calcular o custo por km?</h2>
+      <p>
+        A conta é simples: divida o custo mensal total pelo número de quilômetros rodados no mês.
+        Por exemplo, se o carro custa R$ 1.600 por mês e roda 800 km, o custo por km é R$ 2,00. Esse
+        número ajuda a comparar usar o carro com alternativas como aplicativos, transporte público
+        ou aluguel por viagem.
+      </p>
 
-        <h2>Como calcular o custo por km?</h2>
-        <p>
-          A conta é simples: divida o custo mensal total pelo número de quilômetros rodados no mês.
-          Por exemplo, se o carro custa R$ 1.600 por mês e roda 800 km, o custo por km é R$ 2,00.
-          Esse número ajuda a comparar usar o carro com alternativas como aplicativos, transporte
-          público ou aluguel por viagem.
-        </p>
+      <h2>Gasolina ou etanol: como comparar?</h2>
+      <p>
+        A famosa regra dos 70% diz que o etanol vale a pena quando custa até 70% do preço da
+        gasolina. É uma referência útil, mas imprecisa: o consumo do seu carro com cada combustível
+        pode ser diferente da média. O ideal é abastecer com cada um, anotar o consumo real (km/l) e
+        usar esses valores na calculadora. No modo Flex, simulamos os dois cenários e mostramos qual
+        sai mais barato com os preços e o consumo que você informou.
+      </p>
 
-        <h2>Gasolina ou etanol: como comparar?</h2>
-        <p>
-          A famosa regra dos 70% diz que o etanol vale a pena quando custa até 70% do preço da
-          gasolina. É uma referência útil, mas imprecisa: o consumo do seu carro com cada
-          combustível pode ser diferente da média. O ideal é abastecer com cada um, anotar o consumo
-          real (km/l) e usar esses valores na calculadora. No modo Flex, simulamos os dois cenários
-          e mostramos qual sai mais barato com os preços e o consumo que você informou.
-        </p>
+      <h2>Por que considerar depreciação?</h2>
+      <p>
+        A depreciação não sai do seu bolso todo mês — mas é o custo mais alto e silencioso de ter um
+        carro. Um veículo de R$ 50.000 que perde 8% ao ano vale cerca de R$ 4.000 a menos depois de
+        12 meses, mesmo sem rodar muito. Ignorar isso dá a falsa sensação de que o carro é mais
+        barato do que realmente é, principalmente em carros novos.
+      </p>
 
-        <h2>Por que considerar depreciação?</h2>
-        <p>
-          A depreciação não sai do seu bolso todo mês — mas é o custo mais alto e silencioso de ter
-          um carro. Um veículo de R$ 50.000 que perde 8% ao ano vale cerca de R$ 4.000 a menos
-          depois de 12 meses, mesmo sem rodar muito. Ignorar isso dá a falsa sensação de que o carro
-          é mais barato do que realmente é, principalmente em carros novos.
-        </p>
+      <h2>Exemplo prático</h2>
+      <p>
+        Imagine um motorista que roda 800 km por mês (80% na cidade), em um carro popular que faz 10
+        km/l na cidade e 13 km/l na estrada, abastecendo com gasolina a R$ 6,00 o litro. Só de
+        combustível, ele gasta cerca de R$ 460 por mês. Somando IPVA, seguro, licenciamento,
+        manutenção, pneus, lavagem e depreciação de um carro de R$ 50.000 a 8% ao ano, o custo
+        mensal real fica próximo de R$ 1.500 — quase o triplo do que ele paga só na bomba.
+      </p>
 
-        <h2>Exemplo prático</h2>
-        <p>
-          Imagine um motorista que roda 800 km por mês (80% na cidade), em um carro popular que faz
-          10 km/l na cidade e 13 km/l na estrada, abastecendo com gasolina a R$ 6,00 o litro. Só de
-          combustível, ele gasta cerca de R$ 460 por mês. Somando IPVA, seguro, licenciamento,
-          manutenção, pneus, lavagem e depreciação de um carro de R$ 50.000 a 8% ao ano, o custo
-          mensal real fica próximo de R$ 1.500 — quase o triplo do que ele paga só na bomba.
-        </p>
+      <h2>Fonte dos preços de combustível</h2>
+      <p>
+        O preenchimento automático consulta o{" "}
+        <a
+          href="https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/levantamento-de-precos-de-combustiveis-ultimas-semanas-pesquisadas"
+          target="_blank"
+          rel="noreferrer"
+        >
+          levantamento semanal oficial da ANP
+        </a>
+        . Quando a consulta funciona, mostramos o período pesquisado, a data de atualização do cache
+        e um link para a fonte utilizada. A média estadual não representa necessariamente o preço da
+        sua cidade ou do seu posto; por isso, o campo permanece editável.
+      </p>
 
-        <h2>Fonte dos preços de combustível</h2>
-        <p>
-          O preenchimento automático consulta o{" "}
-          <a
-            href="https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/levantamento-de-precos-de-combustiveis-ultimas-semanas-pesquisadas"
-            target="_blank"
-            rel="noreferrer"
-          >
-            levantamento semanal oficial da ANP
-          </a>
-          . Quando a consulta funciona, mostramos o período pesquisado, a data de atualização do
-          cache e um link para a fonte utilizada. A média estadual não representa necessariamente o
-          preço da sua cidade ou do seu posto; por isso, o campo permanece editável.
-        </p>
-
-        <h2>Limitações</h2>
-        <p>
-          Esta calculadora gera estimativas educativas. Os valores variam por cidade, modelo,
-          oficina, seguradora, perfil do motorista e preço do combustível. O resultado não é oficial
-          e não substitui orçamento, contrato, cotação de seguradora ou consulta com um
-          especialista. Use como ponto de partida para conversar sobre o orçamento do seu carro.
-        </p>
-      </Prose>
-
-      <div className="mx-auto max-w-6xl space-y-10 px-4 pb-16 sm:px-6">
-        <FAQSection items={FAQ} />
-        <RelatedCalculators
-          slugs={["morar-sozinho", "conta-de-luz", "assinaturas", "custo-mudanca"]}
-        />
-      </div>
-    </CalculatorLayout>
+      <h2>Limitações</h2>
+      <p>
+        Esta calculadora gera estimativas educativas. Os valores variam por cidade, modelo, oficina,
+        seguradora, perfil do motorista e preço do combustível. O resultado não é oficial e não
+        substitui orçamento, contrato, cotação de seguradora ou consulta com um especialista. Use
+        como ponto de partida para conversar sobre o orçamento do seu carro.
+      </p>
+    </Prose>
   );
 }

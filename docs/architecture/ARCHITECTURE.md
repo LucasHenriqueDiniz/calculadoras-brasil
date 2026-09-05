@@ -282,20 +282,32 @@ The violations that exist right now.
 - [ ] **`previdenciaComplementar` headlines a saving from a rate the visitor cannot set.**
       `aliquotaIrpfAtual` is hardcoded at 22,5% with no control, yet "Economia IRPF/ano" is shown
       as though it were the visitor's own figure.
-- [ ] **`/calculadora-conta-de-luz` fails hydration on every load, and has since before this
-      branch.** `calculadora-conta-de-luz.tsx:44` is
-      `const nextId = () => \`a${++_id}_${Date.now().toString(36)}\``, and `DEFAULT_APPLIANCES`
-      calls it at module scope. The server evaluates that constant during SSR and the browser
-      evaluates it again at hydration, so the generated ids differ and React reports
-      `Hydration failed because the server rendered text didn't match` — then discards the server
-      markup for that subtree and re-renders it client-side, which is precisely the prerendering
-      this site is built around. It is React's own first listed cause: *"variable input such as
-      `Date.now()` or `Math.random()` which changes each time it's called"*.
-      **Measured, not inferred**: the identical error reproduces on the commit before the slice-2
-      refactor, with the same ids differing the same way, so the split did not introduce it.
-      `calculadora-assinaturas.tsx` uses the same `nextId` pattern and wants the same check.
-      The `architecture` skill's determinism rules already name the fix — derive ids from a stable
-      key rather than drawing them. No plan covers it.
+- [ ] **`nextId()` draws ids from `Date.now()` at module scope**, in
+      `calculadora-conta-de-luz.tsx:44` and again in `calculadora-assinaturas.tsx`.
+      `DEFAULT_APPLIANCES` calls it while the module is evaluated, so a prerendered page bakes in
+      build-time ids and the browser generates different ones. The `architecture` skill's
+      determinism rules name the remedy — derive ids from a stable key rather than drawing them.
+      ⚠️ **No production symptom was found**, so this is latent rather than broken: see the
+      correction below. Low priority; recorded so it is not rediscovered as a surprise.
+
+      **Correction, 2026-09-05.** An earlier version of this entry claimed
+      `/calculadora-conta-de-luz` fails hydration in production and blamed `nextId()`. **Both
+      halves were wrong**, and the measurement that settled it is worth keeping:
+
+      | where | result |
+      |---|---|
+      | dev server, `/calculadora-conta-de-luz` | hydration fails |
+      | dev server, `/metodologia` — static, no calculator state | hydration fails too |
+      | `<main>`, `<header>`, `<footer>` SSR vs client on `/metodologia` | **byte-identical**, 19.647 chars |
+      | `<head>` SSR vs client | **differs** |
+      | the differing element | `<link rel="stylesheet" href="/@tanstack-start/styles.css?routes=…" data-tanstack-router-dev-styles="true">` |
+      | that element in production | **absent** — `document.querySelectorAll('[data-tanstack-router-dev-styles]').length === 0` |
+      | production console, `/metodologia` and `/calculadora-conta-de-luz` | **no errors at all** |
+
+      The mismatch is TanStack Start's **dev-only** stylesheet injection. The `nextId` id
+      difference visible in React's tree diff is downstream of hydration already having aborted on
+      the head, not its cause. The lesson for the next reader: a hydration error in `pnpm run dev`
+      is not evidence of one in production, and the deployed preview is the cheap way to tell.
 - [ ] **`ADSENSE-CHECKLIST.md` sits at the repo root**, dated 2026-06-26 with 3 of 7 fixes still
       open. It is a roadmap document living outside `docs/`, and it has not moved in two months.
 - [ ] **No test covers the two adapters.** `aneel.ts` and `anp.ts` parse third-party formats — an
