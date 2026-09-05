@@ -77,8 +77,8 @@ function BlogPost() {
 
           <h3>IRPF</h3>
           <p>
-            Se ganha acima de R$ 28.559,70/ano, paga IRPF normal com alíquotas progressivas. Sem
-            retenção na fonte, você fica responsável por apurar e pagar.
+            Se ganha acima de R$ 35.584,00/ano (limite do ano-calendário 2025), paga IRPF normal com
+            alíquotas progressivas. Sem retenção na fonte, você fica responsável por apurar e pagar.
           </p>
 
           <h3>Despesas Dedutiveis</h3>

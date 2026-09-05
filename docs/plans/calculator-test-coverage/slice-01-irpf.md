@@ -1,9 +1,22 @@
 ---
-status: todo
+status: done
 kanban: c5fc34fd-52c5-4217-862f-6ef83da6ff50
 ---
 
 # Slice 1 — Tests for calculateIrpf
+
+**Resolved 2026-09-04.** This slice was blocked the day it was written: its 27 tests were green on
+18 and red on 9, and the 9 named four defects in `calculateIrpf` rather than bugs in the tests.
+A fifth turned up during the research that followed.
+
+All of them are fixed. `tests/calculators/irpf.test.ts` reports `28 passed (28)` — 28 rather than
+27 because slice 3 of the fix added a case, and no assertion was relaxed to get there.
+
+The trail, in the order it happened:
+`docs/pitches/irpf-calculation-defects.md` → `docs/research/2026-09-04-irpf-2026-table/research.md`
+→ decision `D3` in `docs/architecture/ARCHITECTURE.md` → `docs/plans/irpf-calculation-defects/`,
+slices 1–4, the last of which added the Lei 15.270/2025 redutor — new behaviour rather than a
+defect this slice found.
 
 The first of the two headline calculators. `/calculadora-irpf-2026` is a top
 public page and `calculateIrpf` has no test today.

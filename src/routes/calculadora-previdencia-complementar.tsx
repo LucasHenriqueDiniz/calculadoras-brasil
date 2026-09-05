@@ -7,18 +7,18 @@ import { FAQSection } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { formatBRL } from "@/lib/format";
 import {
-  calculatePrevidenciaComplementar,
-  type PrevidenciaComplementarInput,
+  calculateSupplementaryPension,
+  type SupplementaryPensionInput,
 } from "@/lib/calculators/previdenciaComplementar";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
 
-const DEFAULTS: PrevidenciaComplementarInput = {
-  contribuicaoMensalPgbl: 1000,
-  tasaRetornoAnual: 8,
-  anosAteAposentadoria: 20,
-  aliquotaIrpfAtual: 22.5,
+const DEFAULTS: SupplementaryPensionInput = {
+  monthlyPgblContribution: 1000,
+  annualReturnRate: 8,
+  yearsToRetirement: 20,
+  currentIrpfRate: 22.5,
 };
 
 const DESCRIPTION =
@@ -76,11 +76,11 @@ export const Route = createFileRoute("/calculadora-previdencia-complementar")({
 });
 
 function Calculator() {
-  const [input, setInput] = usePersistedState<PrevidenciaComplementarInput>(
-    "previdencia-input",
+  const [input, setInput] = usePersistedState<SupplementaryPensionInput>(
+    "previdencia-input-v2",
     DEFAULTS,
   );
-  const result = useMemo(() => calculatePrevidenciaComplementar(input), [input]);
+  const result = useMemo(() => calculateSupplementaryPension(input), [input]);
 
   return (
     <CalculatorLayout
@@ -90,8 +90,8 @@ function Calculator() {
       <FormSection title="Contribuição" description="Quanto você quer contribuir mensalmente">
         <CurrencyInput
           label="Contribuição mensal (PGBL/VGBL)"
-          value={input.contribuicaoMensalPgbl}
-          onChange={(v) => setInput({ ...input, contribuicaoMensalPgbl: v })}
+          value={input.monthlyPgblContribution}
+          onChange={(v) => setInput({ ...input, monthlyPgblContribution: v })}
           hint="A dedução do PGBL é limitada a 12% da renda bruta anual tributável"
         />
       </FormSection>
@@ -99,16 +99,16 @@ function Calculator() {
       <FormSection title="Projeção" description="Taxa de retorno e tempo até aposentadoria">
         <NumberInput
           label="Taxa de retorno anual esperada (%)"
-          value={input.tasaRetornoAnual}
-          onChange={(v) => setInput({ ...input, tasaRetornoAnual: v })}
+          value={input.annualReturnRate}
+          onChange={(v) => setInput({ ...input, annualReturnRate: v })}
           min={0}
           max={20}
           hint="Histórico médio: 8-10% a.a."
         />
         <NumberInput
           label="Anos até aposentadoria"
-          value={input.anosAteAposentadoria}
-          onChange={(v) => setInput({ ...input, anosAteAposentadoria: v })}
+          value={input.yearsToRetirement}
+          onChange={(v) => setInput({ ...input, yearsToRetirement: v })}
           min={1}
           max={40}
           hint="Quanto tempo até parar de trabalhar"
@@ -117,15 +117,9 @@ function Calculator() {
 
       <ResultSummaryCard
         title="Saldo Projetado"
-        mainValue={formatBRL(
-          input.anosAteAposentadoria <= 10
-            ? result.montanteFinal10anos
-            : input.anosAteAposentadoria <= 20
-              ? result.montanteFinal20anos
-              : result.montanteFinal30anos,
-        )}
-        mainLabel={`em ${input.anosAteAposentadoria} anos`}
-        secondaryValue={formatBRL(result.economiaIrpfAnual)}
+        mainValue={formatBRL(result.balanceAtHorizon)}
+        mainLabel={`em ${input.yearsToRetirement} anos`}
+        secondaryValue={formatBRL(result.annualIrpfSaving)}
         secondaryLabel="Economia IRPF/ano"
         resultColor="positive"
       />
@@ -135,28 +129,28 @@ function Calculator() {
         items={[
           {
             label: "Contribuição mensal",
-            value: formatBRL(input.contribuicaoMensalPgbl),
+            value: formatBRL(input.monthlyPgblContribution),
           },
           {
             label: "Contribuição anual",
-            value: formatBRL(result.contribuicaoAnualPgbl),
+            value: formatBRL(result.annualPgblContribution),
           },
           {
             label: "Economia IRPF mensal",
-            value: formatBRL(result.economiaIrpfMensal),
+            value: formatBRL(result.monthlyIrpfSaving),
             subtext: "Desconto sobre sua contribuição",
           },
           {
             label: "Saldo em 10 anos",
-            value: formatBRL(result.montanteFinal10anos),
+            value: formatBRL(result.balanceAt10Years),
           },
           {
             label: "Saldo em 20 anos",
-            value: formatBRL(result.montanteFinal20anos),
+            value: formatBRL(result.balanceAt20Years),
           },
           {
             label: "Saldo em 30 anos",
-            value: formatBRL(result.montanteFinal30anos),
+            value: formatBRL(result.balanceAt30Years),
             isFinal: true,
           },
         ]}

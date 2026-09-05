@@ -7,9 +7,9 @@ import { calculateMovingCost } from "../src/lib/calculators/movingCost";
 import { calculatePetCost } from "../src/lib/calculators/petCost";
 import { calculateInssAutonomo } from "../src/lib/calculators/inssAutonomo";
 import {
-  calcularInssEmpregado,
-  SALARIO_MINIMO,
-  TETO_INSS,
+  calculateEmployeeInss,
+  MINIMUM_WAGE,
+  INSS_CEILING,
 } from "../src/lib/calculators/inss-constants";
 
 describe("core calculators", () => {
@@ -167,30 +167,30 @@ describe("core calculators", () => {
 describe("INSS: progressive employee contribution", () => {
   it("applies the rate only to the slice inside each bracket", () => {
     // 1621 * 7,5% = 121,575 — first bracket in isolation.
-    expect(calcularInssEmpregado(1621)).toBeCloseTo(121.575, 3);
+    expect(calculateEmployeeInss(1621)).toBeCloseTo(121.575, 3);
 
     // 121,575 + (2902,84 - 1621) * 9% = 121,575 + 115,366 = 236,94
-    expect(calcularInssEmpregado(2902.84)).toBeCloseTo(236.94, 2);
+    expect(calculateEmployeeInss(2902.84)).toBeCloseTo(236.94, 2);
 
     // 236,94 + (4354,27 - 2902,84) * 12% = 236,94 + 174,17 = 411,11
-    expect(calcularInssEmpregado(4354.27)).toBeCloseTo(411.11, 2);
+    expect(calculateEmployeeInss(4354.27)).toBeCloseTo(411.11, 2);
   });
 
   it("matches the maximum deduction published for the 2026 ceiling", () => {
     // Reference value published for 2026: R$ 988,09.
-    expect(calcularInssEmpregado(TETO_INSS)).toBeCloseTo(988.09, 2);
+    expect(calculateEmployeeInss(INSS_CEILING)).toBeCloseTo(988.09, 2);
   });
 
   it("never charges more than the contribution at the ceiling", () => {
-    const noTeto = calcularInssEmpregado(TETO_INSS);
-    expect(calcularInssEmpregado(50_000)).toBeCloseTo(noTeto, 2);
+    const noTeto = calculateEmployeeInss(INSS_CEILING);
+    expect(calculateEmployeeInss(50_000)).toBeCloseTo(noTeto, 2);
     // The maximum contribution sits well below 20% of the ceiling.
-    expect(noTeto).toBeLessThan(TETO_INSS * 0.2);
+    expect(noTeto).toBeLessThan(INSS_CEILING * 0.2);
   });
 
   it("keeps the effective rate progressive and below 14%", () => {
     const salario = 5000;
-    const aliquotaEfetiva = calcularInssEmpregado(salario) / salario;
+    const aliquotaEfetiva = calculateEmployeeInss(salario) / salario;
     expect(aliquotaEfetiva).toBeGreaterThan(0.075);
     expect(aliquotaEfetiva).toBeLessThan(0.14);
   });
@@ -199,82 +199,121 @@ describe("INSS: progressive employee contribution", () => {
 describe("self-employed INSS", () => {
   it("charges 20% of the income and 11% always of the minimum wage", () => {
     const result = calculateInssAutonomo({
-      ganhoMensalBruto: 3000,
-      mesesContribuidos: 0,
-      sexo: "masculino",
+      grossMonthlyIncome: 3000,
+      contributedMonths: 0,
+      contributorSex: "masculino",
     });
 
-    expect(result.salarioContribuicao).toBe(3000);
-    expect(result.planoNormal.contribuicaoMensal).toBeCloseTo(600, 2);
+    expect(result.contributionBase).toBe(3000);
+    expect(result.standardPlan.monthlyContribution).toBeCloseTo(600, 2);
     // The simplified plan does not follow the income: 11% of the minimum wage.
-    expect(result.planoSimplificado.contribuicaoMensal).toBeCloseTo(SALARIO_MINIMO * 0.11, 2);
-    expect(result.planoSimplificado.contaTempoDeContribuicao).toBe(false);
+    expect(result.simplifiedPlan.monthlyContribution).toBeCloseTo(MINIMUM_WAGE * 0.11, 2);
+    expect(result.simplifiedPlan.countsTowardsContributionTime).toBe(false);
   });
 
   it("clamps the contribution salary to the floor and the ceiling", () => {
-    const acimaDoTeto = calculateInssAutonomo({
-      ganhoMensalBruto: 30_000,
-      mesesContribuidos: 0,
-      sexo: "masculino",
+    const aboveCeiling = calculateInssAutonomo({
+      grossMonthlyIncome: 30_000,
+      contributedMonths: 0,
+      contributorSex: "masculino",
     });
-    expect(acimaDoTeto.salarioContribuicao).toBe(TETO_INSS);
-    expect(acimaDoTeto.limitadoPeloTeto).toBe(true);
+    expect(aboveCeiling.contributionBase).toBe(INSS_CEILING);
+    expect(aboveCeiling.cappedByCeiling).toBe(true);
 
-    const abaixoDoPiso = calculateInssAutonomo({
-      ganhoMensalBruto: 800,
-      mesesContribuidos: 0,
-      sexo: "masculino",
+    const belowFloor = calculateInssAutonomo({
+      grossMonthlyIncome: 800,
+      contributedMonths: 0,
+      contributorSex: "masculino",
     });
-    expect(abaixoDoPiso.salarioContribuicao).toBe(SALARIO_MINIMO);
-    expect(abaixoDoPiso.elevadoAoPiso).toBe(true);
+    expect(belowFloor.contributionBase).toBe(MINIMUM_WAGE);
+    expect(belowFloor.raisedToFloor).toBe(true);
   });
 
   it("estimates no benefit before the minimum contribution time", () => {
     const result = calculateInssAutonomo({
-      ganhoMensalBruto: 5000,
-      mesesContribuidos: 10 * 12,
-      sexo: "masculino",
+      grossMonthlyIncome: 5000,
+      contributedMonths: 10 * 12,
+      contributorSex: "masculino",
     });
-    expect(result.tempoMinimoAtingido).toBe(false);
-    expect(result.estimativaBeneficioNormal).toBe(0);
+    expect(result.minimumTimeReached).toBe(false);
+    expect(result.standardPlanBenefitEstimate).toBe(0);
   });
 
   it("applies 60% of the average plus 2% per extra year (EC 103/2019)", () => {
     const result = calculateInssAutonomo({
-      ganhoMensalBruto: 5000,
-      mesesContribuidos: 25 * 12,
-      sexo: "masculino",
+      grossMonthlyIncome: 5000,
+      contributedMonths: 25 * 12,
+      contributorSex: "masculino",
     });
     // 20 years of requirement + 5 extra years = 60% + 10% = 70%
-    expect(result.tempoMinimoAtingido).toBe(true);
-    expect(result.percentualMediaAplicado).toBe(70);
-    expect(result.estimativaBeneficioNormal).toBeCloseTo(3500, 2);
+    expect(result.minimumTimeReached).toBe(true);
+    expect(result.appliedAveragePercentage).toBe(70);
+    expect(result.standardPlanBenefitEstimate).toBeCloseTo(3500, 2);
   });
 
   it("uses the shorter requirement for women", () => {
     const result = calculateInssAutonomo({
-      ganhoMensalBruto: 5000,
-      mesesContribuidos: 15 * 12,
-      sexo: "feminino",
+      grossMonthlyIncome: 5000,
+      contributedMonths: 15 * 12,
+      contributorSex: "feminino",
     });
-    expect(result.tempoMinimoContribuicao).toBe(15);
-    expect(result.tempoMinimoAtingido).toBe(true);
-    expect(result.percentualMediaAplicado).toBe(60);
+    expect(result.minimumContributionYears).toBe(15);
+    expect(result.minimumTimeReached).toBe(true);
+    expect(result.appliedAveragePercentage).toBe(60);
   });
 
   it("never estimates a benefit below the floor or above the ceiling", () => {
     const alto = calculateInssAutonomo({
-      ganhoMensalBruto: 30_000,
-      mesesContribuidos: 40 * 12,
-      sexo: "masculino",
+      grossMonthlyIncome: 30_000,
+      contributedMonths: 40 * 12,
+      contributorSex: "masculino",
     });
-    expect(alto.estimativaBeneficioNormal).toBeLessThanOrEqual(TETO_INSS);
+    expect(alto.standardPlanBenefitEstimate).toBeLessThanOrEqual(INSS_CEILING);
 
     const baixo = calculateInssAutonomo({
-      ganhoMensalBruto: SALARIO_MINIMO,
-      mesesContribuidos: 20 * 12,
-      sexo: "masculino",
+      grossMonthlyIncome: MINIMUM_WAGE,
+      contributedMonths: 20 * 12,
+      contributorSex: "masculino",
     });
-    expect(baixo.estimativaBeneficioNormal).toBeGreaterThanOrEqual(SALARIO_MINIMO);
+    expect(baixo.standardPlanBenefitEstimate).toBeGreaterThanOrEqual(MINIMUM_WAGE);
+  });
+});
+
+describe("calculateInssAutonomo — the literal values are stored data", () => {
+  /**
+   * `contributorSex` and `InssPlan` are the only fields in this feature whose
+   * *values* — not just their names — are persisted. The route serialises the
+   * whole input into `localStorage` under `inss-autonomo-input-v2`, so a
+   * returning visitor hands the module a literal written by an older build.
+   *
+   * Slice 3 of docs/plans/english-domain-identifiers/ renamed the type and the
+   * field and deliberately left the literals in Portuguese: changing them would
+   * be a data migration needing a `-v3` key, not a rename. These cases fail if
+   * someone changes a literal without bumping the key.
+   */
+  it.each([
+    ["masculino", 20],
+    ["feminino", 15],
+  ] as const)("accepts the stored contributorSex %s and requires %i years", (stored, years) => {
+    const result = calculateInssAutonomo({
+      grossMonthlyIncome: 3000,
+      contributedMonths: 120,
+      contributorSex: stored,
+    });
+
+    expect(result.minimumContributionYears).toBe(years);
+  });
+
+  it("keeps both plan detail shapes reachable, whichever plan a stored value names", () => {
+    const result = calculateInssAutonomo({
+      grossMonthlyIncome: 3000,
+      contributedMonths: 120,
+      contributorSex: "masculino",
+    });
+
+    // "normal" and "simplificado" are the InssPlan literals a stored input may carry.
+    expect(result.standardPlan.countsTowardsContributionTime).toBe(true);
+    expect(result.simplifiedPlan.countsTowardsContributionTime).toBe(false);
+    expect(result.simplifiedPlan.base).toBe(MINIMUM_WAGE);
   });
 });

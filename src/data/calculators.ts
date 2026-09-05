@@ -244,10 +244,11 @@ export const calculators: CalculatorMeta[] = [
       "O Imposto de Renda Pessoa Física (IRPF) afeta ~50 milhões de brasileiros, mas poucos entendem como funciona. Esta calculadora segue as regras progressivas da Receita Federal para 2026, considerando dependentes, deduções permitidas (educação, saúde, previdência) e regime tributário (completo ou simplificado).",
     whatItDoes: [
       "Calcula o IRPF anual baseado nas alíquotas progressivas de 2026.",
+      "Aplica a redução da Lei 15.270/2025 sobre o imposto que a tabela produz.",
       "Considera desconto INSS na fonte (retenção).",
       "Aplica deduções com educação (até R$ 3.561,50), saúde e previdência complementar.",
-      "Desconta R$ 2.275 por dependente na base imponível.",
-      "Compara regime completo vs. simplificado (20,5% de dedução fixa).",
+      "Desconta R$ 2.275,08 por dependente na base imponível.",
+      "Simula o regime completo ou o simplificado (20% de dedução fixa, até R$ 17.640,00 por ano).",
       "Mostra alíquota marginal e efetiva do seu imposto.",
     ],
     inputs: [
@@ -345,7 +346,7 @@ export const calculators: CalculatorMeta[] = [
       "Contribua para PGBL/VGBL, reduza IRPF agora e acumule para aposentadoria complementar.",
     icon: CreditCard,
     intro:
-      "Previdência complementar oferece duplo ganho: reduz seu IRPF hoje e constrói poupança para aposentadoria. Limite é até 13% da renda bruta. Simule seu caso.",
+      "Previdência complementar oferece duplo ganho: reduz seu IRPF hoje e constrói poupança para aposentadoria. O limite é 12% do rendimento tributável do ano. Simule seu caso.",
     whatItDoes: [
       "Calcula economia de IRPF mensal/anual.",
       "Projeta valor acumulado em 10, 20, 30 anos.",

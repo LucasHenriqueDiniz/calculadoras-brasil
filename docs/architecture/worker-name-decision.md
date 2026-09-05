@@ -3,6 +3,8 @@
 **Date:** 2026-09-03
 **Status:** accepted
 **Answers:** `docs/pitches/worker-name-decision.md`, `docs/plans/worker-name-decision/slice-01-decide-worker-name.md`
+**Record of this decision:** `docs/architecture/ARCHITECTURE.md`, entry `D1`. That file is
+the register; this one is the evidence behind it and is not a second record.
 
 The Cloudflare Worker is **not** renamed. `calcule-brasil` and its preview
 sibling `calcule-brasil-preview` are recorded here as a **documented exception**

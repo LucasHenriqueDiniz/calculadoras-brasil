@@ -66,8 +66,9 @@ function BlogPost() {
 
           <h2>Regime simplificado</h2>
           <p>
-            <strong>Dedução fixa:</strong> 20,5% da renda bruta tributável, dentro de um teto anual
-            reajustado pela Receita Federal.
+            <strong>Dedução fixa:</strong> 20% da renda bruta tributável, limitada a R$ 17.640,00
+            por ano em 2026. Esse desconto entra no lugar de todas as outras deduções — educação,
+            saúde, previdência e dependentes.
           </p>
           <p>
             <strong>Melhor se:</strong> você tem poucos gastos dedutíveis ou não quer guardar
@@ -94,22 +95,27 @@ function BlogPost() {
           <h2>Exemplo comparativo</h2>
           <p>Renda anual: R$ 60.000</p>
           <p>
-            <strong>Simplificado:</strong> dedução de R$ 12.300 (20,5%)
+            <strong>Simplificado:</strong> dedução de R$ 12.000 (20% de R$ 60.000, abaixo do teto de
+            R$ 17.640,00)
           </p>
           <p>
             <strong>Completo com dependentes:</strong> R$ 2.275,08 × 2 filhos + R$ 3.500 de educação
             + R$ 5.000 de saúde = R$ 13.050,16 em deduções
           </p>
           <p>
-            <strong>Resultado:</strong> nesse cenário, o completo economiza cerca de R$ 750 a mais
-            em imposto.
+            <strong>Resultado:</strong> o completo deduz R$ 1.050,16 a mais, o que dá cerca de R$
+            236 a menos de imposto pela tabela. Só que, nessa faixa de renda, a redução da Lei
+            15.270/2025 zera o imposto nos dois regimes — a escolha só começa a pesar no bolso em
+            rendas mais altas, quando a redução já acabou.
           </p>
 
           <h2>Como decidir</h2>
           <p>
             Some suas despesas dedutíveis reais do ano (educação + saúde + previdência +
-            dependentes) e compare com 20,5% da sua renda bruta. Se a soma real for maior, o
-            completo compensa.
+            dependentes) e compare com o desconto simplificado: 20% da sua renda bruta tributável,
+            até o teto de R$ 17.640,00. Se a soma real for maior, o completo compensa. Acima de R$
+            88.200 de rendimentos o desconto simplificado trava no teto, e é aí que o completo
+            costuma ganhar terreno.
           </p>
 
           <h2>Dica final</h2>

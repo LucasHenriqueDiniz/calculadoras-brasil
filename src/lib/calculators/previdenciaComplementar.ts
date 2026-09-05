@@ -1,87 +1,93 @@
-export interface PrevidenciaComplementarInput {
-  contribuicaoMensalPgbl: number;
-  tasaRetornoAnual: number;
-  anosAteAposentadoria: number;
-  aliquotaIrpfAtual: number;
+export interface SupplementaryPensionInput {
+  monthlyPgblContribution: number;
+  annualReturnRate: number;
+  yearsToRetirement: number;
+  currentIrpfRate: number;
 }
 
-export interface PrevidenciaComplementarResult {
-  contribuicaoMensalPgbl: number;
-  contribuicaoAnualPgbl: number;
-  economiaIrpfMensal: number;
-  economiaIrpfAnual: number;
-  montanteFinal10anos: number;
-  montanteFinal20anos: number;
-  montanteFinal30anos: number;
-  rendimentoTotal: number;
-  projecao: Array<{
-    ano: number;
-    saldo: number;
-    rendimento: number;
-  }>;
+export interface SupplementaryPensionYear {
+  year: number;
+  balance: number;
+  earnings: number;
 }
 
-export function calculatePrevidenciaComplementar(
-  input: PrevidenciaComplementarInput,
-): PrevidenciaComplementarResult {
-  const contribuicaoAnual = input.contribuicaoMensalPgbl * 12;
-  const tasaRetornoDecimal = input.tasaRetornoAnual / 100;
+export interface SupplementaryPensionResult {
+  monthlyPgblContribution: number;
+  annualPgblContribution: number;
+  monthlyIrpfSaving: number;
+  annualIrpfSaving: number;
+  /**
+   * The balance at the horizon the visitor asked for. This is the answer the
+   * page headlines; the three fixed marks below are comparison points and must
+   * not stand in for it.
+   */
+  balanceAtHorizon: number;
+  balanceAt10Years: number;
+  balanceAt20Years: number;
+  balanceAt30Years: number;
+  totalEarnings: number;
+  projection: SupplementaryPensionYear[];
+}
+
+/** Years the projection samples, out of every year it walks. */
+function isSampledYear(year: number): boolean {
+  return year === 1 || year === 5 || year % 10 === 0;
+}
+
+/**
+ * Walks the balance year by year. One deposit of `annualContribution` at the
+ * END of each year, so the first year earns nothing: this is the convention the
+ * whole module is written in, and it matches the ordinary-annuity closed form
+ * `C · ((1 + r)^n − 1) / r`.
+ */
+function projectYearByYear(
+  annualContribution: number,
+  annualRate: number,
+  years: number,
+): SupplementaryPensionYear[] {
+  const series: SupplementaryPensionYear[] = [];
+  let balance = 0;
+
+  for (let year = 1; year <= years; year++) {
+    const earnings = balance * annualRate;
+    balance = balance + earnings + annualContribution;
+    series.push({ year, balance, earnings });
+  }
+
+  return series;
+}
+
+const FIXED_MARKS = 30;
+
+export function calculateSupplementaryPension(
+  input: SupplementaryPensionInput,
+): SupplementaryPensionResult {
+  const annualContribution = input.monthlyPgblContribution * 12;
+  const annualRate = input.annualReturnRate / 100;
 
   // IRPF savings (deductible contribution)
-  const economiaIrpfMensal = input.contribuicaoMensalPgbl * (input.aliquotaIrpfAtual / 100);
-  const economiaIrpfAnual = economiaIrpfMensal * 12;
+  const monthlyIrpfSaving = input.monthlyPgblContribution * (input.currentIrpfRate / 100);
+  const annualIrpfSaving = monthlyIrpfSaving * 12;
 
-  // balance projection
-  let saldo = 0;
-  const projecao: Array<{ ano: number; saldo: number; rendimento: number }> = [];
+  // the visitor's own horizon
+  const horizon = projectYearByYear(annualContribution, annualRate, input.yearsToRetirement);
+  const balanceAtHorizon = horizon.at(-1)?.balance ?? 0;
+  const totalEarnings = balanceAtHorizon - annualContribution * input.yearsToRetirement;
 
-  for (let ano = 1; ano <= input.anosAteAposentadoria; ano++) {
-    const rendimento = saldo * tasaRetornoDecimal;
-    saldo = saldo + rendimento + contribuicaoAnual;
-    if (ano % 10 === 0 || ano === 1 || ano === 5 || ano === 20 || ano === 30) {
-      projecao.push({ ano, saldo, rendimento });
-    }
-  }
-
-  // assemble the final values per period
-  let montante10 = 0,
-    montante20 = 0,
-    montante30 = 0;
-
-  for (const p of projecao) {
-    if (p.ano === 10) montante10 = p.saldo;
-    if (p.ano === 20) montante20 = p.saldo;
-    if (p.ano === 30) montante30 = p.saldo;
-  }
-
-  // 10/20/30 years not reached: compute it by hand
-  saldo = 0;
-  for (let ano = 1; ano <= 30; ano++) {
-    const rendimento = saldo * tasaRetornoDecimal;
-    saldo = saldo + rendimento + contribuicaoAnual;
-    if (ano === 10) montante10 = saldo;
-    if (ano === 20) montante20 = saldo;
-    if (ano === 30) montante30 = saldo;
-  }
-
-  // final balance for the chosen period
-  saldo = 0;
-  for (let ano = 1; ano <= input.anosAteAposentadoria; ano++) {
-    const rendimento = saldo * tasaRetornoDecimal;
-    saldo = saldo + rendimento + contribuicaoAnual;
-  }
-
-  const rendimentoTotal = saldo - contribuicaoAnual * input.anosAteAposentadoria;
+  // fixed comparison marks, always the same years whatever the horizon is
+  const marks = projectYearByYear(annualContribution, annualRate, FIXED_MARKS);
+  const balanceAtYear = (year: number) => marks[year - 1]?.balance ?? 0;
 
   return {
-    contribuicaoMensalPgbl: input.contribuicaoMensalPgbl,
-    contribuicaoAnualPgbl: contribuicaoAnual,
-    economiaIrpfMensal,
-    economiaIrpfAnual,
-    montanteFinal10anos: montante10,
-    montanteFinal20anos: montante20,
-    montanteFinal30anos: montante30,
-    rendimentoTotal,
-    projecao,
+    monthlyPgblContribution: input.monthlyPgblContribution,
+    annualPgblContribution: annualContribution,
+    monthlyIrpfSaving,
+    annualIrpfSaving,
+    balanceAtHorizon,
+    balanceAt10Years: balanceAtYear(10),
+    balanceAt20Years: balanceAtYear(20),
+    balanceAt30Years: balanceAtYear(30),
+    totalEarnings,
+    projection: horizon.filter((point) => isSampledYear(point.year)),
   };
 }

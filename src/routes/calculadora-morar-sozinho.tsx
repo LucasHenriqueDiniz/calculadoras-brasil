@@ -15,7 +15,11 @@ import { CopyResultButton, ResetButton, ShareResultButton } from "@/components/c
 import { Prose } from "@/components/layout/PageShell";
 import { getCalculator } from "@/data/calculators";
 import { formatBRL } from "@/lib/format";
-import { calculateLivingAloneCost, type LivingAloneInput } from "@/lib/calculators/livingAlone";
+import {
+  calculateLivingAloneCost,
+  type LivingAloneInput,
+  type LivingAloneResult,
+} from "@/lib/calculators/livingAlone";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
@@ -141,23 +145,16 @@ const STATUS_TONE: Record<string, "primary" | "neutral"> = {
   unknown: "neutral",
 };
 
-function LivingAlonePage() {
-  const [input, setInput] = usePersistedState<LivingAloneInput>(
-    "calculadoras-brasil:morar-sozinho:v1",
-    DEFAULTS,
-  );
-  const result = useMemo(() => calculateLivingAloneCost(input), [input]);
-
-  function update<K extends keyof LivingAloneInput>(key: K, value: LivingAloneInput[K]) {
-    setInput((prev) => ({ ...prev, [key]: value }));
-  }
-
-  const shareText =
-    result.incomePercentage !== null && result.remainingIncome !== null
-      ? `Meu custo estimado para morar sozinho é de ${formatBRL(result.monthlyTotal)} por mês, ou ${formatBRL(result.annualTotal)} por ano. Isso representa ${result.incomePercentage.toFixed(1).replace(".", ",")}% da minha renda líquida informada, com sobra estimada de ${formatBRL(result.remainingIncome)}.`
-      : `Meu custo estimado para morar sozinho é de ${formatBRL(result.monthlyTotal)} por mês, ou ${formatBRL(result.annualTotal)} por ano.`;
-
-  const form = (
+function LivingAloneForm({
+  input,
+  update,
+  onReset,
+}: {
+  input: LivingAloneInput;
+  update: <K extends keyof LivingAloneInput>(key: K, value: LivingAloneInput[K]) => void;
+  onReset: () => void;
+}) {
+  return (
     <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
       <FormSection title="Moradia">
         <CurrencyInput label="Aluguel" value={input.rent} onChange={(v) => update("rent", v)} />
@@ -266,12 +263,20 @@ function LivingAlonePage() {
       </DisclaimerBox>
 
       <div className="flex flex-wrap gap-2">
-        <ResetButton onReset={() => setInput(DEFAULTS)} />
+        <ResetButton onReset={onReset} />
       </div>
     </form>
   );
+}
 
-  const resultBlock = (
+function LivingAloneResults({
+  result,
+  shareText,
+}: {
+  result: LivingAloneResult;
+  shareText: string;
+}) {
+  return (
     <div className="space-y-3">
       <ResultSummaryCard
         title="Custo mensal total"
@@ -320,6 +325,138 @@ function LivingAlonePage() {
       </div>
     </div>
   );
+}
+
+/** The editorial section under the calculator. Static, so it takes no props. */
+function LivingAloneArticle() {
+  return (
+    <Prose collapsibleTitle="Saiba mais sobre morar sozinho">
+      <h2>O que considerar antes de morar sozinho?</h2>
+      <p>
+        Morar sozinho envolve muito mais do que o valor do aluguel. Para ter uma estimativa
+        realista, vale considerar todos os gastos recorrentes que aparecem no fim do mês.
+      </p>
+      <ul>
+        <li>
+          <strong>Aluguel:</strong> a base do orçamento de moradia.
+        </li>
+        <li>
+          <strong>Condomínio:</strong> obrigatório em apartamentos, varia muito por prédio.
+        </li>
+        <li>
+          <strong>IPTU:</strong> imposto municipal, geralmente anual mas pode ser parcelado.
+        </li>
+        <li>
+          <strong>Luz:</strong> depende do consumo e da tarifa local.
+        </li>
+        <li>
+          <strong>Água:</strong> normalmente cobrada por consumo, com mínimo mensal.
+        </li>
+        <li>
+          <strong>Gás:</strong> encanado ou botijão, conforme o imóvel.
+        </li>
+        <li>
+          <strong>Internet:</strong> essencial para trabalho e lazer.
+        </li>
+        <li>
+          <strong>Mercado:</strong> compras de alimentos e itens básicos.
+        </li>
+        <li>
+          <strong>Transporte:</strong> ônibus, metrô, app ou combustível.
+        </li>
+        <li>
+          <strong>Limpeza e higiene:</strong> produtos de casa e cuidados pessoais.
+        </li>
+        <li>
+          <strong>Lazer:</strong> sair, cinema, restaurantes, hobbies.
+        </li>
+        <li>
+          <strong>Móveis:</strong> parcelas de compras feitas para montar a casa.
+        </li>
+        <li>
+          <strong>Reserva:</strong> valor guardado todo mês para imprevistos.
+        </li>
+      </ul>
+
+      <h2>Quanto da renda pode ir para moradia?</h2>
+      <p>
+        Não existe uma regra oficial, mas uma referência usada por muita gente é manter aluguel,
+        condomínio e contas básicas dentro de um percentual confortável da renda líquida — de forma
+        que ainda sobre dinheiro para alimentação, transporte, lazer e reserva. Quanto mais a
+        moradia consome da renda, menos espaço sobra para o resto e para imprevistos. Trate isso
+        como ponto de partida, não como regra fixa.
+      </p>
+
+      <h2>Custos iniciais que muita gente esquece</h2>
+      <p>Além dos gastos mensais, mudar sozinho exige um valor inicial. Os principais são:</p>
+      <ul>
+        <li>Caução, depósito ou seguro-fiança</li>
+        <li>Frete da mudança</li>
+        <li>Móveis essenciais (cama, mesa, sofá, armários)</li>
+        <li>Eletrodomésticos (geladeira, fogão, micro-ondas, máquina de lavar)</li>
+        <li>Utensílios de cozinha (panelas, talheres, pratos, copos)</li>
+        <li>Instalação de internet e ajuste de medidores</li>
+        <li>Produtos de limpeza e materiais para a primeira semana</li>
+        <li>Pequenos reparos, pintura, cortinas e iluminação</li>
+      </ul>
+
+      <h2>Como interpretar o resultado</h2>
+      <p>A calculadora mostra cinco informações principais para ajudar a decisão:</p>
+      <ul>
+        <li>
+          <strong>Total mensal:</strong> soma de todas as categorias informadas.
+        </li>
+        <li>
+          <strong>Total anual:</strong> total mensal multiplicado por 12.
+        </li>
+        <li>
+          <strong>Percentual da renda:</strong> quanto o custo representa da renda líquida.
+        </li>
+        <li>
+          <strong>Sobra mensal:</strong> diferença entre renda líquida e custo mensal.
+        </li>
+        <li>
+          <strong>Maior categoria:</strong> destaca onde está o maior peso do orçamento.
+        </li>
+      </ul>
+
+      <h2>Exemplo prático</h2>
+      <p>
+        Uma pessoa com renda líquida de R$ 3.500, aluguel de R$ 1.200 e condomínio de R$ 250 já
+        parte com cerca de R$ 1.450 só em moradia. Somando luz, água, gás, internet, mercado,
+        transporte, lazer e uma reserva mínima, o orçamento pode terminar apertado — ainda mais se
+        houver delivery frequente, parcelas de móveis ou assinaturas acumuladas. Por isso é
+        importante simular o cenário antes de assinar o contrato.
+      </p>
+
+      <h2>Limitações</h2>
+      <p>
+        O resultado é uma estimativa educativa. Os valores variam por cidade, bairro, contrato,
+        padrão de consumo e estilo de vida. A calculadora não substitui planejamento financeiro
+        profissional, nem consulta a corretores, contadores ou instituições financeiras. Use como
+        ponto de partida para conversar sobre o seu orçamento.
+      </p>
+    </Prose>
+  );
+}
+
+function LivingAlonePage() {
+  const [input, setInput] = usePersistedState<LivingAloneInput>(
+    "calculadoras-brasil:morar-sozinho:v1",
+    DEFAULTS,
+  );
+  const result = useMemo(() => calculateLivingAloneCost(input), [input]);
+
+  function update<K extends keyof LivingAloneInput>(key: K, value: LivingAloneInput[K]) {
+    setInput((prev) => ({ ...prev, [key]: value }));
+  }
+
+  const shareText =
+    result.incomePercentage !== null && result.remainingIncome !== null
+      ? `Meu custo estimado para morar sozinho é de ${formatBRL(result.monthlyTotal)} por mês, ou ${formatBRL(result.annualTotal)} por ano. Isso representa ${result.incomePercentage.toFixed(1).replace(".", ",")}% da minha renda líquida informada, com sobra estimada de ${formatBRL(result.remainingIncome)}.`
+      : `Meu custo estimado para morar sozinho é de ${formatBRL(result.monthlyTotal)} por mês, ou ${formatBRL(result.annualTotal)} por ano.`;
+  const form = <LivingAloneForm input={input} update={update} onReset={() => setInput(DEFAULTS)} />;
+  const resultBlock = <LivingAloneResults result={result} shareText={shareText} />;
 
   return (
     <CalculatorLayout
@@ -338,113 +475,7 @@ function LivingAlonePage() {
         </div>
       </section>
 
-      <Prose collapsibleTitle="Saiba mais sobre morar sozinho">
-        <h2>O que considerar antes de morar sozinho?</h2>
-        <p>
-          Morar sozinho envolve muito mais do que o valor do aluguel. Para ter uma estimativa
-          realista, vale considerar todos os gastos recorrentes que aparecem no fim do mês.
-        </p>
-        <ul>
-          <li>
-            <strong>Aluguel:</strong> a base do orçamento de moradia.
-          </li>
-          <li>
-            <strong>Condomínio:</strong> obrigatório em apartamentos, varia muito por prédio.
-          </li>
-          <li>
-            <strong>IPTU:</strong> imposto municipal, geralmente anual mas pode ser parcelado.
-          </li>
-          <li>
-            <strong>Luz:</strong> depende do consumo e da tarifa local.
-          </li>
-          <li>
-            <strong>Água:</strong> normalmente cobrada por consumo, com mínimo mensal.
-          </li>
-          <li>
-            <strong>Gás:</strong> encanado ou botijão, conforme o imóvel.
-          </li>
-          <li>
-            <strong>Internet:</strong> essencial para trabalho e lazer.
-          </li>
-          <li>
-            <strong>Mercado:</strong> compras de alimentos e itens básicos.
-          </li>
-          <li>
-            <strong>Transporte:</strong> ônibus, metrô, app ou combustível.
-          </li>
-          <li>
-            <strong>Limpeza e higiene:</strong> produtos de casa e cuidados pessoais.
-          </li>
-          <li>
-            <strong>Lazer:</strong> sair, cinema, restaurantes, hobbies.
-          </li>
-          <li>
-            <strong>Móveis:</strong> parcelas de compras feitas para montar a casa.
-          </li>
-          <li>
-            <strong>Reserva:</strong> valor guardado todo mês para imprevistos.
-          </li>
-        </ul>
-
-        <h2>Quanto da renda pode ir para moradia?</h2>
-        <p>
-          Não existe uma regra oficial, mas uma referência usada por muita gente é manter aluguel,
-          condomínio e contas básicas dentro de um percentual confortável da renda líquida — de
-          forma que ainda sobre dinheiro para alimentação, transporte, lazer e reserva. Quanto mais
-          a moradia consome da renda, menos espaço sobra para o resto e para imprevistos. Trate isso
-          como ponto de partida, não como regra fixa.
-        </p>
-
-        <h2>Custos iniciais que muita gente esquece</h2>
-        <p>Além dos gastos mensais, mudar sozinho exige um valor inicial. Os principais são:</p>
-        <ul>
-          <li>Caução, depósito ou seguro-fiança</li>
-          <li>Frete da mudança</li>
-          <li>Móveis essenciais (cama, mesa, sofá, armários)</li>
-          <li>Eletrodomésticos (geladeira, fogão, micro-ondas, máquina de lavar)</li>
-          <li>Utensílios de cozinha (panelas, talheres, pratos, copos)</li>
-          <li>Instalação de internet e ajuste de medidores</li>
-          <li>Produtos de limpeza e materiais para a primeira semana</li>
-          <li>Pequenos reparos, pintura, cortinas e iluminação</li>
-        </ul>
-
-        <h2>Como interpretar o resultado</h2>
-        <p>A calculadora mostra cinco informações principais para ajudar a decisão:</p>
-        <ul>
-          <li>
-            <strong>Total mensal:</strong> soma de todas as categorias informadas.
-          </li>
-          <li>
-            <strong>Total anual:</strong> total mensal multiplicado por 12.
-          </li>
-          <li>
-            <strong>Percentual da renda:</strong> quanto o custo representa da renda líquida.
-          </li>
-          <li>
-            <strong>Sobra mensal:</strong> diferença entre renda líquida e custo mensal.
-          </li>
-          <li>
-            <strong>Maior categoria:</strong> destaca onde está o maior peso do orçamento.
-          </li>
-        </ul>
-
-        <h2>Exemplo prático</h2>
-        <p>
-          Uma pessoa com renda líquida de R$ 3.500, aluguel de R$ 1.200 e condomínio de R$ 250 já
-          parte com cerca de R$ 1.450 só em moradia. Somando luz, água, gás, internet, mercado,
-          transporte, lazer e uma reserva mínima, o orçamento pode terminar apertado — ainda mais se
-          houver delivery frequente, parcelas de móveis ou assinaturas acumuladas. Por isso é
-          importante simular o cenário antes de assinar o contrato.
-        </p>
-
-        <h2>Limitações</h2>
-        <p>
-          O resultado é uma estimativa educativa. Os valores variam por cidade, bairro, contrato,
-          padrão de consumo e estilo de vida. A calculadora não substitui planejamento financeiro
-          profissional, nem consulta a corretores, contadores ou instituições financeiras. Use como
-          ponto de partida para conversar sobre o seu orçamento.
-        </p>
-      </Prose>
+      <LivingAloneArticle />
 
       <div className="mx-auto max-w-6xl space-y-10 px-4 pb-16 sm:px-6">
         <FAQSection items={FAQ} />

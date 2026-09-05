@@ -1,5 +1,5 @@
 ---
-status: todo
+status: done
 kanban: 3308c8b1-ede8-4fd8-b6c3-6cb5dc29a3c7
 ---
 
@@ -70,3 +70,38 @@ or flattening the signature further.
 If the line count lands between 80 and 200, stop there and say so. This slice
 buys the hard limit; going after the soft one inside the same change makes the
 diff harder to review than the function was to read.
+
+---
+
+## What actually happened — 2026-09-05
+
+The `Done when` awk prints **40** and exits 0. It was 229 and exited 1 — so this landed under the
+soft 80-line limit too, not just the hard 200 the slice bought.
+
+Five helpers, along the seams the slice predicted:
+
+| helper | lines | what it owns |
+|---|---|---|
+| `chooseFuel` | 65 | which fuel is paid for, and the flex comparison — the only branch producing one |
+| `monthlyCostsOf` | 18 | every non-fuel cost normalised to a month |
+| `buildBreakdown` | 24 | the eleven rows, now a table rather than eleven object literals |
+| `buildHighlights` | 36 | the four conditional sentences |
+| `collectWarnings` | 16 | the two validations plus the standing caveat |
+
+`buildBreakdown` shrank most: the original repeated `monthly: x, annual: x * 12` eleven times, and
+`annual` could disagree with `monthly` in any one of them without a test noticing. It is now derived
+once from a tuple table, so that class of typo is unrepresentable.
+
+**Removed one piece of dead code**: `selectedPrice` was assigned in all four fuel branches and then
+discarded with `void selectedPrice;`. It reached no field of the result.
+
+### The proof is differential, not "the tests pass"
+
+`tests/` is untouched — `git diff tests/` is empty, which is what this slice asked for. But the
+existing suite does not reach every branch, so passing it is weak evidence for a refactor.
+
+The old function was extracted from `HEAD` into a throwaway module and both versions run
+side by side over the input space: 4 fuel types × 4 mileages × 3 city consumptions × 3 highway
+consumptions × 5 city-use percentages (including -10 and 130, outside the valid range) × 2 petrol
+prices × 3 ethanol prices × 4 depreciation percentages — **17.280 combinations**, comparing
+`JSON.stringify` of the whole result. Byte-identical every time. Probe deleted afterwards.

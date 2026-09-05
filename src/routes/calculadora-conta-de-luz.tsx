@@ -26,6 +26,7 @@ import {
   APPLIANCE_PRESETS,
   calculateElectricityBill,
   type ApplianceInput,
+  type ElectricityResult,
 } from "@/lib/calculators/electricityBill";
 import { getEnergyDistributors, getEnergyTariff } from "@/lib/public-data/client";
 import type { EnergyDistributorOption } from "@/lib/public-data/types";
@@ -41,6 +42,11 @@ const PAGE_DESCRIPTION =
 
 let _id = 0;
 const nextId = () => `a${++_id}_${Date.now().toString(36)}`;
+
+/** Builds a list row from a preset-shaped source, defaulting to a single unit. */
+function newAppliance(source: Omit<ApplianceInput, "id" | "quantity">): ApplianceInput {
+  return { id: nextId(), ...source, quantity: 1 };
+}
 
 const DEFAULT_APPLIANCES: ApplianceInput[] = [
   { id: nextId(), name: "Geladeira", watts: 130, hoursPerDay: 24, daysPerMonth: 30, quantity: 1 },
@@ -140,6 +146,464 @@ const FAQ: FAQItem[] = [
   },
 ];
 
+interface TariffSectionProps {
+  uf: string;
+  distributor: string;
+  distributors: EnergyDistributorOption[];
+  isLoadingDistributors: boolean;
+  tariff: number;
+  tariffState: PublicFieldState;
+  onUfChange: (value: string) => void;
+  onDistributorChange: (value: string) => void;
+  onRefresh: () => void;
+  onTariffChange: (value: string) => void;
+}
+
+function TariffSection({
+  uf,
+  distributor,
+  distributors,
+  isLoadingDistributors,
+  tariff,
+  tariffState,
+  onUfChange,
+  onDistributorChange,
+  onRefresh,
+  onTariffChange,
+}: TariffSectionProps) {
+  return (
+    <FormSection
+      title="Tarifa de energia"
+      description="Selecione seu estado e distribuidora para buscar a tarifa pública da ANEEL — ou informe o valor da sua fatura manualmente."
+    >
+      <SelectField
+        label="Estado da unidade consumidora"
+        value={uf}
+        onChange={onUfChange}
+        options={[...BRAZILIAN_STATES]}
+      />
+      <SearchableSelectField
+        label="Distribuidora"
+        value={distributor}
+        onChange={onDistributorChange}
+        options={distributors.map((item) => ({
+          value: item.distributor,
+          label: item.distributor,
+          description: item.uf,
+        }))}
+        placeholder={isLoadingDistributors ? "Carregando distribuidoras..." : "Selecionar"}
+        searchPlaceholder="Buscar distribuidora..."
+        emptyText="Nenhuma distribuidora encontrada."
+        disabled={isLoadingDistributors}
+        hint="A lista vem da API pública da ANEEL. A UF selecionada é usada na consulta da tarifa."
+      />
+      <div className="sm:col-span-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onRefresh}
+          disabled={tariffState.isLoading || !distributor.trim()}
+          className="w-full"
+        >
+          {tariffState.isLoading ? <LoaderCircle className="animate-spin" /> : null}
+          Atualizar tarifa da ANEEL
+        </Button>
+      </div>
+      <div className="sm:col-span-2">
+        <PublicDataField
+          label="Tarifa em R$/kWh"
+          value={tariff}
+          onManualChange={onTariffChange}
+          {...tariffState}
+          helperText="Prefira o valor total da sua fatura, já com impostos e bandeira."
+        />
+      </div>
+    </FormSection>
+  );
+}
+
+interface ApplianceRowProps {
+  appliance: ApplianceInput;
+  tariff: number;
+  onPatch: (id: string, patch: Partial<ApplianceInput>) => void;
+  onRemove: (id: string) => void;
+}
+
+function ApplianceRow({ appliance: a, tariff, onPatch, onRemove }: ApplianceRowProps) {
+  return (
+    <li className="space-y-3 rounded-xl border border-border bg-surface p-4">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex-1 space-y-1.5">
+          <Label htmlFor={`name-${a.id}`} className="text-sm font-medium">
+            Nome do aparelho
+          </Label>
+          <Input
+            id={`name-${a.id}`}
+            value={a.name}
+            onChange={(e) => onPatch(a.id, { name: e.target.value })}
+          />
+        </div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => onRemove(a.id)}
+          aria-label={`Remover ${a.name}`}
+          className="mt-6 text-muted-foreground hover:text-destructive"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <NumberInput
+          label="Potência"
+          value={a.watts}
+          onChange={(v) => onPatch(a.id, { watts: v })}
+          suffix="W"
+          step={10}
+        />
+        <NumberInput
+          label="Horas/dia"
+          value={a.hoursPerDay}
+          onChange={(v) => onPatch(a.id, { hoursPerDay: v })}
+          step={0.25}
+          max={24}
+        />
+        <NumberInput
+          label="Dias/mês"
+          value={a.daysPerMonth}
+          onChange={(v) => onPatch(a.id, { daysPerMonth: v })}
+          step={1}
+          max={31}
+        />
+        <NumberInput
+          label="Quantidade"
+          value={a.quantity}
+          onChange={(v) => onPatch(a.id, { quantity: Math.max(1, Math.floor(v)) })}
+          step={1}
+          min={1}
+        />
+      </div>
+      <p className="text-xs text-muted-foreground tabular-nums">
+        Consumo:{" "}
+        {formatNumber(
+          (a.watts *
+            Math.min(24, a.hoursPerDay) *
+            Math.min(31, a.daysPerMonth) *
+            Math.max(1, a.quantity)) /
+            1000,
+          1,
+        )}{" "}
+        kWh/mês ·{" "}
+        {formatBRL(
+          ((a.watts *
+            Math.min(24, a.hoursPerDay) *
+            Math.min(31, a.daysPerMonth) *
+            Math.max(1, a.quantity)) /
+            1000) *
+            tariff,
+        )}
+        /mês
+      </p>
+    </li>
+  );
+}
+
+interface ApplianceSectionProps {
+  appliances: ApplianceInput[];
+  tariff: number;
+  presetValue: string;
+  onAdd: () => void;
+  onAddPreset: (name: string) => void;
+  onPatch: (id: string, patch: Partial<ApplianceInput>) => void;
+  onRemove: (id: string) => void;
+}
+
+function ApplianceSection({
+  appliances,
+  tariff,
+  presetValue,
+  onAdd,
+  onAddPreset,
+  onPatch,
+  onRemove,
+}: ApplianceSectionProps) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="font-display text-lg text-foreground">Seus aparelhos</h3>
+        <Button type="button" variant="outline" size="sm" onClick={onAdd}>
+          <Plus className="mr-1 h-4 w-4" /> Adicionar
+        </Button>
+      </div>
+
+      <SelectField
+        label="Adicionar aparelho pré-configurado"
+        value={presetValue}
+        onChange={(v) => {
+          if (v) onAddPreset(v);
+        }}
+        options={[
+          { value: "", label: "Escolher da lista..." },
+          ...APPLIANCE_PRESETS.map((p) => ({
+            value: p.name,
+            label: `${p.name} (${p.watts} W)`,
+          })),
+        ]}
+        hint="Adiciona uma linha com potência e uso típicos. Edite depois."
+      />
+
+      {appliances.length === 0 ? (
+        <p className="rounded-xl border border-dashed border-border bg-surface p-6 text-center text-sm text-muted-foreground">
+          Nenhum aparelho ainda. Adicione um pré-configurado ou clique em "Adicionar".
+        </p>
+      ) : null}
+
+      <ul className="space-y-3">
+        {appliances.map((a) => (
+          <ApplianceRow
+            key={a.id}
+            appliance={a}
+            tariff={tariff}
+            onPatch={onPatch}
+            onRemove={onRemove}
+          />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+interface ElectricityResultsProps {
+  result: ElectricityResult;
+  tariff: number;
+  shareText: string;
+}
+
+function ElectricityResults({ result, tariff, shareText }: ElectricityResultsProps) {
+  return (
+    <div className="space-y-3">
+      <ResultSummaryCard
+        title="Custo mensal estimado"
+        value={formatBRL(result.totalCostPerMonth)}
+        description={`${formatNumber(result.totalKwhPerMonth, 1)} kWh/mês`}
+        tone="primary"
+      />
+      <div className="grid grid-cols-2 gap-3">
+        <ResultSummaryCard title="Custo anual" value={formatBRL(result.totalCostPerYear)} />
+        <ResultSummaryCard title="Tarifa usada" value={`${formatBRL(tariff)}/kWh`} />
+      </div>
+      <ResultSummaryCard
+        title="Maior consumidor"
+        value={result.topAppliance ? result.topAppliance.name : "—"}
+        description={
+          result.topAppliance
+            ? `${result.topAppliance.sharePercent.toFixed(1).replace(".", ",")}% do consumo`
+            : "Adicione aparelhos para ver"
+        }
+      />
+
+      {result.highlights.length > 0 ? (
+        <ul className="space-y-2 rounded-xl border border-border bg-surface p-4 text-sm text-foreground/85">
+          {result.highlights.map((h) => (
+            <li key={h}>• {h}</li>
+          ))}
+        </ul>
+      ) : null}
+
+      <WarningList warnings={result.warnings} />
+
+      <div className="flex flex-wrap gap-2">
+        <CopyResultButton text={shareText} />
+        <ShareResultButton title={PAGE_TITLE} text={shareText} />
+      </div>
+    </div>
+  );
+}
+
+interface ConsumptionTableProps {
+  result: ElectricityResult;
+  rows: BreakdownRow[];
+  colorOf: (id: string) => string;
+}
+
+function ConsumptionTable({ result, rows, colorOf }: ConsumptionTableProps) {
+  return (
+    <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <SimpleBarChart rows={rows} title="Custo mensal por aparelho" />
+        <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]">
+          <div className="flex items-center gap-2 border-b border-border px-5 py-3.5">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary-soft text-primary">
+              <TableIcon className="h-4 w-4" aria-hidden />
+            </span>
+            <p className="text-sm font-semibold text-foreground">Consumo e custo por aparelho</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <caption className="sr-only">Consumo e custo por aparelho</caption>
+              <thead>
+                <tr className="border-b border-border bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <th className="px-4 py-3 font-medium">Aparelho</th>
+                  <th className="px-4 py-3 text-right font-medium">kWh/mês</th>
+                  <th className="px-4 py-3 text-right font-medium">R$/mês</th>
+                  <th className="px-4 py-3 text-right font-medium">%</th>
+                </tr>
+              </thead>
+              <tbody>
+                {result.appliances.map((a) => (
+                  <tr
+                    key={a.id}
+                    className="border-b border-border/60 transition-colors last:border-0 odd:bg-muted/15 hover:bg-primary-soft/25"
+                  >
+                    <td className="px-4 py-2.5">
+                      <span className="flex items-center gap-2.5 text-foreground">
+                        <span
+                          className="h-2.5 w-2.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: colorOf(a.id) }}
+                          aria-hidden
+                        />
+                        <span className="truncate">{a.name}</span>
+                      </span>
+                    </td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
+                      {formatNumber(a.kwhPerMonth, 1)}
+                    </td>
+                    <td className="px-4 py-2.5 text-right font-medium tabular-nums">
+                      {formatBRL(a.costPerMonth)}
+                    </td>
+                    <td className="px-4 py-2.5 text-right">
+                      <span className="inline-flex items-center justify-end gap-2">
+                        <span className="hidden h-1.5 w-12 overflow-hidden rounded-full bg-muted sm:block">
+                          <span
+                            className="block h-full rounded-full"
+                            style={{
+                              width: `${Math.min(100, a.sharePercent)}%`,
+                              backgroundColor: colorOf(a.id),
+                            }}
+                          />
+                        </span>
+                        <span className="w-12 text-right tabular-nums text-muted-foreground">
+                          {a.sharePercent.toFixed(1)}%
+                        </span>
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                <tr className="border-t-2 border-border bg-primary-soft/40 font-semibold text-foreground">
+                  <td className="px-4 py-3">Total</td>
+                  <td className="px-4 py-3 text-right tabular-nums">
+                    {formatNumber(result.totalKwhPerMonth, 1)}
+                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums">
+                    {formatBRL(result.totalCostPerMonth)}
+                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums">100%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ElectricityArticle() {
+  return (
+    <Prose collapsibleTitle="Saiba mais sobre a conta de luz">
+      <h2>Como funciona o cálculo</h2>
+      <p>O consumo de qualquer aparelho elétrico segue uma fórmula simples:</p>
+      <p>
+        <strong>
+          kWh por mês = (potência em watts × horas por dia × dias por mês × quantidade) ÷ 1.000
+        </strong>
+      </p>
+      <p>
+        O custo mensal é o consumo em kWh multiplicado pela tarifa da sua distribuidora, informada
+        em R$/kWh. Por exemplo, uma geladeira de 130 W ligada 24 horas por dia consome
+        aproximadamente 93,6 kWh por mês. Com uma tarifa de R$ 0,95/kWh, isso dá cerca de R$ 89 por
+        mês só com a geladeira.
+      </p>
+
+      <h2>Os campeões da conta de luz</h2>
+      <p>Na maioria das casas, três grupos de aparelhos respondem pela maior parte da fatura:</p>
+      <ul>
+        <li>
+          <strong>Chuveiro elétrico:</strong> potência muito alta (entre 4.500 W e 7.500 W). Banhos
+          longos no inverno são o principal vilão sazonal.
+        </li>
+        <li>
+          <strong>Geladeira e freezer:</strong> potência relativamente baixa, mas ficam ligados 24
+          horas por dia, todos os dias do mês.
+        </li>
+        <li>
+          <strong>Ar-condicionado:</strong> em regiões quentes, pode ser o item mais caro do mês,
+          especialmente em quartos onde o aparelho fica ligado durante o sono.
+        </li>
+      </ul>
+      <p>
+        Outros aparelhos que pesam quando usados com frequência: secadora de roupas, ferro de
+        passar, forno elétrico e secador/chapinha.
+      </p>
+
+      <h2>Como reduzir a conta sem perder conforto</h2>
+      <ul>
+        <li>Reduzir o tempo de banho no inverno e usar a chave em "verão" quando der.</li>
+        <li>Configurar o ar-condicionado em 23–24 °C, com modo econômico ativado.</li>
+        <li>Trocar lâmpadas incandescentes ou fluorescentes por LED.</li>
+        <li>Juntar roupa suficiente para usar a máquina de lavar com a carga cheia.</li>
+        <li>
+          Desligar aparelhos em standby — TVs, vídeo-games e desktops consomem mesmo desligados.
+        </li>
+        <li>Verificar a vedação da geladeira (porta encaixando bem) e evitar abrir muito.</li>
+        <li>Usar o ferro de passar com a maior quantidade de roupas de uma vez.</li>
+      </ul>
+
+      <h2>Sobre a tarifa e as bandeiras</h2>
+      <p>
+        A tarifa que aparece na sua conta já inclui impostos (ICMS, PIS, Cofins) e pode variar mês a
+        mês conforme a bandeira tarifária definida pela Aneel:
+      </p>
+      <ul>
+        <li>
+          <strong>Verde:</strong> sem adicional.
+        </li>
+        <li>
+          <strong>Amarela:</strong> pequeno adicional por kWh consumido.
+        </li>
+        <li>
+          <strong>Vermelha (patamar 1 ou 2):</strong> adicional maior, comum em períodos de seca.
+        </li>
+      </ul>
+      <p>
+        Para uma estimativa fiel ao mês atual, use a tarifa total que aparece no detalhamento da sua
+        fatura mais recente. Para uma média anual, considere uma tarifa intermediária.
+      </p>
+
+      <h2>Fonte da tarifa de energia</h2>
+      <p>
+        A sugestão automática consulta o{" "}
+        <a href="https://dadosabertos.aneel.gov.br/" target="_blank" rel="noreferrer">
+          portal de dados abertos da ANEEL
+        </a>
+        , usando a tarifa B1 residencial convencional vigente para a distribuidora informada. O
+        valor público combina TUSD e TE, mas não inclui impostos, bandeiras tarifárias, iluminação
+        pública nem regras específicas da sua fatura. O cache é atualizado semanalmente e o valor
+        continua editável.
+      </p>
+
+      <h2>Limitações</h2>
+      <p>
+        A calculadora é uma estimativa educativa. O consumo real varia conforme o modelo, a
+        eficiência energética (selo Procel/Inmetro), a idade do aparelho, a temperatura ambiente e
+        os hábitos de uso. Para medições precisas, existem medidores de consumo (watt-meter) que se
+        conectam à tomada e mostram o gasto real do aparelho.
+      </p>
+    </Prose>
+  );
+}
+
 export const Route = createFileRoute("/calculadora-conta-de-luz")({
   head: () => ({
     meta: [
@@ -199,30 +663,13 @@ function ElectricityPage() {
   function addAppliance() {
     setAppliances((prev) => [
       ...prev,
-      {
-        id: nextId(),
-        name: "Novo aparelho",
-        watts: 100,
-        hoursPerDay: 1,
-        daysPerMonth: 30,
-        quantity: 1,
-      },
+      newAppliance({ name: "Novo aparelho", watts: 100, hoursPerDay: 1, daysPerMonth: 30 }),
     ]);
   }
   function addPreset(name: string) {
     const preset = APPLIANCE_PRESETS.find((p) => p.name === name);
     if (!preset) return;
-    setAppliances((prev) => [
-      ...prev,
-      {
-        id: nextId(),
-        name: preset.name,
-        watts: preset.watts,
-        hoursPerDay: preset.hoursPerDay,
-        daysPerMonth: preset.daysPerMonth,
-        quantity: 1,
-      },
-    ]);
+    setAppliances((prev) => [...prev, newAppliance(preset)]);
     setPresetValue("");
   }
   function reset() {
@@ -241,12 +688,7 @@ function ElectricityPage() {
 
   function updateTariffManually(value: string) {
     setTariff(parseBRNumber(value));
-    setTariffState((prev) => ({
-      ...prev,
-      isLoading: false,
-      isManual: true,
-      error: null,
-    }));
+    setTariffState((prev) => ({ ...prev, isLoading: false, isManual: true, error: null }));
   }
 
   async function loadEnergyTariff() {
@@ -326,164 +768,28 @@ function ElectricityPage() {
 
   const form = (
     <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
-      <FormSection
-        title="Tarifa de energia"
-        description="Selecione seu estado e distribuidora para buscar a tarifa pública da ANEEL — ou informe o valor da sua fatura manualmente."
-      >
-        <SelectField
-          label="Estado da unidade consumidora"
-          value={uf}
-          onChange={updateUf}
-          options={[...BRAZILIAN_STATES]}
-        />
-        <SearchableSelectField
-          label="Distribuidora"
-          value={distributor}
-          onChange={setDistributor}
-          options={distributors.map((item) => ({
-            value: item.distributor,
-            label: item.distributor,
-            description: item.uf,
-          }))}
-          placeholder={isLoadingDistributors ? "Carregando distribuidoras..." : "Selecionar"}
-          searchPlaceholder="Buscar distribuidora..."
-          emptyText="Nenhuma distribuidora encontrada."
-          disabled={isLoadingDistributors}
-          hint="A lista vem da API pública da ANEEL. A UF selecionada é usada na consulta da tarifa."
-        />
-        <div className="sm:col-span-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={loadEnergyTariff}
-            disabled={tariffState.isLoading || !distributor.trim()}
-            className="w-full"
-          >
-            {tariffState.isLoading ? <LoaderCircle className="animate-spin" /> : null}
-            Atualizar tarifa da ANEEL
-          </Button>
-        </div>
-        <div className="sm:col-span-2">
-          <PublicDataField
-            label="Tarifa em R$/kWh"
-            value={tariff}
-            onManualChange={updateTariffManually}
-            {...tariffState}
-            helperText="Prefira o valor total da sua fatura, já com impostos e bandeira."
-          />
-        </div>
-      </FormSection>
+      <TariffSection
+        uf={uf}
+        distributor={distributor}
+        distributors={distributors}
+        isLoadingDistributors={isLoadingDistributors}
+        tariff={tariff}
+        tariffState={tariffState}
+        onUfChange={updateUf}
+        onDistributorChange={setDistributor}
+        onRefresh={loadEnergyTariff}
+        onTariffChange={updateTariffManually}
+      />
 
-      <div className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="font-display text-lg text-foreground">Seus aparelhos</h3>
-          <Button type="button" variant="outline" size="sm" onClick={addAppliance}>
-            <Plus className="mr-1 h-4 w-4" /> Adicionar
-          </Button>
-        </div>
-
-        <SelectField
-          label="Adicionar aparelho pré-configurado"
-          value={presetValue}
-          onChange={(v) => {
-            if (v) addPreset(v);
-          }}
-          options={[
-            { value: "", label: "Escolher da lista..." },
-            ...APPLIANCE_PRESETS.map((p) => ({
-              value: p.name,
-              label: `${p.name} (${p.watts} W)`,
-            })),
-          ]}
-          hint="Adiciona uma linha com potência e uso típicos. Edite depois."
-        />
-
-        {appliances.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-border bg-surface p-6 text-center text-sm text-muted-foreground">
-            Nenhum aparelho ainda. Adicione um pré-configurado ou clique em "Adicionar".
-          </p>
-        ) : null}
-
-        <ul className="space-y-3">
-          {appliances.map((a) => (
-            <li key={a.id} className="space-y-3 rounded-xl border border-border bg-surface p-4">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex-1 space-y-1.5">
-                  <Label htmlFor={`name-${a.id}`} className="text-sm font-medium">
-                    Nome do aparelho
-                  </Label>
-                  <Input
-                    id={`name-${a.id}`}
-                    value={a.name}
-                    onChange={(e) => updateAppliance(a.id, { name: e.target.value })}
-                  />
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeAppliance(a.id)}
-                  aria-label={`Remover ${a.name}`}
-                  className="mt-6 text-muted-foreground hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <NumberInput
-                  label="Potência"
-                  value={a.watts}
-                  onChange={(v) => updateAppliance(a.id, { watts: v })}
-                  suffix="W"
-                  step={10}
-                />
-                <NumberInput
-                  label="Horas/dia"
-                  value={a.hoursPerDay}
-                  onChange={(v) => updateAppliance(a.id, { hoursPerDay: v })}
-                  step={0.25}
-                  max={24}
-                />
-                <NumberInput
-                  label="Dias/mês"
-                  value={a.daysPerMonth}
-                  onChange={(v) => updateAppliance(a.id, { daysPerMonth: v })}
-                  step={1}
-                  max={31}
-                />
-                <NumberInput
-                  label="Quantidade"
-                  value={a.quantity}
-                  onChange={(v) => updateAppliance(a.id, { quantity: Math.max(1, Math.floor(v)) })}
-                  step={1}
-                  min={1}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground tabular-nums">
-                Consumo:{" "}
-                {formatNumber(
-                  (a.watts *
-                    Math.min(24, a.hoursPerDay) *
-                    Math.min(31, a.daysPerMonth) *
-                    Math.max(1, a.quantity)) /
-                    1000,
-                  1,
-                )}{" "}
-                kWh/mês ·{" "}
-                {formatBRL(
-                  ((a.watts *
-                    Math.min(24, a.hoursPerDay) *
-                    Math.min(31, a.daysPerMonth) *
-                    Math.max(1, a.quantity)) /
-                    1000) *
-                    tariff,
-                )}
-                /mês
-              </p>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <ApplianceSection
+        appliances={appliances}
+        tariff={tariff}
+        presetValue={presetValue}
+        onAdd={addAppliance}
+        onAddPreset={addPreset}
+        onPatch={updateAppliance}
+        onRemove={removeAppliance}
+      />
 
       <DisclaimerBox>
         Os valores padrão são exemplos editáveis. O consumo real varia conforme modelo, eficiência
@@ -497,220 +803,16 @@ function ElectricityPage() {
     </form>
   );
 
-  const resultBlock = (
-    <div className="space-y-3">
-      <ResultSummaryCard
-        title="Custo mensal estimado"
-        value={formatBRL(result.totalCostPerMonth)}
-        description={`${formatNumber(result.totalKwhPerMonth, 1)} kWh/mês`}
-        tone="primary"
-      />
-      <div className="grid grid-cols-2 gap-3">
-        <ResultSummaryCard title="Custo anual" value={formatBRL(result.totalCostPerYear)} />
-        <ResultSummaryCard title="Tarifa usada" value={`${formatBRL(tariff)}/kWh`} />
-      </div>
-      <ResultSummaryCard
-        title="Maior consumidor"
-        value={result.topAppliance ? result.topAppliance.name : "—"}
-        description={
-          result.topAppliance
-            ? `${result.topAppliance.sharePercent.toFixed(1).replace(".", ",")}% do consumo`
-            : "Adicione aparelhos para ver"
-        }
-      />
-
-      {result.highlights.length > 0 ? (
-        <ul className="space-y-2 rounded-xl border border-border bg-surface p-4 text-sm text-foreground/85">
-          {result.highlights.map((h) => (
-            <li key={h}>• {h}</li>
-          ))}
-        </ul>
-      ) : null}
-
-      <WarningList warnings={result.warnings} />
-
-      <div className="flex flex-wrap gap-2">
-        <CopyResultButton text={shareText} />
-        <ShareResultButton title={PAGE_TITLE} text={shareText} />
-      </div>
-    </div>
-  );
-
   return (
     <CalculatorLayout
       title="Calculadora de conta de luz por aparelho"
       description={PAGE_DESCRIPTION}
       form={form}
-      result={resultBlock}
+      result={<ElectricityResults result={result} tariff={tariff} shareText={shareText} />}
     >
-      <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6">
-        <div className="grid gap-4 lg:grid-cols-2">
-          <SimpleBarChart rows={chartRows} title="Custo mensal por aparelho" />
-          <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]">
-            <div className="flex items-center gap-2 border-b border-border px-5 py-3.5">
-              <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary-soft text-primary">
-                <TableIcon className="h-4 w-4" aria-hidden />
-              </span>
-              <p className="text-sm font-semibold text-foreground">Consumo e custo por aparelho</p>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <caption className="sr-only">Consumo e custo por aparelho</caption>
-                <thead>
-                  <tr className="border-b border-border bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
-                    <th className="px-4 py-3 font-medium">Aparelho</th>
-                    <th className="px-4 py-3 text-right font-medium">kWh/mês</th>
-                    <th className="px-4 py-3 text-right font-medium">R$/mês</th>
-                    <th className="px-4 py-3 text-right font-medium">%</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.appliances.map((a) => (
-                    <tr
-                      key={a.id}
-                      className="border-b border-border/60 transition-colors last:border-0 odd:bg-muted/15 hover:bg-primary-soft/25"
-                    >
-                      <td className="px-4 py-2.5">
-                        <span className="flex items-center gap-2.5 text-foreground">
-                          <span
-                            className="h-2.5 w-2.5 shrink-0 rounded-full"
-                            style={{ backgroundColor: applianceColor(a.id) }}
-                            aria-hidden
-                          />
-                          <span className="truncate">{a.name}</span>
-                        </span>
-                      </td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
-                        {formatNumber(a.kwhPerMonth, 1)}
-                      </td>
-                      <td className="px-4 py-2.5 text-right font-medium tabular-nums">
-                        {formatBRL(a.costPerMonth)}
-                      </td>
-                      <td className="px-4 py-2.5 text-right">
-                        <span className="inline-flex items-center justify-end gap-2">
-                          <span className="hidden h-1.5 w-12 overflow-hidden rounded-full bg-muted sm:block">
-                            <span
-                              className="block h-full rounded-full"
-                              style={{
-                                width: `${Math.min(100, a.sharePercent)}%`,
-                                backgroundColor: applianceColor(a.id),
-                              }}
-                            />
-                          </span>
-                          <span className="w-12 text-right tabular-nums text-muted-foreground">
-                            {a.sharePercent.toFixed(1)}%
-                          </span>
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                  <tr className="border-t-2 border-border bg-primary-soft/40 font-semibold text-foreground">
-                    <td className="px-4 py-3">Total</td>
-                    <td className="px-4 py-3 text-right tabular-nums">
-                      {formatNumber(result.totalKwhPerMonth, 1)}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums">
-                      {formatBRL(result.totalCostPerMonth)}
-                    </td>
-                    <td className="px-4 py-3 text-right tabular-nums">100%</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ConsumptionTable result={result} rows={chartRows} colorOf={applianceColor} />
 
-      <Prose collapsibleTitle="Saiba mais sobre a conta de luz">
-        <h2>Como funciona o cálculo</h2>
-        <p>O consumo de qualquer aparelho elétrico segue uma fórmula simples:</p>
-        <p>
-          <strong>
-            kWh por mês = (potência em watts × horas por dia × dias por mês × quantidade) ÷ 1.000
-          </strong>
-        </p>
-        <p>
-          O custo mensal é o consumo em kWh multiplicado pela tarifa da sua distribuidora, informada
-          em R$/kWh. Por exemplo, uma geladeira de 130 W ligada 24 horas por dia consome
-          aproximadamente 93,6 kWh por mês. Com uma tarifa de R$ 0,95/kWh, isso dá cerca de R$ 89
-          por mês só com a geladeira.
-        </p>
-
-        <h2>Os campeões da conta de luz</h2>
-        <p>Na maioria das casas, três grupos de aparelhos respondem pela maior parte da fatura:</p>
-        <ul>
-          <li>
-            <strong>Chuveiro elétrico:</strong> potência muito alta (entre 4.500 W e 7.500 W).
-            Banhos longos no inverno são o principal vilão sazonal.
-          </li>
-          <li>
-            <strong>Geladeira e freezer:</strong> potência relativamente baixa, mas ficam ligados 24
-            horas por dia, todos os dias do mês.
-          </li>
-          <li>
-            <strong>Ar-condicionado:</strong> em regiões quentes, pode ser o item mais caro do mês,
-            especialmente em quartos onde o aparelho fica ligado durante o sono.
-          </li>
-        </ul>
-        <p>
-          Outros aparelhos que pesam quando usados com frequência: secadora de roupas, ferro de
-          passar, forno elétrico e secador/chapinha.
-        </p>
-
-        <h2>Como reduzir a conta sem perder conforto</h2>
-        <ul>
-          <li>Reduzir o tempo de banho no inverno e usar a chave em "verão" quando der.</li>
-          <li>Configurar o ar-condicionado em 23–24 °C, com modo econômico ativado.</li>
-          <li>Trocar lâmpadas incandescentes ou fluorescentes por LED.</li>
-          <li>Juntar roupa suficiente para usar a máquina de lavar com a carga cheia.</li>
-          <li>
-            Desligar aparelhos em standby — TVs, vídeo-games e desktops consomem mesmo desligados.
-          </li>
-          <li>Verificar a vedação da geladeira (porta encaixando bem) e evitar abrir muito.</li>
-          <li>Usar o ferro de passar com a maior quantidade de roupas de uma vez.</li>
-        </ul>
-
-        <h2>Sobre a tarifa e as bandeiras</h2>
-        <p>
-          A tarifa que aparece na sua conta já inclui impostos (ICMS, PIS, Cofins) e pode variar mês
-          a mês conforme a bandeira tarifária definida pela Aneel:
-        </p>
-        <ul>
-          <li>
-            <strong>Verde:</strong> sem adicional.
-          </li>
-          <li>
-            <strong>Amarela:</strong> pequeno adicional por kWh consumido.
-          </li>
-          <li>
-            <strong>Vermelha (patamar 1 ou 2):</strong> adicional maior, comum em períodos de seca.
-          </li>
-        </ul>
-        <p>
-          Para uma estimativa fiel ao mês atual, use a tarifa total que aparece no detalhamento da
-          sua fatura mais recente. Para uma média anual, considere uma tarifa intermediária.
-        </p>
-
-        <h2>Fonte da tarifa de energia</h2>
-        <p>
-          A sugestão automática consulta o{" "}
-          <a href="https://dadosabertos.aneel.gov.br/" target="_blank" rel="noreferrer">
-            portal de dados abertos da ANEEL
-          </a>
-          , usando a tarifa B1 residencial convencional vigente para a distribuidora informada. O
-          valor público combina TUSD e TE, mas não inclui impostos, bandeiras tarifárias, iluminação
-          pública nem regras específicas da sua fatura. O cache é atualizado semanalmente e o valor
-          continua editável.
-        </p>
-
-        <h2>Limitações</h2>
-        <p>
-          A calculadora é uma estimativa educativa. O consumo real varia conforme o modelo, a
-          eficiência energética (selo Procel/Inmetro), a idade do aparelho, a temperatura ambiente e
-          os hábitos de uso. Para medições precisas, existem medidores de consumo (watt-meter) que
-          se conectam à tomada e mostram o gasto real do aparelho.
-        </p>
-      </Prose>
+      <ElectricityArticle />
 
       <div className="mx-auto max-w-6xl space-y-10 px-4 pb-16 sm:px-6">
         <FAQSection items={FAQ} />

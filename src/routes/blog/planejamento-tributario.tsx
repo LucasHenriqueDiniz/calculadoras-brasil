@@ -64,14 +64,15 @@ function BlogPost() {
 
           <h2>Previdência Complementar</h2>
           <p>
-            Contribuindo até R$ 63.454/ano (13% da renda bruta) em PGBL ou VGBL, você reduz seu IRPF
-            hoje e constrói poupança para aposentadoria. Ganho duplo.
+            Contribuindo até 12% do seu rendimento tributável em PGBL, você reduz seu IRPF hoje e
+            constrói poupança para aposentadoria. Ganho duplo.
           </p>
 
           <h2>Regime Simplificado</h2>
           <p>
-            Se tem poucos gastos dedutíveis, o regime simplificado (20,5% dedução fixa) pode ser
-            melhor que o completo. Compare na calculadora IRPF.
+            Se tem poucos gastos dedutíveis, o regime simplificado (20% de dedução fixa, até R$
+            17.640,00 por ano) pode ser melhor que o completo. Lembre que ele substitui todas as
+            outras deduções, dependentes inclusive. Compare na calculadora IRPF.
           </p>
 
           <h2>Deduções com Educação</h2>

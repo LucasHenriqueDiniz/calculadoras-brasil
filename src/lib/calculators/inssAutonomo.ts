@@ -18,130 +18,130 @@
  */
 
 import {
-  INSS_ANO_REFERENCIA,
-  SALARIO_MINIMO,
-  TETO_INSS,
-  salarioDeContribuicao,
+  INSS_REFERENCE_YEAR,
+  MINIMUM_WAGE,
+  INSS_CEILING,
+  contributionSalary,
 } from "./inss-constants";
 
-export type PlanoInss = "normal" | "simplificado";
+export type InssPlan = "normal" | "simplificado";
 
 export interface InssAutonomoInput {
   /** Gross monthly income declared as self-employed. */
-  ganhoMensalBruto: number;
+  grossMonthlyIncome: number;
   /** Contribution months already accumulated. */
-  mesesContribuidos: number;
+  contributedMonths: number;
   /** Sex sets the minimum length-of-contribution requirement (EC 103/2019). */
-  sexo: "masculino" | "feminino";
+  contributorSex: "masculino" | "feminino";
 }
 
 export interface InssAutonomoResult {
-  anoReferencia: number;
-  ganhoMensalBruto: number;
+  referenceYear: number;
+  grossMonthlyIncome: number;
   /** Effective base of the standard plan, already clamped to floor and ceiling. */
-  salarioContribuicao: number;
+  contributionBase: number;
   /** Signals that the income exceeded the ceiling and the base was capped. */
-  limitadoPeloTeto: boolean;
+  cappedByCeiling: boolean;
   /** Signals that the income fell below the floor and the base was raised to it. */
-  elevadoAoPiso: boolean;
+  raisedToFloor: boolean;
 
-  planoNormal: PlanoDetalhe;
-  planoSimplificado: PlanoDetalhe;
+  standardPlan: PlanDetail;
+  simplifiedPlan: PlanDetail;
 
   /** Annual cost difference between the two plans. */
-  diferencaCustoAnual: number;
+  annualCostDifference: number;
 
-  mesesContribuidos: number;
-  anosContribuidos: number;
+  contributedMonths: number;
+  contributedYears: number;
   /** Applicable length-of-contribution requirement, in years. */
-  tempoMinimoContribuicao: number;
+  minimumContributionYears: number;
   /** Benefit estimate for the standard plan, under the EC 103/2019 rule. */
-  estimativaBeneficioNormal: number;
+  standardPlanBenefitEstimate: number;
   /** The simplified plan's benefit is always one minimum wage. */
-  estimativaBeneficioSimplificado: number;
+  simplifiedPlanBenefitEstimate: number;
   /** Percentage of the average applied in the standard-plan estimate. */
-  percentualMediaAplicado: number;
+  appliedAveragePercentage: number;
   /** False while the minimum contribution time has not been reached yet. */
-  tempoMinimoAtingido: boolean;
+  minimumTimeReached: boolean;
 }
 
-export interface PlanoDetalhe {
+export interface PlanDetail {
   base: number;
-  aliquota: number;
-  contribuicaoMensal: number;
-  contribuicaoAnual: number;
-  contaTempoDeContribuicao: boolean;
-  tetoBeneficio: "teto do INSS" | "um salário mínimo";
+  rate: number;
+  monthlyContribution: number;
+  annualContribution: number;
+  countsTowardsContributionTime: boolean;
+  benefitCeiling: "teto do INSS" | "um salário mínimo";
 }
 
-const ALIQUOTA_NORMAL = 0.2;
-const ALIQUOTA_SIMPLIFICADA = 0.11;
+const STANDARD_PLAN_RATE = 0.2;
+const SIMPLIFIED_PLAN_RATE = 0.11;
 
 /** EC 103/2019: 20 years for men, 15 for women, for a self-employed contributor. */
-const TEMPO_MINIMO_ANOS = { masculino: 20, feminino: 15 } as const;
+const MINIMUM_CONTRIBUTION_YEARS = { masculino: 20, feminino: 15 } as const;
 
 /** EC 103/2019: 60% of the average + 2% per year beyond the minimum time. */
-const PERCENTUAL_BASE = 60;
-const PERCENTUAL_POR_ANO_EXCEDENTE = 2;
+const BASE_PERCENTAGE = 60;
+const PERCENTAGE_PER_EXTRA_YEAR = 2;
 
 export function calculateInssAutonomo(input: InssAutonomoInput): InssAutonomoResult {
-  const ganhoMensalBruto = Math.max(input.ganhoMensalBruto, 0);
-  const salarioContribuicao = salarioDeContribuicao(ganhoMensalBruto);
+  const grossMonthlyIncome = Math.max(input.grossMonthlyIncome, 0);
+  const contributionBase = contributionSalary(grossMonthlyIncome);
 
-  const contribuicaoNormalMensal = salarioContribuicao * ALIQUOTA_NORMAL;
-  const contribuicaoSimplificadaMensal = SALARIO_MINIMO * ALIQUOTA_SIMPLIFICADA;
+  const standardMonthlyContribution = contributionBase * STANDARD_PLAN_RATE;
+  const simplifiedMonthlyContribution = MINIMUM_WAGE * SIMPLIFIED_PLAN_RATE;
 
-  const planoNormal: PlanoDetalhe = {
-    base: salarioContribuicao,
-    aliquota: ALIQUOTA_NORMAL * 100,
-    contribuicaoMensal: contribuicaoNormalMensal,
-    contribuicaoAnual: contribuicaoNormalMensal * 12,
-    contaTempoDeContribuicao: true,
-    tetoBeneficio: "teto do INSS",
+  const standardPlan: PlanDetail = {
+    base: contributionBase,
+    rate: STANDARD_PLAN_RATE * 100,
+    monthlyContribution: standardMonthlyContribution,
+    annualContribution: standardMonthlyContribution * 12,
+    countsTowardsContributionTime: true,
+    benefitCeiling: "teto do INSS",
   };
 
-  const planoSimplificado: PlanoDetalhe = {
-    base: SALARIO_MINIMO,
-    aliquota: ALIQUOTA_SIMPLIFICADA * 100,
-    contribuicaoMensal: contribuicaoSimplificadaMensal,
-    contribuicaoAnual: contribuicaoSimplificadaMensal * 12,
-    contaTempoDeContribuicao: false,
-    tetoBeneficio: "um salário mínimo",
+  const simplifiedPlan: PlanDetail = {
+    base: MINIMUM_WAGE,
+    rate: SIMPLIFIED_PLAN_RATE * 100,
+    monthlyContribution: simplifiedMonthlyContribution,
+    annualContribution: simplifiedMonthlyContribution * 12,
+    countsTowardsContributionTime: false,
+    benefitCeiling: "um salário mínimo",
   };
 
-  const mesesContribuidos = Math.max(input.mesesContribuidos, 0);
-  const anosContribuidos = mesesContribuidos / 12;
-  const tempoMinimoContribuicao = TEMPO_MINIMO_ANOS[input.sexo];
-  const tempoMinimoAtingido = anosContribuidos >= tempoMinimoContribuicao;
+  const contributedMonths = Math.max(input.contributedMonths, 0);
+  const contributedYears = contributedMonths / 12;
+  const minimumContributionYears = MINIMUM_CONTRIBUTION_YEARS[input.contributorSex];
+  const minimumTimeReached = contributedYears >= minimumContributionYears;
 
-  const anosExcedentes = Math.max(anosContribuidos - tempoMinimoContribuicao, 0);
-  const percentualMediaAplicado = Math.min(
-    PERCENTUAL_BASE + Math.floor(anosExcedentes) * PERCENTUAL_POR_ANO_EXCEDENTE,
+  const yearsBeyondMinimum = Math.max(contributedYears - minimumContributionYears, 0);
+  const appliedAveragePercentage = Math.min(
+    BASE_PERCENTAGE + Math.floor(yearsBeyondMinimum) * PERCENTAGE_PER_EXTRA_YEAR,
     100,
   );
 
   // The real average considers every contribution salary since 07/1994.
   // Here the current contribution salary stands in as an approximation.
-  const beneficioBruto = salarioContribuicao * (percentualMediaAplicado / 100);
-  const estimativaBeneficioNormal = tempoMinimoAtingido
-    ? Math.min(Math.max(beneficioBruto, SALARIO_MINIMO), TETO_INSS)
+  const grossBenefit = contributionBase * (appliedAveragePercentage / 100);
+  const standardPlanBenefitEstimate = minimumTimeReached
+    ? Math.min(Math.max(grossBenefit, MINIMUM_WAGE), INSS_CEILING)
     : 0;
 
   return {
-    anoReferencia: INSS_ANO_REFERENCIA,
-    ganhoMensalBruto,
-    salarioContribuicao,
-    limitadoPeloTeto: ganhoMensalBruto > TETO_INSS,
-    elevadoAoPiso: ganhoMensalBruto > 0 && ganhoMensalBruto < SALARIO_MINIMO,
-    planoNormal,
-    planoSimplificado,
-    diferencaCustoAnual: planoNormal.contribuicaoAnual - planoSimplificado.contribuicaoAnual,
-    mesesContribuidos,
-    anosContribuidos,
-    tempoMinimoContribuicao,
-    estimativaBeneficioNormal,
-    estimativaBeneficioSimplificado: SALARIO_MINIMO,
-    percentualMediaAplicado,
-    tempoMinimoAtingido,
+    referenceYear: INSS_REFERENCE_YEAR,
+    grossMonthlyIncome,
+    contributionBase,
+    cappedByCeiling: grossMonthlyIncome > INSS_CEILING,
+    raisedToFloor: grossMonthlyIncome > 0 && grossMonthlyIncome < MINIMUM_WAGE,
+    standardPlan,
+    simplifiedPlan,
+    annualCostDifference: standardPlan.annualContribution - simplifiedPlan.annualContribution,
+    contributedMonths,
+    contributedYears,
+    minimumContributionYears,
+    standardPlanBenefitEstimate,
+    simplifiedPlanBenefitEstimate: MINIMUM_WAGE,
+    appliedAveragePercentage,
+    minimumTimeReached,
   };
 }

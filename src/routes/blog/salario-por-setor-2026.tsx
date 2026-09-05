@@ -66,32 +66,38 @@ function BlogPost() {
 
           <h2>Tecnologia</h2>
           <p>
-            <strong>Bruto:</strong> R$ 8.000 | <strong>Líquido estimado:</strong> ~R$ 6.200 (cerca
-            de 22% de desconto)
+            <strong>Bruto:</strong> R$ 8.000 | <strong>Líquido estimado:</strong> ~R$ 6.041 (cerca
+            de 24,5% de desconto)
           </p>
           <p>
-            Faixa de IRPF mais alta (até 22,5%), mas costuma vir acompanhada de benefícios que
-            compensam parte do desconto, como auxílio home office e planos de saúde robustos.
+            Faixa de IRPF mais alta (chega aos 27,5%) e sem direito à redução da Lei 15.270/2025,
+            que se esgota acima de R$ 7.350 por mês na retenção da folha — R$ 88.200 no ano, quando
+            a conta é fechada no ajuste anual. Em compensação, costuma vir acompanhada de benefícios
+            que compensam parte do desconto, como auxílio home office e planos de saúde robustos.
           </p>
 
           <h2>Saúde</h2>
           <p>
-            <strong>Bruto:</strong> R$ 5.000 | <strong>Líquido estimado:</strong> ~R$ 4.150 (cerca
-            de 17% de desconto)
+            <strong>Bruto:</strong> R$ 5.000 | <strong>Líquido estimado:</strong> ~R$ 4.498 (cerca
+            de 10% de desconto)
           </p>
           <p>
             Médicos, enfermeiros e dentistas têm IRPF progressivo, mas costumam ter deduções altas
-            com educação continuada e previdência complementar.
+            com educação continuada e previdência complementar. Vale lembrar que, desde 2026, quem
+            recebe até cerca de R$ 5.000 por mês tem o IRPF zerado pela redução da Lei 15.270/2025 —
+            nesse patamar, o que sobra de desconto é praticamente só o INSS.
           </p>
 
           <h2>Educação</h2>
           <p>
-            <strong>Bruto:</strong> R$ 4.000 | <strong>Líquido estimado:</strong> ~R$ 3.350 (cerca
-            de 16% de desconto)
+            <strong>Bruto:</strong> R$ 4.000 | <strong>Líquido estimado:</strong> ~R$ 3.631 (cerca
+            de 9% de desconto)
           </p>
           <p>
-            Servidores públicos costumam ter desconto de IRPF proporcionalmente menor pela estrutura
-            salarial, enquanto professores da rede privada têm carga tributária um pouco maior.
+            Nesse patamar o IRPF também é zerado pela redução da Lei 15.270/2025, então o desconto
+            que aparece no contracheque é só o INSS. Servidores públicos costumam ter desconto
+            proporcionalmente menor pela estrutura salarial, enquanto professores da rede privada
+            têm carga tributária um pouco maior quando somam outras fontes de renda.
           </p>
 
           <h2>Comércio e varejo</h2>
@@ -100,8 +106,9 @@ function BlogPost() {
             de 8% de desconto)
           </p>
           <p>
-            Salários mais próximos do piso regional costumam ter IRPF mínimo ou nulo, já que muitos
-            ficam dentro ou perto da faixa de isenção (até R$ 21.503,34/ano).
+            Salários mais próximos do piso regional costumam ter IRPF nulo. A tabela já isenta até
+            R$ 29.145,60 por ano, e a redução da Lei 15.270/2025 zera o imposto de quem tem renda
+            tributável de até R$ 60.000 no ano — cerca de R$ 5.000 por mês.
           </p>
 
           <h2>Como melhorar seu salário líquido, independente do setor</h2>
