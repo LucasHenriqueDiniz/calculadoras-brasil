@@ -234,9 +234,6 @@ The violations that exist right now.
       Plan: `docs/plans/oversized-functions/`.
 - [ ] **Portuguese identifiers in the domain.** See Divergences.
       Plan: `docs/plans/english-domain-identifiers/`.
-- [ ] **`README.md` says 38 prerendered public pages, in two places.** `SEO_PAGES` has **49**
-      entries and `vite.config.ts` prerenders exactly that list. The README is stale; no plan
-      covers it.
 - [ ] **`ADSENSE-CHECKLIST.md` sits at the repo root**, dated 2026-06-26 with 3 of 7 fixes still
       open. It is a roadmap document living outside `docs/`, and it has not moved in two months.
 - [ ] **No test covers the two adapters.** `aneel.ts` and `anp.ts` parse third-party formats — an

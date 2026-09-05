@@ -6,7 +6,7 @@
 
 A hub of Brazilian calculators for estimating day-to-day costs, taxes and common financial decisions in Brazil. The application uses React, TypeScript, TanStack Start and Cloudflare Workers.
 
-The 38 public pages are prerendered at build time so that content, metadata and JSON-LD are delivered without depending on JavaScript execution. The calculators stay interactive after hydration.
+The 49 public pages are prerendered at build time so that content, metadata and JSON-LD are delivered without depending on JavaScript execution. The calculators stay interactive after hydration.
 
 The site's own content is written in Brazilian Portuguese, for a Brazilian audience. This repository — code, comments, docs and commit messages — is written in English.
 
@@ -44,7 +44,7 @@ The gate runs:
 - the formula tests;
 - TypeScript and ESLint;
 - the client and Worker builds;
-- prerendering of the 38 public routes;
+- prerendering of the 49 public routes;
 - the SEO smoke test without JavaScript;
 - the deploy dry-run;
 - the dependency audit.
