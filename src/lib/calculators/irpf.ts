@@ -1,10 +1,21 @@
 /**
  * IRPF 2026 Calculator
  * Computes Brazilian personal income tax (IRPF) under the 2026 legislation.
- * Reference: Receita Federal annual table, ano-calendário 2026 (exercício 2027).
+ *
+ * This module answers an ANNUAL question — the ajuste anual — so it reaches for
+ * the annual half of `irpf-constants.ts`. The monthly half belongs to
+ * `salarioLiquido.ts` and `cltVsPj.ts`, and is not this one divided by twelve.
  */
 
 import { calcularInssEmpregado } from "./inss-constants";
+import {
+  DEDUCTION_PER_DEPENDENT_ANNUAL,
+  MAX_DEDUCTION_EDUCATION_ANNUAL,
+  MAX_SIMPLIFIED_DEDUCTION_ANNUAL,
+  SIMPLIFIED_DEDUCTION_RATE_ANNUAL,
+  annualReductionLei15270,
+  findAnnualTaxBracket,
+} from "./irpf-constants";
 
 export interface IrpfInput {
   rendaBrutaAnual: number;
@@ -37,37 +48,16 @@ export interface IrpfResult {
   aliquotaMarginal: string;
 }
 
-// Official annual table for ano-calendário 2026 (exercício 2027), Receita Federal.
-// Figures, sources and the arithmetic that cross-checks them:
-// docs/research/2026-09-04-irpf-2026-table/research.md
-//
-// Each bracket carries only its upper bound. The previous shape paired a `max`
-// with the next bracket's `min` — two numbers that had to agree and did not, so
-// every base between them (33503.346, say) matched no bracket at all and fell
-// through to a fallback that charged 27.5% and then floored the result at zero.
-const IRPF_TABLE_2026 = [
-  { upTo: 29145.6, rate: 0.0, deduction: 0 },
-  { upTo: 33919.8, rate: 0.075, deduction: 2185.92 },
-  { upTo: 45012.6, rate: 0.15, deduction: 4729.91 },
-  { upTo: 55976.16, rate: 0.225, deduction: 8105.85 },
-  { upTo: Infinity, rate: 0.275, deduction: 10904.66 },
-] as const;
-
-// 2026 constants
-const DEDUCTION_PER_DEPENDENT = 2275.08; // annual amount per dependant in 2026
-const MAX_DEDUCTION_EDUCATION = 3561.5; // cap on education deductions
-const MAX_DEDUCTION_HEALTH = 2666.67; // cap on health deductions (no official cap exists; used as a reference)
-const SIMPLIFIED_DEDUCTION_RATE = 0.2; // desconto simplificado: 20% of gross income
-const MAX_SIMPLIFIED_DEDUCTION = 17640.0; // annual ceiling on that discount in 2026
-
-// Lei 15.270/2025, annual reduction. It is applied to the tax the table produces
-// rather than changing the brackets, which is why no table can express it.
-// Figures and sources: docs/research/2026-09-04-irpf-2026-table/research.md
-const REDUCTION_FULL_UP_TO = 60000.0;
-const REDUCTION_FULL_AMOUNT = 2694.15;
-const REDUCTION_PHASE_OUT_UP_TO = 88200.0;
-const REDUCTION_PHASE_OUT_BASE = 8429.73;
-const REDUCTION_PHASE_OUT_RATE = 0.095575;
+/**
+ * Cap on health deductions.
+ *
+ * ⚠️ Stays here rather than joining the published figures in `irpf-constants.ts`,
+ * and that is the point: no official ceiling on despesas médicas was found in
+ * any source read for the research note. This is an invented reference figure,
+ * and `salarioLiquido.ts` deliberately applies no health cap at all. Moving it
+ * in beside the sourced constants would launder it into one of them.
+ */
+const MAX_DEDUCTION_HEALTH = 2666.67;
 
 /**
  * Computes personal income tax.
@@ -98,7 +88,7 @@ export function calculateIrpf(input: IrpfInput): IrpfResult {
   const basePosInss = rendaBrutaAnual - descInss;
 
   // 3. determine the allowed deductions
-  const deducaoEducacao = Math.min(input.deducaoEducacao, MAX_DEDUCTION_EDUCATION);
+  const deducaoEducacao = Math.min(input.deducaoEducacao, MAX_DEDUCTION_EDUCATION_ANNUAL);
   const deducaoSaude = Math.min(input.deducaoSaude, MAX_DEDUCTION_HEALTH);
   const deducaoPrevidenciaComplementar = Math.max(input.deducaoPrevidenciaComplementar, 0);
 
@@ -108,7 +98,7 @@ export function calculateIrpf(input: IrpfInput): IrpfResult {
   const baseCalculoCompleta = Math.max(basePosInss - totalDeducoes, 0);
 
   // 5. dependant deduction (R$ 2.275 per dependant in 2026)
-  const descDependentes = input.dependentes * DEDUCTION_PER_DEPENDENT;
+  const descDependentes = input.dependentes * DEDUCTION_PER_DEPENDENT_ANNUAL;
 
   // 6. assessable base (full base minus dependants)
   const baseImponivel = Math.max(baseCalculoCompleta - descDependentes, 0);
@@ -126,25 +116,25 @@ export function calculateIrpf(input: IrpfInput): IrpfResult {
     // branch used to do, takes one of them twice. `descDependentes` is still
     // reported in the result; it just does not reduce the tax under this regime.
     const descontoSimplificado = Math.min(
-      rendaBrutaAnual * SIMPLIFIED_DEDUCTION_RATE,
-      MAX_SIMPLIFIED_DEDUCTION,
+      rendaBrutaAnual * SIMPLIFIED_DEDUCTION_RATE_ANNUAL,
+      MAX_SIMPLIFIED_DEDUCTION_ANNUAL,
     );
     baseCalculoSimplificada = Math.max(rendaBrutaAnual - descontoSimplificado, 0);
 
-    const { rate, deduction } = findTaxBracket(baseCalculoSimplificada);
+    const { rate, deduction } = findAnnualTaxBracket(baseCalculoSimplificada);
     irpfCalculado = Math.max(baseCalculoSimplificada * rate - deduction, 0);
     aliquotaMarginal = rate > 0 ? `${(rate * 100).toFixed(1)}%` : "Isento";
   } else {
     // full regime: itemised deductions
     baseCalculoSimplificada = baseCalculoCompleta;
-    const { rate, deduction } = findTaxBracket(baseImponivel);
+    const { rate, deduction } = findAnnualTaxBracket(baseImponivel);
     irpfCalculado = Math.max(baseImponivel * rate - deduction, 0);
     aliquotaMarginal = rate > 0 ? `${(rate * 100).toFixed(1)}%` : "Isento";
   }
 
   // 8. Lei 15.270/2025 reduction, applied to the tax the table produced.
   const irpfPelaTabela = irpfCalculado;
-  const reducaoLei15270 = calcularReducaoLei15270(rendaBrutaAnual, irpfPelaTabela);
+  const reducaoLei15270 = annualReductionLei15270(rendaBrutaAnual, irpfPelaTabela);
 
   // 9. what is actually owed
   irpfCalculado = Math.max(irpfPelaTabela - reducaoLei15270, 0);
@@ -171,50 +161,4 @@ export function calculateIrpf(input: IrpfInput): IrpfResult {
     irpfDevido,
     aliquotaMarginal,
   };
-}
-
-/**
- * Annual reduction of Lei 15.270/2025.
- *
- * ⚠️ The coefficient applies to gross taxable income, not to the calculation
- * base — the Receita's own worked example is explicit about it, and applying it
- * to the base instead is silent and wrong.
- *
- * The first band is written "até R$ 2.694,15 (de modo que o imposto devido seja
- * zero)". R$ 2.694,15 is exactly the tax due at R$ 60.000 under the simplified
- * discount, so it zeroes that case by construction. It is a cap, not a promise:
- * an itemised return at the same income can still owe the difference.
- */
-function calcularReducaoLei15270(rendaBrutaAnual: number, irpfPelaTabela: number): number {
-  if (rendaBrutaAnual <= REDUCTION_FULL_UP_TO) {
-    return Math.min(REDUCTION_FULL_AMOUNT, irpfPelaTabela);
-  }
-
-  if (rendaBrutaAnual <= REDUCTION_PHASE_OUT_UP_TO) {
-    const reducao = REDUCTION_PHASE_OUT_BASE - REDUCTION_PHASE_OUT_RATE * rendaBrutaAnual;
-    return Math.min(Math.max(reducao, 0), irpfPelaTabela);
-  }
-
-  return 0;
-}
-
-/**
- * Finds the rate bracket that applies to the assessable base.
- * Total by construction: the last bracket has no upper bound, so every
- * non-negative base matches exactly one.
- */
-function findTaxBracket(baseImponivel: number): { rate: number; deduction: number } {
-  if (baseImponivel <= 0) {
-    return { rate: 0, deduction: 0 };
-  }
-
-  for (const bracket of IRPF_TABLE_2026) {
-    if (baseImponivel <= bracket.upTo) {
-      return { rate: bracket.rate, deduction: bracket.deduction };
-    }
-  }
-
-  // Unreachable while the last bracket's upTo is Infinity. Throwing rather than
-  // returning a rate keeps a future edit to that row from silently charging 0%.
-  throw new Error("IRPF bracket table does not cover the assessable base");
 }

@@ -31,7 +31,7 @@ remembered; the commands that produce them are in the sections themselves.
 ```
 src/
   lib/
-    calculators/        THE DOMAIN. 12 calculators + inss-constants.ts. Pure.
+    calculators/        THE DOMAIN. 12 calculators + inss-constants, irpf-constants, money. Pure.
     public-data/        browser-side client for the two public-data endpoints
     seo-pages.ts        49 paths. Drives BOTH the sitemap and the prerender
     schema-builders.ts  JSON-LD builders (WebApplication, BreadcrumbList, FAQPage)
@@ -62,12 +62,15 @@ src/
 
 ### The domain is pure, and that is measured
 
-`src/lib/calculators/` is 13 modules and **1578 lines that do no I/O**. The whole directory contains
-exactly three `import` lines, and all three are internal:
+`src/lib/calculators/` is 15 modules and **2041 lines that do no I/O**. Every `import` line in the
+whole directory is internal — the four calculators that need a shared rule reach for one of the
+three constant modules and for nothing else:
 
 ```
-src/lib/calculators/inssAutonomo.ts:20    import { … } from "./inss-constants"
-src/lib/calculators/salarioLiquido.ts:6   import { calcularInssEmpregado } from "./inss-constants"
+src/lib/calculators/inssAutonomo.ts    -> ./inss-constants
+src/lib/calculators/irpf.ts            -> ./inss-constants, ./irpf-constants
+src/lib/calculators/salarioLiquido.ts  -> ./inss-constants, ./irpf-constants, ./money
+src/lib/calculators/cltVsPj.ts         -> ./inss-constants, ./irpf-constants, ./money
 ```
 
 No React, no `@tanstack/*`, no component, nothing from `src/server/`. The checks:
@@ -239,18 +242,19 @@ The violations that exist right now.
       A visitor comparing two of this site's own pages gets contradictory tax advice. Each needs its
       own research note before any of them is edited — correcting one to match another would be
       guessing which is right. No plan covers it.
-- [ ] **Three calculators implement the 2026 IRPF rules independently, and each was wrong in its
-      own way.** `irpf.ts`, `salarioLiquido.ts` and `cltVsPj.ts` each carry their own copy of the
-      progressive table — `grep -l '0\.275' src/lib/calculators/` finds all three. They never
-      agreed. `cltVsPj.ts:33-37` is the starkest: it implements **only** the 22,5% and 27,5%
-      branches, so tax is zero below an annual base of 44.693,60 and R$ 201,86 immediately above —
-      one real more of gross salary costs the visitor R$ 201 of net.
-      **The duplication is the defect; the wrong figures are its symptom.** A single shared module
-      owning the table, the reduction and the INSS contribution — `inss-constants.ts` already does
-      this for INSS and is imported by three modules — would have made one correction fix all
-      three. Named here rather than fixed: merging them is its own pitch, and
-      `docs/pitches/calculator-test-coverage.md` already records that `irpf` and `salarioLiquido`
-      duplicate each other.
+- [x] **Three calculators implemented the 2026 IRPF rules independently, and each was wrong in its
+      own way.** `irpf.ts`, `salarioLiquido.ts` and `cltVsPj.ts` each carried their own copy of the
+      progressive table — `grep -l '0\.275' src/lib/calculators/` found all three. They never
+      agreed. `cltVsPj.ts:33-37` was the starkest: it implemented **only** the 22,5% and 27,5%
+      branches, so tax was zero below an annual base of 44.693,60 and R$ 201,86 immediately above —
+      one real more of gross salary cost the visitor R$ 201 of net.
+      **The duplication was the defect; the wrong figures were its symptom.** Closed 2026-09-05:
+      `irpf-constants.ts` owns both incidence tables, both Lei 15.270/2025 reductions and every
+      published deduction ceiling, and the three calculators import from it — the shape
+      `inss-constants.ts` already had for INSS. Each figure is declared exactly once. The monthly
+      and annual halves stay separate symbols on purpose: they are separate publications, not one
+      table over twelve. `MAX_DEDUCTION_HEALTH` deliberately stayed in `irpf.ts`, because no
+      official ceiling for it was ever found and it is not one of the published figures.
 - [ ] **4 of the 12 calculators have no test at all**: `salarioLiquido`, `beneficiosFiscais`,
       `cltVsPj`, `previdenciaComplementar` — 375 of the 1578 lines in the domain, all of it tax
       arithmetic. Plan: `docs/plans/calculator-test-coverage/`.

@@ -11,16 +11,19 @@
  * the monthly Lei 15.270/2025 reduction, neither of which is its annual
  * counterpart divided by twelve.
  *
- * Figures, sources and the arithmetic that cross-checks them:
- * docs/research/2026-09-04-irpf-2026-table/research.md
- *
- * ⚠️ The table below is the same one `salarioLiquido.ts` holds. Two calculators
- * on this site answer the same monthly CLT question, so they must agree to the
- * centavo; the duplication is a standing invitation to extract a shared module,
- * which is out of scope for the change that wrote this comment.
+ * The rules themselves live in `irpf-constants.ts`, alongside their sources —
+ * the same module `salarioLiquido.ts` reads. Two calculators on this site answer
+ * the same monthly CLT question, so they must agree to the centavo, and sharing
+ * one definition is what makes that true by construction rather than by review.
  */
 
 import { calcularInssEmpregado } from "./inss-constants";
+import {
+  DEDUCTION_PER_DEPENDENT_MONTHLY,
+  findMonthlyTaxBracket,
+  monthlyReductionLei15270,
+} from "./irpf-constants";
+import { roundToCentavos } from "./money";
 
 export interface CltVsPjInput {
   salarioCltBruto: number;
@@ -72,28 +75,6 @@ export interface CltVsPjResult {
     justificativa: string;
   };
 }
-
-// Official monthly incidence table from January 2026, Receita Federal.
-// Each bracket carries only its upper bound, so no base can fall between two of
-// them.
-const IRPF_MONTHLY_TABLE_2026 = [
-  { upTo: 2428.8, rate: 0.0, deduction: 0 },
-  { upTo: 2826.65, rate: 0.075, deduction: 182.16 },
-  { upTo: 3751.05, rate: 0.15, deduction: 394.16 },
-  { upTo: 4664.68, rate: 0.225, deduction: 675.49 },
-  { upTo: Infinity, rate: 0.275, deduction: 908.73 },
-] as const;
-
-// Monthly dependant allowance, from the same table page (R$ 2.275,08 a year).
-const DEDUCTION_PER_DEPENDENT_MONTHLY = 189.59;
-
-// Lei 15.270/2025, monthly reduction (Art. 3º-A). Applied to the tax the table
-// produces rather than changing the brackets, which is why no table expresses it.
-const REDUCTION_FULL_UP_TO = 5000.0;
-const REDUCTION_FULL_AMOUNT = 312.89;
-const REDUCTION_PHASE_OUT_UP_TO = 7350.0;
-const REDUCTION_PHASE_OUT_BASE = 978.62;
-const REDUCTION_PHASE_OUT_RATE = 0.133145;
 
 /**
  * The rights a CLT contract carries, amortised over the year: 13th salary
@@ -213,6 +194,10 @@ function calcularPj(propostaPjMensal: number, despesasDedutivelsPj: number) {
  * and the reduction's first band is a centavo literal. Left in binary floating
  * point, the statute's own exempt case misses by 1.1e-13 and a salary the
  * statute declares exempt is withheld a sliver of tax.
+ *
+ * Reached from the PJ side too: a pró-labore is income taxed by the progressive
+ * table, and relieving only one of the two sides would make the verdict an
+ * artefact of the relief rather than of the arrangement.
  */
 function calcularIrpfMensal(
   rendimentoBrutoMensal: number,
@@ -222,7 +207,7 @@ function calcularIrpfMensal(
   const { rate, deduction } = findMonthlyTaxBracket(baseIrpf);
   const irpfPelaTabela = roundToCentavos(Math.max(baseIrpf * rate - deduction, 0));
   const reducaoLei15270 = roundToCentavos(
-    calcularReducaoMensalLei15270(rendimentoBrutoMensal, irpfPelaTabela),
+    monthlyReductionLei15270(rendimentoBrutoMensal, irpfPelaTabela),
   );
 
   return {
@@ -231,57 +216,6 @@ function calcularIrpfMensal(
     reducaoLei15270,
     descIrpf: roundToCentavos(Math.max(irpfPelaTabela - reducaoLei15270, 0)),
   };
-}
-
-/**
- * Monthly reduction of Lei 15.270/2025.
- *
- * ⚠️ The coefficient applies to gross monthly income, not to the calculation
- * base — the Receita's own worked example is explicit about it, and applying it
- * to the base instead is silent and wrong.
- *
- * Applied to the PJ side too: a pró-labore is income taxed by the progressive
- * table, and relieving only one of the two sides would make the verdict an
- * artefact of the relief rather than of the arrangement.
- *
- * Capped at the tax the table produced, so it can zero the withholding but never
- * turn it into a refund.
- */
-function calcularReducaoMensalLei15270(
-  rendimentoBrutoMensal: number,
-  irpfPelaTabela: number,
-): number {
-  if (rendimentoBrutoMensal <= REDUCTION_FULL_UP_TO) {
-    return Math.min(REDUCTION_FULL_AMOUNT, irpfPelaTabela);
-  }
-
-  if (rendimentoBrutoMensal <= REDUCTION_PHASE_OUT_UP_TO) {
-    const reducao = REDUCTION_PHASE_OUT_BASE - REDUCTION_PHASE_OUT_RATE * rendimentoBrutoMensal;
-    return Math.min(Math.max(reducao, 0), irpfPelaTabela);
-  }
-
-  return 0;
-}
-
-/**
- * Finds the rate bracket that applies to the monthly assessable base.
- * Total by construction: the last bracket has no upper bound, so every
- * non-negative base matches exactly one.
- */
-function findMonthlyTaxBracket(baseImponivelMensal: number): { rate: number; deduction: number } {
-  if (baseImponivelMensal <= 0) {
-    return { rate: 0, deduction: 0 };
-  }
-
-  for (const bracket of IRPF_MONTHLY_TABLE_2026) {
-    if (baseImponivelMensal <= bracket.upTo) {
-      return { rate: bracket.rate, deduction: bracket.deduction };
-    }
-  }
-
-  // Unreachable while the last bracket's upTo is Infinity. Throwing rather than
-  // returning a rate keeps a future edit to that row from silently charging 0%.
-  throw new Error("IRPF bracket table does not cover the assessable base");
 }
 
 /**
@@ -314,11 +248,6 @@ function resolverPjNecessaria(alvo: number, despesasDedutivelsPj: number): numbe
   }
 
   return roundToCentavos(high);
-}
-
-/** Rounds a currency amount to the centavo, the granularity a payslip has. */
-function roundToCentavos(amount: number): number {
-  return Math.round(amount * 100) / 100;
 }
 
 /** The verdict in Portuguese, which is what the page prints beside the badge. */

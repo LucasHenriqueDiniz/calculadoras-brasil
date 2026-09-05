@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-  IRPF_MONTHLY_TABLE_2026,
   calculateSalarioLiquido,
   type SalarioLiquidoInput,
 } from "../../src/lib/calculators/salarioLiquido";
+import { IRPF_MONTHLY_TABLE_2026 } from "../../src/lib/calculators/irpf-constants";
 import { calculateIrpf } from "../../src/lib/calculators/irpf";
 import { TETO_INSS, calcularInssEmpregado } from "../../src/lib/calculators/inss-constants";
 

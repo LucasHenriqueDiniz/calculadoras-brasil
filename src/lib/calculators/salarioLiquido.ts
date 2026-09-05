@@ -8,11 +8,19 @@
  * the monthly incidence table and the monthly Lei 15.270/2025 reduction, both of
  * which differ from their annual counterparts by more than a factor of twelve.
  *
- * Figures, sources and the arithmetic that cross-checks them:
- * docs/research/2026-09-04-irpf-2026-table/research.md
+ * The rules themselves live in `irpf-constants.ts`, alongside their sources.
  */
 
 import { calcularInssEmpregado } from "./inss-constants";
+import {
+  DEDUCTION_PER_DEPENDENT_ANNUAL,
+  MAX_DEDUCTION_EDUCATION_ANNUAL,
+  MAX_SIMPLIFIED_DEDUCTION_MONTHLY,
+  SIMPLIFIED_DEDUCTION_RATE_MONTHLY,
+  findMonthlyTaxBracket,
+  monthlyReductionLei15270,
+} from "./irpf-constants";
+import { roundToCentavos } from "./money";
 
 export interface SalarioLiquidoInput {
   salarioBrutoMensal: number;
@@ -63,61 +71,6 @@ export interface SalarioLiquidoResult {
   };
 }
 
-/**
- * Official monthly incidence table from January 2026, Receita Federal.
- * Each bracket carries only its upper bound, so no base can fall between two of
- * them — the gap the annual table in this file used to have.
- *
- * Exported so the tests probe these boundaries rather than a hand copy of them.
- * A copy drifts silently: the suite goes on asserting continuity and monotonicity
- * at figures the module no longer uses, and passes. Exporting the array is the
- * whole seam — the tests need the boundaries, not a way to replace them.
- */
-export const IRPF_MONTHLY_TABLE_2026 = [
-  { upTo: 2428.8, rate: 0.0, deduction: 0 },
-  { upTo: 2826.65, rate: 0.075, deduction: 182.16 },
-  { upTo: 3751.05, rate: 0.15, deduction: 394.16 },
-  { upTo: 4664.68, rate: 0.225, deduction: 675.49 },
-  { upTo: Infinity, rate: 0.275, deduction: 908.73 },
-] as const;
-
-// 2026 constants. The deduction inputs are annual, so these are the annual figures.
-const DEDUCTION_PER_DEPENDENT = 2275.08;
-const MAX_DEDUCTION_EDUCATION = 3561.5;
-
-// Desconto simplificado, monthly. Only half of this is sourced, so the two halves
-// are labelled rather than presented as one figure from the research note.
-//
-// SOURCED — the R$ 607,20 ceiling. The Receita's own monthly table states
-// "Limite do desconto simplificado: R$ 607,20" and nothing more
-// (fetches/receita-federal-tabelas-2026.md). Note it is NOT the annual ceiling
-// divided by twelve (17.640,00 / 12 = 1.470,00), which is why it is stated
-// separately from irpf.ts.
-//
-// INFERRED — the 20% rate. No monthly source read for that research gives any
-// percentage at all; 20% is the ANNUAL rate, carried across on the assumption
-// that the monthly discount is the same proportion under a lower ceiling.
-//
-// The inference is free today, and provably rather than by luck: 607,20 / 0,20 is
-// R$ 3.036,00, and 80% of R$ 3.036,00 is R$ 2.428,80 — the exempt ceiling itself.
-// So below R$ 3.036 of gross both readings (a rate under a cap, or a flat
-// R$ 607,20) leave the base inside the exemption, and above it both subtract the
-// same R$ 607,20. They can never produce a different withholding. They do differ
-// in `baseImponivelMensal` below R$ 3.036 — at a gross of R$ 1.000 this reading
-// gives R$ 800,00 and the flat one R$ 392,80 — but no route renders that field.
-// The equivalence is pinned in tests/calculators/salario-liquido.test.ts, so an
-// edit that moves the rate or the ceiling apart fails there instead of shipping.
-const SIMPLIFIED_DEDUCTION_RATE = 0.2;
-const MAX_SIMPLIFIED_DEDUCTION_MONTHLY = 607.2;
-
-// Lei 15.270/2025, monthly reduction (Art. 3º-A). Applied to the tax the table
-// produces rather than changing the brackets, which is why no table expresses it.
-const REDUCTION_FULL_UP_TO = 5000.0;
-const REDUCTION_FULL_AMOUNT = 312.89;
-const REDUCTION_PHASE_OUT_UP_TO = 7350.0;
-const REDUCTION_PHASE_OUT_BASE = 978.62;
-const REDUCTION_PHASE_OUT_RATE = 0.133145;
-
 export function calculateSalarioLiquido(input: SalarioLiquidoInput): SalarioLiquidoResult {
   const salarioBrutoMensal = Math.max(input.salarioBrutoMensal, 0);
   const salarioBrutoAnual = salarioBrutoMensal * 12;
@@ -131,13 +84,16 @@ export function calculateSalarioLiquido(input: SalarioLiquidoInput): SalarioLiqu
 
   // 3. annual itemised deductions.
   //    Health is uncapped on purpose: no official ceiling was found for it.
-  const deducaoEducacao = Math.min(Math.max(input.deducaoEducacao, 0), MAX_DEDUCTION_EDUCATION);
+  const deducaoEducacao = Math.min(
+    Math.max(input.deducaoEducacao, 0),
+    MAX_DEDUCTION_EDUCATION_ANNUAL,
+  );
   const deducaoSaude = Math.max(input.deducaoSaude, 0);
   const deducaoPrevidenciaComplementar = Math.max(input.deducaoPrevidenciaComplementar, 0);
   const totalDeducoes = deducaoEducacao + deducaoSaude + deducaoPrevidenciaComplementar;
 
   const baseCalculoAnual = Math.max(baseParaIrpf * 12 - totalDeducoes, 0);
-  const descDependentes = Math.max(input.dependentes, 0) * DEDUCTION_PER_DEPENDENT;
+  const descDependentes = Math.max(input.dependentes, 0) * DEDUCTION_PER_DEPENDENT_ANNUAL;
   const baseImponivel = Math.max(baseCalculoAnual - descDependentes, 0);
 
   // 4. the monthly base the table is applied to.
@@ -152,7 +108,7 @@ export function calculateSalarioLiquido(input: SalarioLiquidoInput): SalarioLiqu
     ? Math.max(
         salarioBrutoMensal -
           Math.min(
-            salarioBrutoMensal * SIMPLIFIED_DEDUCTION_RATE,
+            salarioBrutoMensal * SIMPLIFIED_DEDUCTION_RATE_MONTHLY,
             MAX_SIMPLIFIED_DEDUCTION_MONTHLY,
           ),
         0,
@@ -220,53 +176,4 @@ export function calculateSalarioLiquido(input: SalarioLiquidoInput): SalarioLiqu
       total: economiaComDependentes + economiaComDeducoes,
     },
   };
-}
-
-/** Rounds a currency amount to the centavo, the granularity a payslip has. */
-function roundToCentavos(amount: number): number {
-  return Math.round(amount * 100) / 100;
-}
-
-/**
- * Monthly reduction of Lei 15.270/2025.
- *
- * ⚠️ The coefficient applies to gross monthly income, not to the calculation
- * base — the Receita's own worked example is explicit about it, and applying it
- * to the base instead is silent and wrong.
- *
- * Capped at the tax the table produced, so it can zero the withholding but never
- * turn it into a refund.
- */
-function monthlyReductionLei15270(salarioBrutoMensal: number, irpfPelaTabela: number): number {
-  if (salarioBrutoMensal <= REDUCTION_FULL_UP_TO) {
-    return Math.min(REDUCTION_FULL_AMOUNT, irpfPelaTabela);
-  }
-
-  if (salarioBrutoMensal <= REDUCTION_PHASE_OUT_UP_TO) {
-    const reducao = REDUCTION_PHASE_OUT_BASE - REDUCTION_PHASE_OUT_RATE * salarioBrutoMensal;
-    return Math.min(Math.max(reducao, 0), irpfPelaTabela);
-  }
-
-  return 0;
-}
-
-/**
- * Finds the rate bracket that applies to the monthly assessable base.
- * Total by construction: the last bracket has no upper bound, so every
- * non-negative base matches exactly one.
- */
-function findMonthlyTaxBracket(baseImponivelMensal: number): { rate: number; deduction: number } {
-  if (baseImponivelMensal <= 0) {
-    return { rate: 0, deduction: 0 };
-  }
-
-  for (const bracket of IRPF_MONTHLY_TABLE_2026) {
-    if (baseImponivelMensal <= bracket.upTo) {
-      return { rate: bracket.rate, deduction: bracket.deduction };
-    }
-  }
-
-  // Unreachable while the last bracket's upTo is Infinity. Throwing rather than
-  // returning a rate keeps a future edit to that row from silently charging 0%.
-  throw new Error("IRPF bracket table does not cover the assessable base");
 }
