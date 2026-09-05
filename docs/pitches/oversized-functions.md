@@ -1,5 +1,5 @@
 ---
-status: active
+status: done
 epic: size
 ---
 
@@ -69,3 +69,29 @@ refactored here without a component test suite.
 Four slices, one per stateful function, smallest blast radius first.
 `calculateCarCost` goes first because it is already covered by
 `tests/calculators.test.ts` — the refactor is proven by tests that exist today.
+
+---
+
+**Delivered 2026-09-05.** Four slices, `docs/plans/oversized-functions/`.
+
+| target | was | is |
+|---|---|---|
+| `calculateCarCost` | 229 | **40** |
+| `ElectricityPage` | 559 | **197** |
+| `CarCostPage` | 477 | **66** |
+| `LivingAlonePage` | 314 | **46** |
+
+All four are under the hard 200-line limit and three are under the soft 80. Each was proven the
+way its own risk demanded rather than by the gate alone: `calculateCarCost` differentially over
+17.280 inputs, the three pages by comparing their prerendered HTML before and after — byte-identical
+in every case — plus a manual hydration check per page.
+
+Two things the work turned up that were not about size. `CarCostPage` was hiding a hand-rolled
+cache that is now the named `useFuelPrices` hook. And an entry this branch had added to
+`ARCHITECTURE.md`, claiming a production hydration failure, was **wrong** and is corrected there:
+the failure is a dev-server artifact of TanStack's stylesheet injection, and production logs no
+error at all.
+
+The five prose components the pitch deliberately excluded (`PrivacidadePage`, three `BlogPost`s,
+`Home`) are still excluded. Slice 4 raises whether they should get the same treatment; that is the
+owner's call.
