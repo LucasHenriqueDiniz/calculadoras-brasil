@@ -220,10 +220,18 @@ The violations that exist right now.
       visible contradiction left on the page, and it is a product decision rather than a defect:
       the constant's own comment already says "no official cap exists". Out of scope in
       `docs/pitches/irpf-calculation-defects.md`; no plan covers it.
-- [ ] **Two FAQ figures on that page were not verified and were left alone**: the declaration
-      threshold of R$ 28.559,70 and the supplementary-pension ceiling of R$ 63.454/ano. Both are
-      different figures from the ones `docs/research/2026-09-04-irpf-2026-table/research.md`
-      establishes, and neither was researched. They may be right; nothing here says they are.
+- [ ] **The site states three different figures for the same rule, in three places.** None was
+      researched and none can be settled from
+      `docs/research/2026-09-04-irpf-2026-table/research.md`, which covers the tables and the
+      Lei 15.270/2025 reduction only:
+      | rule | figures found |
+      |---|---|
+      | obligation to file | R$ 28.559,70 (calculator page, `guia-irpf-2026`, blog `calculadora-irpf-2026`) vs **R$ 33.888** (`tabela-irpf-2026-completa`, `blog.ts`) |
+      | assets requiring a return | R$ 300 mil (two articles) vs **R$ 800 mil** (`blog.ts`) |
+      | supplementary-pension ceiling | R$ 63.454/ano "13% da renda" (three files) vs **12% da renda bruta** (two others) |
+      A visitor comparing two of this site's own pages gets contradictory tax advice. Each needs its
+      own research note before any of them is edited — correcting one to match another would be
+      guessing which is right. No plan covers it.
 - [ ] **Three calculators implement the 2026 IRPF rules independently, and each was wrong in its
       own way.** `irpf.ts`, `salarioLiquido.ts` and `cltVsPj.ts` each carry their own copy of the
       progressive table — `grep -l '0\.275' src/lib/calculators/` finds all three. They never
