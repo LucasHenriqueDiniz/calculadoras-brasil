@@ -319,6 +319,13 @@ function IrpfCalculator() {
             <li>Isenções específicas (ex: aposentado com renda baixa)</li>
           </ul>
           <p>
+            Esta página faz a <strong>conta anual</strong> — a do ajuste da declaração. A{" "}
+            <a href="/calculadora-salario-liquido">calculadora de salário líquido</a> calcula a
+            retenção mensal na folha, que segue tabela e redução próprias. Os dois resultados não
+            batem exatamente para a mesma pessoa, e é justamente essa diferença que a declaração
+            acerta.
+          </p>
+          <p>
             Use esta ferramenta como referência. Para uma declaração oficial, consulte a Receita
             Federal ou um contador.
           </p>

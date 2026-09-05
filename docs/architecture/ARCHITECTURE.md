@@ -271,12 +271,6 @@ The violations that exist right now.
       `pjNecessaria` and it biases every verdict toward CLT. No source in
       `docs/research/2026-09-04-irpf-2026-table/research.md` covers pró-labore contributions, so
       this needs its own research note before either the copy or the model is changed.
-- [ ] **Monthly withholding and the annual adjustment diverge, and no page says so.** For a
-      R$ 6.000 salary `/calculadora-salario-liquido` implies R$ 4.621/year of tax while
-      `/calculadora-irpf-2026` says R$ 5.230. Traced: the tables agree to 14 centavos and the whole
-      gap is the reduction (monthly 179,75 × 12 = 2.157,00 against the annual 1.548,33). Both are
-      correct at their own endpoints — it is genuine statutory divergence, the ajuste anual. A
-      visitor comparing the two pages just sees two numbers. One sentence of copy on each page.
 - [ ] **`/calculadora-salario-liquido` labels annual inputs as monthly.** The fields read "Gastos
       **mensais** com educação/saúde" and "Previdência complementar **mensal**", and the module
       consumes them as annual amounts — a 12x error for anyone who fills them. The education hint

@@ -118,7 +118,7 @@ function Calculator() {
         secondaryValue={formatBRL(Math.abs(result.diferenca))}
         secondaryLabel={
           result.analise.temBaseParaPercentual
-            ? `Diferença: ${result.percentualDiferenca}%`
+            ? `Diferença: ${Math.abs(result.percentualDiferenca)}%`
             : "Diferença"
         }
         resultColor={

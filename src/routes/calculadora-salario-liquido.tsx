@@ -199,8 +199,16 @@ function SalarioLiquidoCalculator() {
         title="Seu Salário Líquido"
         mainValue={formatBRL(result.salarioLiquidoMensal)}
         mainLabel="Salário líquido mensal"
-        secondaryValue={formatBRL(result.rendimentoTotalMensal)}
-        secondaryLabel="+ benefícios não tributáveis"
+        secondaryValue={
+          result.beneficiosNaoTributaveis > 0
+            ? formatBRL(result.rendimentoTotalMensal)
+            : `${result.aliquotaEfetivaIrpf.toFixed(2)}%`
+        }
+        secondaryLabel={
+          result.beneficiosNaoTributaveis > 0
+            ? "Total com benefícios não tributáveis"
+            : "Alíquota efetiva de IRPF"
+        }
         resultColor="positive"
       />
 
@@ -212,7 +220,7 @@ function SalarioLiquidoCalculator() {
             value: formatBRL(result.salarioBrutoMensal),
           },
           {
-            label: "Desconto INSS (8-14%)",
+            label: "Desconto INSS (7,5% a 14%)",
             value: `- ${formatBRL(result.descInssEmpregado)}`,
             subtext: "Contribuição para seguridade social",
           },
@@ -260,6 +268,13 @@ function SalarioLiquidoCalculator() {
             <li>Contribuições adicionais (Vale Refeição, Convênios)</li>
             <li>Bônus e complementos salariais</li>
           </ul>
+          <p>
+            Esta página calcula a <strong>retenção mensal na folha</strong>, com a tabela mensal e a
+            redução mensal da Lei 15.270/2025. A{" "}
+            <a href="/calculadora-irpf-2026">calculadora de IRPF</a> faz a conta anual, que tem
+            tabela e redução próprias — por isso os dois resultados não batem exatamente para a
+            mesma pessoa. A diferença é acertada no ajuste da declaração.
+          </p>
           <p>Use como referência. Verifique seu contracheque para valores exatos.</p>
         </Prose>
       </DisclaimerBox>

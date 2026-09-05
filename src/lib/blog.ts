@@ -792,7 +792,7 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "PJ paga mais imposto que CLT?",
         answer:
-          "Em termos percentuais, sim: o INSS do contribuinte individual chega a 20% (contra 8-14% do CLT) e não há retenção automática de benefícios. Em compensação, o PJ pode deduzir despesas da atividade, o que reduz parte dessa diferença.",
+          "Em termos percentuais, sim: o INSS do contribuinte individual chega a 20% (contra 7,5% a 14% do CLT) e não há retenção automática de benefícios. Em compensação, o PJ pode deduzir despesas da atividade, o que reduz parte dessa diferença.",
       },
       {
         question: "Quais benefícios o CLT tem que o PJ perde?",
