@@ -47,8 +47,16 @@ function incomeForBase(base: number): number {
   return (low + high) / 2;
 }
 
+/**
+ * The tax the TABLE produces, before the Lei 15.270/2025 reduction.
+ *
+ * ⚠️ Deliberately not `irpfCalculado`. The reduction zeroes the tax below
+ * R$ 60.000 of income, and every boundary here sits under that — so asserting
+ * continuity on the final figure would compare 0 to 0 at two of the four
+ * boundaries and pass while proving nothing.
+ */
 function taxAtBase(base: number): number {
-  return irpf({ rendaBrutaAnual: incomeForBase(base) }).irpfCalculado;
+  return irpf({ rendaBrutaAnual: incomeForBase(base) }).irpfPelaTabela;
 }
 
 describe("calculateIrpf — exemption band", () => {
@@ -247,6 +255,67 @@ describe("calculateIrpf — the two regimes", () => {
     const two = irpf({ rendaBrutaAnual: 100_000, regimeSimplificado: true, dependentes: 2 });
 
     expect(two.irpfCalculado).toBe(none.irpfCalculado);
+  });
+});
+
+describe("calculateIrpf — the Lei 15.270/2025 reduction", () => {
+  it("zeroes the tax at and below R$ 60.000 under the simplified regime", () => {
+    for (const rendaBrutaAnual of [40_000, 59_999, 60_000]) {
+      expect(irpf({ rendaBrutaAnual, regimeSimplificado: true }).irpfDevido).toBe(0);
+    }
+  });
+
+  it("matches the statute's formula in the middle of the phase-out band", () => {
+    // 8.429,73 − 0,095575 × 70.000 = 1.739,48
+    expect(irpf({ rendaBrutaAnual: 70_000 }).reducaoLei15270).toBeCloseTo(1739.48, 2);
+  });
+
+  it("has phased out to nothing by R$ 88.200", () => {
+    const atLimit = irpf({ rendaBrutaAnual: 88_200 });
+    const above = irpf({ rendaBrutaAnual: 88_201 });
+
+    expect(atLimit.reducaoLei15270).toBeLessThan(0.02);
+    expect(above.reducaoLei15270).toBe(0);
+    expect(above.irpfDevido).toBeCloseTo(above.irpfPelaTabela, 2);
+  });
+
+  it("never reduces by more than the tax the table produced", () => {
+    for (let rendaBrutaAnual = 20_000; rendaBrutaAnual <= 120_000; rendaBrutaAnual += 500) {
+      const result = irpf({ rendaBrutaAnual });
+
+      expect(result.reducaoLei15270).toBeLessThanOrEqual(result.irpfPelaTabela + 1e-9);
+      expect(result.irpfDevido).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it("leaves the tax rising with income across the whole phase-out band", () => {
+    let previous = -Infinity;
+
+    for (let rendaBrutaAnual = 55_000; rendaBrutaAnual <= 95_000; rendaBrutaAnual += 1) {
+      const tax = irpf({ rendaBrutaAnual, regimeSimplificado: true }).irpfDevido;
+      expect(tax).toBeGreaterThanOrEqual(previous - 1e-9);
+      previous = tax;
+    }
+  });
+
+  /**
+   * ⚠️ Pinned artifact, not a defect in this module.
+   *
+   * The statute caps the first band at R$ 2.694,15 while its second-band formula
+   * evaluates to R$ 2.695,23 at R$ 60.000,01 — so the reduction steps UP by about
+   * R$ 1,08 as income crosses R$ 60.000, and the tax due therefore steps DOWN by
+   * the same amount. Under the simplified regime it is invisible, because the tax
+   * is zero on both sides. Under an itemised return it is not.
+   *
+   * This test exists so the step cannot change size unnoticed. It is not an
+   * endorsement: see docs/research/2026-09-04-irpf-2026-table/research.md.
+   */
+  it("carries the statute's own R$ 1,08 step at R$ 60.000 under the itemised regime", () => {
+    const below = irpf({ rendaBrutaAnual: 60_000 });
+    const above = irpf({ rendaBrutaAnual: 60_000.01 });
+
+    expect(above.reducaoLei15270 - below.reducaoLei15270).toBeCloseTo(1.08, 2);
+    expect(below.irpfDevido - above.irpfDevido).toBeCloseTo(1.08, 2);
   });
 });
 

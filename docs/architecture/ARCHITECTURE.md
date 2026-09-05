@@ -213,14 +213,13 @@ Worker is dashboard state too.
 
 The violations that exist right now.
 
-- [ ] **`calculateIrpf` does not implement the Lei 15.270/2025 redutor.** The five arithmetic
-      defects found on 2026-09-04 are fixed (slices 1-3 of `docs/plans/irpf-calculation-defects/`):
-      the table is the Receita's own, the bracket lookup is total, INSS is the progressive
-      contribution with its ceiling, and the simplified regime is 20% capped at R$ 17.640,00 with
-      no other deduction stacked on it. What remains is larger than any of them — the 2026
-      exemption is a **reduction applied on top of the table**, and without it the page overstates
-      the tax for everyone earning under R$ 88.200 a year. Slice 4, still open. Decision `D3`
-      above; figures in `docs/research/2026-09-04-irpf-2026-table/research.md`.
+- [ ] **`/calculadora-irpf-2026` calls a zero tax a refund.** `calculadora-irpf-2026.tsx:220` and
+      `:223` branch on `irpfCalculado > 0` and fall through to "Você terá restituição". Zero tax was
+      a rare outcome until the Lei 15.270/2025 reduction landed on 2026-09-04; it is now the normal
+      one for anyone earning under R$ 60.000 a year. The page also does not show the reduction at
+      all, so the figure it prints cannot be reconciled with the table. **The domain is correct and
+      the page is not — this is the last thing between the IRPF work and shipping.** No plan covers
+      it; `docs/plans/irpf-calculation-defects/slice-04-redutor.md` raises it.
 - [ ] **4 of the 12 calculators have no test at all**: `salarioLiquido`, `beneficiosFiscais`,
       `cltVsPj`, `previdenciaComplementar` — 375 of the 1578 lines in the domain, all of it tax
       arithmetic. Plan: `docs/plans/calculator-test-coverage/`.

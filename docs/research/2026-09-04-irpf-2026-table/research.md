@@ -129,6 +129,13 @@ today and certifies the bug. It has to be inverted, not deleted.
   invented cap is a product decision.
 - **The 65+ exemption (R$ 1.903,98 monthly)** exists in the official table and the module has no
   concept of it. Out of scope here; recorded so it is not rediscovered as a surprise.
+- **The statute's two bands do not meet at R$ 60.000.** Band 1 caps the reduction at R$ 2.694,15;
+  band 2 evaluates to R$ 2.695,23 at R$ 60.000,01. The reduction therefore steps *up* by R$ 1,08 as
+  income crosses R$ 60.000, and the tax due steps *down* by the same amount. Measured after
+  implementing it, not predicted. Invisible under the simplified regime (tax is zero both sides),
+  visible on an itemised return. Whether this is a rough edge in the drafting or a misreading of
+  the first band's "até" was **not** resolved — the implementation follows the text literally and
+  `tests/calculators/irpf.test.ts` pins the step so it cannot drift unnoticed.
 - **Nothing was verified against the Receita's own calculator**, which would be the strongest
   possible check. The figures cross-check against each other and against arithmetic instead.
 - The redutor news page at the Receita is **behind authentication** — see

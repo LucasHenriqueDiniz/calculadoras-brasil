@@ -27,10 +27,14 @@ export interface IrpfResult {
   descDependentes: number;
   baseImponivel: number;
   aliquotaEfetiva: number;
+  /** What the progressive table produces, before the Lei 15.270/2025 reduction. */
+  irpfPelaTabela: number;
+  /** The Lei 15.270/2025 reduction actually applied, never more than the tax due. */
+  reducaoLei15270: number;
+  /** What is actually owed: the table's figure less the reduction, floored at zero. */
   irpfCalculado: number;
   irpfDevido: number;
   aliquotaMarginal: string;
-  parcelasRestituicao?: number;
 }
 
 // Official annual table for ano-calendário 2026 (exercício 2027), Receita Federal.
@@ -55,6 +59,15 @@ const MAX_DEDUCTION_EDUCATION = 3561.5; // cap on education deductions
 const MAX_DEDUCTION_HEALTH = 2666.67; // cap on health deductions (no official cap exists; used as a reference)
 const SIMPLIFIED_DEDUCTION_RATE = 0.2; // desconto simplificado: 20% of gross income
 const MAX_SIMPLIFIED_DEDUCTION = 17640.0; // annual ceiling on that discount in 2026
+
+// Lei 15.270/2025, annual reduction. It is applied to the tax the table produces
+// rather than changing the brackets, which is why no table can express it.
+// Figures and sources: docs/research/2026-09-04-irpf-2026-table/research.md
+const REDUCTION_FULL_UP_TO = 60000.0;
+const REDUCTION_FULL_AMOUNT = 2694.15;
+const REDUCTION_PHASE_OUT_UP_TO = 88200.0;
+const REDUCTION_PHASE_OUT_BASE = 8429.73;
+const REDUCTION_PHASE_OUT_RATE = 0.095575;
 
 /**
  * Computes personal income tax.
@@ -129,14 +142,16 @@ export function calculateIrpf(input: IrpfInput): IrpfResult {
     aliquotaMarginal = rate > 0 ? `${(rate * 100).toFixed(1)}%` : "Isento";
   }
 
-  // 8. effective rate
-  const aliquotaEfetiva = rendaBrutaAnual > 0 ? (irpfCalculado / rendaBrutaAnual) * 100 : 0;
+  // 8. Lei 15.270/2025 reduction, applied to the tax the table produced.
+  const irpfPelaTabela = irpfCalculado;
+  const reducaoLei15270 = calcularReducaoLei15270(rendaBrutaAnual, irpfPelaTabela);
 
-  // 9. tax due (a negative value is a refund)
+  // 9. what is actually owed
+  irpfCalculado = Math.max(irpfPelaTabela - reducaoLei15270, 0);
   const irpfDevido = irpfCalculado;
 
-  // 10. number of refund instalments, if any
-  const parcelasRestituicao = irpfDevido < 0 ? 3 : undefined;
+  // 10. effective rate, on what is owed rather than on what the table said
+  const aliquotaEfetiva = rendaBrutaAnual > 0 ? (irpfDevido / rendaBrutaAnual) * 100 : 0;
 
   return {
     rendaBrutaAnual,
@@ -150,11 +165,37 @@ export function calculateIrpf(input: IrpfInput): IrpfResult {
     descDependentes,
     baseImponivel,
     aliquotaEfetiva,
+    irpfPelaTabela,
+    reducaoLei15270,
     irpfCalculado,
     irpfDevido,
     aliquotaMarginal,
-    parcelasRestituicao,
   };
+}
+
+/**
+ * Annual reduction of Lei 15.270/2025.
+ *
+ * ⚠️ The coefficient applies to gross taxable income, not to the calculation
+ * base — the Receita's own worked example is explicit about it, and applying it
+ * to the base instead is silent and wrong.
+ *
+ * The first band is written "até R$ 2.694,15 (de modo que o imposto devido seja
+ * zero)". R$ 2.694,15 is exactly the tax due at R$ 60.000 under the simplified
+ * discount, so it zeroes that case by construction. It is a cap, not a promise:
+ * an itemised return at the same income can still owe the difference.
+ */
+function calcularReducaoLei15270(rendaBrutaAnual: number, irpfPelaTabela: number): number {
+  if (rendaBrutaAnual <= REDUCTION_FULL_UP_TO) {
+    return Math.min(REDUCTION_FULL_AMOUNT, irpfPelaTabela);
+  }
+
+  if (rendaBrutaAnual <= REDUCTION_PHASE_OUT_UP_TO) {
+    const reducao = REDUCTION_PHASE_OUT_BASE - REDUCTION_PHASE_OUT_RATE * rendaBrutaAnual;
+    return Math.min(Math.max(reducao, 0), irpfPelaTabela);
+  }
+
+  return 0;
 }
 
 /**

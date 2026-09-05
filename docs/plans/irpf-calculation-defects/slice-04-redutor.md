@@ -1,5 +1,5 @@
 ---
-status: todo
+status: done
 kanban: 7361b632-e42e-47ab-9f9e-9af2ae79bc2f
 ---
 
@@ -81,3 +81,53 @@ first one.
 If the page turns out to need the reduction shown to make sense of the number — and it probably
 does — that is the follow-up the pitch names as out of scope. Write it as a new pitch rather than
 widening this one.
+
+---
+
+## What actually happened — 2026-09-04
+
+`pnpm run check` green end to end. `tests/calculators/irpf.test.ts` is 34 cases, 51 across the repo.
+
+**The vacuity trap was real and was handled by shaping the result, not the tests.** `IrpfResult` now
+separates the two numbers:
+
+| field | |
+|---|---|
+| `irpfPelaTabela` | what the progressive table produces |
+| `reducaoLei15270` | the reduction actually applied, never more than the tax |
+| `irpfCalculado` / `irpfDevido` | what is owed — the first less the second, floored at zero |
+
+`taxAtBase` reads `irpfPelaTabela`, so every continuity and monotonicity assertion still probes the
+table. Neither option the plan offered was needed: exporting the table application would have added
+a seam that exists only for tests, and moving the cases above R$ 88.200 would have stopped testing
+the low brackets at all.
+
+**Measured, and not predicted: the statute's two bands do not meet.** Band 1 caps at R$ 2.694,15,
+band 2 gives R$ 2.695,23 at R$ 60.000,01 — so the reduction steps up R$ 1,08 crossing R$ 60.000 and
+the tax due steps down by the same. Zero monotonicity breaks under the simplified regime across
+55.000-95.000 at step 1; exactly one under the itemised regime. Pinned by a test named as an
+artifact rather than smoothed over.
+
+`parcelasRestituicao` is gone, with the unreachable branch behind it.
+
+⚠️ **This slice leaves the page rendering a false label, and that has to be fixed before any of
+this ships.** `src/routes/calculadora-irpf-2026.tsx:220` and `:223` read:
+
+```tsx
+mainLabel={result.irpfCalculado > 0 ? "Você deve pagar" : "Você terá restituição"}
+resultColor={result.irpfCalculado > 0 ? "negative" : "positive"}
+```
+
+Zero tax is not a refund. Before the redutor a result of exactly zero was rare; it is now the
+normal outcome for anyone under R$ 60.000 a year — which is most of this site's audience. The page
+would tell them they are getting money back.
+
+The pitch put the page out of scope and that was right for widening the work, but this is not a
+widening — it is a regression this slice causes. It also wants the reduction shown as its own line,
+which is a genuine product decision. **Left deliberately untouched and raised instead.**
+
+## Also worth carrying into another plan
+
+`reducaoLei15270` and `irpfPelaTabela` are two more Portuguese identifiers, added to match the
+surrounding interface rather than the `language` skill. `docs/plans/english-domain-identifiers/`
+slice 2 covers this file and should pick them up.
