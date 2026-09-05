@@ -24,7 +24,7 @@ const meta = {
 };
 const PAGE_TITLE = "Calculadora IRPF 2026 - Simule seu Imposto de Renda";
 const PAGE_DESCRIPTION =
-  "Calcule seu IRPF 2026 de forma fácil. Inclua dependentes, deduções com educação e saúde, e saiba quanto você deve ao leão ou se terá restituição.";
+  "Calcule seu IRPF 2026 de forma fácil. Inclua dependentes, deduções com educação e saúde, e veja o efeito da redução que isenta quem recebe até R$ 5.000 por mês.";
 
 const DEFAULTS: IrpfInput = {
   rendaBrutaAnual: 48000,
@@ -39,17 +39,17 @@ const FAQ: FAQItem[] = [
   {
     question: "Como funciona o cálculo do IRPF 2026?",
     answer:
-      "O IRPF segue uma tabela progressiva: quanto mais você ganha, maior a alíquota. Em 2026: até R$ 21.503/ano isento, depois 7,5% até 15%, 22,5% e 27,5% nas maiores rendas. A calculadora segue as regras oficiais.",
+      "O IRPF segue uma tabela progressiva: quanto mais você ganha, maior a alíquota. Em 2026 há duas etapas. Primeiro a tabela anual: até R$ 29.145,60 isento, depois 7,5%, 15%, 22,5% e 27,5% nas faixas seguintes. Depois a redução da Lei 15.270/2025, que abate o imposto de quem ganha menos e pode zerá-lo.",
   },
   {
     question: "Qual é a alíquota IRPF para cada faixa salarial?",
     answer:
-      "Até R$ 21.503/ano: 0% (isento). De R$ 21.503 a R$ 33.503: 7,5%. De R$ 33.503 a R$ 44.694: 15%. De R$ 44.694 a R$ 55.472: 22,5%. Acima de R$ 55.472: 27,5%. Essas faixas foram atualizadas em 2026.",
+      "Na tabela anual de 2026: até R$ 29.145,60 é isento; de R$ 29.145,61 a R$ 33.919,80 são 7,5%; até R$ 45.012,60 são 15%; até R$ 55.976,16 são 22,5%; acima disso, 27,5%. Sobre o resultado ainda incide a redução da Lei 15.270/2025, então a alíquota da faixa não é o que você paga de fato.",
   },
   {
     question: "Dependentes reduzem meu IRPF?",
     answer:
-      "Sim, cada dependente reduz R$ 2.275 da base imponível em 2026. Cônjuge, filhos até 21 anos (ou 24 se estudante), pais, irmãos menores contam. A redução é significativa se tiver vários dependentes.",
+      "Sim, cada dependente reduz R$ 2.275,08 da base imponível em 2026. Cônjuge, filhos até 21 anos (ou 24 se estudante), pais, irmãos menores contam. A redução é significativa se tiver vários dependentes.",
   },
   {
     question: "Educação é dedutível no IRPF?",
@@ -64,7 +64,7 @@ const FAQ: FAQItem[] = [
   {
     question: "Vale a pena usar o regime simplificado?",
     answer:
-      "Depende. Regime simplificado: dedução fixa de 20,5% da renda bruta. Regime completo: deduções reais (educação, saúde, previdência). Se tem muitos gastos dedutíveis, completo vale mais. A calculadora compara para você.",
+      "Depende. O regime simplificado desconta 20% da renda bruta, até o limite de R$ 17.640,00 por ano, e substitui todas as outras deduções — inclusive dependentes. O regime completo usa as deduções reais (educação, saúde, previdência). Se você tem muitos gastos dedutíveis, o completo tende a valer mais. Simule os dois: a calculadora mostra o resultado do regime que você escolher, não escolhe por você.",
   },
   {
     question: "Quando devo declarar IRPF?",
@@ -74,7 +74,7 @@ const FAQ: FAQItem[] = [
   {
     question: "Como funciona o desconto INSS na calculadora?",
     answer:
-      "Se empregado CLT, o INSS (8-11%) é retido na folha de pagamento automaticamente. A calculadora desconta 10% como média. Autônomos pagam diretamente à Receita Federal (alíquota conforme a categoria).",
+      "Se você é CLT, o INSS é retido na folha automaticamente. A calculadora aplica as faixas progressivas de 2026 sobre o salário mensal e limita a contribuição ao teto do RGPS, em vez de usar um percentual único. Autônomos pagam diretamente, com alíquota conforme a categoria.",
   },
   {
     question: "Previdência complementar é dedutível?",
@@ -82,14 +82,14 @@ const FAQ: FAQItem[] = [
       "Sim, até o limite de R$ 63.454/ano em 2026 (aproximadamente 13% da renda bruta). Contribuições a PGBL, VGBL, fundos de pensão entram como deduções.",
   },
   {
-    question: "E se meu resultado for negativo? Ganho restituição?",
+    question: "O que é a redução da Lei 15.270/2025?",
     answer:
-      "Sim! Se o valor calculado for negativo, você tem direito à restituição (devolução de imposto pago em excesso). A Receita Federal restitui em até 3 parcelas mensais.",
+      "É o mecanismo que criou a isenção efetiva de 2026. A lei não mudou as faixas da tabela: ela abate um valor do imposto que a tabela calculou. Quem tem renda tributável anual de até R$ 60.000 tem o imposto zerado; entre R$ 60.000 e R$ 88.200 o abatimento diminui aos poucos; acima disso não há redução. Por isso o detalhamento mostra o imposto pela tabela e a redução em linhas separadas.",
   },
   {
     question: "Preciso pagar imposto se ganho pouco?",
     answer:
-      "Só se sua renda ultrapassar R$ 21.503,34/ano (em 2026). Abaixo disso, é isento. Se recebe salário de empresa, ela faz retenção na folha mesmo assim — você recupera na restituição.",
+      "Na prática, não. A tabela de 2026 isenta até R$ 29.145,60 por ano, e a redução da Lei 15.270/2025 zera o imposto de quem tem renda tributável de até R$ 60.000 por ano — cerca de R$ 5.000 por mês. Se a empresa reteve na folha ao longo do ano, a diferença é acertada na declaração.",
   },
   {
     question: "Como funciona o desconto na fonte?",
@@ -206,7 +206,7 @@ function IrpfCalculator() {
               value: "completo",
             },
             {
-              label: "Regime Simplificado (20,5% dedução fixa)",
+              label: "Regime Simplificado (20% dedução fixa)",
               value: "simplificado",
             },
           ]}
@@ -216,8 +216,8 @@ function IrpfCalculator() {
 
       <ResultSummaryCard
         title="Seu IRPF 2026"
-        mainValue={formatBRL(Math.abs(result.irpfCalculado))}
-        mainLabel={result.irpfCalculado > 0 ? "Você deve pagar" : "Você terá restituição"}
+        mainValue={formatBRL(result.irpfCalculado)}
+        mainLabel={result.irpfCalculado > 0 ? "Você deve pagar" : "Nada a pagar"}
         secondaryValue={`Alíquota efetiva: ${result.aliquotaEfetiva.toFixed(2)}%`}
         secondaryLabel="Do seu rendimento total"
         resultColor={result.irpfCalculado > 0 ? "negative" : "positive"}
@@ -239,9 +239,9 @@ function IrpfCalculator() {
             value: formatBRL(result.rendaBrutaAnual),
           },
           {
-            label: "Desconto INSS (10% aprox.)",
+            label: "Desconto INSS",
             value: `- ${formatBRL(result.descInss)}`,
-            subtext: "Retenção na folha ou contribuição de autônomo",
+            subtext: "Faixas progressivas, limitado ao teto do RGPS",
           },
           {
             label: "Base após INSS",
@@ -261,14 +261,27 @@ function IrpfCalculator() {
           {
             label: `Desconto por ${input.dependentes} dependente(s)`,
             value: `- ${formatBRL(result.descDependentes)}`,
-            subtext: `R$ 2.275 por dependente`,
+            subtext: `R$ 2.275,08 por dependente`,
           },
           {
             label: "Base imponível",
             value: formatBRL(result.baseImponivel),
           },
           {
-            label: "IRPF Calculado",
+            label: "IRPF pela tabela",
+            value: formatBRL(result.irpfPelaTabela),
+          },
+          ...(result.reducaoLei15270 > 0
+            ? [
+                {
+                  label: "Redução (Lei 15.270/2025)",
+                  value: `- ${formatBRL(result.reducaoLei15270)}`,
+                  subtext: "Isenção efetiva para quem recebe até R$ 5.000 por mês",
+                },
+              ]
+            : []),
+          {
+            label: "IRPF devido",
             value: formatBRL(result.irpfCalculado),
             isFinal: true,
           },
@@ -296,11 +309,11 @@ function IrpfCalculator() {
       </DisclaimerBox>
 
       <div className="flex gap-2">
-        <CopyResultButton value={`IRPF 2026: ${formatBRL(Math.abs(result.irpfCalculado))}`} />
+        <CopyResultButton value={`IRPF 2026: ${formatBRL(result.irpfCalculado)}`} />
         <ShareResultButton
           title="Meu IRPF 2026"
           text={`Calculei meu IRPF 2026 em ${formatBRL(
-            Math.abs(result.irpfCalculado),
+            result.irpfCalculado,
           )} (alíquota efetiva: ${result.aliquotaEfetiva.toFixed(2)}%)`}
         />
         <ResetButton onClick={handleReset} />

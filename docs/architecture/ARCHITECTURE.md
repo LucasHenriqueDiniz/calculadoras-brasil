@@ -213,13 +213,17 @@ Worker is dashboard state too.
 
 The violations that exist right now.
 
-- [ ] **`/calculadora-irpf-2026` calls a zero tax a refund.** `calculadora-irpf-2026.tsx:220` and
-      `:223` branch on `irpfCalculado > 0` and fall through to "Você terá restituição". Zero tax was
-      a rare outcome until the Lei 15.270/2025 reduction landed on 2026-09-04; it is now the normal
-      one for anyone earning under R$ 60.000 a year. The page also does not show the reduction at
-      all, so the figure it prints cannot be reconciled with the table. **The domain is correct and
-      the page is not — this is the last thing between the IRPF work and shipping.** No plan covers
-      it; `docs/plans/irpf-calculation-defects/slice-04-redutor.md` raises it.
+- [ ] **`/calculadora-irpf-2026` tells the visitor health expenses have no limit, and then caps
+      them.** The form hint says "Sem limite legal. Mantenha comprovantes." and the FAQ says "Sim,
+      completamente. Sem limite legal" — while `MAX_DEDUCTION_HEALTH = 2666.67` silently truncates
+      the figure they typed. The law agrees with the copy; the module does not. This is the most
+      visible contradiction left on the page, and it is a product decision rather than a defect:
+      the constant's own comment already says "no official cap exists". Out of scope in
+      `docs/pitches/irpf-calculation-defects.md`; no plan covers it.
+- [ ] **Two FAQ figures on that page were not verified and were left alone**: the declaration
+      threshold of R$ 28.559,70 and the supplementary-pension ceiling of R$ 63.454/ano. Both are
+      different figures from the ones `docs/research/2026-09-04-irpf-2026-table/research.md`
+      establishes, and neither was researched. They may be right; nothing here says they are.
 - [ ] **4 of the 12 calculators have no test at all**: `salarioLiquido`, `beneficiosFiscais`,
       `cltVsPj`, `previdenciaComplementar` — 375 of the 1578 lines in the domain, all of it tax
       arithmetic. Plan: `docs/plans/calculator-test-coverage/`.
