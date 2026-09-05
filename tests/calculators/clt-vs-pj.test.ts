@@ -4,7 +4,7 @@ import {
   type CltVsPjInput,
   type CltVsPjResult,
 } from "../../src/lib/calculators/cltVsPj";
-import { TETO_INSS, calcularInssEmpregado } from "../../src/lib/calculators/inss-constants";
+import { INSS_CEILING, calculateEmployeeInss } from "../../src/lib/calculators/inss-constants";
 
 const BASELINE: CltVsPjInput = {
   salarioCltBruto: 8_000,
@@ -183,13 +183,13 @@ describe("calculateCltVsPj — the CLT side", () => {
    */
   it.each([2_000, 4_000, 8_000, 30_000])("withholds the payslip INSS on %s", (salarioCltBruto) => {
     expect(compare({ salarioCltBruto }).detalhesClt.descInss).toBeCloseTo(
-      calcularInssEmpregado(salarioCltBruto),
+      calculateEmployeeInss(salarioCltBruto),
       2,
     );
   });
 
   it("stops the contribution at the RGPS ceiling", () => {
-    const ceiling = calcularInssEmpregado(TETO_INSS);
+    const ceiling = calculateEmployeeInss(INSS_CEILING);
 
     expect(compare({ salarioCltBruto: 30_000 }).detalhesClt.descInss).toBeCloseTo(ceiling, 2);
   });

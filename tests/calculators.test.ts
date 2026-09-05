@@ -7,9 +7,9 @@ import { calculateMovingCost } from "../src/lib/calculators/movingCost";
 import { calculatePetCost } from "../src/lib/calculators/petCost";
 import { calculateInssAutonomo } from "../src/lib/calculators/inssAutonomo";
 import {
-  calcularInssEmpregado,
-  SALARIO_MINIMO,
-  TETO_INSS,
+  calculateEmployeeInss,
+  MINIMUM_WAGE,
+  INSS_CEILING,
 } from "../src/lib/calculators/inss-constants";
 
 describe("core calculators", () => {
@@ -167,30 +167,30 @@ describe("core calculators", () => {
 describe("INSS: progressive employee contribution", () => {
   it("applies the rate only to the slice inside each bracket", () => {
     // 1621 * 7,5% = 121,575 — first bracket in isolation.
-    expect(calcularInssEmpregado(1621)).toBeCloseTo(121.575, 3);
+    expect(calculateEmployeeInss(1621)).toBeCloseTo(121.575, 3);
 
     // 121,575 + (2902,84 - 1621) * 9% = 121,575 + 115,366 = 236,94
-    expect(calcularInssEmpregado(2902.84)).toBeCloseTo(236.94, 2);
+    expect(calculateEmployeeInss(2902.84)).toBeCloseTo(236.94, 2);
 
     // 236,94 + (4354,27 - 2902,84) * 12% = 236,94 + 174,17 = 411,11
-    expect(calcularInssEmpregado(4354.27)).toBeCloseTo(411.11, 2);
+    expect(calculateEmployeeInss(4354.27)).toBeCloseTo(411.11, 2);
   });
 
   it("matches the maximum deduction published for the 2026 ceiling", () => {
     // Reference value published for 2026: R$ 988,09.
-    expect(calcularInssEmpregado(TETO_INSS)).toBeCloseTo(988.09, 2);
+    expect(calculateEmployeeInss(INSS_CEILING)).toBeCloseTo(988.09, 2);
   });
 
   it("never charges more than the contribution at the ceiling", () => {
-    const noTeto = calcularInssEmpregado(TETO_INSS);
-    expect(calcularInssEmpregado(50_000)).toBeCloseTo(noTeto, 2);
+    const noTeto = calculateEmployeeInss(INSS_CEILING);
+    expect(calculateEmployeeInss(50_000)).toBeCloseTo(noTeto, 2);
     // The maximum contribution sits well below 20% of the ceiling.
-    expect(noTeto).toBeLessThan(TETO_INSS * 0.2);
+    expect(noTeto).toBeLessThan(INSS_CEILING * 0.2);
   });
 
   it("keeps the effective rate progressive and below 14%", () => {
     const salario = 5000;
-    const aliquotaEfetiva = calcularInssEmpregado(salario) / salario;
+    const aliquotaEfetiva = calculateEmployeeInss(salario) / salario;
     expect(aliquotaEfetiva).toBeGreaterThan(0.075);
     expect(aliquotaEfetiva).toBeLessThan(0.14);
   });
@@ -207,7 +207,7 @@ describe("self-employed INSS", () => {
     expect(result.salarioContribuicao).toBe(3000);
     expect(result.planoNormal.contribuicaoMensal).toBeCloseTo(600, 2);
     // The simplified plan does not follow the income: 11% of the minimum wage.
-    expect(result.planoSimplificado.contribuicaoMensal).toBeCloseTo(SALARIO_MINIMO * 0.11, 2);
+    expect(result.planoSimplificado.contribuicaoMensal).toBeCloseTo(MINIMUM_WAGE * 0.11, 2);
     expect(result.planoSimplificado.contaTempoDeContribuicao).toBe(false);
   });
 
@@ -217,7 +217,7 @@ describe("self-employed INSS", () => {
       mesesContribuidos: 0,
       sexo: "masculino",
     });
-    expect(acimaDoTeto.salarioContribuicao).toBe(TETO_INSS);
+    expect(acimaDoTeto.salarioContribuicao).toBe(INSS_CEILING);
     expect(acimaDoTeto.limitadoPeloTeto).toBe(true);
 
     const abaixoDoPiso = calculateInssAutonomo({
@@ -225,7 +225,7 @@ describe("self-employed INSS", () => {
       mesesContribuidos: 0,
       sexo: "masculino",
     });
-    expect(abaixoDoPiso.salarioContribuicao).toBe(SALARIO_MINIMO);
+    expect(abaixoDoPiso.salarioContribuicao).toBe(MINIMUM_WAGE);
     expect(abaixoDoPiso.elevadoAoPiso).toBe(true);
   });
 
@@ -268,13 +268,13 @@ describe("self-employed INSS", () => {
       mesesContribuidos: 40 * 12,
       sexo: "masculino",
     });
-    expect(alto.estimativaBeneficioNormal).toBeLessThanOrEqual(TETO_INSS);
+    expect(alto.estimativaBeneficioNormal).toBeLessThanOrEqual(INSS_CEILING);
 
     const baixo = calculateInssAutonomo({
-      ganhoMensalBruto: SALARIO_MINIMO,
+      ganhoMensalBruto: MINIMUM_WAGE,
       mesesContribuidos: 20 * 12,
       sexo: "masculino",
     });
-    expect(baixo.estimativaBeneficioNormal).toBeGreaterThanOrEqual(SALARIO_MINIMO);
+    expect(baixo.estimativaBeneficioNormal).toBeGreaterThanOrEqual(MINIMUM_WAGE);
   });
 });

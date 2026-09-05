@@ -17,7 +17,7 @@
  * one definition is what makes that true by construction rather than by review.
  */
 
-import { calcularInssEmpregado } from "./inss-constants";
+import { calculateEmployeeInss } from "./inss-constants";
 import {
   DEDUCTION_PER_DEPENDENT_MONTHLY,
   findMonthlyTaxBracket,
@@ -110,7 +110,7 @@ export function calculateCltVsPj(input: CltVsPjInput): CltVsPjResult {
   // INSS is progressive and capped at the RGPS ceiling, the same contribution
   // /calculadora-salario-liquido withholds for this salary. A flat percentage
   // would put the two calculators on different answers for the same input.
-  const descInssClt = calcularInssEmpregado(salarioCltBruto);
+  const descInssClt = calculateEmployeeInss(salarioCltBruto);
   const deducaoDependentes = Math.max(input.dependentes, 0) * DEDUCTION_PER_DEPENDENT_MONTHLY;
   const impostoClt = calcularIrpfMensal(
     salarioCltBruto,

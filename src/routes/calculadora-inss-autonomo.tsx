@@ -12,7 +12,7 @@ import { FAQSection } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { formatBRL } from "@/lib/format";
 import { calculateInssAutonomo, type InssAutonomoInput } from "@/lib/calculators/inssAutonomo";
-import { SALARIO_MINIMO, TETO_INSS } from "@/lib/calculators/inss-constants";
+import { MINIMUM_WAGE, INSS_CEILING } from "@/lib/calculators/inss-constants";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
@@ -89,12 +89,12 @@ function Calculator() {
   const avisos: string[] = [];
   if (result.limitadoPeloTeto) {
     avisos.push(
-      `Sua renda está acima do teto do INSS (${formatBRL(TETO_INSS)}). A contribuição do plano normal é calculada sobre o teto, e o benefício também fica limitado a ele.`,
+      `Sua renda está acima do teto do INSS (${formatBRL(INSS_CEILING)}). A contribuição do plano normal é calculada sobre o teto, e o benefício também fica limitado a ele.`,
     );
   }
   if (result.elevadoAoPiso) {
     avisos.push(
-      `Sua renda está abaixo do salário mínimo (${formatBRL(SALARIO_MINIMO)}). O salário de contribuição não pode ser menor que o mínimo, então a base foi elevada a esse piso.`,
+      `Sua renda está abaixo do salário mínimo (${formatBRL(MINIMUM_WAGE)}). O salário de contribuição não pode ser menor que o mínimo, então a base foi elevada a esse piso.`,
     );
   }
   if (!result.tempoMinimoAtingido) {
@@ -116,7 +116,7 @@ function Calculator() {
           label="Renda mensal bruta"
           value={input.ganhoMensalBruto}
           onChange={(v) => setInput({ ...input, ganhoMensalBruto: v })}
-          hint={`Limitada entre ${formatBRL(SALARIO_MINIMO)} e ${formatBRL(TETO_INSS)} para fins de contribuição`}
+          hint={`Limitada entre ${formatBRL(MINIMUM_WAGE)} e ${formatBRL(INSS_CEILING)} para fins de contribuição`}
         />
         <NumberInput
           label="Meses já contribuídos"
@@ -183,7 +183,7 @@ function Calculator() {
         items={[
           {
             label: "Teto do benefício — plano normal",
-            value: formatBRL(TETO_INSS),
+            value: formatBRL(INSS_CEILING),
             subtext: "Benefícios proporcionais à média das contribuições, até o teto do INSS",
           },
           {

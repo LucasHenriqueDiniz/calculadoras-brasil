@@ -5,7 +5,7 @@ import {
 } from "../../src/lib/calculators/salarioLiquido";
 import { IRPF_MONTHLY_TABLE_2026 } from "../../src/lib/calculators/irpf-constants";
 import { calculateIrpf } from "../../src/lib/calculators/irpf";
-import { TETO_INSS, calcularInssEmpregado } from "../../src/lib/calculators/inss-constants";
+import { INSS_CEILING, calculateEmployeeInss } from "../../src/lib/calculators/inss-constants";
 
 /**
  * The monthly incidence table exactly as the Receita Federal publishes it,
@@ -171,10 +171,10 @@ describe("calculateSalarioLiquido — the ordinary case", () => {
 
 describe("calculateSalarioLiquido — INSS", () => {
   it("stops at the RGPS ceiling instead of scaling with the salary", () => {
-    const ceilingContribution = calcularInssEmpregado(TETO_INSS);
+    const ceilingContribution = calculateEmployeeInss(INSS_CEILING);
 
     expect(ceilingContribution).toBeCloseTo(988.09, 2);
-    expect(salario({ salarioBrutoMensal: TETO_INSS }).descInssEmpregado).toBeCloseTo(
+    expect(salario({ salarioBrutoMensal: INSS_CEILING }).descInssEmpregado).toBeCloseTo(
       ceilingContribution,
       2,
     );
@@ -185,7 +185,7 @@ describe("calculateSalarioLiquido — INSS", () => {
   });
 
   /**
-   * The figure, not the wiring. Asserting this against `calcularInssEmpregado`
+   * The figure, not the wiring. Asserting this against `calculateEmployeeInss`
    * only restated the call the module makes and would have passed against a flat
    * rate, a cumulative one, or any other contribution table.
    *

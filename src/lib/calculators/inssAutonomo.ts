@@ -18,10 +18,10 @@
  */
 
 import {
-  INSS_ANO_REFERENCIA,
-  SALARIO_MINIMO,
-  TETO_INSS,
-  salarioDeContribuicao,
+  INSS_REFERENCE_YEAR,
+  MINIMUM_WAGE,
+  INSS_CEILING,
+  contributionSalary,
 } from "./inss-constants";
 
 export type PlanoInss = "normal" | "simplificado";
@@ -86,10 +86,10 @@ const PERCENTUAL_POR_ANO_EXCEDENTE = 2;
 
 export function calculateInssAutonomo(input: InssAutonomoInput): InssAutonomoResult {
   const ganhoMensalBruto = Math.max(input.ganhoMensalBruto, 0);
-  const salarioContribuicao = salarioDeContribuicao(ganhoMensalBruto);
+  const salarioContribuicao = contributionSalary(ganhoMensalBruto);
 
   const contribuicaoNormalMensal = salarioContribuicao * ALIQUOTA_NORMAL;
-  const contribuicaoSimplificadaMensal = SALARIO_MINIMO * ALIQUOTA_SIMPLIFICADA;
+  const contribuicaoSimplificadaMensal = MINIMUM_WAGE * ALIQUOTA_SIMPLIFICADA;
 
   const planoNormal: PlanoDetalhe = {
     base: salarioContribuicao,
@@ -101,7 +101,7 @@ export function calculateInssAutonomo(input: InssAutonomoInput): InssAutonomoRes
   };
 
   const planoSimplificado: PlanoDetalhe = {
-    base: SALARIO_MINIMO,
+    base: MINIMUM_WAGE,
     aliquota: ALIQUOTA_SIMPLIFICADA * 100,
     contribuicaoMensal: contribuicaoSimplificadaMensal,
     contribuicaoAnual: contribuicaoSimplificadaMensal * 12,
@@ -124,15 +124,15 @@ export function calculateInssAutonomo(input: InssAutonomoInput): InssAutonomoRes
   // Here the current contribution salary stands in as an approximation.
   const beneficioBruto = salarioContribuicao * (percentualMediaAplicado / 100);
   const estimativaBeneficioNormal = tempoMinimoAtingido
-    ? Math.min(Math.max(beneficioBruto, SALARIO_MINIMO), TETO_INSS)
+    ? Math.min(Math.max(beneficioBruto, MINIMUM_WAGE), INSS_CEILING)
     : 0;
 
   return {
-    anoReferencia: INSS_ANO_REFERENCIA,
+    anoReferencia: INSS_REFERENCE_YEAR,
     ganhoMensalBruto,
     salarioContribuicao,
-    limitadoPeloTeto: ganhoMensalBruto > TETO_INSS,
-    elevadoAoPiso: ganhoMensalBruto > 0 && ganhoMensalBruto < SALARIO_MINIMO,
+    limitadoPeloTeto: ganhoMensalBruto > INSS_CEILING,
+    elevadoAoPiso: ganhoMensalBruto > 0 && ganhoMensalBruto < MINIMUM_WAGE,
     planoNormal,
     planoSimplificado,
     diferencaCustoAnual: planoNormal.contribuicaoAnual - planoSimplificado.contribuicaoAnual,
@@ -140,7 +140,7 @@ export function calculateInssAutonomo(input: InssAutonomoInput): InssAutonomoRes
     anosContribuidos,
     tempoMinimoContribuicao,
     estimativaBeneficioNormal,
-    estimativaBeneficioSimplificado: SALARIO_MINIMO,
+    estimativaBeneficioSimplificado: MINIMUM_WAGE,
     percentualMediaAplicado,
     tempoMinimoAtingido,
   };

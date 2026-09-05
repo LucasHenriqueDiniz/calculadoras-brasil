@@ -11,7 +11,7 @@
  * The rules themselves live in `irpf-constants.ts`, alongside their sources.
  */
 
-import { calcularInssEmpregado } from "./inss-constants";
+import { calculateEmployeeInss } from "./inss-constants";
 import {
   DEDUCTION_PER_DEPENDENT_ANNUAL,
   MAX_DEDUCTION_EDUCATION_ANNUAL,
@@ -77,7 +77,7 @@ export function calculateSalarioLiquido(input: SalarioLiquidoInput): SalarioLiqu
 
   // 1. employee INSS: progressive per bracket and capped at the RGPS ceiling.
   //    Each rate applies only to the slice of the salary inside its bracket.
-  const descInssEmpregado = calcularInssEmpregado(salarioBrutoMensal);
+  const descInssEmpregado = calculateEmployeeInss(salarioBrutoMensal);
 
   // 2. IRPF base after INSS
   const baseParaIrpf = salarioBrutoMensal - descInssEmpregado;

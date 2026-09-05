@@ -7,7 +7,7 @@
  * `salarioLiquido.ts` and `cltVsPj.ts`, and is not this one divided by twelve.
  */
 
-import { calcularInssEmpregado } from "./inss-constants";
+import { calculateEmployeeInss } from "./inss-constants";
 import {
   DEDUCTION_PER_DEPENDENT_ANNUAL,
   MAX_DEDUCTION_EDUCATION_ANNUAL,
@@ -82,7 +82,7 @@ export function calculateIrpf(input: IrpfInput): IrpfResult {
   // computed on the monthly salary and annualised. What matters is not the rate
   // but the ceiling: a flat percentage of gross income has none, and deducted
   // R$ 50.000 from an income of R$ 500.000 against a legal maximum of R$ 11.857.
-  const descInss = calcularInssEmpregado(rendaBrutaAnual / 12) * 12;
+  const descInss = calculateEmployeeInss(rendaBrutaAnual / 12) * 12;
 
   // 2. taxable base after INSS
   const basePosInss = rendaBrutaAnual - descInss;

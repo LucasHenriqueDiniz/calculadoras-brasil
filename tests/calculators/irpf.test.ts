@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { calculateIrpf, type IrpfInput } from "../../src/lib/calculators/irpf";
-import { TETO_INSS, calcularInssEmpregado } from "../../src/lib/calculators/inss-constants";
+import { INSS_CEILING, calculateEmployeeInss } from "../../src/lib/calculators/inss-constants";
 
 /**
  * The declared boundaries of IRPF_TABLE_2026, as the upper bound of each bracket.
@@ -125,14 +125,14 @@ describe("calculateIrpf — the progressive table is self-consistent", () => {
 
 describe("calculateIrpf — INSS withheld", () => {
   it("never deducts more INSS than the RGPS ceiling allows", () => {
-    const annualCeiling = calcularInssEmpregado(TETO_INSS) * 12;
+    const annualCeiling = calculateEmployeeInss(INSS_CEILING) * 12;
 
     expect(irpf({ rendaBrutaAnual: 500_000 }).descInss).toBeLessThanOrEqual(annualCeiling + 0.01);
   });
 
   it("deducts the progressive contribution below the ceiling, not a flat rate", () => {
     const rendaBrutaAnual = 50_000;
-    const expected = calcularInssEmpregado(rendaBrutaAnual / 12) * 12;
+    const expected = calculateEmployeeInss(rendaBrutaAnual / 12) * 12;
 
     expect(irpf({ rendaBrutaAnual }).descInss).toBeCloseTo(expected, 2);
 
