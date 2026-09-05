@@ -108,10 +108,22 @@ function Calculator() {
       <ResultSummaryCard
         title="Comparação"
         mainValue={formatBRL(result.cltComBeneficios)}
-        mainLabel={result.analise.cltMelhor ? "CLT é melhor" : "PJ é melhor"}
+        mainLabel={
+          result.analise.empate
+            ? "Empate técnico"
+            : result.analise.cltMelhor
+              ? "CLT é melhor"
+              : "PJ é melhor"
+        }
         secondaryValue={formatBRL(Math.abs(result.diferenca))}
-        secondaryLabel={`Diferença: ${result.percentualDiferenca}%`}
-        resultColor={result.analise.cltMelhor ? "positive" : "warning"}
+        secondaryLabel={
+          result.analise.temBaseParaPercentual
+            ? `Diferença: ${result.percentualDiferenca}%`
+            : "Diferença"
+        }
+        resultColor={
+          result.analise.empate ? "neutral" : result.analise.cltMelhor ? "positive" : "warning"
+        }
       />
 
       <BreakdownTable
@@ -143,7 +155,10 @@ function Calculator() {
           {
             label: "PJ Necessária para igualar CLT",
             value: formatBRL(result.pjNecessaria),
-            subtext: `${((result.pjNecessaria / input.salarioCltBruto - 1) * 100).toFixed(0)}% a mais que CLT`,
+            subtext:
+              input.salarioCltBruto > 0
+                ? `${((result.pjNecessaria / input.salarioCltBruto - 1) * 100).toFixed(0)}% a mais que CLT`
+                : "Informe o salário CLT para comparar",
           },
         ]}
       />

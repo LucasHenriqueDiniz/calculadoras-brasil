@@ -63,6 +63,10 @@ export interface CltVsPjResult {
   detalhesPj: CltVsPjImpostoDetalhado & { descContador: number };
   analise: {
     cltMelhor: boolean;
+    /** The two packages are level to within a centavo. `cltMelhor` alone cannot say so. */
+    empate: boolean;
+    /** False when there is no CLT package to take a percentage of. */
+    temBaseParaPercentual: boolean;
     diferencaMensal: number;
     diferencaAnual: number;
     justificativa: string;
@@ -168,6 +172,8 @@ export function calculateCltVsPj(input: CltVsPjInput): CltVsPjResult {
     detalhesPj: { ...pj.imposto, descInss: pj.descInss, descContador: pj.descContador },
     analise: {
       cltMelhor,
+      empate,
+      temBaseParaPercentual: cltComBeneficios > 0,
       diferencaMensal: Math.abs(diferenca),
       diferencaAnual: roundToCentavos(Math.abs(diferenca) * 12),
       justificativa: escreverJustificativa({

@@ -531,6 +531,48 @@ describe("calculateCltVsPj — the verdict", () => {
   );
 });
 
+describe("calculateCltVsPj — the verdict the page renders", () => {
+  /**
+   * `cltMelhor` is a boolean, so on its own it cannot express a tie: at an exact
+   * draw it reads false and the badge said "PJ é melhor" over prose saying the
+   * two were level. `empate` is what gives the page a third state.
+   */
+  it("flags a tie rather than silently favouring PJ", () => {
+    const gross = 8_000;
+    const matching = calculateCltVsPj({
+      salarioCltBruto: gross,
+      propostaPjMensal: 4_000,
+      dependentes: 0,
+      despesasDedutivelsPj: 0,
+    }).pjNecessaria;
+
+    const tied = calculateCltVsPj({
+      salarioCltBruto: gross,
+      propostaPjMensal: matching,
+      dependentes: 0,
+      despesasDedutivelsPj: 0,
+    });
+
+    expect(tied.analise.empate).toBe(true);
+    expect(Math.abs(tied.diferenca)).toBeLessThan(0.01);
+  });
+
+  it.each([0, 8_000])(
+    "says whether a percentage has a base to be taken of, for a CLT salary of %s",
+    (salarioCltBruto) => {
+      const result = calculateCltVsPj({
+        salarioCltBruto,
+        propostaPjMensal: 5_000,
+        dependentes: 0,
+        despesasDedutivelsPj: 0,
+      });
+
+      expect(result.analise.temBaseParaPercentual).toBe(salarioCltBruto > 0);
+      expect(Number.isFinite(result.percentualDiferenca)).toBe(true);
+    },
+  );
+});
+
 describe("calculateCltVsPj — degenerate input", () => {
   /**
    * ⚠️ Both fields are plain currency inputs with no floor, so a visitor who
