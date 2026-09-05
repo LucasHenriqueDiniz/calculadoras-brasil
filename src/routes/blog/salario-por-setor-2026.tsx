@@ -66,14 +66,14 @@ function BlogPost() {
 
           <h2>Tecnologia</h2>
           <p>
-            <strong>Bruto:</strong> R$ 8.000 | <strong>Líquido estimado:</strong> ~R$ 6.200 (cerca
-            de 22% de desconto)
+            <strong>Bruto:</strong> R$ 8.000 | <strong>Líquido estimado:</strong> ~R$ 6.041 (cerca
+            de 24,5% de desconto)
           </p>
           <p>
             Faixa de IRPF mais alta (chega aos 27,5%) e sem direito à redução da Lei 15.270/2025,
-            que se esgota acima de R$ 88.200 de rendimentos tributáveis no ano. Em compensação,
-            costuma vir acompanhada de benefícios que compensam parte do desconto, como auxílio home
-            office e planos de saúde robustos.
+            que se esgota acima de R$ 7.350 por mês na retenção da folha — R$ 88.200 no ano, quando
+            a conta é fechada no ajuste anual. Em compensação, costuma vir acompanhada de benefícios
+            que compensam parte do desconto, como auxílio home office e planos de saúde robustos.
           </p>
 
           <h2>Saúde</h2>

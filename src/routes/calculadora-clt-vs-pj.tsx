@@ -167,7 +167,8 @@ function Calculator() {
         <p>
           Para o seu cenário, a simulação indica que seria preciso faturar cerca de{" "}
           <strong>{formatBRL(result.pjNecessaria)}</strong> por mês como PJ para chegar ao mesmo
-          ganho líquido de <strong>{formatBRL(result.salarioCltBruto)}</strong> por mês em CLT.
+          ganho líquido de <strong>{formatBRL(result.cltComBeneficios)}</strong> por mês em CLT, já
+          somados FGTS, 13º e férias.
         </p>
         <p className="mt-3">
           É uma estimativa educativa. Ela não considera despesas próprias do seu negócio

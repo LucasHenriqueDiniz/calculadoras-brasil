@@ -13,7 +13,8 @@ tags:
 > that is actually built, when each piece was decided, where it diverges from the house style and
 > why, and what is still wrong.
 
-**Recorded 2026-09-04**, from the tree at commit `aaad430`. Every count below was measured, not
+**Recorded 2026-09-04**, from the tree at commit `aaad430`, and kept current through the
+IRPF correction work that followed on the same day. Every count below was measured, not
 remembered; the commands that produce them are in the sections themselves.
 
 ## How to keep this file
@@ -255,9 +256,6 @@ The violations that exist right now.
       and annual halves stay separate symbols on purpose: they are separate publications, not one
       table over twelve. `MAX_DEDUCTION_HEALTH` deliberately stayed in `irpf.ts`, because no
       official ceiling for it was ever found and it is not one of the published figures.
-- [ ] **4 of the 12 calculators have no test at all**: `salarioLiquido`, `beneficiosFiscais`,
-      `cltVsPj`, `previdenciaComplementar` — 375 of the 1578 lines in the domain, all of it tax
-      arithmetic. Plan: `docs/plans/calculator-test-coverage/`.
 - [ ] **Two route components are past the hard 200-line limit by more than 3x**:
       `calculadora-conta-de-luz.tsx` (723) and `calculadora-custo-carro.tsx` (692). They hold form
       state, persistence, public-data fetching, editorial copy and JSON-LD in one file.

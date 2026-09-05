@@ -238,35 +238,52 @@ function IrpfCalculator() {
             label: "Renda bruta anual",
             value: formatBRL(result.rendaBrutaAnual),
           },
-          {
-            label: "Desconto INSS",
-            value: `- ${formatBRL(result.descInss)}`,
-            subtext: "Faixas progressivas, limitado ao teto do RGPS",
-          },
-          {
-            label: "Base após INSS",
-            value: formatBRL(result.rendaBrutaAnual - result.descInss),
-          },
-          {
-            label: "Deduções (educação, saúde, previdência)",
-            value: `- ${formatBRL(result.totalDeducoes)}`,
-            subtext: `Educação: ${formatBRL(result.deducaoEducacao)} | Saúde: ${formatBRL(
-              result.deducaoSaude,
-            )} | Previdência: ${formatBRL(result.deducaoPrevidenciaComplementar)}`,
-          },
-          {
-            label: "Base de cálculo",
-            value: formatBRL(result.baseCalculoCompleta),
-          },
-          {
-            label: `Desconto por ${input.dependentes} dependente(s)`,
-            value: `- ${formatBRL(result.descDependentes)}`,
-            subtext: `R$ 2.275,08 por dependente`,
-          },
-          {
-            label: "Base imponível",
-            value: formatBRL(result.baseImponivel),
-          },
+          // The simplified regime replaces every other deduction — INSS, dependants
+          // and the itemised three. Listing them under it would show a chain that
+          // does not produce the tax printed below it.
+          ...(input.regimeSimplificado
+            ? [
+                {
+                  label: "Desconto simplificado",
+                  value: `- ${formatBRL(result.rendaBrutaAnual - result.baseCalculoSimplificada)}`,
+                  subtext: "20% da renda bruta, até R$ 17.640,00 — no lugar de todas as deduções",
+                },
+                {
+                  label: "Base de cálculo",
+                  value: formatBRL(result.baseCalculoSimplificada),
+                },
+              ]
+            : [
+                {
+                  label: "Desconto INSS",
+                  value: `- ${formatBRL(result.descInss)}`,
+                  subtext: "Faixas progressivas, limitado ao teto do RGPS",
+                },
+                {
+                  label: "Base após INSS",
+                  value: formatBRL(result.rendaBrutaAnual - result.descInss),
+                },
+                {
+                  label: "Deduções (educação, saúde, previdência)",
+                  value: `- ${formatBRL(result.totalDeducoes)}`,
+                  subtext: `Educação: ${formatBRL(result.deducaoEducacao)} | Saúde: ${formatBRL(
+                    result.deducaoSaude,
+                  )} | Previdência: ${formatBRL(result.deducaoPrevidenciaComplementar)}`,
+                },
+                {
+                  label: "Base de cálculo",
+                  value: formatBRL(result.baseCalculoCompleta),
+                },
+                {
+                  label: `Desconto por ${input.dependentes} dependente(s)`,
+                  value: `- ${formatBRL(result.descDependentes)}`,
+                  subtext: `R$ 2.275,08 por dependente`,
+                },
+                {
+                  label: "Base imponível",
+                  value: formatBRL(result.baseImponivel),
+                },
+              ]),
           {
             label: "IRPF pela tabela",
             value: formatBRL(result.irpfPelaTabela),

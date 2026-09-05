@@ -15,8 +15,8 @@ All of them are fixed. `tests/calculators/irpf.test.ts` reports `28 passed (28)`
 The trail, in the order it happened:
 `docs/pitches/irpf-calculation-defects.md` → `docs/research/2026-09-04-irpf-2026-table/research.md`
 → decision `D3` in `docs/architecture/ARCHITECTURE.md` → `docs/plans/irpf-calculation-defects/`,
-slices 1–3. Slice 4 there is still open and adds the Lei 15.270/2025 redutor, which is new
-behaviour rather than a defect this slice found.
+slices 1–4, the last of which added the Lei 15.270/2025 redutor — new behaviour rather than a
+defect this slice found.
 
 The first of the two headline calculators. `/calculadora-irpf-2026` is a top
 public page and `calculateIrpf` has no test today.
