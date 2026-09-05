@@ -220,6 +220,13 @@ The violations that exist right now.
       visible contradiction left on the page, and it is a product decision rather than a defect:
       the constant's own comment already says "no official cap exists". Out of scope in
       `docs/pitches/irpf-calculation-defects.md`; no plan covers it.
+- [ ] **`PrevidenciaComplementarInput.tasaRetornoAnual` is Spanish, and renaming it is a data
+      migration.** `previdenciaComplementar.ts:3` — `tasa` should be `taxa`. The field is persisted
+      verbatim in the visitor's `localStorage` under `previdencia-input`
+      (`calculadora-previdencia-complementar.tsx:80`), so a rename orphans the stored value of every
+      returning visitor. The `naming` skill's test for which class a rename falls into puts this in
+      the expensive one; it needs a key version bump alongside, the same way
+      `docs/plans/english-domain-identifiers/` handles the others.
 - [ ] **The site states three different figures for the same rule, in three places.** None was
       researched and none can be settled from
       `docs/research/2026-09-04-irpf-2026-table/research.md`, which covers the tables and the

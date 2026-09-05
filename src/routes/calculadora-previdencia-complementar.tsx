@@ -117,13 +117,7 @@ function Calculator() {
 
       <ResultSummaryCard
         title="Saldo Projetado"
-        mainValue={formatBRL(
-          input.anosAteAposentadoria <= 10
-            ? result.montanteFinal10anos
-            : input.anosAteAposentadoria <= 20
-              ? result.montanteFinal20anos
-              : result.montanteFinal30anos,
-        )}
+        mainValue={formatBRL(result.montanteFinalHorizonte)}
         mainLabel={`em ${input.anosAteAposentadoria} anos`}
         secondaryValue={formatBRL(result.economiaIrpfAnual)}
         secondaryLabel="Economia IRPF/ano"
