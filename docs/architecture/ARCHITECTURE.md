@@ -224,6 +224,18 @@ The violations that exist right now.
       threshold of R$ 28.559,70 and the supplementary-pension ceiling of R$ 63.454/ano. Both are
       different figures from the ones `docs/research/2026-09-04-irpf-2026-table/research.md`
       establishes, and neither was researched. They may be right; nothing here says they are.
+- [ ] **Three calculators implement the 2026 IRPF rules independently, and each was wrong in its
+      own way.** `irpf.ts`, `salarioLiquido.ts` and `cltVsPj.ts` each carry their own copy of the
+      progressive table — `grep -l '0\.275' src/lib/calculators/` finds all three. They never
+      agreed. `cltVsPj.ts:33-37` is the starkest: it implements **only** the 22,5% and 27,5%
+      branches, so tax is zero below an annual base of 44.693,60 and R$ 201,86 immediately above —
+      one real more of gross salary costs the visitor R$ 201 of net.
+      **The duplication is the defect; the wrong figures are its symptom.** A single shared module
+      owning the table, the reduction and the INSS contribution — `inss-constants.ts` already does
+      this for INSS and is imported by three modules — would have made one correction fix all
+      three. Named here rather than fixed: merging them is its own pitch, and
+      `docs/pitches/calculator-test-coverage.md` already records that `irpf` and `salarioLiquido`
+      duplicate each other.
 - [ ] **4 of the 12 calculators have no test at all**: `salarioLiquido`, `beneficiosFiscais`,
       `cltVsPj`, `previdenciaComplementar` — 375 of the 1578 lines in the domain, all of it tax
       arithmetic. Plan: `docs/plans/calculator-test-coverage/`.
