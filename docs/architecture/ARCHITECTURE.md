@@ -263,14 +263,17 @@ The violations that exist right now.
       Plan: `docs/plans/oversized-functions/`.
 - [ ] **Portuguese identifiers in the domain.** See Divergences.
       Plan: `docs/plans/english-domain-identifiers/`.
-- [ ] **`/calculadora-clt-vs-pj` argues against its own result.** The FAQ says it is common to need
-      "entre 25% e 40% a mais como PJ"; the page above it renders **79%**. Both the FAQ and the
-      disclaimer also invoke the Simples Nacional, which the module does not model at all — it
-      applies the monthly IRPF table plus a flat 20% contribution and a 5% fee. `INSS_RATE_PJ` is
-      uncapped, so a R$ 60.000 invoice is charged R$ 12.000: that is the largest remaining error in
-      `pjNecessaria` and it biases every verdict toward CLT. No source in
-      `docs/research/2026-09-04-irpf-2026-table/research.md` covers pró-labore contributions, so
-      this needs its own research note before either the copy or the model is changed.
+- [ ] **`/calculadora-clt-vs-pj` overstates what a PJ must invoice, and its FAQ was right all
+      along.** Researched 2026-09-05: `docs/research/2026-09-05-pj-tax-model/research.md`. The
+      module charges `INSS_RATE_PJ = 0.2` uncapped on the whole invoice. The sócio's contribution
+      is **11%**, **capped at the RGPS ceiling** (`0,11 × 8.475,55 = R$ 932,31/month`), and levied
+      on the **pró-labore**, not the invoice — the 20% is the *patronal* contribution, owed by the
+      company, and only outside Simples Nacional. At a CLT gross of R$ 10.000 the module invents
+      R$ 2.413,72 a month of contribution nobody owes, and answers +67% where the source's worked
+      case is +30% to +40%. **The FAQ's "25% a 40%" needs no change; the arithmetic does.** The
+      module also models no Simples Nacional at all, while the page's own FAQ and disclaimer
+      describe one. Which of the four options to take is a product decision the research
+      deliberately leaves open — they range from capping the contribution to modelling the Fator R.
 - [ ] **`/calculadora-salario-liquido` labels annual inputs as monthly.** The fields read "Gastos
       **mensais** com educação/saúde" and "Previdência complementar **mensal**", and the module
       consumes them as annual amounts — a 12x error for anyone who fills them. The education hint
