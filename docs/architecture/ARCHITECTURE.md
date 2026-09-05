@@ -282,6 +282,20 @@ The violations that exist right now.
 - [ ] **`previdenciaComplementar` headlines a saving from a rate the visitor cannot set.**
       `aliquotaIrpfAtual` is hardcoded at 22,5% with no control, yet "Economia IRPF/ano" is shown
       as though it were the visitor's own figure.
+- [ ] **`/calculadora-conta-de-luz` fails hydration on every load, and has since before this
+      branch.** `calculadora-conta-de-luz.tsx:44` is
+      `const nextId = () => \`a${++_id}_${Date.now().toString(36)}\``, and `DEFAULT_APPLIANCES`
+      calls it at module scope. The server evaluates that constant during SSR and the browser
+      evaluates it again at hydration, so the generated ids differ and React reports
+      `Hydration failed because the server rendered text didn't match` — then discards the server
+      markup for that subtree and re-renders it client-side, which is precisely the prerendering
+      this site is built around. It is React's own first listed cause: *"variable input such as
+      `Date.now()` or `Math.random()` which changes each time it's called"*.
+      **Measured, not inferred**: the identical error reproduces on the commit before the slice-2
+      refactor, with the same ids differing the same way, so the split did not introduce it.
+      `calculadora-assinaturas.tsx` uses the same `nextId` pattern and wants the same check.
+      The `architecture` skill's determinism rules already name the fix — derive ids from a stable
+      key rather than drawing them. No plan covers it.
 - [ ] **`ADSENSE-CHECKLIST.md` sits at the repo root**, dated 2026-06-26 with 3 of 7 fixes still
       open. It is a roadmap document living outside `docs/`, and it has not moved in two months.
 - [ ] **No test covers the two adapters.** `aneel.ts` and `anp.ts` parse third-party formats — an
