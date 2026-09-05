@@ -7,17 +7,17 @@ import { FAQSection } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { formatBRL } from "@/lib/format";
 import {
-  calculateBeneficiosFiscais,
-  type BeneficiosFiscaisInput,
+  calculateTaxFreeBenefits,
+  type TaxFreeBenefitsInput,
 } from "@/lib/calculators/beneficiosFiscais";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
 
-const DEFAULTS: BeneficiosFiscaisInput = {
-  valeRefeicaoMensal: 360,
-  valeTransporteMensal: 0,
-  aliquotaIrpfEstimada: 15,
+const DEFAULTS: TaxFreeBenefitsInput = {
+  monthlyMealAllowance: 360,
+  monthlyTransportAllowance: 0,
+  estimatedIrpfRate: 15,
 };
 
 const DESCRIPTION =
@@ -70,8 +70,11 @@ export const Route = createFileRoute("/calculadora-beneficios-fiscais")({
 });
 
 function Calculator() {
-  const [input, setInput] = usePersistedState<BeneficiosFiscaisInput>("beneficios-input", DEFAULTS);
-  const result = useMemo(() => calculateBeneficiosFiscais(input), [input]);
+  const [input, setInput] = usePersistedState<TaxFreeBenefitsInput>(
+    "beneficios-input-v2",
+    DEFAULTS,
+  );
+  const result = useMemo(() => calculateTaxFreeBenefits(input), [input]);
 
   return (
     <CalculatorLayout
@@ -81,14 +84,14 @@ function Calculator() {
       <FormSection title="Benefícios" description="Valores que você recebe">
         <CurrencyInput
           label="Vale refeição mensal"
-          value={input.valeRefeicaoMensal}
-          onChange={(v) => setInput({ ...input, valeRefeicaoMensal: v })}
+          value={input.monthlyMealAllowance}
+          onChange={(v) => setInput({ ...input, monthlyMealAllowance: v })}
           hint="Informe o valor que consta no seu holerite"
         />
         <CurrencyInput
           label="Vale transporte mensal"
-          value={input.valeTransporteMensal}
-          onChange={(v) => setInput({ ...input, valeTransporteMensal: v })}
+          value={input.monthlyTransportAllowance}
+          onChange={(v) => setInput({ ...input, monthlyTransportAllowance: v })}
           hint="A empresa pode descontar até 6% do salário-base a esse título"
         />
       </FormSection>
@@ -96,8 +99,8 @@ function Calculator() {
       <FormSection title="Imposto" description="Sua alíquota IRPF estimada">
         <NumberInput
           label="Alíquota IRPF (%)"
-          value={input.aliquotaIrpfEstimada}
-          onChange={(v) => setInput({ ...input, aliquotaIrpfEstimada: v })}
+          value={input.estimatedIrpfRate}
+          onChange={(v) => setInput({ ...input, estimatedIrpfRate: v })}
           min={0}
           max={27.5}
           hint="Alíquota marginal do seu IRPF"
@@ -106,9 +109,9 @@ function Calculator() {
 
       <ResultSummaryCard
         title="Economia Fiscal"
-        mainValue={formatBRL(result.economiaIrpfMensal)}
+        mainValue={formatBRL(result.monthlyIrpfSaving)}
         mainLabel="Economia IRPF mensal"
-        secondaryValue={formatBRL(result.economiaIrpfAnual)}
+        secondaryValue={formatBRL(result.annualIrpfSaving)}
         secondaryLabel="Economia IRPF anual"
         resultColor="positive"
       />
@@ -118,31 +121,31 @@ function Calculator() {
         items={[
           {
             label: "Vale refeição mensal",
-            value: formatBRL(result.valeRefeicaoMensal),
+            value: formatBRL(result.monthlyMealAllowance),
             subtext: "Não tributável",
           },
           {
             label: "Vale transporte mensal",
-            value: formatBRL(result.valeTransporteMensal),
+            value: formatBRL(result.monthlyTransportAllowance),
             subtext: "Não tributável",
           },
           {
             label: "Total de benefícios",
-            value: formatBRL(result.beneficiosTotalMensal),
+            value: formatBRL(result.monthlyBenefitTotal),
           },
           {
             label: "Economia de IRPF mensal",
-            value: formatBRL(result.economiaIrpfMensal),
+            value: formatBRL(result.monthlyIrpfSaving),
             subtext: "Se recebesse em dinheiro, pagaria IRPF",
           },
           {
             label: "Economia de IRPF anual",
-            value: formatBRL(result.economiaIrpfAnual),
+            value: formatBRL(result.annualIrpfSaving),
             isFinal: true,
           },
           {
             label: "Salário bruto necessário para igualar",
-            value: formatBRL(result.comparacao.emDinheiro),
+            value: formatBRL(result.comparison.asCash),
             subtext: "Quanto teria que receber a mais em salário para ter o mesmo em líquido",
           },
         ]}

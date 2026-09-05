@@ -1,5 +1,5 @@
 ---
-status: active
+status: done
 epic: identifiers
 ---
 
@@ -86,3 +86,20 @@ Three slices, ordered by blast radius: internals first (nothing outside the file
 can see them), exported symbols second (the type checker finds every caller),
 persisted fields last (the type checker cannot find a returning visitor's
 browser).
+
+---
+
+**Delivered 2026-09-05.** Four slices, `docs/plans/english-domain-identifiers/`. The check this
+pitch set is directory-wide and now returns nothing:
+
+```
+$ grep -rniE 'aliquota|deducao|salario|contribuicao|beneficio' src/lib/calculators/
+$ echo $?
+1
+```
+
+Two decisions worth carrying forward. **Persisted literal values were left in Portuguese**
+(`"normal" | "simplificado"`, `"masculino" | "feminino"`): they are stored data, and changing them
+is a migration rather than a rename. **Five storage keys were bumped** in the same commits as their
+renames, because `usePersistedState` does a raw `JSON.parse` with no shape validation and would
+otherwise hand the new code a stale object of `undefined`s.

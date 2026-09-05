@@ -7,10 +7,10 @@ import {
 import { INSS_CEILING, calculateEmployeeInss } from "../../src/lib/calculators/inss-constants";
 
 const BASELINE: CltVsPjInput = {
-  salarioCltBruto: 8_000,
-  propostaPjMensal: 12_000,
-  dependentes: 0,
-  despesasDedutivelsPj: 0,
+  cltGrossSalary: 8_000,
+  monthlyPjOffer: 12_000,
+  dependants: 0,
+  pjDeductibleExpenses: 0,
 };
 
 function compare(overrides: Partial<CltVsPjInput> = {}): CltVsPjResult {
@@ -50,19 +50,19 @@ const TAX_PATHS = [
     // than a division. Bisection on the base the module itself reports.
     grossForBase: (base: number) =>
       bisect(
-        (salarioCltBruto) => compare({ salarioCltBruto }).detalhesClt.baseIrpf < base,
+        (cltGrossSalary) => compare({ cltGrossSalary }).cltDetail.assessableBase < base,
         0,
         base * 2 + 20_000,
       ),
-    detail: (gross: number) => compare({ salarioCltBruto: gross }).detalhesClt,
-    net: (gross: number) => compare({ salarioCltBruto: gross }).cltLiquido,
+    detail: (gross: number) => compare({ cltGrossSalary: gross }).cltDetail,
+    net: (gross: number) => compare({ cltGrossSalary: gross }).cltNet,
   },
   {
     name: "PJ",
     // The invoice less the 20% pró-labore contribution, with no expenses.
     grossForBase: (base: number) => base / 0.8,
-    detail: (gross: number) => compare({ propostaPjMensal: gross }).detalhesPj,
-    net: (gross: number) => compare({ propostaPjMensal: gross }).pjLiquido,
+    detail: (gross: number) => compare({ monthlyPjOffer: gross }).pjDetail,
+    net: (gross: number) => compare({ monthlyPjOffer: gross }).pjNet,
   },
 ] as const;
 
@@ -121,9 +121,9 @@ function firstNonSmoothPoint(
  * The lowest PJ proposal at which the module stops calling CLT the better deal,
  * found by bisection rather than by re-deriving the module's own arithmetic.
  */
-function crossoverProposal(salarioCltBruto: number): number {
+function crossoverProposal(cltGrossSalary: number): number {
   return bisect(
-    (propostaPjMensal) => compare({ salarioCltBruto, propostaPjMensal }).analise.cltMelhor,
+    (monthlyPjOffer) => compare({ cltGrossSalary, monthlyPjOffer }).analysis.cltIsBetter,
     0,
     500_000,
   );
@@ -140,8 +140,8 @@ describe.each(TAX_PATHS)("calculateCltVsPj — the monthly IRPF table, $name sid
    * zero with zero and pass while proving nothing.
    */
   it.each(BRACKET_BOUNDARIES)("does not jump across the boundary at %s", (boundary) => {
-    const below = path.detail(path.grossForBase(boundary)).irpfPelaTabela;
-    const above = path.detail(path.grossForBase(boundary + 0.01)).irpfPelaTabela;
+    const below = path.detail(path.grossForBase(boundary)).taxFromTable;
+    const above = path.detail(path.grossForBase(boundary + 0.01)).taxFromTable;
 
     expect(above - below).toBeGreaterThan(-0.01);
     expect(Math.abs(above - below)).toBeLessThan(1);
@@ -155,14 +155,14 @@ describe.each(TAX_PATHS)("calculateCltVsPj — the monthly IRPF table, $name sid
    */
   it.each(MONTHLY_TABLE)("charges $rate on the band ending at $upTo", ({ rate, inside }) => {
     const [lower, upper] = inside;
-    const taxAt = (base: number) => path.detail(path.grossForBase(base)).irpfPelaTabela;
+    const taxAt = (base: number) => path.detail(path.grossForBase(base)).taxFromTable;
 
     expect((taxAt(upper) - taxAt(lower)) / (upper - lower)).toBeCloseTo(rate, 3);
   });
 
   it("charges nothing at all below the first bracket", () => {
-    expect(path.detail(path.grossForBase(1_000)).irpfPelaTabela).toBe(0);
-    expect(path.detail(path.grossForBase(BRACKET_BOUNDARIES[0] - 0.01)).irpfPelaTabela).toBe(0);
+    expect(path.detail(path.grossForBase(1_000)).taxFromTable).toBe(0);
+    expect(path.detail(path.grossForBase(BRACKET_BOUNDARIES[0] - 0.01)).taxFromTable).toBe(0);
   });
 
   /**
@@ -181,9 +181,9 @@ describe("calculateCltVsPj — the CLT side", () => {
    * percentage put the two calculators on different answers for one input, and
    * kept charging above the ceiling.
    */
-  it.each([2_000, 4_000, 8_000, 30_000])("withholds the payslip INSS on %s", (salarioCltBruto) => {
-    expect(compare({ salarioCltBruto }).detalhesClt.descInss).toBeCloseTo(
-      calculateEmployeeInss(salarioCltBruto),
+  it.each([2_000, 4_000, 8_000, 30_000])("withholds the payslip INSS on %s", (cltGrossSalary) => {
+    expect(compare({ cltGrossSalary }).cltDetail.inssWithheld).toBeCloseTo(
+      calculateEmployeeInss(cltGrossSalary),
       2,
     );
   });
@@ -191,7 +191,7 @@ describe("calculateCltVsPj — the CLT side", () => {
   it("stops the contribution at the RGPS ceiling", () => {
     const ceiling = calculateEmployeeInss(INSS_CEILING);
 
-    expect(compare({ salarioCltBruto: 30_000 }).detalhesClt.descInss).toBeCloseTo(ceiling, 2);
+    expect(compare({ cltGrossSalary: 30_000 }).cltDetail.inssWithheld).toBeCloseTo(ceiling, 2);
   });
 
   /**
@@ -201,12 +201,12 @@ describe("calculateCltVsPj — the CLT side", () => {
    * withholding is nil and the net is the gross less INSS.
    */
   it("leaves a R$ 4.000 salary untaxed, which is what Lei 15.270/2025 is for", () => {
-    const { detalhesClt, cltLiquido } = compare({ salarioCltBruto: 4_000 });
+    const { cltDetail, cltNet } = compare({ cltGrossSalary: 4_000 });
 
-    expect(detalhesClt.irpfPelaTabela).toBe(150.55);
-    expect(detalhesClt.reducaoLei15270).toBe(150.55);
-    expect(detalhesClt.descIrpf).toBe(0);
-    expect(cltLiquido).toBe(3631.4);
+    expect(cltDetail.taxFromTable).toBe(150.55);
+    expect(cltDetail.reductionLei15270).toBe(150.55);
+    expect(cltDetail.irpfWithheld).toBe(0);
+    expect(cltNet).toBe(3631.4);
   });
 
   /**
@@ -215,11 +215,11 @@ describe("calculateCltVsPj — the CLT side", () => {
    * 7.078,49 × 0,275 − 908,73 = R$ 1.037,85 with nothing taken off it.
    */
   it("withholds R$ 1.037,85 on a R$ 8.000 salary, where the reduction no longer reaches", () => {
-    const { detalhesClt, cltLiquido } = compare({ salarioCltBruto: 8_000 });
+    const { cltDetail, cltNet } = compare({ cltGrossSalary: 8_000 });
 
-    expect(detalhesClt.irpfPelaTabela).toBe(1037.85);
-    expect(detalhesClt.reducaoLei15270).toBe(0);
-    expect(cltLiquido).toBe(6040.64);
+    expect(cltDetail.taxFromTable).toBe(1037.85);
+    expect(cltDetail.reductionLei15270).toBe(0);
+    expect(cltNet).toBe(6040.64);
   });
 
   /**
@@ -228,13 +228,10 @@ describe("calculateCltVsPj — the CLT side", () => {
    * this file — the result stays monotone, smooth and self-consistent — and the
    * page then prints a net nobody receives.
    */
-  it.each([2_000, 4_000, 8_000, 20_000])("nets %s down by both withholdings", (salarioCltBruto) => {
-    const { detalhesClt, cltLiquido } = compare({ salarioCltBruto });
+  it.each([2_000, 4_000, 8_000, 20_000])("nets %s down by both withholdings", (cltGrossSalary) => {
+    const { cltDetail, cltNet } = compare({ cltGrossSalary });
 
-    expect(cltLiquido).toBeCloseTo(
-      salarioCltBruto - detalhesClt.descInss - detalhesClt.descIrpf,
-      2,
-    );
+    expect(cltNet).toBeCloseTo(cltGrossSalary - cltDetail.inssWithheld - cltDetail.irpfWithheld, 2);
   });
 
   /**
@@ -245,25 +242,22 @@ describe("calculateCltVsPj — the CLT side", () => {
    * positive and scale-invariant, so that assertion held for all of them.
    */
   it("amortises the benefits at one twelfth plus 15% of the gross", () => {
-    const result = compare({ salarioCltBruto: 8_000 });
+    const result = compare({ cltGrossSalary: 8_000 });
 
-    expect(result.detalhesClt.beneficios).toBeCloseTo(8_000 * (1 / 12 + 0.15), 6);
-    expect(result.detalhesClt.beneficios).toBeCloseTo(1866.67, 2);
-    expect(result.cltComBeneficios).toBe(7907.31);
+    expect(result.cltDetail.benefits).toBeCloseTo(8_000 * (1 / 12 + 0.15), 6);
+    expect(result.cltDetail.benefits).toBeCloseTo(1866.67, 2);
+    expect(result.cltWithBenefits).toBe(7907.31);
   });
 
   it("adds those benefits on top of the net, and nothing else", () => {
-    const result = compare({ salarioCltBruto: 11_000 });
+    const result = compare({ cltGrossSalary: 11_000 });
 
-    expect(result.cltComBeneficios).toBeCloseTo(
-      result.cltLiquido + result.detalhesClt.beneficios,
-      2,
-    );
+    expect(result.cltWithBenefits).toBeCloseTo(result.cltNet + result.cltDetail.benefits, 2);
   });
 });
 
 /**
- * `dependentes` is published input that nothing read: the CLT tax ignored it, so
+ * `dependants` is published input that nothing read: the CLT tax ignored it, so
  * the field could only ever be decoration. It is wired into the CLT withholding
  * base here — the route hardcodes it to 0 and offers no control, but removing it
  * from the interface would have to change the route, and the allowance is the
@@ -271,34 +265,34 @@ describe("calculateCltVsPj — the CLT side", () => {
  */
 describe("calculateCltVsPj — dependants", () => {
   it.each([
-    { dependentes: 1, allowance: 189.59 },
-    { dependentes: 3, allowance: 568.77 },
-  ])("takes R$ $allowance off the CLT base for $dependentes", ({ dependentes, allowance }) => {
-    const none = compare({ salarioCltBruto: 8_000, dependentes: 0 });
-    const some = compare({ salarioCltBruto: 8_000, dependentes });
+    { dependants: 1, allowance: 189.59 },
+    { dependants: 3, allowance: 568.77 },
+  ])("takes R$ $allowance off the CLT base for $dependants", ({ dependants, allowance }) => {
+    const none = compare({ cltGrossSalary: 8_000, dependants: 0 });
+    const some = compare({ cltGrossSalary: 8_000, dependants });
 
-    expect(none.detalhesClt.baseIrpf - some.detalhesClt.baseIrpf).toBeCloseTo(allowance, 2);
+    expect(none.cltDetail.assessableBase - some.cltDetail.assessableBase).toBeCloseTo(allowance, 2);
   });
 
   it("turns the allowance into tax at the marginal rate, and into net pay", () => {
-    const none = compare({ salarioCltBruto: 8_000, dependentes: 0 });
-    const one = compare({ salarioCltBruto: 8_000, dependentes: 1 });
+    const none = compare({ cltGrossSalary: 8_000, dependants: 0 });
+    const one = compare({ cltGrossSalary: 8_000, dependants: 1 });
 
     // 189,59 sheltered from the top row: 189,59 × 0,275 = 52,14.
-    expect(none.detalhesClt.descIrpf - one.detalhesClt.descIrpf).toBeCloseTo(52.14, 1);
-    expect(one.cltLiquido).toBeGreaterThan(none.cltLiquido);
+    expect(none.cltDetail.irpfWithheld - one.cltDetail.irpfWithheld).toBeCloseTo(52.14, 1);
+    expect(one.cltNet).toBeGreaterThan(none.cltNet);
   });
 
   it("never touches the PJ side, which shelters income with expenses instead", () => {
-    const none = compare({ dependentes: 0 });
-    const three = compare({ dependentes: 3 });
+    const none = compare({ dependants: 0 });
+    const three = compare({ dependants: 3 });
 
-    expect(three.pjLiquido).toBe(none.pjLiquido);
-    expect(three.pjNecessaria).toBeGreaterThan(none.pjNecessaria);
+    expect(three.pjNet).toBe(none.pjNet);
+    expect(three.breakEvenPjOffer).toBeGreaterThan(none.breakEvenPjOffer);
   });
 
   it("treats a negative count as none rather than as a surcharge", () => {
-    expect(compare({ dependentes: -2 }).cltLiquido).toBe(compare({ dependentes: 0 }).cltLiquido);
+    expect(compare({ dependants: -2 }).cltNet).toBe(compare({ dependants: 0 }).cltNet);
   });
 });
 
@@ -309,13 +303,13 @@ describe("calculateCltVsPj — the PJ side", () => {
    * R$ 851,27, past the reduction's reach.
    */
   it("nets R$ 5.148,73 out of a R$ 8.000 invoice", () => {
-    const { detalhesPj, pjLiquido } = compare({ propostaPjMensal: 8_000 });
+    const { pjDetail, pjNet } = compare({ monthlyPjOffer: 8_000 });
 
-    expect(detalhesPj.descInss).toBeCloseTo(1_600, 2);
-    expect(detalhesPj.descContador).toBeCloseTo(400, 2);
-    expect(detalhesPj.irpfPelaTabela).toBe(851.27);
-    expect(detalhesPj.reducaoLei15270).toBe(0);
-    expect(pjLiquido).toBe(5148.73);
+    expect(pjDetail.inssWithheld).toBeCloseTo(1_600, 2);
+    expect(pjDetail.accountantFee).toBeCloseTo(400, 2);
+    expect(pjDetail.taxFromTable).toBe(851.27);
+    expect(pjDetail.reductionLei15270).toBe(0);
+    expect(pjNet).toBe(5148.73);
   });
 
   /**
@@ -323,20 +317,20 @@ describe("calculateCltVsPj — the PJ side", () => {
    * 3.200 × 0,15 − 394,16 = R$ 85,84, which the reduction covers in full.
    */
   it("applies the same Lei 15.270/2025 reduction to a small invoice", () => {
-    const { detalhesPj, pjLiquido } = compare({ propostaPjMensal: 4_000 });
+    const { pjDetail, pjNet } = compare({ monthlyPjOffer: 4_000 });
 
-    expect(detalhesPj.irpfPelaTabela).toBe(85.84);
-    expect(detalhesPj.reducaoLei15270).toBe(85.84);
-    expect(detalhesPj.descIrpf).toBe(0);
-    expect(pjLiquido).toBe(3_000);
+    expect(pjDetail.taxFromTable).toBe(85.84);
+    expect(pjDetail.reductionLei15270).toBe(85.84);
+    expect(pjDetail.irpfWithheld).toBe(0);
+    expect(pjNet).toBe(3_000);
   });
 
   /** ⚠️ The PJ twin of the CLT wiring test above, and the same silent failure. */
-  it.each([2_000, 4_000, 8_000, 20_000])("nets %s down by all three costs", (propostaPjMensal) => {
-    const { detalhesPj, pjLiquido } = compare({ propostaPjMensal });
+  it.each([2_000, 4_000, 8_000, 20_000])("nets %s down by all three costs", (monthlyPjOffer) => {
+    const { pjDetail, pjNet } = compare({ monthlyPjOffer });
 
-    expect(pjLiquido).toBeCloseTo(
-      propostaPjMensal - detalhesPj.descInss - detalhesPj.descContador - detalhesPj.descIrpf,
+    expect(pjNet).toBeCloseTo(
+      monthlyPjOffer - pjDetail.inssWithheld - pjDetail.accountantFee - pjDetail.irpfWithheld,
       2,
     );
   });
@@ -348,13 +342,13 @@ describe("calculateCltVsPj — the PJ side", () => {
    */
   it.each([500, 2_000, 5_000, 20_000])(
     "shelters tax with %s of expenses, and no more",
-    (despesasDedutivelsPj) => {
-      const withoutExpenses = compare({ propostaPjMensal: 15_000, despesasDedutivelsPj: 0 });
-      const withExpenses = compare({ propostaPjMensal: 15_000, despesasDedutivelsPj });
-      const gain = withExpenses.pjLiquido - withoutExpenses.pjLiquido;
+    (pjDeductibleExpenses) => {
+      const withoutExpenses = compare({ monthlyPjOffer: 15_000, pjDeductibleExpenses: 0 });
+      const withExpenses = compare({ monthlyPjOffer: 15_000, pjDeductibleExpenses });
+      const gain = withExpenses.pjNet - withoutExpenses.pjNet;
 
       expect(gain).toBeGreaterThanOrEqual(0);
-      expect(gain).toBeLessThanOrEqual(despesasDedutivelsPj);
+      expect(gain).toBeLessThanOrEqual(pjDeductibleExpenses);
     },
   );
 
@@ -364,24 +358,24 @@ describe("calculateCltVsPj — the PJ side", () => {
    * contribution and the fee.
    */
   it("stops rewarding expenses once the tax is already zero", () => {
-    const propostaPjMensal = 8_000;
-    const large = compare({ propostaPjMensal, despesasDedutivelsPj: 50_000 }).pjLiquido;
-    const larger = compare({ propostaPjMensal, despesasDedutivelsPj: 100_000 }).pjLiquido;
+    const monthlyPjOffer = 8_000;
+    const large = compare({ monthlyPjOffer, pjDeductibleExpenses: 50_000 }).pjNet;
+    const larger = compare({ monthlyPjOffer, pjDeductibleExpenses: 100_000 }).pjNet;
 
     expect(larger).toBe(large);
     expect(large).toBe(6_000);
   });
 
   it("treats a negative expense as none", () => {
-    expect(compare({ despesasDedutivelsPj: -1_000 }).pjLiquido).toBe(
-      compare({ despesasDedutivelsPj: 0 }).pjLiquido,
+    expect(compare({ pjDeductibleExpenses: -1_000 }).pjNet).toBe(
+      compare({ pjDeductibleExpenses: 0 }).pjNet,
     );
   });
 });
 
 describe("calculateCltVsPj — the break-even proposal", () => {
   /**
-   * ⚠️ `pjNecessaria` is the single number the page promises in prose: "seria
+   * ⚠️ `breakEvenPjOffer` is the single number the page promises in prose: "seria
    * preciso faturar cerca de R$ X por mês como PJ para chegar ao mesmo ganho
    * líquido". A PJ invoicing exactly that must land on the CLT package — not
    * near it, on it, since the search solves for the figure instead of stepping
@@ -389,24 +383,24 @@ describe("calculateCltVsPj — the break-even proposal", () => {
    */
   it.each([3_000, 8_000, 15_000, 25_000])(
     "names the invoice that matches a %s salary",
-    (salarioCltBruto) => {
-      const result = compare({ salarioCltBruto });
-      const atThatInvoice = compare({ salarioCltBruto, propostaPjMensal: result.pjNecessaria });
+    (cltGrossSalary) => {
+      const result = compare({ cltGrossSalary });
+      const atThatInvoice = compare({ cltGrossSalary, monthlyPjOffer: result.breakEvenPjOffer });
 
-      expect(atThatInvoice.pjLiquido).toBe(result.cltComBeneficios);
+      expect(atThatInvoice.pjNet).toBe(result.cltWithBenefits);
     },
   );
 
   it.each([3_000, 8_000, 15_000, 25_000])(
     "names the smallest such invoice for %s",
-    (salarioCltBruto) => {
-      const result = compare({ salarioCltBruto });
+    (cltGrossSalary) => {
+      const result = compare({ cltGrossSalary });
       const aCentavoLess = compare({
-        salarioCltBruto,
-        propostaPjMensal: result.pjNecessaria - 0.01,
+        cltGrossSalary,
+        monthlyPjOffer: result.breakEvenPjOffer - 0.01,
       });
 
-      expect(aCentavoLess.pjLiquido).toBeLessThan(result.cltComBeneficios);
+      expect(aCentavoLess.pjNet).toBeLessThan(result.cltWithBenefits);
     },
   );
 
@@ -419,22 +413,22 @@ describe("calculateCltVsPj — the break-even proposal", () => {
    */
   it.each([0, 4_000, 8_000, 12_000, 20_000])(
     "ignores the %s offer it is compared with",
-    (propostaPjMensal) => {
-      const reference = compare({ salarioCltBruto: 8_000, propostaPjMensal: 1 }).pjNecessaria;
+    (monthlyPjOffer) => {
+      const reference = compare({ cltGrossSalary: 8_000, monthlyPjOffer: 1 }).breakEvenPjOffer;
 
-      expect(compare({ salarioCltBruto: 8_000, propostaPjMensal }).pjNecessaria).toBe(reference);
+      expect(compare({ cltGrossSalary: 8_000, monthlyPjOffer }).breakEvenPjOffer).toBe(reference);
     },
   );
 
   it("does depend on the expenses, which are part of the question", () => {
-    const withoutExpenses = compare({ despesasDedutivelsPj: 0 }).pjNecessaria;
-    const withExpenses = compare({ despesasDedutivelsPj: 3_000 }).pjNecessaria;
+    const withoutExpenses = compare({ pjDeductibleExpenses: 0 }).breakEvenPjOffer;
+    const withExpenses = compare({ pjDeductibleExpenses: 3_000 }).breakEvenPjOffer;
 
     expect(withExpenses).toBeLessThan(withoutExpenses);
   });
 
   it("asks for nothing when there is no CLT package to match", () => {
-    expect(compare({ salarioCltBruto: 0 }).pjNecessaria).toBe(0);
+    expect(compare({ cltGrossSalary: 0 }).breakEvenPjOffer).toBe(0);
   });
 });
 
@@ -447,37 +441,37 @@ describe("calculateCltVsPj — the verdict", () => {
    */
   it.each([4_000, 8_000, 20_000])(
     "flips the verdict across the crossover for %s, and only there",
-    (salarioCltBruto) => {
-      const crossover = crossoverProposal(salarioCltBruto);
+    (cltGrossSalary) => {
+      const crossover = crossoverProposal(cltGrossSalary);
 
       // Both sides are rounded to the centavo, so the flip lands within one of zero.
       expect(
-        Math.abs(compare({ salarioCltBruto, propostaPjMensal: crossover }).diferenca),
+        Math.abs(compare({ cltGrossSalary, monthlyPjOffer: crossover }).difference),
       ).toBeLessThanOrEqual(0.01);
-      expect(compare({ salarioCltBruto, propostaPjMensal: crossover - 10 }).analise.cltMelhor).toBe(
+      expect(compare({ cltGrossSalary, monthlyPjOffer: crossover - 10 }).analysis.cltIsBetter).toBe(
         true,
       );
-      expect(compare({ salarioCltBruto, propostaPjMensal: crossover + 10 }).analise.cltMelhor).toBe(
+      expect(compare({ cltGrossSalary, monthlyPjOffer: crossover + 10 }).analysis.cltIsBetter).toBe(
         false,
       );
     },
   );
 
   /**
-   * ⚠️ The exact tie, which `pjNecessaria` puts within reach: invoicing the
+   * ⚠️ The exact tie, which `breakEvenPjOffer` puts within reach: invoicing the
    * break-even figure makes the difference exactly zero. Neither side is ahead
    * there, so the badge must not claim CLT is — and the prose must say so too,
    * rather than announcing a 0% advantage for whichever side the comparison
    * happens to fall on.
    */
   it("calls an exact tie a tie, on neither side", () => {
-    const salarioCltBruto = 8_000;
-    const { pjNecessaria } = compare({ salarioCltBruto });
-    const tie = compare({ salarioCltBruto, propostaPjMensal: pjNecessaria });
+    const cltGrossSalary = 8_000;
+    const { breakEvenPjOffer } = compare({ cltGrossSalary });
+    const tie = compare({ cltGrossSalary, monthlyPjOffer: breakEvenPjOffer });
 
-    expect(tie.diferenca).toBe(0);
-    expect(tie.analise.cltMelhor).toBe(false);
-    expect(tie.analise.justificativa).toMatch(/empatam/);
+    expect(tie.difference).toBe(0);
+    expect(tie.analysis.cltIsBetter).toBe(false);
+    expect(tie.analysis.rationale).toMatch(/empatam/);
   });
 
   /**
@@ -486,15 +480,15 @@ describe("calculateCltVsPj — the verdict", () => {
    * paragraph explaining how much better PJ is, and no assertion notices.
    */
   it.each([
-    { scenario: "CLT ahead", propostaPjMensal: 5_000, cltMelhor: true, opening: /^CLT é/ },
-    { scenario: "PJ ahead", propostaPjMensal: 20_000, cltMelhor: false, opening: /^PJ é/ },
+    { scenario: "CLT ahead", monthlyPjOffer: 5_000, cltIsBetter: true, opening: /^CLT é/ },
+    { scenario: "PJ ahead", monthlyPjOffer: 20_000, cltIsBetter: false, opening: /^PJ é/ },
   ])(
     "says in prose what the badge says, with $scenario",
-    ({ propostaPjMensal, cltMelhor, opening }) => {
-      const { analise } = compare({ salarioCltBruto: 8_000, propostaPjMensal });
+    ({ monthlyPjOffer, cltIsBetter, opening }) => {
+      const { analysis } = compare({ cltGrossSalary: 8_000, monthlyPjOffer });
 
-      expect(analise.cltMelhor).toBe(cltMelhor);
-      expect(analise.justificativa).toMatch(opening);
+      expect(analysis.cltIsBetter).toBe(cltIsBetter);
+      expect(analysis.rationale).toMatch(opening);
     },
   );
 
@@ -504,71 +498,71 @@ describe("calculateCltVsPj — the verdict", () => {
    * input, because the prose read a search that never converged.
    */
   it("quotes the break-even invoice the page prints beside it", () => {
-    const result = compare({ salarioCltBruto: 8_000, propostaPjMensal: 5_000 });
+    const result = compare({ cltGrossSalary: 8_000, monthlyPjOffer: 5_000 });
 
-    expect(result.analise.cltMelhor).toBe(true);
-    expect(result.analise.justificativa).toContain(result.pjNecessaria.toFixed(0));
+    expect(result.analysis.cltIsBetter).toBe(true);
+    expect(result.analysis.rationale).toContain(result.breakEvenPjOffer.toFixed(0));
   });
 
   it.each([4_000, 9_000, 13_000, 25_000])(
     "agrees on which side is ahead at %s",
-    (propostaPjMensal) => {
-      const result = compare({ propostaPjMensal });
+    (monthlyPjOffer) => {
+      const result = compare({ monthlyPjOffer });
 
-      expect(result.percentualDiferenca < 0).toBe(result.analise.cltMelhor);
-      expect(result.diferenca < 0).toBe(result.analise.cltMelhor);
+      expect(result.differencePercent < 0).toBe(result.analysis.cltIsBetter);
+      expect(result.difference < 0).toBe(result.analysis.cltIsBetter);
     },
   );
 
   it.each([4_000, 13_000, 25_000])(
     "reports the yearly gap at %s as twelve monthly ones",
-    (propostaPjMensal) => {
-      const { analise } = compare({ propostaPjMensal });
+    (monthlyPjOffer) => {
+      const { analysis } = compare({ monthlyPjOffer });
 
-      expect(analise.diferencaMensal).toBeGreaterThanOrEqual(0);
-      expect(analise.diferencaAnual).toBeCloseTo(analise.diferencaMensal * 12, 2);
+      expect(analysis.monthlyDifference).toBeGreaterThanOrEqual(0);
+      expect(analysis.annualDifference).toBeCloseTo(analysis.monthlyDifference * 12, 2);
     },
   );
 });
 
 describe("calculateCltVsPj — the verdict the page renders", () => {
   /**
-   * `cltMelhor` is a boolean, so on its own it cannot express a tie: at an exact
+   * `cltIsBetter` is a boolean, so on its own it cannot express a tie: at an exact
    * draw it reads false and the badge said "PJ é melhor" over prose saying the
-   * two were level. `empate` is what gives the page a third state.
+   * two were level. `isTie` is what gives the page a third state.
    */
   it("flags a tie rather than silently favouring PJ", () => {
     const gross = 8_000;
     const matching = calculateCltVsPj({
-      salarioCltBruto: gross,
-      propostaPjMensal: 4_000,
-      dependentes: 0,
-      despesasDedutivelsPj: 0,
-    }).pjNecessaria;
+      cltGrossSalary: gross,
+      monthlyPjOffer: 4_000,
+      dependants: 0,
+      pjDeductibleExpenses: 0,
+    }).breakEvenPjOffer;
 
     const tied = calculateCltVsPj({
-      salarioCltBruto: gross,
-      propostaPjMensal: matching,
-      dependentes: 0,
-      despesasDedutivelsPj: 0,
+      cltGrossSalary: gross,
+      monthlyPjOffer: matching,
+      dependants: 0,
+      pjDeductibleExpenses: 0,
     });
 
-    expect(tied.analise.empate).toBe(true);
-    expect(Math.abs(tied.diferenca)).toBeLessThan(0.01);
+    expect(tied.analysis.isTie).toBe(true);
+    expect(Math.abs(tied.difference)).toBeLessThan(0.01);
   });
 
   it.each([0, 8_000])(
     "says whether a percentage has a base to be taken of, for a CLT salary of %s",
-    (salarioCltBruto) => {
+    (cltGrossSalary) => {
       const result = calculateCltVsPj({
-        salarioCltBruto,
-        propostaPjMensal: 5_000,
-        dependentes: 0,
-        despesasDedutivelsPj: 0,
+        cltGrossSalary,
+        monthlyPjOffer: 5_000,
+        dependants: 0,
+        pjDeductibleExpenses: 0,
       });
 
-      expect(result.analise.temBaseParaPercentual).toBe(salarioCltBruto > 0);
-      expect(Number.isFinite(result.percentualDiferenca)).toBe(true);
+      expect(result.analysis.hasBaseForPercentage).toBe(cltGrossSalary > 0);
+      expect(Number.isFinite(result.differencePercent)).toBe(true);
     },
   );
 });
@@ -576,15 +570,15 @@ describe("calculateCltVsPj — the verdict the page renders", () => {
 describe("calculateCltVsPj — degenerate input", () => {
   /**
    * ⚠️ Both fields are plain currency inputs with no floor, so a visitor who
-   * clears them reaches this. `percentualDiferenca` was 0/0 here, and the number
+   * clears them reaches this. `differencePercent` was 0/0 here, and the number
    * lands in the page twice: in the "Diferença: %" label and inside the
-   * Portuguese justificativa.
+   * Portuguese rationale.
    */
   it("does not produce a NaN percentage when both sides are zero", () => {
-    const result = compare({ salarioCltBruto: 0, propostaPjMensal: 0 });
+    const result = compare({ cltGrossSalary: 0, monthlyPjOffer: 0 });
 
-    expect(Number.isNaN(result.percentualDiferenca)).toBe(false);
-    expect(result.analise.justificativa).not.toMatch(/NaN/);
+    expect(Number.isNaN(result.differencePercent)).toBe(false);
+    expect(result.analysis.rationale).not.toMatch(/NaN/);
   });
 
   /**
@@ -592,43 +586,43 @@ describe("calculateCltVsPj — degenerate input", () => {
    * salary divided by zero and rendered as "PJ é Infinity% mais vantajoso".
    */
   it("does not produce an infinite percentage when the CLT salary is zero", () => {
-    const result = compare({ salarioCltBruto: 0, propostaPjMensal: 5_000 });
+    const result = compare({ cltGrossSalary: 0, monthlyPjOffer: 5_000 });
 
-    expect(Number.isFinite(result.percentualDiferenca)).toBe(true);
-    expect(result.analise.justificativa).not.toMatch(/Infinity/);
-    expect(result.analise.justificativa).toMatch(/^PJ é mais vantajoso/);
+    expect(Number.isFinite(result.differencePercent)).toBe(true);
+    expect(result.analysis.rationale).not.toMatch(/Infinity/);
+    expect(result.analysis.rationale).toMatch(/^PJ é mais vantajoso/);
   });
 
   it("keeps every returned figure finite for ordinary input", () => {
-    const result = compare({ salarioCltBruto: 7_500, propostaPjMensal: 11_000 });
+    const result = compare({ cltGrossSalary: 7_500, monthlyPjOffer: 11_000 });
 
     for (const value of [
-      result.cltLiquido,
-      result.cltComBeneficios,
-      result.pjLiquido,
-      result.diferenca,
-      result.percentualDiferenca,
-      result.pjNecessaria,
-      result.analise.diferencaMensal,
-      result.analise.diferencaAnual,
+      result.cltNet,
+      result.cltWithBenefits,
+      result.pjNet,
+      result.difference,
+      result.differencePercent,
+      result.breakEvenPjOffer,
+      result.analysis.monthlyDifference,
+      result.analysis.annualDifference,
     ]) {
       expect(Number.isFinite(value)).toBe(true);
     }
   });
 
   it("echoes the input back untouched", () => {
-    const result = compare({ salarioCltBruto: 7_500, propostaPjMensal: 11_000 });
+    const result = compare({ cltGrossSalary: 7_500, monthlyPjOffer: 11_000 });
 
-    expect(result.salarioCltBruto).toBe(7_500);
-    expect(result.propostaPjMensal).toBe(11_000);
+    expect(result.cltGrossSalary).toBe(7_500);
+    expect(result.monthlyPjOffer).toBe(11_000);
   });
 
   it("floors negative income at zero instead of paying a negative tax", () => {
-    const result = compare({ salarioCltBruto: -5_000, propostaPjMensal: -5_000 });
+    const result = compare({ cltGrossSalary: -5_000, monthlyPjOffer: -5_000 });
 
-    expect(result.salarioCltBruto).toBe(0);
-    expect(result.propostaPjMensal).toBe(0);
-    expect(result.cltLiquido).toBe(0);
-    expect(result.pjLiquido).toBe(0);
+    expect(result.cltGrossSalary).toBe(0);
+    expect(result.monthlyPjOffer).toBe(0);
+    expect(result.cltNet).toBe(0);
+    expect(result.pjNet).toBe(0);
   });
 });

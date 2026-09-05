@@ -5,16 +5,17 @@
  * contract carries — against a PJ invoice, net of contributions, income tax and
  * the accountant.
  *
- * This module answers a MONTHLY question, exactly like `salarioLiquido.ts`: what
- * lands in the bank account each month under either arrangement. That decides
- * which half of the 2026 legislation applies — the monthly incidence table and
- * the monthly Lei 15.270/2025 reduction, neither of which is its annual
- * counterpart divided by twelve.
+ * This module answers a MONTHLY question, exactly like the net-salary
+ * calculator: what lands in the bank account each month under either
+ * arrangement. That decides which half of the 2026 legislation applies — the
+ * monthly incidence table and the monthly Lei 15.270/2025 reduction, neither of
+ * which is its annual counterpart divided by twelve.
  *
  * The rules themselves live in `irpf-constants.ts`, alongside their sources —
- * the same module `salarioLiquido.ts` reads. Two calculators on this site answer
- * the same monthly CLT question, so they must agree to the centavo, and sharing
- * one definition is what makes that true by construction rather than by review.
+ * the same module the net-salary calculator reads. Two calculators on this site
+ * answer the same monthly CLT question, so they must agree to the centavo, and
+ * sharing one definition is what makes that true by construction rather than by
+ * review.
  */
 
 import { calculateEmployeeInss } from "./inss-constants";
@@ -26,53 +27,57 @@ import {
 import { roundToCentavos } from "./money";
 
 export interface CltVsPjInput {
-  salarioCltBruto: number;
-  propostaPjMensal: number;
+  cltGrossSalary: number;
+  monthlyPjOffer: number;
   /**
    * Dependants claimed against the CLT withholding base. They lower the CLT tax
    * and never touch the PJ side, where the invoice is sheltered by
-   * `despesasDedutivelsPj` instead.
+   * `pjDeductibleExpenses` instead.
    */
-  dependentes: number;
-  despesasDedutivelsPj: number;
+  dependants: number;
+  pjDeductibleExpenses: number;
 }
 
 /** How a monthly income tax was arrived at, in the order it is computed. */
-export interface IrpfMensalDetalhado {
+export interface MonthlyIrpfDetail {
   /** The monthly base actually taken to the table. */
-  baseIrpf: number;
+  assessableBase: number;
   /** What the monthly table produces, before the Lei 15.270/2025 reduction. */
-  irpfPelaTabela: number;
+  taxFromTable: number;
   /** The monthly reduction applied, never more than the tax due. */
-  reducaoLei15270: number;
-  descIrpf: number;
+  reductionLei15270: number;
+  irpfWithheld: number;
 }
 
 /** The same, plus the contribution that shaped the base. */
-export type CltVsPjImpostoDetalhado = IrpfMensalDetalhado & { descInss: number };
+export type CltVsPjTaxDetail = MonthlyIrpfDetail & { inssWithheld: number };
 
 export interface CltVsPjResult {
-  salarioCltBruto: number;
-  propostaPjMensal: number;
-  cltLiquido: number;
-  cltComBeneficios: number;
-  pjLiquido: number;
-  diferenca: number;
-  percentualDiferenca: number;
-  pjNecessaria: number;
+  cltGrossSalary: number;
+  monthlyPjOffer: number;
+  cltNet: number;
+  cltWithBenefits: number;
+  pjNet: number;
+  difference: number;
+  differencePercent: number;
+  breakEvenPjOffer: number;
   /** The CLT withholdings, plus the amortised benefits added on top of the net. */
-  detalhesClt: CltVsPjImpostoDetalhado & { beneficios: number };
+  cltDetail: CltVsPjTaxDetail & { benefits: number };
   /** The PJ withholdings, plus the accountant fee, which is a cost and not a tax. */
-  detalhesPj: CltVsPjImpostoDetalhado & { descContador: number };
-  analise: {
-    cltMelhor: boolean;
-    /** The two packages are level to within a centavo. `cltMelhor` alone cannot say so. */
-    empate: boolean;
+  pjDetail: CltVsPjTaxDetail & { accountantFee: number };
+  analysis: {
+    cltIsBetter: boolean;
+    /** The two packages are level to within a centavo. `cltIsBetter` alone cannot say so. */
+    isTie: boolean;
     /** False when there is no CLT package to take a percentage of. */
-    temBaseParaPercentual: boolean;
-    diferencaMensal: number;
-    diferencaAnual: number;
-    justificativa: string;
+    hasBaseForPercentage: boolean;
+    monthlyDifference: number;
+    annualDifference: number;
+    /**
+     * The verdict in Portuguese. Product copy: every string this field can hold
+     * is written for the visitor and stays in Brazilian Portuguese.
+     */
+    rationale: string;
   };
 }
 
@@ -102,87 +107,87 @@ const ACCOUNTANT_FEE_RATE = 0.05;
 const TIE_TOLERANCE = 0.01;
 
 export function calculateCltVsPj(input: CltVsPjInput): CltVsPjResult {
-  const salarioCltBruto = Math.max(input.salarioCltBruto, 0);
-  const propostaPjMensal = Math.max(input.propostaPjMensal, 0);
-  const despesasDedutivelsPj = Math.max(input.despesasDedutivelsPj, 0);
+  const cltGrossSalary = Math.max(input.cltGrossSalary, 0);
+  const monthlyPjOffer = Math.max(input.monthlyPjOffer, 0);
+  const pjDeductibleExpenses = Math.max(input.pjDeductibleExpenses, 0);
 
   // ---- CLT side ----------------------------------------------------------
   // INSS is progressive and capped at the RGPS ceiling, the same contribution
-  // /calculadora-salario-liquido withholds for this salary. A flat percentage
+  // the net-salary calculator withholds for this salary. A flat percentage
   // would put the two calculators on different answers for the same input.
-  const descInssClt = calculateEmployeeInss(salarioCltBruto);
-  const deducaoDependentes = Math.max(input.dependentes, 0) * DEDUCTION_PER_DEPENDENT_MONTHLY;
-  const impostoClt = calcularIrpfMensal(
-    salarioCltBruto,
-    salarioCltBruto - descInssClt - deducaoDependentes,
+  const cltInssWithheld = calculateEmployeeInss(cltGrossSalary);
+  const dependantAllowance = Math.max(input.dependants, 0) * DEDUCTION_PER_DEPENDENT_MONTHLY;
+  const cltTax = computeMonthlyIrpf(
+    cltGrossSalary,
+    cltGrossSalary - cltInssWithheld - dependantAllowance,
   );
 
-  const cltLiquido = roundToCentavos(salarioCltBruto - descInssClt - impostoClt.descIrpf);
-  const beneficiosClt = salarioCltBruto * CLT_BENEFITS_RATE;
-  const cltComBeneficios = roundToCentavos(cltLiquido + beneficiosClt);
+  const cltNet = roundToCentavos(cltGrossSalary - cltInssWithheld - cltTax.irpfWithheld);
+  const cltBenefits = cltGrossSalary * CLT_BENEFITS_RATE;
+  const cltWithBenefits = roundToCentavos(cltNet + cltBenefits);
 
   // ---- PJ side -----------------------------------------------------------
-  const pj = calcularPj(propostaPjMensal, despesasDedutivelsPj);
+  const pj = computePjSide(monthlyPjOffer, pjDeductibleExpenses);
 
   // ---- The comparison ----------------------------------------------------
   // What a PJ must invoice to match the CLT package is a property of that
   // package and of the deductible expenses. It is solved for, not stepped
   // towards from the offer on the table, so two candidates weighing different
   // offers against the same salary are told the same figure.
-  const pjNecessaria = resolverPjNecessaria(cltComBeneficios, despesasDedutivelsPj);
+  const breakEvenPjOffer = solveBreakEvenPjOffer(cltWithBenefits, pjDeductibleExpenses);
 
-  const diferenca = roundToCentavos(pj.liquido - cltComBeneficios);
-  const cltMelhor = cltComBeneficios > pj.liquido;
-  const empate = Math.abs(diferenca) < TIE_TOLERANCE;
+  const difference = roundToCentavos(pj.net - cltWithBenefits);
+  const cltIsBetter = cltWithBenefits > pj.net;
+  const isTie = Math.abs(difference) < TIE_TOLERANCE;
 
   // A percentage of nothing is not a number. Both fields are currency inputs
   // with no floor, so a visitor who clears them reaches this.
-  const percentualDiferenca =
-    cltComBeneficios > 0 ? roundToCentavos((diferenca / cltComBeneficios) * 100) : 0;
+  const differencePercent =
+    cltWithBenefits > 0 ? roundToCentavos((difference / cltWithBenefits) * 100) : 0;
 
   return {
-    salarioCltBruto,
-    propostaPjMensal,
-    cltLiquido,
-    cltComBeneficios,
-    pjLiquido: pj.liquido,
-    diferenca,
-    percentualDiferenca,
-    pjNecessaria,
-    detalhesClt: { ...impostoClt, descInss: descInssClt, beneficios: beneficiosClt },
-    detalhesPj: { ...pj.imposto, descInss: pj.descInss, descContador: pj.descContador },
-    analise: {
-      cltMelhor,
-      empate,
-      temBaseParaPercentual: cltComBeneficios > 0,
-      diferencaMensal: Math.abs(diferenca),
-      diferencaAnual: roundToCentavos(Math.abs(diferenca) * 12),
-      justificativa: escreverJustificativa({
-        empate,
-        cltMelhor,
-        temBaseParaPercentual: cltComBeneficios > 0,
-        percentualDiferenca,
-        diferenca,
-        pjNecessaria,
+    cltGrossSalary,
+    monthlyPjOffer,
+    cltNet,
+    cltWithBenefits,
+    pjNet: pj.net,
+    difference,
+    differencePercent,
+    breakEvenPjOffer,
+    cltDetail: { ...cltTax, inssWithheld: cltInssWithheld, benefits: cltBenefits },
+    pjDetail: { ...pj.tax, inssWithheld: pj.inssWithheld, accountantFee: pj.accountantFee },
+    analysis: {
+      cltIsBetter,
+      isTie,
+      hasBaseForPercentage: cltWithBenefits > 0,
+      monthlyDifference: Math.abs(difference),
+      annualDifference: roundToCentavos(Math.abs(difference) * 12),
+      rationale: writeRationale({
+        isTie,
+        cltIsBetter,
+        hasBaseForPercentage: cltWithBenefits > 0,
+        differencePercent,
+        difference,
+        breakEvenPjOffer,
       }),
     },
   };
 }
 
 /** The PJ side of the comparison, for whatever invoice is being considered. */
-function calcularPj(propostaPjMensal: number, despesasDedutivelsPj: number) {
-  const descInss = propostaPjMensal * INSS_RATE_PJ;
-  const descContador = propostaPjMensal * ACCOUNTANT_FEE_RATE;
-  const imposto = calcularIrpfMensal(
-    propostaPjMensal,
-    propostaPjMensal - descInss - despesasDedutivelsPj,
+function computePjSide(monthlyPjOffer: number, pjDeductibleExpenses: number) {
+  const inssWithheld = monthlyPjOffer * INSS_RATE_PJ;
+  const accountantFee = monthlyPjOffer * ACCOUNTANT_FEE_RATE;
+  const tax = computeMonthlyIrpf(
+    monthlyPjOffer,
+    monthlyPjOffer - inssWithheld - pjDeductibleExpenses,
   );
 
   return {
-    descInss,
-    descContador,
-    imposto,
-    liquido: roundToCentavos(propostaPjMensal - descInss - descContador - imposto.descIrpf),
+    inssWithheld,
+    accountantFee,
+    tax,
+    net: roundToCentavos(monthlyPjOffer - inssWithheld - accountantFee - tax.irpfWithheld),
   };
 }
 
@@ -199,27 +204,27 @@ function calcularPj(propostaPjMensal: number, despesasDedutivelsPj: number) {
  * table, and relieving only one of the two sides would make the verdict an
  * artefact of the relief rather than of the arrangement.
  */
-function calcularIrpfMensal(
-  rendimentoBrutoMensal: number,
-  baseImponivelMensal: number,
-): IrpfMensalDetalhado {
-  const baseIrpf = Math.max(baseImponivelMensal, 0);
-  const { rate, deduction } = findMonthlyTaxBracket(baseIrpf);
-  const irpfPelaTabela = roundToCentavos(Math.max(baseIrpf * rate - deduction, 0));
-  const reducaoLei15270 = roundToCentavos(
-    monthlyReductionLei15270(rendimentoBrutoMensal, irpfPelaTabela),
+function computeMonthlyIrpf(
+  monthlyGrossIncome: number,
+  monthlyAssessableBase: number,
+): MonthlyIrpfDetail {
+  const assessableBase = Math.max(monthlyAssessableBase, 0);
+  const { rate, deduction } = findMonthlyTaxBracket(assessableBase);
+  const taxFromTable = roundToCentavos(Math.max(assessableBase * rate - deduction, 0));
+  const reductionLei15270 = roundToCentavos(
+    monthlyReductionLei15270(monthlyGrossIncome, taxFromTable),
   );
 
   return {
-    baseIrpf,
-    irpfPelaTabela,
-    reducaoLei15270,
-    descIrpf: roundToCentavos(Math.max(irpfPelaTabela - reducaoLei15270, 0)),
+    assessableBase,
+    taxFromTable,
+    reductionLei15270,
+    irpfWithheld: roundToCentavos(Math.max(taxFromTable - reductionLei15270, 0)),
   };
 }
 
 /**
- * The smallest invoice whose net matches `alvo`, to the centavo.
+ * The smallest invoice whose net matches `target`, to the centavo.
  *
  * Bisection, not a fixed number of R$ 100 steps away from the offer: the net is
  * strictly increasing in the invoice — the worst marginal case keeps about 40
@@ -227,20 +232,20 @@ function calcularIrpfMensal(
  * on 80% of the invoice and the reduction's phase-out are all taken off — so the
  * search always brackets the answer and always converges to it.
  */
-function resolverPjNecessaria(alvo: number, despesasDedutivelsPj: number): number {
-  if (alvo <= 0) {
+function solveBreakEvenPjOffer(target: number, pjDeductibleExpenses: number): number {
+  if (target <= 0) {
     return 0;
   }
 
-  let high = Math.max(alvo, 1);
-  while (calcularPj(high, despesasDedutivelsPj).liquido < alvo && high < Number.MAX_SAFE_INTEGER) {
+  let high = Math.max(target, 1);
+  while (computePjSide(high, pjDeductibleExpenses).net < target && high < Number.MAX_SAFE_INTEGER) {
     high *= 2;
   }
 
   let low = 0;
   for (let step = 0; step < 100; step += 1) {
     const middle = (low + high) / 2;
-    if (calcularPj(middle, despesasDedutivelsPj).liquido < alvo) {
+    if (computePjSide(middle, pjDeductibleExpenses).net < target) {
       low = middle;
     } else {
       high = middle;
@@ -250,26 +255,32 @@ function resolverPjNecessaria(alvo: number, despesasDedutivelsPj: number): numbe
   return roundToCentavos(high);
 }
 
-/** The verdict in Portuguese, which is what the page prints beside the badge. */
-function escreverJustificativa(veredito: {
-  empate: boolean;
-  cltMelhor: boolean;
-  temBaseParaPercentual: boolean;
-  percentualDiferenca: number;
-  diferenca: number;
-  pjNecessaria: number;
+/**
+ * The verdict in Portuguese, which is what the page prints beside the badge.
+ *
+ * ⚠️ Product copy. The identifiers around these strings are English because the
+ * repo is; every string returned here is read by a visitor and stays Brazilian
+ * Portuguese, word for word.
+ */
+function writeRationale(verdict: {
+  isTie: boolean;
+  cltIsBetter: boolean;
+  hasBaseForPercentage: boolean;
+  differencePercent: number;
+  difference: number;
+  breakEvenPjOffer: number;
 }): string {
-  if (veredito.empate) {
+  if (verdict.isTie) {
     return "CLT e PJ empatam: o ganho líquido mensal é o mesmo nos dois regimes.";
   }
 
-  if (veredito.cltMelhor) {
-    return `CLT é ${Math.abs(veredito.percentualDiferenca)}% mais vantajoso. PJ precisa de R$ ${veredito.pjNecessaria.toFixed(0)}/mês para igualar.`;
+  if (verdict.cltIsBetter) {
+    return `CLT é ${Math.abs(verdict.differencePercent)}% mais vantajoso. PJ precisa de R$ ${verdict.breakEvenPjOffer.toFixed(0)}/mês para igualar.`;
   }
 
-  if (!veredito.temBaseParaPercentual) {
-    return `PJ é mais vantajoso. Ganho adicional: R$ ${veredito.diferenca.toFixed(2)}/mês.`;
+  if (!verdict.hasBaseForPercentage) {
+    return `PJ é mais vantajoso. Ganho adicional: R$ ${verdict.difference.toFixed(2)}/mês.`;
   }
 
-  return `PJ é ${veredito.percentualDiferenca}% mais vantajoso. Ganho adicional: R$ ${veredito.diferenca.toFixed(2)}/mês.`;
+  return `PJ é ${verdict.differencePercent}% mais vantajoso. Ganho adicional: R$ ${verdict.difference.toFixed(2)}/mês.`;
 }

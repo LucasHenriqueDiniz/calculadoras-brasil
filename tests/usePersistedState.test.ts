@@ -43,6 +43,17 @@ const NET_SALARY_KEY = "salario-liquido-input-v2";
 const ROUTE_KEYS: ReadonlyArray<readonly [string, string, string]> = [
   ["src/routes/calculadora-irpf-2026.tsx", IRPF_KEY, OLD_IRPF_KEY],
   ["src/routes/calculadora-salario-liquido.tsx", NET_SALARY_KEY, OLD_NET_SALARY_KEY],
+  // Slices 3 and 4 of docs/plans/english-domain-identifiers/ bumped three more
+  // keys for the same reason. Without a row here, a revert to an unbumped key
+  // would pass the suite and hand a returning visitor a form of undefineds.
+  ["src/routes/calculadora-inss-autonomo.tsx", "inss-autonomo-input-v2", "inss-autonomo-input"],
+  ["src/routes/calculadora-clt-vs-pj.tsx", "clt-vs-pj-input-v2", "clt-vs-pj-input"],
+  ["src/routes/calculadora-beneficios-fiscais.tsx", "beneficios-input-v2", "beneficios-input"],
+  [
+    "src/routes/calculadora-previdencia-complementar.tsx",
+    "previdencia-input-v2",
+    "previdencia-input",
+  ],
 ];
 
 const IRPF_DEFAULTS: IrpfInput = {

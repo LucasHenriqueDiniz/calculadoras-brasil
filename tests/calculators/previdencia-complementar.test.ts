@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
-  calculatePrevidenciaComplementar,
-  type PrevidenciaComplementarInput,
-  type PrevidenciaComplementarResult,
+  calculateSupplementaryPension,
+  type SupplementaryPensionInput,
+  type SupplementaryPensionResult,
 } from "../../src/lib/calculators/previdenciaComplementar";
 
 /**
@@ -12,17 +12,15 @@ import {
  * scanning for ⚠️ returns the pinned cases and nothing else.
  */
 
-const BASELINE: PrevidenciaComplementarInput = {
-  contribuicaoMensalPgbl: 1_000,
-  tasaRetornoAnual: 8,
-  anosAteAposentadoria: 10,
-  aliquotaIrpfAtual: 27.5,
+const BASELINE: SupplementaryPensionInput = {
+  monthlyPgblContribution: 1_000,
+  annualReturnRate: 8,
+  yearsToRetirement: 10,
+  currentIrpfRate: 27.5,
 };
 
-function project(
-  overrides: Partial<PrevidenciaComplementarInput> = {},
-): PrevidenciaComplementarResult {
-  return calculatePrevidenciaComplementar({ ...BASELINE, ...overrides });
+function project(overrides: Partial<SupplementaryPensionInput> = {}): SupplementaryPensionResult {
+  return calculateSupplementaryPension({ ...BASELINE, ...overrides });
 }
 
 /**
@@ -50,14 +48,14 @@ function annuityFutureValue(
   return annualContribution * (((1 + rate) ** years - 1) / rate);
 }
 
-describe("calculatePrevidenciaComplementar — the compounding base case", () => {
+describe("calculateSupplementaryPension — the compounding base case", () => {
   it("has nothing saved and nothing earned when there are no years left", () => {
-    const result = project({ anosAteAposentadoria: 0 });
+    const result = project({ yearsToRetirement: 0 });
 
-    expect(result.montanteFinalHorizonte).toBe(0);
-    expect(result.rendimentoTotal).toBe(0);
-    expect(result.projecao).toHaveLength(0);
-    expect(Number.isNaN(result.rendimentoTotal)).toBe(false);
+    expect(result.balanceAtHorizon).toBe(0);
+    expect(result.totalEarnings).toBe(0);
+    expect(result.projection).toHaveLength(0);
+    expect(Number.isNaN(result.totalEarnings)).toBe(false);
   });
 
   /**
@@ -71,26 +69,26 @@ describe("calculatePrevidenciaComplementar — the compounding base case", () =>
    * contribution starts earning on arrival.
    */
   it("treats a year of contributions as one deposit at year end", () => {
-    const result = project({ anosAteAposentadoria: 1 });
+    const result = project({ yearsToRetirement: 1 });
 
-    expect(result.montanteFinalHorizonte).toBeCloseTo(12_000, 6);
-    expect(result.rendimentoTotal).toBeCloseTo(0, 6);
-    expect(result.projecao[0]).toMatchObject({ ano: 1, rendimento: 0 });
+    expect(result.balanceAtHorizon).toBeCloseTo(12_000, 6);
+    expect(result.totalEarnings).toBeCloseTo(0, 6);
+    expect(result.projection[0]).toMatchObject({ year: 1, earnings: 0 });
   });
 
   it("returns exactly the contributions when nothing is earned on them", () => {
-    const result = project({ tasaRetornoAnual: 0, anosAteAposentadoria: 25 });
+    const result = project({ annualReturnRate: 0, yearsToRetirement: 25 });
 
-    expect(result.rendimentoTotal).toBe(0);
-    expect(result.montanteFinalHorizonte).toBe(300_000);
+    expect(result.totalEarnings).toBe(0);
+    expect(result.balanceAtHorizon).toBe(300_000);
   });
 });
 
-describe("calculatePrevidenciaComplementar — the balance at the visitor's horizon", () => {
+describe("calculateSupplementaryPension — the balance at the visitor's horizon", () => {
   /**
    * The field the page headlines. It is the balance after exactly the number of
    * years the visitor asked for — never the nearest of the 10/20/30 marks,
-   * which is what the route used to print under the label "em {anos} anos".
+   * which is what the route used to print under the label "em {yearsToRetirement} anos".
    */
   it.each([
     [5, 70_399.21],
@@ -98,27 +96,27 @@ describe("calculatePrevidenciaComplementar — the balance at the visitor's hori
     [35, 2_067_801.64],
   ])(
     "reports the balance at %i years, not the nearest fixed mark",
-    (anosAteAposentadoria, expected) => {
-      const result = project({ anosAteAposentadoria });
+    (yearsToRetirement, expected) => {
+      const result = project({ yearsToRetirement });
 
-      expect(result.montanteFinalHorizonte).toBeCloseTo(expected, 2);
-      expect(result.montanteFinalHorizonte).toBeCloseTo(
-        annuityFutureValue(12_000, 8, anosAteAposentadoria),
+      expect(result.balanceAtHorizon).toBeCloseTo(expected, 2);
+      expect(result.balanceAtHorizon).toBeCloseTo(
+        annuityFutureValue(12_000, 8, yearsToRetirement),
         2,
       );
-      expect(result.montanteFinalHorizonte).not.toBeCloseTo(result.montanteFinal10anos, 2);
-      expect(result.montanteFinalHorizonte).not.toBeCloseTo(result.montanteFinal20anos, 2);
-      expect(result.montanteFinalHorizonte).not.toBeCloseTo(result.montanteFinal30anos, 2);
+      expect(result.balanceAtHorizon).not.toBeCloseTo(result.balanceAt10Years, 2);
+      expect(result.balanceAtHorizon).not.toBeCloseTo(result.balanceAt20Years, 2);
+      expect(result.balanceAtHorizon).not.toBeCloseTo(result.balanceAt30Years, 2);
     },
   );
 
   it.each([1, 10, 20, 30])(
     "coincides with the mark when the horizon lands on one: %i years",
-    (anosAteAposentadoria) => {
-      const result = project({ anosAteAposentadoria });
+    (yearsToRetirement) => {
+      const result = project({ yearsToRetirement });
 
-      expect(result.montanteFinalHorizonte).toBeCloseTo(
-        annuityFutureValue(12_000, 8, anosAteAposentadoria),
+      expect(result.balanceAtHorizon).toBeCloseTo(
+        annuityFutureValue(12_000, 8, yearsToRetirement),
         2,
       );
     },
@@ -132,23 +130,23 @@ describe("calculatePrevidenciaComplementar — the balance at the visitor's hori
     [0.5, 30],
   ])(
     "matches the ordinary-annuity closed form at %i%% over %i years",
-    (tasaRetornoAnual, anosAteAposentadoria) => {
-      const result = project({ tasaRetornoAnual, anosAteAposentadoria });
+    (annualReturnRate, yearsToRetirement) => {
+      const result = project({ annualReturnRate, yearsToRetirement });
 
-      expect(result.montanteFinalHorizonte).toBeCloseTo(
-        annuityFutureValue(12_000, tasaRetornoAnual, anosAteAposentadoria),
+      expect(result.balanceAtHorizon).toBeCloseTo(
+        annuityFutureValue(12_000, annualReturnRate, yearsToRetirement),
         2,
       );
     },
   );
 
   it.each([1, 5, 12, 25, 40])(
-    "keeps rendimentoTotal as the horizon balance less the contributions: %i years",
-    (anosAteAposentadoria) => {
-      const result = project({ anosAteAposentadoria });
+    "keeps totalEarnings as the horizon balance less the contributions: %i years",
+    (yearsToRetirement) => {
+      const result = project({ yearsToRetirement });
 
-      expect(result.rendimentoTotal).toBeCloseTo(
-        result.montanteFinalHorizonte - result.contribuicaoAnualPgbl * anosAteAposentadoria,
+      expect(result.totalEarnings).toBeCloseTo(
+        result.balanceAtHorizon - result.annualPgblContribution * yearsToRetirement,
         6,
       );
     },
@@ -156,67 +154,67 @@ describe("calculatePrevidenciaComplementar — the balance at the visitor's hori
 
   it("pins the worked example: R$ 1.000/month at 8% for 10 years", () => {
     // 12.000 × ((1,08^10 − 1) / 0,08) = 173.838,75
-    expect(project().montanteFinalHorizonte).toBeCloseTo(173_838.75, 2);
-    expect(project().rendimentoTotal).toBeCloseTo(173_838.75 - 120_000, 2);
+    expect(project().balanceAtHorizon).toBeCloseTo(173_838.75, 2);
+    expect(project().totalEarnings).toBeCloseTo(173_838.75 - 120_000, 2);
   });
 
   it("scales in proportion to the contribution", () => {
-    const single = project({ contribuicaoMensalPgbl: 1_000, anosAteAposentadoria: 20 });
-    const triple = project({ contribuicaoMensalPgbl: 3_000, anosAteAposentadoria: 20 });
+    const single = project({ monthlyPgblContribution: 1_000, yearsToRetirement: 20 });
+    const triple = project({ monthlyPgblContribution: 3_000, yearsToRetirement: 20 });
 
-    expect(triple.montanteFinalHorizonte).toBeCloseTo(single.montanteFinalHorizonte * 3, 6);
-    expect(triple.rendimentoTotal).toBeCloseTo(single.rendimentoTotal * 3, 6);
+    expect(triple.balanceAtHorizon).toBeCloseTo(single.balanceAtHorizon * 3, 6);
+    expect(triple.totalEarnings).toBeCloseTo(single.totalEarnings * 3, 6);
   });
 
   it("grows with the return rate and with the horizon", () => {
     let previousByRate = -Infinity;
-    for (let tasaRetornoAnual = 0; tasaRetornoAnual <= 20; tasaRetornoAnual += 0.5) {
-      const balance = project({ tasaRetornoAnual }).montanteFinalHorizonte;
+    for (let annualReturnRate = 0; annualReturnRate <= 20; annualReturnRate += 0.5) {
+      const balance = project({ annualReturnRate }).balanceAtHorizon;
       expect(balance).toBeGreaterThanOrEqual(previousByRate);
       previousByRate = balance;
     }
 
     let previousByYears = -Infinity;
-    for (let anosAteAposentadoria = 1; anosAteAposentadoria <= 40; anosAteAposentadoria += 1) {
-      const balance = project({ anosAteAposentadoria }).montanteFinalHorizonte;
+    for (let yearsToRetirement = 1; yearsToRetirement <= 40; yearsToRetirement += 1) {
+      const balance = project({ yearsToRetirement }).balanceAtHorizon;
       expect(balance).toBeGreaterThan(previousByYears);
       previousByYears = balance;
     }
   });
 
   it("never reports a gain where the money only sat still", () => {
-    for (let tasaRetornoAnual = 0; tasaRetornoAnual <= 20; tasaRetornoAnual += 0.5) {
-      const result = project({ tasaRetornoAnual, anosAteAposentadoria: 30 });
+    for (let annualReturnRate = 0; annualReturnRate <= 20; annualReturnRate += 0.5) {
+      const result = project({ annualReturnRate, yearsToRetirement: 30 });
 
-      expect(result.rendimentoTotal).toBeGreaterThanOrEqual(0);
-      expect(Number.isFinite(result.rendimentoTotal)).toBe(true);
+      expect(result.totalEarnings).toBeGreaterThanOrEqual(0);
+      expect(Number.isFinite(result.totalEarnings)).toBe(true);
     }
   });
 
   /**
-   * `montanteFinal10anos`, `montanteFinal20anos` and `montanteFinal30anos` are
+   * `balanceAt10Years`, `balanceAt20Years` and `balanceAt30Years` are
    * fixed reference points — the balance at that many years, whatever horizon
    * the visitor chose — and the breakdown table prints all three side by side.
    * They are comparison marks, not the answer, which is why the headline reads
-   * `montanteFinalHorizonte` instead.
+   * `balanceAtHorizon` instead.
    */
   it.each([1, 5, 15, 35])(
     "reports 10, 20 and 30 years as fixed marks, independent of a %i-year horizon",
-    (anosAteAposentadoria) => {
-      const result = project({ anosAteAposentadoria });
+    (yearsToRetirement) => {
+      const result = project({ yearsToRetirement });
 
-      expect(result.montanteFinal10anos).toBeCloseTo(annuityFutureValue(12_000, 8, 10), 2);
-      expect(result.montanteFinal20anos).toBeCloseTo(annuityFutureValue(12_000, 8, 20), 2);
-      expect(result.montanteFinal30anos).toBeCloseTo(annuityFutureValue(12_000, 8, 30), 2);
+      expect(result.balanceAt10Years).toBeCloseTo(annuityFutureValue(12_000, 8, 10), 2);
+      expect(result.balanceAt20Years).toBeCloseTo(annuityFutureValue(12_000, 8, 20), 2);
+      expect(result.balanceAt30Years).toBeCloseTo(annuityFutureValue(12_000, 8, 30), 2);
     },
   );
 });
 
-describe("calculatePrevidenciaComplementar — the year-by-year projection", () => {
+describe("calculateSupplementaryPension — the year-by-year projection", () => {
   /**
    * ⚠️ Pinned sampling, not a contract.
    *
-   * `projecao` is dead output: `grep -rn projecao src/` finds the module and
+   * `projection` is dead output: `grep -rn projection src/` finds the module and
    * nothing else, so no component renders the series and it declares no
    * sampling contract of its own. What it actually keeps is year 1, year 5 and
    * every multiple of ten the horizon reaches — which means the visitor's own
@@ -228,42 +226,42 @@ describe("calculatePrevidenciaComplementar — the year-by-year projection", () 
     [2, [1]],
     [15, [1, 5, 10]],
     [35, [1, 5, 10, 20, 30]],
-  ])("samples years 1, 5 and each decade — a %i-year horizon gives %j", (anos, expected) => {
-    const { projecao } = project({ anosAteAposentadoria: anos });
+  ])("samples years 1, 5 and each decade — a %i-year horizon gives %j", (years, expected) => {
+    const { projection } = project({ yearsToRetirement: years });
 
-    expect(projecao.map((point) => point.ano)).toEqual(expected);
+    expect(projection.map((point) => point.year)).toEqual(expected);
   });
 
   it.each([1, 5, 12, 30, 40])(
     "never samples a year beyond a %i-year horizon, and always moves forward",
-    (anosAteAposentadoria) => {
-      const { projecao } = project({ anosAteAposentadoria });
+    (yearsToRetirement) => {
+      const { projection } = project({ yearsToRetirement });
 
       let previousYear = 0;
-      for (const point of projecao) {
-        expect(point.ano).toBeGreaterThan(previousYear);
-        expect(point.ano).toBeLessThanOrEqual(anosAteAposentadoria);
-        previousYear = point.ano;
+      for (const point of projection) {
+        expect(point.year).toBeGreaterThan(previousYear);
+        expect(point.year).toBeLessThanOrEqual(yearsToRetirement);
+        previousYear = point.year;
       }
     },
   );
 
   it("agrees with the closed form at every year it does sample", () => {
-    const { projecao } = project({ anosAteAposentadoria: 40, tasaRetornoAnual: 6 });
+    const { projection } = project({ yearsToRetirement: 40, annualReturnRate: 6 });
 
-    expect(projecao.length).toBeGreaterThan(0);
+    expect(projection.length).toBeGreaterThan(0);
 
-    for (const point of projecao) {
-      expect(point.saldo).toBeCloseTo(annuityFutureValue(12_000, 6, point.ano), 2);
-      expect(point.rendimento).toBeCloseTo(annuityFutureValue(12_000, 6, point.ano - 1) * 0.06, 2);
+    for (const point of projection) {
+      expect(point.balance).toBeCloseTo(annuityFutureValue(12_000, 6, point.year), 2);
+      expect(point.earnings).toBeCloseTo(annuityFutureValue(12_000, 6, point.year - 1) * 0.06, 2);
     }
   });
 });
 
-describe("calculatePrevidenciaComplementar — the IRPF deduction", () => {
+describe("calculateSupplementaryPension — the IRPF deduction", () => {
   it("deducts nothing in the exempt band", () => {
-    expect(project({ aliquotaIrpfAtual: 0 }).economiaIrpfMensal).toBe(0);
-    expect(project({ aliquotaIrpfAtual: 0 }).economiaIrpfAnual).toBe(0);
+    expect(project({ currentIrpfRate: 0 }).monthlyIrpfSaving).toBe(0);
+    expect(project({ currentIrpfRate: 0 }).annualIrpfSaving).toBe(0);
   });
 
   /**
@@ -271,51 +269,51 @@ describe("calculatePrevidenciaComplementar — the IRPF deduction", () => {
    * R$ 275 of IRPF a month, R$ 3.300 a year.
    */
   it("defers the marginal rate on the contribution", () => {
-    const result = project({ aliquotaIrpfAtual: 27.5 });
+    const result = project({ currentIrpfRate: 27.5 });
 
-    expect(result.economiaIrpfMensal).toBeCloseTo(275, 2);
-    expect(result.economiaIrpfAnual).toBeCloseTo(3_300, 2);
+    expect(result.monthlyIrpfSaving).toBeCloseTo(275, 2);
+    expect(result.annualIrpfSaving).toBeCloseTo(3_300, 2);
   });
 
   it.each([0, 7.5, 15, 22.5, 27.5])(
     "never defers more tax than the contribution itself at %i%%",
-    (aliquotaIrpfAtual) => {
-      const result = project({ aliquotaIrpfAtual });
+    (currentIrpfRate) => {
+      const result = project({ currentIrpfRate });
 
-      expect(result.economiaIrpfMensal).toBeGreaterThanOrEqual(0);
-      expect(result.economiaIrpfMensal).toBeLessThanOrEqual(result.contribuicaoMensalPgbl);
-      expect(result.economiaIrpfAnual).toBeCloseTo(result.economiaIrpfMensal * 12, 6);
+      expect(result.monthlyIrpfSaving).toBeGreaterThanOrEqual(0);
+      expect(result.monthlyIrpfSaving).toBeLessThanOrEqual(result.monthlyPgblContribution);
+      expect(result.annualIrpfSaving).toBeCloseTo(result.monthlyIrpfSaving * 12, 6);
     },
   );
 
   it("leaves the projected balance untouched — the deduction is a separate pot", () => {
-    const exempt = project({ aliquotaIrpfAtual: 0 });
-    const topRate = project({ aliquotaIrpfAtual: 27.5 });
+    const exempt = project({ currentIrpfRate: 0 });
+    const topRate = project({ currentIrpfRate: 27.5 });
 
-    expect(topRate.montanteFinalHorizonte).toBe(exempt.montanteFinalHorizonte);
+    expect(topRate.balanceAtHorizon).toBe(exempt.balanceAtHorizon);
   });
 });
 
-describe("calculatePrevidenciaComplementar — degenerate input", () => {
+describe("calculateSupplementaryPension — degenerate input", () => {
   it("echoes the contribution back, monthly and annualised", () => {
-    const result = project({ contribuicaoMensalPgbl: 750 });
+    const result = project({ monthlyPgblContribution: 750 });
 
-    expect(result.contribuicaoMensalPgbl).toBe(750);
-    expect(result.contribuicaoAnualPgbl).toBe(9_000);
+    expect(result.monthlyPgblContribution).toBe(750);
+    expect(result.annualPgblContribution).toBe(9_000);
   });
 
   it("saves nothing and earns nothing on a zero contribution", () => {
-    const result = project({ contribuicaoMensalPgbl: 0 });
+    const result = project({ monthlyPgblContribution: 0 });
 
-    expect(result.rendimentoTotal).toBe(0);
-    expect(result.economiaIrpfMensal).toBe(0);
-    expect(result.montanteFinalHorizonte).toBe(0);
+    expect(result.totalEarnings).toBe(0);
+    expect(result.monthlyIrpfSaving).toBe(0);
+    expect(result.balanceAtHorizon).toBe(0);
   });
 
   /**
    * ⚠️ Pinned arithmetic, not an endorsement.
    *
-   * `rendimentoTotal` is the balance less the contributions, and neither term
+   * `totalEarnings` is the balance less the contributions, and neither term
    * is floored. A negative horizon runs no years, so the balance is zero while
    * the contributions term goes negative — and the subtraction reports a
    * R$ 60.000 return on money never deposited. No visitor reaches it: the
@@ -325,17 +323,17 @@ describe("calculatePrevidenciaComplementar — degenerate input", () => {
    * a defect until something can reach it.
    */
   it("manufactures a return out of a negative horizon", () => {
-    const result = project({ anosAteAposentadoria: -5 });
+    const result = project({ yearsToRetirement: -5 });
 
-    expect(result.montanteFinalHorizonte).toBe(0);
-    expect(result.projecao).toHaveLength(0);
-    expect(result.rendimentoTotal).toBe(60_000);
+    expect(result.balanceAtHorizon).toBe(0);
+    expect(result.projection).toHaveLength(0);
+    expect(result.totalEarnings).toBe(60_000);
   });
 
   it("reports a loss, not a gain, when the rate is negative", () => {
-    const result = project({ tasaRetornoAnual: -20, anosAteAposentadoria: 10 });
+    const result = project({ annualReturnRate: -20, yearsToRetirement: 10 });
 
-    expect(result.rendimentoTotal).toBeLessThan(0);
-    expect(result.montanteFinalHorizonte).toBeCloseTo(annuityFutureValue(12_000, -20, 10), 2);
+    expect(result.totalEarnings).toBeLessThan(0);
+    expect(result.balanceAtHorizon).toBeCloseTo(annuityFutureValue(12_000, -20, 10), 2);
   });
 });

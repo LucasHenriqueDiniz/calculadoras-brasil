@@ -12,10 +12,10 @@ import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
 
 const DEFAULTS: CltVsPjInput = {
-  salarioCltBruto: 5000,
-  propostaPjMensal: 6000,
-  dependentes: 0,
-  despesasDedutivelsPj: 0,
+  cltGrossSalary: 5000,
+  monthlyPjOffer: 6000,
+  dependants: 0,
+  pjDeductibleExpenses: 0,
 };
 
 const DESCRIPTION =
@@ -73,7 +73,7 @@ export const Route = createFileRoute("/calculadora-clt-vs-pj")({
 });
 
 function Calculator() {
-  const [input, setInput] = usePersistedState<CltVsPjInput>("clt-vs-pj-input", DEFAULTS);
+  const [input, setInput] = usePersistedState<CltVsPjInput>("clt-vs-pj-input-v2", DEFAULTS);
   const result = useMemo(() => calculateCltVsPj(input), [input]);
 
   return (
@@ -84,8 +84,8 @@ function Calculator() {
       <FormSection title="Cenário CLT" description="Seu salário bruto em regime CLT">
         <CurrencyInput
           label="Salário bruto CLT mensal"
-          value={input.salarioCltBruto}
-          onChange={(v) => setInput({ ...input, salarioCltBruto: v })}
+          value={input.cltGrossSalary}
+          onChange={(v) => setInput({ ...input, cltGrossSalary: v })}
           hint="Valor antes de INSS e IRPF"
         />
       </FormSection>
@@ -93,36 +93,36 @@ function Calculator() {
       <FormSection title="Proposta PJ" description="Valor que você receberia como PJ">
         <CurrencyInput
           label="Proposta PJ mensal"
-          value={input.propostaPjMensal}
-          onChange={(v) => setInput({ ...input, propostaPjMensal: v })}
+          value={input.monthlyPjOffer}
+          onChange={(v) => setInput({ ...input, monthlyPjOffer: v })}
           hint="Quanto está oferecendo como PJ"
         />
         <CurrencyInput
           label="Despesas dedutíveis PJ"
-          value={input.despesasDedutivelsPj}
-          onChange={(v) => setInput({ ...input, despesasDedutivelsPj: v })}
+          value={input.pjDeductibleExpenses}
+          onChange={(v) => setInput({ ...input, pjDeductibleExpenses: v })}
           hint="Equipamentos, combustível, aluguel do espaço"
         />
       </FormSection>
 
       <ResultSummaryCard
         title="Comparação"
-        mainValue={formatBRL(result.cltComBeneficios)}
+        mainValue={formatBRL(result.cltWithBenefits)}
         mainLabel={
-          result.analise.empate
+          result.analysis.isTie
             ? "Empate técnico"
-            : result.analise.cltMelhor
+            : result.analysis.cltIsBetter
               ? "CLT é melhor"
               : "PJ é melhor"
         }
-        secondaryValue={formatBRL(Math.abs(result.diferenca))}
+        secondaryValue={formatBRL(Math.abs(result.difference))}
         secondaryLabel={
-          result.analise.temBaseParaPercentual
-            ? `Diferença: ${Math.abs(result.percentualDiferenca)}%`
+          result.analysis.hasBaseForPercentage
+            ? `Diferença: ${Math.abs(result.differencePercent)}%`
             : "Diferença"
         }
         resultColor={
-          result.analise.empate ? "neutral" : result.analise.cltMelhor ? "positive" : "warning"
+          result.analysis.isTie ? "neutral" : result.analysis.cltIsBetter ? "positive" : "warning"
         }
       />
 
@@ -131,33 +131,33 @@ function Calculator() {
         items={[
           {
             label: "CLT - Salário líquido",
-            value: formatBRL(result.cltLiquido),
+            value: formatBRL(result.cltNet),
           },
           {
             label: "CLT - Benefícios (13º, FGTS, vale)",
-            value: `+ ${formatBRL(result.cltComBeneficios - result.cltLiquido)}`,
+            value: `+ ${formatBRL(result.cltWithBenefits - result.cltNet)}`,
             subtext: "Diluído mensalmente",
           },
           {
             label: "CLT Total",
-            value: formatBRL(result.cltComBeneficios),
+            value: formatBRL(result.cltWithBenefits),
             isFinal: true,
           },
           {
             label: "PJ - Proposta",
-            value: formatBRL(result.propostaPjMensal),
+            value: formatBRL(result.monthlyPjOffer),
           },
           {
             label: "PJ - Líquido (após INSS, IRPF, contador)",
-            value: formatBRL(result.pjLiquido),
+            value: formatBRL(result.pjNet),
             isFinal: true,
           },
           {
             label: "PJ Necessária para igualar CLT",
-            value: formatBRL(result.pjNecessaria),
+            value: formatBRL(result.breakEvenPjOffer),
             subtext:
-              input.salarioCltBruto > 0
-                ? `${((result.pjNecessaria / input.salarioCltBruto - 1) * 100).toFixed(0)}% a mais que CLT`
+              input.cltGrossSalary > 0
+                ? `${((result.breakEvenPjOffer / input.cltGrossSalary - 1) * 100).toFixed(0)}% a mais que CLT`
                 : "Informe o salário CLT para comparar",
           },
         ]}
@@ -166,8 +166,8 @@ function Calculator() {
       <DisclaimerBox>
         <p>
           Para o seu cenário, a simulação indica que seria preciso faturar cerca de{" "}
-          <strong>{formatBRL(result.pjNecessaria)}</strong> por mês como PJ para chegar ao mesmo
-          ganho líquido de <strong>{formatBRL(result.cltComBeneficios)}</strong> por mês em CLT, já
+          <strong>{formatBRL(result.breakEvenPjOffer)}</strong> por mês como PJ para chegar ao mesmo
+          ganho líquido de <strong>{formatBRL(result.cltWithBenefits)}</strong> por mês em CLT, já
           somados FGTS, 13º e férias.
         </p>
         <p className="mt-3">

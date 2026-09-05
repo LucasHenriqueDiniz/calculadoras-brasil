@@ -1,5 +1,5 @@
 ---
-status: todo
+status: done
 kanban: 0225dd88-288d-489a-9f61-78b1471fabd5
 ---
 
@@ -72,3 +72,40 @@ If bumping three storage keys in one slice feels like three chances to get it
 wrong, split by file — `slice-04b`, `slice-04c` — and keep the directory-wide
 grep as the last one's `Done when`. Fractional slice numbers are cheaper than a
 slice that half-lands.
+
+---
+
+## What actually happened — 2026-09-05
+
+`checks-ok`, and the directory-wide grep prints nothing and exits 1. **That closes the feature**:
+all seven modules under `src/lib/calculators/` are in English.
+
+The two names wrong in both languages are gone: `despesasDedutivelsPj` → `pjDeductibleExpenses`,
+and **`tasaRetornoAnual` → `annualReturnRate`**.
+
+`taxFromTable`, `reductionLei15270`, `inssWithheld` and `dependantAllowance` now read the same in
+`irpf.ts`, `salarioLiquido.ts` and `cltVsPj.ts` — the three modules that touch the 2026 rules share
+one vocabulary, which is what makes their remaining duplication legible in a diff.
+
+**Three keys bumped**, all to `-v2`: `clt-vs-pj-input`, `beneficios-input`, `previdencia-input`.
+Every field of all three interfaces was renamed, so without the bump a returning visitor's stored
+object would have made each one read `undefined`.
+
+⚠️ **`CltVsPjResult.analysis.rationale` holds prose the page renders.** The field renamed; every
+Portuguese string it can hold is byte-identical, and the four regex assertions over it were not
+touched.
+
+**No literal union in these three modules** — every field is `number`, `boolean` or free-form
+`string`, so slice 3's conservative half had nothing to apply to.
+
+**No expected value moved.** Numeric-literal multiset byte-identical to `HEAD` in all nine files,
+extracted with a lookbehind so digits inside identifiers (`balanceAt10Years`, `reductionLei15270`)
+cannot mask a moved figure. 149 `expect` lines removed, 149 added.
+
+### A hole the slice exposed, closed here
+
+`tests/usePersistedState.test.ts` guards that each route's source contains its bumped key — but it
+listed only slice 2's two routes. The four keys bumped in slices 3 and 4 had no guard, so a revert
+to an unbumped key would have passed the suite and handed a returning visitor a form of
+`undefined`s. All six routes are listed now. Verified by reverting `previdencia-input-v2` and
+watching the guard fail.

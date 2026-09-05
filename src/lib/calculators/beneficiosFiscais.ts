@@ -1,55 +1,55 @@
-export interface BeneficiosFiscaisInput {
-  valeRefeicaoMensal: number;
-  valeTransporteMensal: number;
-  aliquotaIrpfEstimada: number;
+export interface TaxFreeBenefitsInput {
+  monthlyMealAllowance: number;
+  monthlyTransportAllowance: number;
+  estimatedIrpfRate: number;
 }
 
-export interface BeneficiosFiscaisResult {
-  valeRefeicaoMensal: number;
-  valeTransporteMensal: number;
-  beneficiosTotalMensal: number;
-  economiaIrpfMensal: number;
-  economiaIrpfAnual: number;
-  salarioLiquidoSemBeneficios: number;
-  salarioLiquidoComBeneficios: number;
-  rendaBrutaNecessaria: number;
-  comparacao: {
-    emDinheiro: number;
-    emBeneficios: number;
-    diferenca: number;
+export interface TaxFreeBenefitsResult {
+  monthlyMealAllowance: number;
+  monthlyTransportAllowance: number;
+  monthlyBenefitTotal: number;
+  monthlyIrpfSaving: number;
+  annualIrpfSaving: number;
+  netSalaryWithoutBenefits: number;
+  netSalaryWithBenefits: number;
+  requiredGrossIncome: number;
+  comparison: {
+    asCash: number;
+    asBenefits: number;
+    difference: number;
   };
 }
 
-export function calculateBeneficiosFiscais(input: BeneficiosFiscaisInput): BeneficiosFiscaisResult {
+export function calculateTaxFreeBenefits(input: TaxFreeBenefitsInput): TaxFreeBenefitsResult {
   // non-taxable benefits
-  const beneficiosTotalMensal = input.valeRefeicaoMensal + input.valeTransporteMensal;
+  const monthlyBenefitTotal = input.monthlyMealAllowance + input.monthlyTransportAllowance;
 
   // IRPF savings (taken as cash, this amount would be taxed)
-  const economiaIrpfMensal = beneficiosTotalMensal * (input.aliquotaIrpfEstimada / 100);
-  const economiaIrpfAnual = economiaIrpfMensal * 12;
+  const monthlyIrpfSaving = monthlyBenefitTotal * (input.estimatedIrpfRate / 100);
+  const annualIrpfSaving = monthlyIrpfSaving * 12;
 
   // Simulation: the equivalent in gross salary.
   // Received as benefits, nothing is withheld for IRPF;
   // received as cash, it would be.
-  const salarioLiquidoSemBeneficios = 0; // reference point
-  const salarioLiquidoComBeneficios = beneficiosTotalMensal; // the untaxed part
+  const netSalaryWithoutBenefits = 0; // reference point
+  const netSalaryWithBenefits = monthlyBenefitTotal; // the untaxed part
 
   // Gross salary needed to end up with the same net amount
-  const rendaBrutaNecessaria = beneficiosTotalMensal / (1 - input.aliquotaIrpfEstimada / 100);
+  const requiredGrossIncome = monthlyBenefitTotal / (1 - input.estimatedIrpfRate / 100);
 
   return {
-    valeRefeicaoMensal: input.valeRefeicaoMensal,
-    valeTransporteMensal: input.valeTransporteMensal,
-    beneficiosTotalMensal,
-    economiaIrpfMensal,
-    economiaIrpfAnual,
-    salarioLiquidoSemBeneficios,
-    salarioLiquidoComBeneficios,
-    rendaBrutaNecessaria,
-    comparacao: {
-      emDinheiro: rendaBrutaNecessaria,
-      emBeneficios: beneficiosTotalMensal,
-      diferenca: rendaBrutaNecessaria - beneficiosTotalMensal,
+    monthlyMealAllowance: input.monthlyMealAllowance,
+    monthlyTransportAllowance: input.monthlyTransportAllowance,
+    monthlyBenefitTotal,
+    monthlyIrpfSaving,
+    annualIrpfSaving,
+    netSalaryWithoutBenefits,
+    netSalaryWithBenefits,
+    requiredGrossIncome,
+    comparison: {
+      asCash: requiredGrossIncome,
+      asBenefits: monthlyBenefitTotal,
+      difference: requiredGrossIncome - monthlyBenefitTotal,
     },
   };
 }
