@@ -108,10 +108,22 @@ function Calculator() {
       <ResultSummaryCard
         title="Comparação"
         mainValue={formatBRL(result.cltComBeneficios)}
-        mainLabel={result.analise.cltMelhor ? "CLT é melhor" : "PJ é melhor"}
+        mainLabel={
+          result.analise.empate
+            ? "Empate técnico"
+            : result.analise.cltMelhor
+              ? "CLT é melhor"
+              : "PJ é melhor"
+        }
         secondaryValue={formatBRL(Math.abs(result.diferenca))}
-        secondaryLabel={`Diferença: ${result.percentualDiferenca}%`}
-        resultColor={result.analise.cltMelhor ? "positive" : "warning"}
+        secondaryLabel={
+          result.analise.temBaseParaPercentual
+            ? `Diferença: ${Math.abs(result.percentualDiferenca)}%`
+            : "Diferença"
+        }
+        resultColor={
+          result.analise.empate ? "neutral" : result.analise.cltMelhor ? "positive" : "warning"
+        }
       />
 
       <BreakdownTable
@@ -143,7 +155,10 @@ function Calculator() {
           {
             label: "PJ Necessária para igualar CLT",
             value: formatBRL(result.pjNecessaria),
-            subtext: `${((result.pjNecessaria / input.salarioCltBruto - 1) * 100).toFixed(0)}% a mais que CLT`,
+            subtext:
+              input.salarioCltBruto > 0
+                ? `${((result.pjNecessaria / input.salarioCltBruto - 1) * 100).toFixed(0)}% a mais que CLT`
+                : "Informe o salário CLT para comparar",
           },
         ]}
       />
@@ -152,7 +167,8 @@ function Calculator() {
         <p>
           Para o seu cenário, a simulação indica que seria preciso faturar cerca de{" "}
           <strong>{formatBRL(result.pjNecessaria)}</strong> por mês como PJ para chegar ao mesmo
-          ganho líquido de <strong>{formatBRL(result.salarioCltBruto)}</strong> por mês em CLT.
+          ganho líquido de <strong>{formatBRL(result.cltComBeneficios)}</strong> por mês em CLT, já
+          somados FGTS, 13º e férias.
         </p>
         <p className="mt-3">
           É uma estimativa educativa. Ela não considera despesas próprias do seu negócio

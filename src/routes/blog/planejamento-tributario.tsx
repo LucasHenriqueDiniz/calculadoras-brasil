@@ -70,8 +70,9 @@ function BlogPost() {
 
           <h2>Regime Simplificado</h2>
           <p>
-            Se tem poucos gastos dedutíveis, o regime simplificado (20,5% dedução fixa) pode ser
-            melhor que o completo. Compare na calculadora IRPF.
+            Se tem poucos gastos dedutíveis, o regime simplificado (20% de dedução fixa, até R$
+            17.640,00 por ano) pode ser melhor que o completo. Lembre que ele substitui todas as
+            outras deduções, dependentes inclusive. Compare na calculadora IRPF.
           </p>
 
           <h2>Deduções com Educação</h2>

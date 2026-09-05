@@ -300,17 +300,17 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "Como funciona o cálculo do IRPF 2026?",
         answer:
-          "O IRPF segue uma tabela progressiva: até R$ 21.503/ano isento, depois 7,5% até 15%, 22,5% e 27,5% nas maiores rendas. Você deduz INSS, deduções permitidas (educação, saúde, previdência) e dependentes antes de aplicar a alíquota.",
+          "O IRPF segue uma tabela progressiva: quanto mais você ganha, maior a alíquota. Em 2026 há duas etapas. Primeiro a tabela anual: até R$ 29.145,60 isento, depois 7,5%, 15%, 22,5% e 27,5% nas faixas seguintes. Depois a redução da Lei 15.270/2025, que abate o imposto de quem ganha menos e pode zerá-lo.",
       },
       {
         question: "Qual é a alíquota IRPF para cada faixa salarial?",
         answer:
-          "Até R$ 21.503/ano: 0% (isento). De R$ 21.503 a R$ 33.503: 7,5%. De R$ 33.503 a R$ 44.694: 15%. De R$ 44.694 a R$ 55.472: 22,5%. Acima de R$ 55.472: 27,5%. Essas faixas foram atualizadas em 2026.",
+          "Na tabela anual de 2026: até R$ 29.145,60 é isento; de R$ 29.145,61 a R$ 33.919,80 são 7,5%; até R$ 45.012,60 são 15%; até R$ 55.976,16 são 22,5%; acima disso, 27,5%. Sobre o resultado ainda incide a redução da Lei 15.270/2025, então a alíquota da faixa não é o que você paga de fato.",
       },
       {
         question: "Dependentes reduzem meu IRPF?",
         answer:
-          "Sim, cada dependente reduz R$ 2.275 da base imponível em 2026. Cônjuge, filhos até 21 anos (ou 24 se estudante), pais, irmãos menores contam. A redução é significativa se tiver vários dependentes.",
+          "Sim, cada dependente reduz R$ 2.275,08 da base imponível em 2026. Cônjuge, filhos até 21 anos (ou 24 se estudante), pais, irmãos menores contam. A redução é significativa se tiver vários dependentes.",
       },
       {
         question: "Educação é dedutível no IRPF?",
@@ -325,7 +325,7 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "Vale a pena usar o regime simplificado?",
         answer:
-          "Depende. Regime simplificado: dedução fixa de 20,5% da renda bruta. Regime completo: deduções reais (educação, saúde, previdência). Se tem muitos gastos dedutíveis, completo vale mais. Nossa calculadora compara para você.",
+          "Depende. O regime simplificado desconta 20% da renda bruta, até o limite de R$ 17.640,00 por ano, e substitui todas as outras deduções — inclusive dependentes. O regime completo usa as deduções reais (educação, saúde, previdência). Se tem muitos gastos dedutíveis, o completo tende a valer mais. Simule os dois: a calculadora mostra o resultado do regime que você escolher, não escolhe por você.",
       },
       {
         question: "Quando devo declarar IRPF?",
@@ -335,7 +335,7 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "Como funciona o desconto INSS na calculadora?",
         answer:
-          "Se empregado CLT, o INSS (8-11%) é retido na folha de pagamento automaticamente. A calculadora desconta 10% como média. Autônomos pagam diretamente à Receita Federal (alíquota conforme a categoria).",
+          "Se empregado CLT, o INSS é retido na folha de pagamento automaticamente. A calculadora aplica as faixas progressivas de 2026 sobre o salário mensal e limita a contribuição ao teto do RGPS, em vez de usar um percentual único. Autônomos pagam diretamente à Receita Federal (alíquota conforme a categoria).",
       },
       {
         question: "Previdência complementar é dedutível?",
@@ -343,9 +343,14 @@ export const blogPosts: Record<string, BlogPost> = {
           "Sim, até o limite de R$ 63.454/ano em 2026 (aproximadamente 13% da renda bruta). Contribuições a PGBL, VGBL, fundos de pensão entram como deduções.",
       },
       {
-        question: "E se meu resultado for negativo? Ganho restituição?",
+        question: "O que é a redução da Lei 15.270/2025?",
         answer:
-          "Sim! Se o valor calculado for negativo, você tem direito à restituição (devolução de imposto pago em excesso). A Receita Federal restitui em até 3 parcelas mensais.",
+          "É o mecanismo que criou a isenção efetiva de 2026. A lei não mudou as faixas da tabela: ela abate um valor do imposto que a tabela calculou. Quem tem renda tributável anual de até R$ 60.000 tem o imposto zerado; entre R$ 60.000 e R$ 88.200 o abatimento diminui aos poucos; acima disso não há redução.",
+      },
+      {
+        question: "Se o imposto der zero, eu recebo restituição?",
+        answer:
+          "Zero na calculadora significa que você não tem imposto a pagar, não que a Receita vá lhe devolver algo — a redução da Lei 15.270/2025 pode zerar o imposto, mas nunca gera restituição sozinha. A restituição aparece quando o que foi retido na folha ao longo do ano supera o imposto devido, e essa diferença é acertada na declaração.",
       },
     ],
   },
@@ -374,17 +379,17 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "Qual é a alíquota IRPF para quem ganha R$ 50.000/ano?",
         answer:
-          "Não é uma alíquota única. Você paga 0% até R$ 21.503, depois 7,5%, 15%, 22,5% conforme cada faixa. Alíquota efetiva fica em torno de 10-12%, bem menor que a marginal de 22,5%.",
+          "Não é uma alíquota única. Você paga 0% até R$ 29.145,60, depois 7,5%, 15% e 22,5% conforme cada faixa. Sem nenhuma dedução, a tabela cobraria cerca de R$ 3.144 sobre R$ 50.000 — efetiva de aproximadamente 6,3%, bem menor que a marginal de 22,5%. E sobre esse valor ainda incide a redução da Lei 15.270/2025.",
       },
       {
         question: "Dependentes realmente reduzem IRPF?",
         answer:
-          "Sim, cada dependente reduz R$ 2.275 da base imponível em 2026. Com 2 filhos, você já economiza R$ 4.550. Efeito significativo na hora do imposto.",
+          "Sim, cada dependente reduz R$ 2.275,08 da base imponível em 2026. Com 2 filhos, são R$ 4.550,16 a menos na base. Vale apenas no regime completo: o desconto simplificado substitui todas as deduções, dependentes inclusive.",
       },
       {
         question: "Qual regime é melhor para mim: completo ou simplificado?",
         answer:
-          "Depende. Se tem muito gasto com educação/saúde, completo é melhor. Se tem pouco, simplificado (20,5% dedução fixa) é mais fácil e pode ser melhor. Use calculadora para comparar.",
+          "Depende. Se tem muito gasto com educação/saúde, o completo tende a ser melhor. Se tem pouco, o simplificado (20% de dedução fixa, até R$ 17.640,00 por ano) é mais fácil e pode compensar. Simule os dois na calculadora antes de decidir.",
       },
     ],
   },
@@ -733,7 +738,7 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "Qual é a estratégia mais simples para começar?",
         answer:
-          "Compare o regime simplificado (dedução fixa de 20,5%) com o completo (deduções reais) na sua declaração. Essa escolha sozinha já pode gerar economia significativa sem nenhuma mudança de comportamento.",
+          "Compare o regime simplificado (dedução fixa de 20% dos rendimentos tributáveis, até R$ 17.640,00 por ano) com o completo (deduções reais) na sua declaração. Essa escolha sozinha já pode gerar economia significativa sem nenhuma mudança de comportamento.",
       },
       {
         question: "Investir em PGBL realmente reduz meu imposto?",
@@ -787,7 +792,7 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "PJ paga mais imposto que CLT?",
         answer:
-          "Em termos percentuais, sim: o INSS do contribuinte individual chega a 20% (contra 8-14% do CLT) e não há retenção automática de benefícios. Em compensação, o PJ pode deduzir despesas da atividade, o que reduz parte dessa diferença.",
+          "Em termos percentuais, sim: o INSS do contribuinte individual chega a 20% (contra 7,5% a 14% do CLT) e não há retenção automática de benefícios. Em compensação, o PJ pode deduzir despesas da atividade, o que reduz parte dessa diferença.",
       },
       {
         question: "Quais benefícios o CLT tem que o PJ perde?",
@@ -861,7 +866,8 @@ export const blogPosts: Record<string, BlogPost> = {
   "tabela-irpf-2026-completa": {
     slug: "tabela-irpf-2026-completa",
     title: "Tabela IRPF 2026 Completa",
-    description: "Tabela de alíquotas IRPF 2026, deduções dependentes, limites de isenção.",
+    description:
+      "Tabela de alíquotas IRPF 2026, parcelas a deduzir, deduções por dependente, limites de isenção e a redução da Lei 15.270/2025.",
     category: "educacao",
     imageUrl: "/blog/tabela.jpg",
     imageAlt: "Tabela de alíquotas IRPF 2026",
@@ -874,12 +880,22 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "Qual é o limite de isenção do IRPF em 2026?",
         answer:
-          "Rendimentos até R$ 21.503,34 por ano (equivalente a até 2 salários mínimos mensais) ficam isentos de IRPF, considerando apenas a tabela progressiva sobre salários e rendimentos tributáveis.",
+          "Na tabela progressiva, rendimentos tributáveis até R$ 29.145,60 por ano ficam isentos. Mas a isenção que se tornou conhecida em 2026 vem da redução da Lei 15.270/2025, que zera o imposto de quem tem renda tributável de até R$ 60.000 por ano — cerca de R$ 5.000 por mês.",
       },
       {
         question: "Como funciona a tabela progressiva do IRPF?",
         answer:
           "O imposto é calculado por faixas: cada parcela da renda paga a alíquota da sua faixa correspondente, não a alíquota máxima sobre o valor total. Por isso a alíquota efetiva é sempre menor que a alíquota marginal da tabela.",
+      },
+      {
+        question: "O que é a redução da Lei 15.270/2025?",
+        answer:
+          "É o mecanismo que criou a isenção efetiva de 2026. A lei não mexeu nas faixas da tabela: ela abate um valor do imposto que a tabela calculou. Até R$ 60.000 de renda tributável anual, a redução chega a R$ 2.694,15 e zera o imposto; entre R$ 60.000 e R$ 88.200 ela diminui aos poucos; acima disso não há redução. A redução nunca passa do imposto devido.",
+      },
+      {
+        question: "Qual é o teto do desconto simplificado em 2026?",
+        answer:
+          "O desconto simplificado é de 20% dos rendimentos tributáveis, limitado a R$ 17.640,00 por ano. Quem opta por ele abre mão de todas as outras deduções, inclusive a de dependentes.",
       },
       {
         question: "Quanto cada dependente reduz na tabela do IRPF?",
@@ -1000,7 +1016,7 @@ export const blogPosts: Record<string, BlogPost> = {
     slug: "simplificado-vs-completo",
     title: "IRPF Simplificado vs Completo: Qual Escolher?",
     description:
-      "Comparação: regime simplificado (20,5% dedução fixa) vs completo (deduções reais).",
+      "Comparação: regime simplificado (20% de dedução fixa, até R$ 17.640,00) vs completo (deduções reais).",
     category: "guia",
     imageUrl: "/blog/regimes.jpg",
     imageAlt: "Comparação de regimes IRPF",
@@ -1013,17 +1029,17 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "Qual é a diferença entre regime simplificado e completo?",
         answer:
-          "O simplificado aplica uma dedução fixa de 20,5% sobre a renda bruta tributável, sem precisar comprovar gastos. O completo permite deduzir despesas reais (educação, saúde, dependentes, previdência), mas exige comprovantes.",
+          "O simplificado aplica uma dedução fixa de 20% sobre a renda bruta tributável, limitada a R$ 17.640,00 por ano, sem precisar comprovar gastos — e substitui todas as outras deduções, dependentes inclusive. O completo permite deduzir despesas reais (educação, saúde, dependentes, previdência), mas exige comprovantes.",
       },
       {
         question: "Como sei qual regime é melhor para mim?",
         answer:
-          "Compare os dois: se suas deduções reais (educação + saúde + dependentes + previdência) somarem mais que 20,5% da sua renda bruta, o completo compensa. Caso contrário, o simplificado é mais vantajoso.",
+          "Compare os dois: se suas deduções reais (educação + saúde + dependentes + previdência) somarem mais que o desconto simplificado — 20% da renda bruta tributável, até R$ 17.640,00 —, o completo compensa. Caso contrário, o simplificado é mais vantajoso.",
       },
       {
         question: "Existe um teto para a dedução do regime simplificado?",
         answer:
-          "Sim. O desconto simplificado tem um limite anual, reajustado periodicamente pela Receita Federal. Rendas muito altas podem esbarrar nesse teto e acabar levando o completo a ser mais vantajoso.",
+          "Sim: R$ 17.640,00 por ano em 2026. A partir de R$ 88.200 de rendimentos tributáveis o desconto trava nesse valor, e rendas mais altas podem acabar levando o completo a ser mais vantajoso.",
       },
       {
         question: "Posso trocar de regime todo ano?",
@@ -1038,7 +1054,7 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "Quem tem poucos dependentes deve preferir o simplificado?",
         answer:
-          "Geralmente sim, principalmente se também não tem muitos gastos com saúde ou educação. Nesses casos, o desconto fixo de 20,5% tende a superar a soma das deduções reais disponíveis.",
+          "Geralmente sim, principalmente se também não tem muitos gastos com saúde ou educação. Nesses casos, o desconto fixo de 20% tende a superar a soma das deduções reais disponíveis.",
       },
     ],
   },
@@ -1231,7 +1247,7 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "Salários baixos realmente pagam pouco ou nenhum IRPF?",
         answer:
-          "Sim. Rendimentos até R$ 21.503,34/ano ficam isentos, e faixas logo acima pagam alíquotas baixas (7,5%), o que explica o desconto reduzido em setores com salários menores como comércio e varejo.",
+          "Sim. Rendimentos até R$ 29.145,60/ano já ficam isentos pela tabela, e a redução da Lei 15.270/2025 zera o imposto de quem tem renda tributável de até R$ 60.000 por ano — o que explica o desconto reduzido em setores com salários menores como comércio e varejo.",
       },
       {
         question: "Como comparar meu salário líquido com a média do setor?",

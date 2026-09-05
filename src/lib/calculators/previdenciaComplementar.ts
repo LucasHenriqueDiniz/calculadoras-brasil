@@ -5,21 +5,59 @@ export interface PrevidenciaComplementarInput {
   aliquotaIrpfAtual: number;
 }
 
+export interface PrevidenciaComplementarYear {
+  ano: number;
+  saldo: number;
+  rendimento: number;
+}
+
 export interface PrevidenciaComplementarResult {
   contribuicaoMensalPgbl: number;
   contribuicaoAnualPgbl: number;
   economiaIrpfMensal: number;
   economiaIrpfAnual: number;
+  /**
+   * The balance at the horizon the visitor asked for. This is the answer the
+   * page headlines; the three fixed marks below are comparison points and must
+   * not stand in for it.
+   */
+  montanteFinalHorizonte: number;
   montanteFinal10anos: number;
   montanteFinal20anos: number;
   montanteFinal30anos: number;
   rendimentoTotal: number;
-  projecao: Array<{
-    ano: number;
-    saldo: number;
-    rendimento: number;
-  }>;
+  projecao: PrevidenciaComplementarYear[];
 }
+
+/** Years the projection samples, out of every year it walks. */
+function isSampledYear(ano: number): boolean {
+  return ano === 1 || ano === 5 || ano % 10 === 0;
+}
+
+/**
+ * Walks the balance year by year. One deposit of `annualContribution` at the
+ * END of each year, so the first year earns nothing: this is the convention the
+ * whole module is written in, and it matches the ordinary-annuity closed form
+ * `C · ((1 + r)^n − 1) / r`.
+ */
+function projectYearByYear(
+  annualContribution: number,
+  annualRate: number,
+  years: number,
+): PrevidenciaComplementarYear[] {
+  const series: PrevidenciaComplementarYear[] = [];
+  let saldo = 0;
+
+  for (let ano = 1; ano <= years; ano++) {
+    const rendimento = saldo * annualRate;
+    saldo = saldo + rendimento + annualContribution;
+    series.push({ ano, saldo, rendimento });
+  }
+
+  return series;
+}
+
+const FIXED_MARKS = 30;
 
 export function calculatePrevidenciaComplementar(
   input: PrevidenciaComplementarInput,
@@ -31,57 +69,29 @@ export function calculatePrevidenciaComplementar(
   const economiaIrpfMensal = input.contribuicaoMensalPgbl * (input.aliquotaIrpfAtual / 100);
   const economiaIrpfAnual = economiaIrpfMensal * 12;
 
-  // balance projection
-  let saldo = 0;
-  const projecao: Array<{ ano: number; saldo: number; rendimento: number }> = [];
+  // the visitor's own horizon
+  const horizonte = projectYearByYear(
+    contribuicaoAnual,
+    tasaRetornoDecimal,
+    input.anosAteAposentadoria,
+  );
+  const montanteFinalHorizonte = horizonte.at(-1)?.saldo ?? 0;
+  const rendimentoTotal = montanteFinalHorizonte - contribuicaoAnual * input.anosAteAposentadoria;
 
-  for (let ano = 1; ano <= input.anosAteAposentadoria; ano++) {
-    const rendimento = saldo * tasaRetornoDecimal;
-    saldo = saldo + rendimento + contribuicaoAnual;
-    if (ano % 10 === 0 || ano === 1 || ano === 5 || ano === 20 || ano === 30) {
-      projecao.push({ ano, saldo, rendimento });
-    }
-  }
-
-  // assemble the final values per period
-  let montante10 = 0,
-    montante20 = 0,
-    montante30 = 0;
-
-  for (const p of projecao) {
-    if (p.ano === 10) montante10 = p.saldo;
-    if (p.ano === 20) montante20 = p.saldo;
-    if (p.ano === 30) montante30 = p.saldo;
-  }
-
-  // 10/20/30 years not reached: compute it by hand
-  saldo = 0;
-  for (let ano = 1; ano <= 30; ano++) {
-    const rendimento = saldo * tasaRetornoDecimal;
-    saldo = saldo + rendimento + contribuicaoAnual;
-    if (ano === 10) montante10 = saldo;
-    if (ano === 20) montante20 = saldo;
-    if (ano === 30) montante30 = saldo;
-  }
-
-  // final balance for the chosen period
-  saldo = 0;
-  for (let ano = 1; ano <= input.anosAteAposentadoria; ano++) {
-    const rendimento = saldo * tasaRetornoDecimal;
-    saldo = saldo + rendimento + contribuicaoAnual;
-  }
-
-  const rendimentoTotal = saldo - contribuicaoAnual * input.anosAteAposentadoria;
+  // fixed comparison marks, always the same years whatever the horizon is
+  const marcos = projectYearByYear(contribuicaoAnual, tasaRetornoDecimal, FIXED_MARKS);
+  const saldoNoAno = (ano: number) => marcos[ano - 1]?.saldo ?? 0;
 
   return {
     contribuicaoMensalPgbl: input.contribuicaoMensalPgbl,
     contribuicaoAnualPgbl: contribuicaoAnual,
     economiaIrpfMensal,
     economiaIrpfAnual,
-    montanteFinal10anos: montante10,
-    montanteFinal20anos: montante20,
-    montanteFinal30anos: montante30,
+    montanteFinalHorizonte,
+    montanteFinal10anos: saldoNoAno(10),
+    montanteFinal20anos: saldoNoAno(20),
+    montanteFinal30anos: saldoNoAno(30),
     rendimentoTotal,
-    projecao,
+    projecao: horizonte.filter((ponto) => isSampledYear(ponto.ano)),
   };
 }

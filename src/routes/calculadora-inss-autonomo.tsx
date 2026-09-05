@@ -12,15 +12,15 @@ import { FAQSection } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { formatBRL } from "@/lib/format";
 import { calculateInssAutonomo, type InssAutonomoInput } from "@/lib/calculators/inssAutonomo";
-import { SALARIO_MINIMO, TETO_INSS } from "@/lib/calculators/inss-constants";
+import { MINIMUM_WAGE, INSS_CEILING } from "@/lib/calculators/inss-constants";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
 
 const DEFAULTS: InssAutonomoInput = {
-  ganhoMensalBruto: 3000,
-  mesesContribuidos: 0,
-  sexo: "masculino",
+  grossMonthlyIncome: 3000,
+  contributedMonths: 0,
+  contributorSex: "masculino",
 };
 
 const DESCRIPTION =
@@ -87,19 +87,19 @@ function Calculator() {
   const result = useMemo(() => calculateInssAutonomo(input), [input]);
 
   const avisos: string[] = [];
-  if (result.limitadoPeloTeto) {
+  if (result.cappedByCeiling) {
     avisos.push(
-      `Sua renda está acima do teto do INSS (${formatBRL(TETO_INSS)}). A contribuição do plano normal é calculada sobre o teto, e o benefício também fica limitado a ele.`,
+      `Sua renda está acima do teto do INSS (${formatBRL(INSS_CEILING)}). A contribuição do plano normal é calculada sobre o teto, e o benefício também fica limitado a ele.`,
     );
   }
-  if (result.elevadoAoPiso) {
+  if (result.raisedToFloor) {
     avisos.push(
-      `Sua renda está abaixo do salário mínimo (${formatBRL(SALARIO_MINIMO)}). O salário de contribuição não pode ser menor que o mínimo, então a base foi elevada a esse piso.`,
+      `Sua renda está abaixo do salário mínimo (${formatBRL(MINIMUM_WAGE)}). O salário de contribuição não pode ser menor que o mínimo, então a base foi elevada a esse piso.`,
     );
   }
-  if (!result.tempoMinimoAtingido) {
+  if (!result.minimumTimeReached) {
     avisos.push(
-      `Com ${result.anosContribuidos.toFixed(1)} ano(s) de contribuição, você ainda não atingiu o tempo mínimo de ${result.tempoMinimoContribuicao} anos exigido para a aposentadoria por tempo de contribuição. Por isso a estimativa de benefício aparece zerada.`,
+      `Com ${result.contributedYears.toFixed(1)} ano(s) de contribuição, você ainda não atingiu o tempo mínimo de ${result.minimumContributionYears} anos exigido para a aposentadoria por tempo de contribuição. Por isso a estimativa de benefício aparece zerada.`,
     );
   }
 
@@ -114,21 +114,23 @@ function Calculator() {
       >
         <CurrencyInput
           label="Renda mensal bruta"
-          value={input.ganhoMensalBruto}
-          onChange={(v) => setInput({ ...input, ganhoMensalBruto: v })}
-          hint={`Limitada entre ${formatBRL(SALARIO_MINIMO)} e ${formatBRL(TETO_INSS)} para fins de contribuição`}
+          value={input.grossMonthlyIncome}
+          onChange={(v) => setInput({ ...input, grossMonthlyIncome: v })}
+          hint={`Limitada entre ${formatBRL(MINIMUM_WAGE)} e ${formatBRL(INSS_CEILING)} para fins de contribuição`}
         />
         <NumberInput
           label="Meses já contribuídos"
-          value={input.mesesContribuidos}
-          onChange={(v) => setInput({ ...input, mesesContribuidos: v })}
+          value={input.contributedMonths}
+          onChange={(v) => setInput({ ...input, contributedMonths: v })}
           min={0}
           hint="Consulte o total no seu extrato do CNIS, no Meu INSS"
         />
         <SelectField
           label="Sexo"
-          value={input.sexo}
-          onChange={(v) => setInput({ ...input, sexo: v as InssAutonomoInput["sexo"] })}
+          value={input.contributorSex}
+          onChange={(v) =>
+            setInput({ ...input, contributorSex: v as InssAutonomoInput["contributorSex"] })
+          }
           options={[
             { value: "masculino", label: "Masculino (mínimo de 20 anos)" },
             { value: "feminino", label: "Feminino (mínimo de 15 anos)" },
@@ -139,9 +141,9 @@ function Calculator() {
 
       <ResultSummaryCard
         title="Plano normal (20%)"
-        mainValue={formatBRL(result.planoNormal.contribuicaoMensal)}
-        mainLabel={`Por mês sobre um salário de contribuição de ${formatBRL(result.salarioContribuicao)}`}
-        secondaryValue={formatBRL(result.planoSimplificado.contribuicaoMensal)}
+        mainValue={formatBRL(result.standardPlan.monthlyContribution)}
+        mainLabel={`Por mês sobre um salário de contribuição de ${formatBRL(result.contributionBase)}`}
+        secondaryValue={formatBRL(result.simplifiedPlan.monthlyContribution)}
         secondaryLabel="Plano simplificado (11% sobre o salário mínimo)"
         resultColor="neutral"
       />
@@ -153,26 +155,26 @@ function Calculator() {
         items={[
           {
             label: "Renda mensal informada",
-            value: formatBRL(result.ganhoMensalBruto),
+            value: formatBRL(result.grossMonthlyIncome),
           },
           {
             label: "Salário de contribuição (plano normal)",
-            value: formatBRL(result.salarioContribuicao),
+            value: formatBRL(result.contributionBase),
             subtext: "Renda limitada ao piso do salário mínimo e ao teto do INSS",
           },
           {
             label: "Plano normal — 20% ao mês",
-            value: formatBRL(result.planoNormal.contribuicaoMensal),
-            subtext: `${formatBRL(result.planoNormal.contribuicaoAnual)} por ano · conta tempo de contribuição`,
+            value: formatBRL(result.standardPlan.monthlyContribution),
+            subtext: `${formatBRL(result.standardPlan.annualContribution)} por ano · conta tempo de contribuição`,
           },
           {
             label: "Plano simplificado — 11% ao mês",
-            value: formatBRL(result.planoSimplificado.contribuicaoMensal),
-            subtext: `${formatBRL(result.planoSimplificado.contribuicaoAnual)} por ano · sempre sobre o salário mínimo`,
+            value: formatBRL(result.simplifiedPlan.monthlyContribution),
+            subtext: `${formatBRL(result.simplifiedPlan.annualContribution)} por ano · sempre sobre o salário mínimo`,
           },
           {
             label: "Diferença de custo por ano",
-            value: formatBRL(result.diferencaCustoAnual),
+            value: formatBRL(result.annualCostDifference),
             isFinal: true,
           },
         ]}
@@ -183,22 +185,22 @@ function Calculator() {
         items={[
           {
             label: "Teto do benefício — plano normal",
-            value: formatBRL(TETO_INSS),
+            value: formatBRL(INSS_CEILING),
             subtext: "Benefícios proporcionais à média das contribuições, até o teto do INSS",
           },
           {
             label: "Teto do benefício — plano simplificado",
-            value: formatBRL(result.estimativaBeneficioSimplificado),
+            value: formatBRL(result.simplifiedPlanBenefitEstimate),
             subtext: "Benefícios limitados a um salário mínimo, qualquer que seja sua renda",
           },
           {
             label: "Estimativa de benefício no plano normal",
-            value: result.tempoMinimoAtingido
-              ? formatBRL(result.estimativaBeneficioNormal)
+            value: result.minimumTimeReached
+              ? formatBRL(result.standardPlanBenefitEstimate)
               : "Tempo mínimo não atingido",
-            subtext: result.tempoMinimoAtingido
-              ? `${result.percentualMediaAplicado}% da média, pela regra da EC 103/2019`
-              : `Faltam ${(result.tempoMinimoContribuicao - result.anosContribuidos).toFixed(1)} ano(s) de contribuição`,
+            subtext: result.minimumTimeReached
+              ? `${result.appliedAveragePercentage}% da média, pela regra da EC 103/2019`
+              : `Faltam ${(result.minimumContributionYears - result.contributedYears).toFixed(1)} ano(s) de contribuição`,
             isFinal: true,
           },
         ]}
@@ -217,7 +219,7 @@ function Calculator() {
           O plano mais barato não é automaticamente o melhor: o simplificado limita seus benefícios
           a um salário mínimo e não conta tempo para a aposentadoria por tempo de contribuição.
           Confirme sua situação no extrato do CNIS, no Meu INSS, e consulte um profissional de
-          previdência antes de decidir. Valores de referência do ano-base {result.anoReferencia}.
+          previdência antes de decidir. Valores de referência do ano-base {result.referenceYear}.
         </p>
       </DisclaimerBox>
 

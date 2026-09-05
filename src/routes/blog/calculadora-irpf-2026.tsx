@@ -87,43 +87,69 @@ function BlogPost() {
           <table>
             <thead>
               <tr>
-                <th>Faixa de Renda (Anual)</th>
+                <th>Base de Cálculo (Anual)</th>
                 <th>Alíquota</th>
-                <th>Exemplo</th>
+                <th>Exemplo (imposto pela tabela)</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Até R$ 21.503,34</td>
+                <td>Até R$ 29.145,60</td>
                 <td>0% (Isento)</td>
-                <td>Renda de R$ 20.000/ano não paga imposto</td>
+                <td>Base de R$ 28.000/ano não paga imposto</td>
               </tr>
               <tr>
-                <td>R$ 21.503,35 a R$ 33.503,34</td>
+                <td>R$ 29.145,61 a R$ 33.919,80</td>
                 <td>7,5%</td>
-                <td>Ganho de R$ 30.000/ano paga ~R$ 637,50</td>
+                <td>Base de R$ 30.000/ano paga ~R$ 64,08</td>
               </tr>
               <tr>
-                <td>R$ 33.503,35 a R$ 44.693,59</td>
+                <td>R$ 33.919,81 a R$ 45.012,60</td>
                 <td>15%</td>
-                <td>Ganho de R$ 40.000/ano paga ~R$ 1.860,73</td>
+                <td>Base de R$ 40.000/ano paga ~R$ 1.270,09</td>
               </tr>
               <tr>
-                <td>R$ 44.693,60 a R$ 55.471,74</td>
+                <td>R$ 45.012,61 a R$ 55.976,16</td>
                 <td>22,5%</td>
-                <td>Ganho de R$ 50.000/ano paga ~R$ 3.965,84</td>
+                <td>Base de R$ 50.000/ano paga ~R$ 3.144,15</td>
               </tr>
               <tr>
-                <td>Acima de R$ 55.471,75</td>
+                <td>Acima de R$ 55.976,16</td>
                 <td>27,5%</td>
-                <td>Ganho de R$ 60.000/ano paga ~R$ 6.061,95</td>
+                <td>Base de R$ 60.000/ano paga ~R$ 5.595,34</td>
               </tr>
             </tbody>
           </table>
           <p>
-            <strong>Importante:</strong> essa progressão significa que uma pessoa que ganha R$
-            50.000/ano não paga 22,5% sobre TODA a renda. Ela paga alíquotas diferentes em cada
-            faixa. Por isso, a alíquota "efetiva" é sempre menor que a "marginal".
+            <strong>Importante:</strong> essa progressão significa que uma pessoa com base de
+            cálculo de R$ 50.000/ano não paga 22,5% sobre TODA a renda. Ela paga alíquotas
+            diferentes em cada faixa. Por isso, a alíquota "efetiva" é sempre menor que a
+            "marginal".
+          </p>
+
+          <h2>A redução da Lei 15.270/2025</h2>
+          <p>
+            Os valores da coluna acima são o que a <em>tabela</em> cobra. Em 2026 há um segundo
+            passo: a Lei 15.270/2025 abate um valor do imposto que a tabela calculou. Ela não mexeu
+            nas faixas — trabalha em cima do resultado delas.
+          </p>
+          <ul>
+            <li>
+              <strong>Renda tributável anual até R$ 60.000:</strong> a redução chega a R$ 2.694,15 e
+              zera o imposto devido.
+            </li>
+            <li>
+              <strong>De R$ 60.000,01 a R$ 88.200:</strong> a redução é R$ 8.429,73 menos 0,095575 ×
+              os rendimentos tributáveis, até chegar a zero.
+            </li>
+            <li>
+              <strong>Acima de R$ 88.200:</strong> não há redução.
+            </li>
+          </ul>
+          <p>
+            A redução nunca passa do imposto devido: pode zerar o que você paga, mas não gera
+            restituição sozinha. É por isso que se fala em isenção para quem recebe até cerca de R$
+            5.000 por mês.
           </p>
 
           <h2>Desconto INSS: a retenção na fonte</h2>
@@ -139,8 +165,8 @@ function BlogPost() {
 
           <h2>Dependentes reduzem seu imposto</h2>
           <p>
-            Cada dependente reduz sua base imponível em R$ 2.275 (valor atualizado em 2026). Quem
-            conta como dependente:
+            Cada dependente reduz sua base imponível em R$ 2.275,08 (valor de 2026), no regime
+            completo. Quem conta como dependente:
           </p>
           <ul>
             <li>Cônjuge (mesmo se separado, em alguns casos)</li>
@@ -150,7 +176,8 @@ function BlogPost() {
           </ul>
           <p>
             <strong>Exemplo:</strong> se sua base imponível é R$ 50.000 e você tem 2 dependentes, a
-            base reduz em R$ 4.550 (2 × R$ 2.275), ficando em R$ 45.450 para cálculo do imposto.
+            base reduz em R$ 4.550,16 (2 × R$ 2.275,08), ficando em R$ 45.449,84 para cálculo do
+            imposto.
           </p>
 
           <h2>Deduções que reduzem sua base de cálculo</h2>
@@ -190,10 +217,12 @@ function BlogPost() {
             <li>Contribui para previdência complementar</li>
           </ul>
 
-          <h3>Regime Simplificado (Dedução Fixa 20,5%)</h3>
+          <h3>Regime Simplificado (Dedução Fixa 20%)</h3>
           <p>
-            A Receita Federal deduz automaticamente 20,5% da sua renda bruta. Você não precisa de
-            comprovantes. Melhor se:
+            A Receita Federal deduz automaticamente 20% dos seus rendimentos tributáveis, até o
+            limite de R$ 17.640,00 por ano. Você não precisa de comprovantes, mas esse desconto
+            substitui todas as outras deduções — educação, saúde, previdência e dependentes. Melhor
+            se:
           </p>
           <ul>
             <li>Tem poucos gastos dedutíveis</li>
@@ -202,26 +231,34 @@ function BlogPost() {
           </ul>
 
           <p>
-            <strong>Dica:</strong> nossa calculadora IRPF compara os dois regimes automaticamente e
-            mostra qual resulta em menor imposto para seu caso.
+            <strong>Dica:</strong> simule os dois na nossa calculadora IRPF. Ela mostra o resultado
+            do regime que você escolher, então rode uma vez em cada um e compare.
           </p>
 
           <h2>Exemplo prático: quanto você paga</h2>
-          <p>Vamos simular o caso de uma pessoa que ganha R$ 60.000/ano:</p>
+          <p>
+            Vamos simular o caso de uma pessoa que ganha R$ 60.000/ano e declara pelo regime
+            completo:
+          </p>
           <ul>
             <li>Renda bruta anual: R$ 60.000</li>
-            <li>Desconto INSS (10%): R$ 6.000</li>
+            <li>Desconto INSS (estimativa de 10% para o exemplo): R$ 6.000</li>
             <li>Base após INSS: R$ 54.000</li>
             <li>Deduções (educação + saúde + previdência): R$ 8.000</li>
             <li>Base de cálculo: R$ 46.000</li>
-            <li>Dependentes: 1 (desconto de R$ 2.275)</li>
-            <li>Base imponível final: R$ 43.725</li>
-            <li>Imposto calculado: ~R$ 5.110</li>
-            <li>Alíquota efetiva: ~8,5% sobre a renda bruta</li>
+            <li>Dependentes: 1 (desconto de R$ 2.275,08)</li>
+            <li>Base imponível final: R$ 43.724,92</li>
+            <li>Imposto pela tabela: ~R$ 1.828,83</li>
+            <li>
+              Redução da Lei 15.270/2025: −R$ 1.828,83 (a renda tributável não passa de R$ 60.000)
+            </li>
+            <li>IRPF devido: R$ 0</li>
           </ul>
           <p>
-            Neste exemplo, essa pessoa recebe R$ 60.000 de renda bruta, mas paga ~R$ 11.110 em
-            impostos (INSS + IRPF), ficando com ~R$ 48.890 de renda líquida.
+            Neste exemplo, a tabela chegaria a cobrar cerca de R$ 1.828, mas a redução abate esse
+            valor inteiro e o imposto devido fica em zero. O que sai do bolso são os ~R$ 6.000 de
+            INSS. Se a empresa reteve IRPF na folha ao longo do ano, essa diferença é acertada na
+            declaração.
           </p>
 
           <h2>Desconto na fonte e retenção</h2>
@@ -283,7 +320,8 @@ function BlogPost() {
               melhora sua aposentadoria
             </li>
             <li>
-              <strong>Registre dependentes corretamente:</strong> cada um economiza R$ 2.275/ano
+              <strong>Registre dependentes corretamente:</strong> cada um reduz R$ 2.275,08/ano da
+              base de cálculo, no regime completo
             </li>
             <li>
               <strong>Compare os regimes:</strong> nem sempre o completo é melhor (a calculadora

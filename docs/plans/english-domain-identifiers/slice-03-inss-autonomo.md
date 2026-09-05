@@ -1,5 +1,5 @@
 ---
-status: todo
+status: done
 kanban: 10e0f8bb-781b-4149-bc87-0c15599c13fe
 ---
 
@@ -77,3 +77,40 @@ If the literal-union question turns into a debate, take the conservative half:
 rename the type and the field, leave `"normal" | "simplificado"` and
 `"masculino" | "feminino"` alone, and say in the file why. That still clears the
 grep, because the grep tokens do not match those literals.
+
+---
+
+## What actually happened — 2026-09-05
+
+`checks-ok`, `grep-exit=1`, `pnpm run check` exit 0. Suite 275 → **278**.
+
+**Took the conservative half of the literal-union question**, which this slice's own `If stuck`
+names: the type and the field are renamed, `"normal" | "simplificado"` and
+`"masculino" | "feminino"` are left alone, and `inss-autonomo-input-v2` is untouched. Changing a
+literal would be a data migration needing `-v3`, and the grep tokens do not match those literals,
+so the conservative half still clears the `Done when`.
+
+`PlanoInss` → `InssPlan`, `PlanoDetalhe` → `PlanDetail`, `sexo` → `contributorSex` (the wording
+this slice suggested), and 30 more. One rename needed care: the result field `salarioContribuicao`
+would have become `contributionSalary`, colliding with the function of that name imported from
+`inss-constants.ts`. It is `contributionBase`, which is what its own docstring already called it.
+
+`tetoBeneficio` → `benefitCeiling`, and its Portuguese literal phrases stay — measured first:
+`grep -rn tetoBeneficio src tests` finds the field nowhere outside the module, so those strings
+reach no visitor and are data rather than product text.
+
+### Three guard cases added
+
+The slice asks for one assertion per literal union — the test that fails if someone renames
+`"simplificado"` and forgets the key. Verified by mutation rather than asserted: renaming the
+`contributorSex` literals to `"male" | "female"` while leaving the storage key at `-v2` produces
+**11 type errors**. Before `tests/` entered `tsconfig.json` in slice 2 that mutation would have
+been invisible to `pnpm run typecheck`.
+
+### A process note worth keeping
+
+The first attempt at this rename ran a `for f in $FILES` loop. **zsh does not word-split unquoted
+parameter expansions**, so all three paths arrived as one filename, every `perl` call failed, and
+only the one rename with a literal path took effect — and `pnpm run typecheck` still exited 0,
+because the file that did change stayed internally consistent. A green gate over a no-op. The
+redo used a proper array. Worth remembering when a rename "passes" suspiciously fast.

@@ -84,27 +84,27 @@ function BlogPost() {
             </thead>
             <tbody>
               <tr>
-                <td>Até R$ 21.503,34</td>
+                <td>Até R$ 29.145,60</td>
                 <td>0%</td>
                 <td>Totalmente isento de imposto</td>
               </tr>
               <tr>
-                <td>R$ 21.503,35 a R$ 33.503,34</td>
+                <td>R$ 29.145,61 a R$ 33.919,80</td>
                 <td>7,5%</td>
                 <td>Você paga 7,5% da renda nesta faixa</td>
               </tr>
               <tr>
-                <td>R$ 33.503,35 a R$ 44.693,59</td>
+                <td>R$ 33.919,81 a R$ 45.012,60</td>
                 <td>15%</td>
                 <td>Você paga 15% da renda nesta faixa</td>
               </tr>
               <tr>
-                <td>R$ 44.693,60 a R$ 55.471,74</td>
+                <td>R$ 45.012,61 a R$ 55.976,16</td>
                 <td>22,5%</td>
                 <td>Você paga 22,5% da renda nesta faixa</td>
               </tr>
               <tr>
-                <td>Acima de R$ 55.471,75</td>
+                <td>Acima de R$ 55.976,16</td>
                 <td>27,5%</td>
                 <td>Você paga 27,5% da renda nesta faixa</td>
               </tr>
@@ -115,15 +115,45 @@ function BlogPost() {
             R$ 60.000. Você paga:
           </p>
           <ul>
-            <li>0% até R$ 21.503,34</li>
-            <li>7,5% de R$ 21.503,35 até R$ 33.503,34 (R$ 900,13)</li>
-            <li>15% de R$ 33.503,35 até R$ 44.693,59 (R$ 1.687,92)</li>
-            <li>22,5% de R$ 44.693,60 até R$ 55.471,74 (R$ 2.425,81)</li>
-            <li>27,5% de R$ 55.471,75 até R$ 60.000 (R$ 1.245,19)</li>
+            <li>0% até R$ 29.145,60</li>
+            <li>7,5% de R$ 29.145,61 até R$ 33.919,80 (R$ 358,07)</li>
+            <li>15% de R$ 33.919,81 até R$ 45.012,60 (R$ 1.663,92)</li>
+            <li>22,5% de R$ 45.012,61 até R$ 55.976,16 (R$ 2.466,80)</li>
+            <li>27,5% de R$ 55.976,17 até R$ 60.000 (R$ 1.106,56)</li>
           </ul>
           <p>
-            <strong>Total:</strong> aproximadamente R$ 6.259,05 sobre R$ 60.000 = alíquota efetiva
-            de ~10,4% (bem menor que 27,5%!).
+            <strong>Total pela tabela:</strong> aproximadamente R$ 5.595,34 sobre R$ 60.000 =
+            alíquota efetiva de ~9,3% (bem menor que 27,5%!). E esse ainda não é o valor final:
+            sobre ele incide a redução da Lei 15.270/2025, explicada a seguir.
+          </p>
+
+          <h2>A redução da Lei 15.270/2025</h2>
+          <p>
+            Essa é a mudança de 2026 que mais muda a conta. A Lei 15.270/2025 não mexeu nas faixas
+            da tabela: ela abate um valor do imposto que a tabela já calculou.
+          </p>
+          <ul>
+            <li>
+              <strong>Renda tributável anual até R$ 60.000:</strong> a redução chega a R$ 2.694,15 e
+              zera o imposto devido.
+            </li>
+            <li>
+              <strong>De R$ 60.000,01 a R$ 88.200:</strong> a redução é R$ 8.429,73 menos 0,095575 ×
+              os rendimentos tributáveis, diminuindo aos poucos até chegar a zero.
+            </li>
+            <li>
+              <strong>Acima de R$ 88.200:</strong> não há redução.
+            </li>
+          </ul>
+          <p>
+            A redução nunca passa do imposto devido: pode zerar o que você paga, mas não gera
+            restituição por si só. É daí que vem a isenção de quem recebe até cerca de R$ 5.000 por
+            mês — não de uma faixa de isenção maior na tabela.
+          </p>
+          <p>
+            <strong>Voltando ao exemplo:</strong> quem tem R$ 60.000 de rendimentos tributáveis e
+            usa o desconto simplificado de 20% (R$ 12.000) fica com base de R$ 48.000. A tabela
+            cobra R$ 2.694,15 e a redução abate exatamente esse valor: imposto devido zero.
           </p>
 
           <h2>Desconto INSS: a primeira redução</h2>
@@ -150,8 +180,8 @@ function BlogPost() {
 
           <h2>Dependentes reduzem imposto</h2>
           <p>
-            Cada dependente reduz sua base imponível em R$ 2.275 (em 2026). Quem conta como
-            dependente:
+            Cada dependente reduz sua base imponível em R$ 2.275,08 (em 2026), no regime completo.
+            Quem conta como dependente:
           </p>
           <ul>
             <li>Cônjuge (mesma declaração ou casado)</li>
@@ -160,7 +190,11 @@ function BlogPost() {
             <li>Irmãos e irmãs menores a seu cargo</li>
             <li>Enteados e equiparados</li>
           </ul>
-          <p>Exemplo: com 2 filhos, você deduz R$ 4.550 (2 × R$ 2.275) da base imponível.</p>
+          <p>
+            Exemplo: com 2 filhos, você deduz R$ 4.550,16 (2 × R$ 2.275,08) da base imponível. No
+            regime simplificado essa dedução não existe — o desconto de 20% entra no lugar de todas
+            as outras.
+          </p>
 
           <h2>Deduções que reduzem imposto</h2>
 
@@ -199,8 +233,10 @@ function BlogPost() {
 
           <h3>Regime Simplificado</h3>
           <p>
-            A Receita deduz automaticamente 20,5% da sua renda bruta. Você não precisa guardar
-            comprovantes. Melhor se:
+            A Receita deduz automaticamente 20% dos seus rendimentos tributáveis, até o limite de R$
+            17.640,00 por ano. Você não precisa guardar comprovantes, mas esse desconto entra no
+            lugar de todas as outras deduções — educação, saúde, previdência e dependentes. Melhor
+            se:
           </p>
           <ul>
             <li>Tem poucos gastos dedutíveis</li>
@@ -209,7 +245,8 @@ function BlogPost() {
           </ul>
 
           <p>
-            <strong>Dica:</strong> use nossa calculadora IRPF para comparar os dois regimes e ver
+            <strong>Dica:</strong> use nossa calculadora IRPF para simular os dois regimes. Ela
+            mostra o resultado do regime que você escolher, então rode uma vez em cada um e veja
             qual resulta em menor imposto para seu caso.
           </p>
 
@@ -228,7 +265,8 @@ function BlogPost() {
               melhora sua aposentadoria.
             </li>
             <li>
-              <strong>Declare todos os dependentes:</strong> cada um economiza R$ 2.275/ano.
+              <strong>Declare todos os dependentes:</strong> cada um reduz R$ 2.275,08/ano da base
+              de cálculo, no regime completo.
             </li>
             <li>
               <strong>Compare os regimes:</strong> nem sempre o completo é melhor.
