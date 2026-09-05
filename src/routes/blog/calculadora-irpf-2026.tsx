@@ -197,7 +197,7 @@ function BlogPost() {
             dentista, óculos, aparelho auditivo. SEM LIMITE máximo. Mantenha todos os comprovantes.
           </p>
 
-          <h3>Previdência Complementar (até R$ 63.454/ano)</h3>
+          <h3>Previdência Complementar (até 12% do rendimento tributável)</h3>
           <p>
             Contribuições a PGBL, VGBL, fundos de pensão. O limite é aproximadamente 13% da sua
             renda bruta.
@@ -282,10 +282,10 @@ function BlogPost() {
           <h2>Quando você deve declarar IRPF</h2>
           <p>Você é obrigado a declarar IRPF se:</p>
           <ul>
-            <li>Recebeu renda &gt; R$ 28.559,70 no ano</li>
+            <li>Recebeu renda tributável acima de R$ 35.584,00 (ano-calendário 2025)</li>
             <li>Teve atividade profissional (autônomo, PJ)</li>
             <li>Receberá herança, doação ou ganhou na loteria</li>
-            <li>Tem bens (imóvel, carro, ações) acima de R$ 300 mil</li>
+            <li>Tem bens (imóvel, carro, ações) acima de R$ 800 mil</li>
             <li>Vive no exterior, mas é residente fiscal brasileiro</li>
           </ul>
           <p>

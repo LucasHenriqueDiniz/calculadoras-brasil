@@ -69,7 +69,7 @@ const FAQ: FAQItem[] = [
   {
     question: "Quando devo declarar IRPF?",
     answer:
-      "A declaração de 2026 é feita em 2027 (entre março e abril). Precisa declarar se teve renda > R$ 28.559,70 (em 2026) ou atividade profissional. Fique atento aos prazos divulgados pela Receita Federal.",
+      "A declaração do ano-calendário 2026 é feita em 2027, entre março e abril. Os limites de obrigatoriedade desse ano ainda não foram publicados pela Receita. Como referência, na declaração entregue em 2026 — referente a 2025 — era obrigado a declarar quem teve mais de R$ 35.584,00 de rendimentos tributáveis ou bens acima de R$ 800.000,00. Confirme o valor vigente no site da Receita Federal.",
   },
   {
     question: "Como funciona o desconto INSS na calculadora?",
@@ -79,7 +79,7 @@ const FAQ: FAQItem[] = [
   {
     question: "Previdência complementar é dedutível?",
     answer:
-      "Sim, até o limite de R$ 63.454/ano em 2026 (aproximadamente 13% da renda bruta). Contribuições a PGBL, VGBL, fundos de pensão entram como deduções.",
+      "Sim, até o limite de 12% do seu rendimento tributável no ano — a regra é uma proporção da renda, não um valor fixo em reais. Vale para o PGBL; o VGBL não é dedutível.",
   },
   {
     question: "O que é a redução da Lei 15.270/2025?",
@@ -188,7 +188,7 @@ function IrpfCalculator() {
           placeholder="PGBL, VGBL, fundo de pensão"
           value={input.supplementaryPensionDeduction}
           onChange={(value) => setInput({ ...input, supplementaryPensionDeduction: value })}
-          hint={`Até ${formatBRL(63454)}/ano (13% da renda bruta).`}
+          hint="Até 12% do rendimento tributável do ano. Só o PGBL é dedutível; o VGBL não."
         />
       </FormSection>
 

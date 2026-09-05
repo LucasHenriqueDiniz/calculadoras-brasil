@@ -346,7 +346,7 @@ export const calculators: CalculatorMeta[] = [
       "Contribua para PGBL/VGBL, reduza IRPF agora e acumule para aposentadoria complementar.",
     icon: CreditCard,
     intro:
-      "Previdência complementar oferece duplo ganho: reduz seu IRPF hoje e constrói poupança para aposentadoria. Limite é até 13% da renda bruta. Simule seu caso.",
+      "Previdência complementar oferece duplo ganho: reduz seu IRPF hoje e constrói poupança para aposentadoria. O limite é 12% do rendimento tributável do ano. Simule seu caso.",
     whatItDoes: [
       "Calcula economia de IRPF mensal/anual.",
       "Projeta valor acumulado em 10, 20, 30 anos.",

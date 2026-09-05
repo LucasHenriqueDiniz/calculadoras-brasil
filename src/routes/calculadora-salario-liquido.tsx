@@ -58,7 +58,7 @@ const FAQ: FAQItem[] = [
   {
     question: "Como reduzir meu desconto de IRPF?",
     answer:
-      "Contribuindo para previdência complementar (até R$ 63.454/ano), gastos com educação e saúde, e incluindo todos os dependentes. Use a calculadora para ver o impacto.",
+      "Contribuindo para previdência complementar (até 12% do rendimento tributável), gastos com educação e saúde, e incluindo todos os dependentes. Use a calculadora para ver o impacto.",
   },
   {
     question: "Posso negociar um salário bruto maior?",
@@ -150,7 +150,7 @@ function SalarioLiquidoCalculator() {
           placeholder="0"
           value={input.supplementaryPensionDeduction}
           onChange={(value) => setInput({ ...input, supplementaryPensionDeduction: value })}
-          hint="PGBL, VGBL, fundo de pensão (limite: ~13% da renda bruta)"
+          hint="PGBL: limite de 12% do rendimento tributável. VGBL não é dedutível."
         />
       </FormSection>
 

@@ -330,7 +330,7 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "Quando devo declarar IRPF?",
         answer:
-          "A declaração de 2026 é feita em 2027 (entre março e abril). Precisa declarar se teve renda > R$ 28.559,70 ou atividade profissional. Fique atento aos prazos divulgados pela Receita Federal.",
+          "A declaração do ano-calendário 2026 é feita em 2027 (entre março e abril). Os limites desse ano ainda não foram publicados; na declaração entregue em 2026, referente a 2025, o piso foi R$ 35.584,00 de rendimentos tributáveis ou atividade profissional. Fique atento aos prazos divulgados pela Receita Federal.",
       },
       {
         question: "Como funciona o desconto INSS na calculadora?",
@@ -340,7 +340,7 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "Previdência complementar é dedutível?",
         answer:
-          "Sim, até o limite de R$ 63.454/ano em 2026 (aproximadamente 13% da renda bruta). Contribuições a PGBL, VGBL, fundos de pensão entram como deduções.",
+          "Sim, até o limite de 12% do seu rendimento tributável no ano — a regra é uma proporção da sua renda, não um valor fixo em reais. Vale para o PGBL; o VGBL não é dedutível.",
       },
       {
         question: "O que é a redução da Lei 15.270/2025?",
@@ -915,7 +915,7 @@ export const blogPosts: Record<string, BlogPost> = {
       {
         question: "Quem precisa declarar IRPF em 2026?",
         answer:
-          "Quem recebeu rendimentos tributáveis acima de R$ 33.888 no ano, teve ganho de capital, possui bens acima de R$ 800 mil ou se enquadra em outras hipóteses definidas anualmente pela Receita Federal.",
+          "Quem recebeu rendimentos tributáveis acima de R$ 35.584,00 no ano-calendário 2025, teve ganho de capital, possui bens acima de R$ 800 mil ou se enquadra em outras hipóteses definidas anualmente pela Receita Federal.",
       },
     ],
   },

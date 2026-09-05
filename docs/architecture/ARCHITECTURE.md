@@ -224,31 +224,21 @@ The violations that exist right now.
       visible contradiction left on the page, and it is a product decision rather than a defect:
       the constant's own comment already says "no official cap exists". Out of scope in
       `docs/pitches/irpf-calculation-defects.md`; no plan covers it.
-- [ ] **The site states three different figures for the same rule, in three places.** None was
-      researched and none can be settled from
-      `docs/research/2026-09-04-irpf-2026-table/research.md`, which covers the tables and the
-      Lei 15.270/2025 reduction only:
-      | rule | figures found |
-      |---|---|
-      | obligation to file | R$ 28.559,70 (calculator page, `guia-irpf-2026`, blog `calculadora-irpf-2026`) vs **R$ 33.888** (`tabela-irpf-2026-completa`, `blog.ts`) |
-      | assets requiring a return | R$ 300 mil (two articles) vs **R$ 800 mil** (`blog.ts`) |
-      | supplementary-pension ceiling | R$ 63.454/ano "13% da renda" (three files) vs **12% da renda bruta** (two others) |
-      A visitor comparing two of this site's own pages gets contradictory tax advice. Each needs its
-      own research note before any of them is edited — correcting one to match another would be
-      guessing which is right. No plan covers it.
-- [x] **Three calculators implemented the 2026 IRPF rules independently, and each was wrong in its
-      own way.** `irpf.ts`, `salarioLiquido.ts` and `cltVsPj.ts` each carried their own copy of the
-      progressive table — `grep -l '0\.275' src/lib/calculators/` found all three. They never
-      agreed. `cltVsPj.ts:33-37` was the starkest: it implemented **only** the 22,5% and 27,5%
-      branches, so tax was zero below an annual base of 44.693,60 and R$ 201,86 immediately above —
-      one real more of gross salary cost the visitor R$ 201 of net.
-      **The duplication was the defect; the wrong figures were its symptom.** Closed 2026-09-05:
-      `irpf-constants.ts` owns both incidence tables, both Lei 15.270/2025 reductions and every
-      published deduction ceiling, and the three calculators import from it — the shape
-      `inss-constants.ts` already had for INSS. Each figure is declared exactly once. The monthly
-      and annual halves stay separate symbols on purpose: they are separate publications, not one
-      table over twelve. `MAX_DEDUCTION_HEALTH` deliberately stayed in `irpf.ts`, because no
-      official ceiling for it was ever found and it is not one of the published figures.
+- [ ] **The ano-calendário 2026 filing thresholds are not published, and the site quotes 2025's.**
+      Researched 2026-09-05: `docs/research/2026-09-05-filing-and-pension-limits/research.md`. The
+      three contradictions this entry used to list are resolved — none of the site's own figures was
+      current, and on one of them the rule is not a monetary figure at all:
+      | rule | site said | is |
+      |---|---|---|
+      | filing, income | R$ 28.559,70 **and** R$ 33.888 | **R$ 35.584,00**, ano-calendário 2025 |
+      | filing, assets | R$ 300 mil **and** R$ 800 mil | **R$ 800.000,00** |
+      | pension deduction | "R$ 63.454/ano (13%)" **and** "12%" | **12% do rendimento tributável, no R$ ceiling** |
+      The R$ 63.454 figure was a category error rather than a stale number: the Receita's own FAQ
+      says *"até o limite de 12% do rendimento tributável"* and names no monetary cap, so every
+      reference was deleted rather than updated. What stays open is smaller and unavoidable: this
+      site's calculators compute **ano-calendário 2026**, filed in 2027, and those thresholds are
+      not published. The copy now gives the current figure, says which year it covers, and says the
+      next is not out — which is accurate today and needs revisiting when the Receita publishes.
 - [ ] **Two route components are past the hard 200-line limit by more than 3x**:
       `calculadora-conta-de-luz.tsx` (723) and `calculadora-custo-carro.tsx` (692). They hold form
       state, persistence, public-data fetching, editorial copy and JSON-LD in one file.

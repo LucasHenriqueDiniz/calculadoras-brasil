@@ -163,9 +163,9 @@ function BlogPost() {
             Pela tabela, rendimentos tributáveis até R$ 29.145,60 no ano ficam isentos de IRPF — e a
             redução da Lei 15.270/2025 estende a isenção efetiva até R$ 60.000 de renda tributável
             anual. Já a obrigatoriedade de declarar é definida por outro limite, geralmente em torno
-            de R$ 33.888 em rendimentos tributáveis — sempre confirme o valor vigente no site da
-            Receita Federal antes de declarar. Ficar isento de imposto não significa ficar
-            dispensado de declarar.
+            de R$ 35.584,00 em rendimentos tributáveis no ano-calendário 2025 — sempre confirme o
+            valor vigente no site da Receita Federal antes de declarar. Ficar isento de imposto não
+            significa ficar dispensado de declarar.
           </p>
 
           <Button asChild className="my-6" size="lg">

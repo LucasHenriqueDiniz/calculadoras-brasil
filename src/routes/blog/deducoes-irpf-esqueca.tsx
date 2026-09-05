@@ -90,8 +90,8 @@ function BlogPost() {
 
           <h3>5. Previdência Complementar Não Usada</h3>
           <p>
-            Até R$ 63.454/ano (13% da renda bruta). PGBL e VGBL são dedutiveis e ainda reduzem seu
-            imposto AGORA enquanto acumula para aposentadoria.
+            Até 12% do rendimento tributável do ano — proporção da renda, não valor fixo. Só o PGBL
+            é dedutível e ainda reduzem seu imposto AGORA enquanto acumula para aposentadoria.
           </p>
 
           <h2>Dica Importante: Guarde Comprovantes</h2>
