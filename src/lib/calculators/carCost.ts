@@ -86,191 +86,133 @@ function fuelCostFor(
   return { monthly, averageConsumption, liters };
 }
 
-export function calculateCarCost(input: CarCostInput): CarCostResult {
-  const warnings: string[] = [];
-  const highlights: string[] = [];
+interface FuelChoice {
+  monthlyFuelCost: number;
+  selectedFuelLabel: string;
+  recommendedFuel?: string;
+  fuelComparison?: FuelComparison;
+}
 
-  const monthlyKm = safe(input.monthlyKm);
-  if (monthlyKm === 0) {
-    warnings.push("Informe quilômetros por mês para calcular o custo por km.");
-  }
-  if (safe(input.cityConsumptionKmL) === 0 || safe(input.highwayConsumptionKmL) === 0) {
-    warnings.push("Consumo informado inválido; ajuste os valores de km/l.");
-  }
+/**
+ * Picks the fuel the driver actually pays for, and — under flex — the cheaper of
+ * the two, which is the only branch that produces a comparison.
+ */
+function chooseFuel(input: CarCostInput, monthlyKm: number): FuelChoice {
+  const costOf = (pricePerLiter: number) =>
+    fuelCostFor(
+      pricePerLiter,
+      monthlyKm,
+      input.cityConsumptionKmL,
+      input.highwayConsumptionKmL,
+      input.cityUsePercent,
+    ).monthly;
 
-  // Fuel selection
-  let selectedPrice = 0;
-  let selectedFuelLabel = FUEL_LABEL[input.fuelType];
-  let recommendedFuel: string | undefined;
-  let fuelComparison: FuelComparison | undefined;
-
-  const gasolineCalc = fuelCostFor(
-    input.gasolinePrice,
-    monthlyKm,
-    input.cityConsumptionKmL,
-    input.highwayConsumptionKmL,
-    input.cityUsePercent,
-  );
-  const ethanolCalc = fuelCostFor(
-    input.ethanolPrice,
-    monthlyKm,
-    input.cityConsumptionKmL,
-    input.highwayConsumptionKmL,
-    input.cityUsePercent,
-  );
-  const dieselCalc = fuelCostFor(
-    input.dieselPrice,
-    monthlyKm,
-    input.cityConsumptionKmL,
-    input.highwayConsumptionKmL,
-    input.cityUsePercent,
-  );
-
-  let monthlyFuelCost = 0;
   if (input.fuelType === "gasoline") {
-    monthlyFuelCost = gasolineCalc.monthly;
-    selectedPrice = input.gasolinePrice;
-  } else if (input.fuelType === "ethanol") {
-    monthlyFuelCost = ethanolCalc.monthly;
-    selectedPrice = input.ethanolPrice;
-  } else if (input.fuelType === "diesel") {
-    monthlyFuelCost = dieselCalc.monthly;
-    selectedPrice = input.dieselPrice;
-  } else {
-    // flex — compare gasoline vs ethanol
-    const cheaper: "gasoline" | "ethanol" | "tie" =
-      Math.abs(gasolineCalc.monthly - ethanolCalc.monthly) < 0.01
-        ? "tie"
-        : gasolineCalc.monthly < ethanolCalc.monthly
-          ? "gasoline"
-          : "ethanol";
-    fuelComparison = {
-      gasolineMonthly: gasolineCalc.monthly,
-      ethanolMonthly: ethanolCalc.monthly,
-      cheaper,
-      differenceMonthly: Math.abs(gasolineCalc.monthly - ethanolCalc.monthly),
-    };
-    if (cheaper === "ethanol") {
-      monthlyFuelCost = ethanolCalc.monthly;
-      recommendedFuel = "Etanol";
-      selectedPrice = input.ethanolPrice;
-    } else {
-      monthlyFuelCost = gasolineCalc.monthly;
-      recommendedFuel = cheaper === "tie" ? "Empate (gasolina ou etanol)" : "Gasolina";
-      selectedPrice = input.gasolinePrice;
-    }
-    selectedFuelLabel = `Flex — ${recommendedFuel}`;
+    return { monthlyFuelCost: costOf(input.gasolinePrice), selectedFuelLabel: FUEL_LABEL.gasoline };
   }
-  void selectedPrice;
+  if (input.fuelType === "ethanol") {
+    return { monthlyFuelCost: costOf(input.ethanolPrice), selectedFuelLabel: FUEL_LABEL.ethanol };
+  }
+  if (input.fuelType === "diesel") {
+    return { monthlyFuelCost: costOf(input.dieselPrice), selectedFuelLabel: FUEL_LABEL.diesel };
+  }
 
-  // Fixed costs
-  const ipvaMonthly = safe(input.ipvaAnnual) / 12;
-  const insuranceMonthly = safe(input.insuranceAnnual) / 12;
-  const licensingMonthly = safe(input.licensingAnnual) / 12;
-  const tiresMonthly = safe(input.tiresAnnual) / 12;
-  const parkingMonthly = safe(input.parkingMonthly);
-  const tollsMonthly = safe(input.tollsMonthly);
-  const washingMonthly = safe(input.washingMonthly);
-  const maintenanceMonthly = safe(input.maintenanceMonthly);
-  const finesAndOthersMonthly = safe(input.finesAndOthersMonthly);
+  const gasolineMonthly = costOf(input.gasolinePrice);
+  const ethanolMonthly = costOf(input.ethanolPrice);
+  const cheaper: FuelComparison["cheaper"] =
+    Math.abs(gasolineMonthly - ethanolMonthly) < 0.01
+      ? "tie"
+      : gasolineMonthly < ethanolMonthly
+        ? "gasoline"
+        : "ethanol";
 
-  const depreciationMonthly =
-    (safe(input.carValue) * Math.min(Math.max(input.depreciationAnnualPercent, 0), 100)) / 100 / 12;
+  const fuelComparison: FuelComparison = {
+    gasolineMonthly,
+    ethanolMonthly,
+    cheaper,
+    differenceMonthly: Math.abs(gasolineMonthly - ethanolMonthly),
+  };
 
-  const monthlyFixedCost = ipvaMonthly + insuranceMonthly + licensingMonthly + parkingMonthly;
-  const monthlyVariableCost =
-    monthlyFuelCost +
-    maintenanceMonthly +
-    tiresMonthly +
-    tollsMonthly +
-    washingMonthly +
-    finesAndOthersMonthly;
+  const recommendedFuel =
+    cheaper === "ethanol"
+      ? "Etanol"
+      : cheaper === "tie"
+        ? "Empate (gasolina ou etanol)"
+        : "Gasolina";
 
-  const monthlyTotal = monthlyFixedCost + monthlyVariableCost + depreciationMonthly;
-  const annualTotal = monthlyTotal * 12;
-  const costPerKm = monthlyKm > 0 ? monthlyTotal / monthlyKm : null;
+  return {
+    monthlyFuelCost: cheaper === "ethanol" ? ethanolMonthly : gasolineMonthly,
+    selectedFuelLabel: `Flex — ${recommendedFuel}`,
+    recommendedFuel,
+    fuelComparison,
+  };
+}
 
-  const breakdown: BreakdownItem[] = [
-    {
-      key: "fuel",
-      label: "Combustível",
-      monthly: monthlyFuelCost,
-      annual: monthlyFuelCost * 12,
-      category: "variavel",
-    },
-    {
-      key: "ipva",
-      label: "IPVA",
-      monthly: ipvaMonthly,
-      annual: ipvaMonthly * 12,
-      category: "fixo",
-    },
-    {
-      key: "insurance",
-      label: "Seguro",
-      monthly: insuranceMonthly,
-      annual: insuranceMonthly * 12,
-      category: "fixo",
-    },
-    {
-      key: "licensing",
-      label: "Licenciamento",
-      monthly: licensingMonthly,
-      annual: licensingMonthly * 12,
-      category: "fixo",
-    },
-    {
-      key: "maintenance",
-      label: "Manutenção",
-      monthly: maintenanceMonthly,
-      annual: maintenanceMonthly * 12,
-      category: "variavel",
-    },
-    {
-      key: "tires",
-      label: "Pneus",
-      monthly: tiresMonthly,
-      annual: tiresMonthly * 12,
-      category: "variavel",
-    },
-    {
-      key: "parking",
-      label: "Estacionamento",
-      monthly: parkingMonthly,
-      annual: parkingMonthly * 12,
-      category: "fixo",
-    },
-    {
-      key: "tolls",
-      label: "Pedágios",
-      monthly: tollsMonthly,
-      annual: tollsMonthly * 12,
-      category: "variavel",
-    },
-    {
-      key: "washing",
-      label: "Lavagem",
-      monthly: washingMonthly,
-      annual: washingMonthly * 12,
-      category: "variavel",
-    },
-    {
-      key: "depreciation",
-      label: "Depreciação",
-      monthly: depreciationMonthly,
-      annual: depreciationMonthly * 12,
-      category: "depreciacao",
-    },
-    {
-      key: "fines",
-      label: "Multas e outros",
-      monthly: finesAndOthersMonthly,
-      annual: finesAndOthersMonthly * 12,
-      category: "variavel",
-    },
+interface MonthlyCosts {
+  ipva: number;
+  insurance: number;
+  licensing: number;
+  tires: number;
+  parking: number;
+  tolls: number;
+  washing: number;
+  maintenance: number;
+  finesAndOthers: number;
+  depreciation: number;
+}
+
+/** Every non-fuel cost, normalised to a month and floored at zero. */
+function monthlyCostsOf(input: CarCostInput): MonthlyCosts {
+  return {
+    ipva: safe(input.ipvaAnnual) / 12,
+    insurance: safe(input.insuranceAnnual) / 12,
+    licensing: safe(input.licensingAnnual) / 12,
+    tires: safe(input.tiresAnnual) / 12,
+    parking: safe(input.parkingMonthly),
+    tolls: safe(input.tollsMonthly),
+    washing: safe(input.washingMonthly),
+    maintenance: safe(input.maintenanceMonthly),
+    finesAndOthers: safe(input.finesAndOthersMonthly),
+    depreciation:
+      (safe(input.carValue) * Math.min(Math.max(input.depreciationAnnualPercent, 0), 100)) /
+      100 /
+      12,
+  };
+}
+
+function buildBreakdown(costs: MonthlyCosts, monthlyFuelCost: number): BreakdownItem[] {
+  const rows: ReadonlyArray<[string, string, number, BreakdownItem["category"]]> = [
+    ["fuel", "Combustível", monthlyFuelCost, "variavel"],
+    ["ipva", "IPVA", costs.ipva, "fixo"],
+    ["insurance", "Seguro", costs.insurance, "fixo"],
+    ["licensing", "Licenciamento", costs.licensing, "fixo"],
+    ["maintenance", "Manutenção", costs.maintenance, "variavel"],
+    ["tires", "Pneus", costs.tires, "variavel"],
+    ["parking", "Estacionamento", costs.parking, "fixo"],
+    ["tolls", "Pedágios", costs.tolls, "variavel"],
+    ["washing", "Lavagem", costs.washing, "variavel"],
+    ["depreciation", "Depreciação", costs.depreciation, "depreciacao"],
+    ["fines", "Multas e outros", costs.finesAndOthers, "variavel"],
   ];
 
-  // Highlights
+  return rows.map(([key, label, monthly, category]) => ({
+    key,
+    label,
+    monthly,
+    annual: monthly * 12,
+    category,
+  }));
+}
+
+function buildHighlights(
+  breakdown: BreakdownItem[],
+  monthlyTotal: number,
+  depreciationMonthly: number,
+  costPerKm: number | null,
+  fuelComparison: FuelComparison | undefined,
+): string[] {
+  const highlights: string[] = [];
+
   const sorted = [...breakdown].sort((a, b) => b.monthly - a.monthly);
   if (sorted[0] && sorted[0].monthly > 0) {
     highlights.push(`${sorted[0].label} é o maior custo mensal estimado.`);
@@ -295,23 +237,62 @@ export function calculateCarCost(input: CarCostInput): CarCostResult {
     }
   }
 
+  return highlights;
+}
+
+function collectWarnings(input: CarCostInput, monthlyKm: number): string[] {
+  const warnings: string[] = [];
+
+  if (monthlyKm === 0) {
+    warnings.push("Informe quilômetros por mês para calcular o custo por km.");
+  }
+  if (safe(input.cityConsumptionKmL) === 0 || safe(input.highwayConsumptionKmL) === 0) {
+    warnings.push("Consumo informado inválido; ajuste os valores de km/l.");
+  }
   warnings.push(
     "Valores padrão são apenas exemplos. Use seus custos reais para uma estimativa melhor.",
   );
 
+  return warnings;
+}
+
+export function calculateCarCost(input: CarCostInput): CarCostResult {
+  const monthlyKm = safe(input.monthlyKm);
+  const fuel = chooseFuel(input, monthlyKm);
+  const costs = monthlyCostsOf(input);
+
+  const monthlyFixedCost = costs.ipva + costs.insurance + costs.licensing + costs.parking;
+  const monthlyVariableCost =
+    fuel.monthlyFuelCost +
+    costs.maintenance +
+    costs.tires +
+    costs.tolls +
+    costs.washing +
+    costs.finesAndOthers;
+
+  const monthlyTotal = monthlyFixedCost + monthlyVariableCost + costs.depreciation;
+  const costPerKm = monthlyKm > 0 ? monthlyTotal / monthlyKm : null;
+  const breakdown = buildBreakdown(costs, fuel.monthlyFuelCost);
+
   return {
     monthlyTotal,
-    annualTotal,
+    annualTotal: monthlyTotal * 12,
     costPerKm,
-    monthlyFuelCost,
+    monthlyFuelCost: fuel.monthlyFuelCost,
     monthlyFixedCost,
     monthlyVariableCost,
-    monthlyDepreciation: depreciationMonthly,
-    selectedFuelLabel,
-    recommendedFuel,
-    fuelComparison,
+    monthlyDepreciation: costs.depreciation,
+    selectedFuelLabel: fuel.selectedFuelLabel,
+    recommendedFuel: fuel.recommendedFuel,
+    fuelComparison: fuel.fuelComparison,
     breakdown,
-    highlights,
-    warnings,
+    highlights: buildHighlights(
+      breakdown,
+      monthlyTotal,
+      costs.depreciation,
+      costPerKm,
+      fuel.fuelComparison,
+    ),
+    warnings: collectWarnings(input, monthlyKm),
   };
 }
