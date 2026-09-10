@@ -9,6 +9,7 @@ const BASE_URL = `http://${HOST}:${PORT}`;
 const CANONICAL_ORIGIN = "https://calculebrasil.com";
 const PUBLIC_ROUTES = [
   "/",
+  "/calculadoras",
   "/calculadora-custo-carro",
   "/calculadora-morar-sozinho",
   "/calculadora-conta-de-luz",
