@@ -7,14 +7,36 @@ import { getBlogPost } from "@/lib/blog";
 const POST_SLUG = "quanto-custa-morar-sozinho";
 const post = getBlogPost(POST_SLUG)!;
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: post.faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.answer,
+    },
+  })),
+};
+
 const articleSchema = {
   "@context": "https://schema.org",
   "@type": "Article",
   headline: post.title,
   description: post.description,
+  image: `${absoluteUrl(post.imageUrl)}`,
   datePublished: post.publishedAt,
   dateModified: post.updatedAt,
   author: { "@type": "Organization", name: post.author },
+  publisher: {
+    "@type": "Organization",
+    name: "Calcule Brasil",
+    logo: {
+      "@type": "ImageObject",
+      url: `${absoluteUrl("/og-image.png")}`,
+    },
+  },
 };
 
 export const Route = createFileRoute("/blog/quanto-custa-morar-sozinho")({
@@ -22,11 +44,21 @@ export const Route = createFileRoute("/blog/quanto-custa-morar-sozinho")({
     meta: [
       { title: `${post.title} | Calcule Brasil` },
       { name: "description", content: post.description },
+      { name: "keywords", content: post.keywords.join(", ") },
       { property: "og:title", content: post.title },
       { property: "og:description", content: post.description },
+      { property: "og:image", content: absoluteUrl(post.imageUrl) },
+      { property: "og:type", content: "article" },
+      { property: "og:url", content: absoluteUrl(`/blog/${post.slug}`) },
+      { property: "article:published_time", content: post.publishedAt },
+      { property: "article:modified_time", content: post.updatedAt },
+      { property: "article:author", content: post.author },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(`/blog/${post.slug}`) }],
-    scripts: [{ type: "application/ld+json", children: JSON.stringify(articleSchema) }],
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify(articleSchema) },
+      { type: "application/ld+json", children: JSON.stringify(faqSchema) },
+    ],
   }),
   component: BlogPost,
 });
@@ -36,7 +68,7 @@ function BlogPost() {
     <PageShell>
       <article>
         <PageHeader
-          eyebrow={`${post.category} • ${post.readingTime} min de leitura`}
+          eyebrow={`${post.category.charAt(0).toUpperCase() + post.category.slice(1)} • ${post.readingTime} min de leitura`}
           title={post.title}
           description={post.description}
         />
@@ -250,6 +282,15 @@ function BlogPost() {
             </li>
           </ol>
 
+          {/* FAQ */}
+          <h2>Perguntas frequentes</h2>
+          {post.faqs.map((faq, i) => (
+            <div key={i} className="mb-6">
+              <h3>{faq.question}</h3>
+              <p>{faq.answer}</p>
+            </div>
+          ))}
+
           {/* LIMITATIONS */}
           <h2>O que essas faixas não capturam</h2>
           <p>
@@ -272,6 +313,35 @@ function BlogPost() {
             citados não são cotações e mudam com o tempo.
           </p>
         </Prose>
+
+        {/* RELATED CONTENT */}
+        <div className="mt-12 border-t border-border pt-8">
+          <h3 className="mb-6 text-lg font-semibold">Conteúdo relacionado</h3>
+          <ul className="grid gap-4 md:grid-cols-2">
+            <li>
+              <a
+                href="/calculadora-morar-sozinho"
+                className="block rounded-lg border border-border p-4 hover:border-primary hover:bg-surface"
+              >
+                <h4 className="font-semibold">Calculadora de custo para morar sozinho</h4>
+                <p className="text-sm text-muted-foreground">
+                  Simule o custo mensal com os seus valores
+                </p>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/blog/quanto-custa-ter-carro"
+                className="block rounded-lg border border-border p-4 hover:border-primary hover:bg-surface"
+              >
+                <h4 className="font-semibold">Quanto custa ter um carro no Brasil</h4>
+                <p className="text-sm text-muted-foreground">
+                  O custo que costuma pesar mais que o aluguel
+                </p>
+              </a>
+            </li>
+          </ul>
+        </div>
       </article>
     </PageShell>
   );

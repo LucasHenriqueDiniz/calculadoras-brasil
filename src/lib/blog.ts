@@ -16,7 +16,7 @@ export interface BlogPost {
 export const blogPosts: Record<string, BlogPost> = {
   "quanto-custa-ter-carro": {
     slug: "quanto-custa-ter-carro",
-    title: "Quanto custa ter um carro no Brasil em 2024",
+    title: "Quanto custa ter um carro no Brasil",
     description:
       "Guia completo dos custos reais de manter um carro: combustível, IPVA, seguro, manutenção e depreciação. Inclui dicas de economia.",
     category: "guia",
@@ -78,15 +78,15 @@ export const blogPosts: Record<string, BlogPost> = {
 
   "quanto-custa-morar-sozinho": {
     slug: "quanto-custa-morar-sozinho",
-    title: "Quanto custa morar sozinho - Guia 2024",
+    title: "Quanto custa morar sozinho: guia completo",
     description:
-      "Descobrir quanto custa sair de casa e morar sozinho. Custos iniciais, mensais, por cidade e dicas de economia.",
+      "Quanto custa sair de casa e morar sozinho: custos iniciais, gastos mensais, os custos que ninguém soma e por que a regra dos 30% engana no Brasil.",
     category: "guia",
     imageUrl: "/blog/morar-sozinho.jpg",
     imageAlt: "Custo mensal de morar sozinho",
     author: "Calcule Brasil",
     publishedAt: "2026-06-25",
-    updatedAt: "2026-06-25",
+    updatedAt: "2026-09-10",
     readingTime: 10,
     keywords: [
       "quanto custa morar sozinho",
