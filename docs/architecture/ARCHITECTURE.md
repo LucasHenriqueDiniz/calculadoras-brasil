@@ -17,6 +17,11 @@ tags:
 IRPF correction work that followed on the same day. Every count below was measured, not
 remembered; the commands that produce them are in the sections themselves.
 
+**Re-verified 2026-09-10** against `fix/adsense-small-findings`. The one rule still holds with
+zero violations. Four recorded facts had drifted and are corrected in place; one was wrong when
+written and is corrected with a note, because a record that quietly fixes its own errors teaches
+the next reader nothing.
+
 ## How to keep this file
 
 - **Record, do not prescribe.** Present tense, about the code as it stands.
@@ -34,7 +39,7 @@ src/
   lib/
     calculators/        THE DOMAIN. 12 calculators + inss-constants, irpf-constants, money. Pure.
     public-data/        browser-side client for the two public-data endpoints
-    seo-pages.ts        49 paths. Drives BOTH the sitemap and the prerender
+    seo-pages.ts        50 paths. Drives BOTH the sitemap and the prerender
     schema-builders.ts  JSON-LD builders (WebApplication, BreadcrumbList, FAQPage)
     structured-data.ts  site.ts  format.ts  blog.ts  chart-colors.ts
     error-page.ts  utils.ts
@@ -63,7 +68,7 @@ src/
 
 ### The domain is pure, and that is measured
 
-`src/lib/calculators/` is 15 modules and **2041 lines that do no I/O**. Every `import` line in the
+`src/lib/calculators/` is 15 modules and **2044 lines that do no I/O**. Every `import` line in the
 whole directory is internal — the four calculators that need a shared rule reach for one of the
 three constant modules and for nothing else:
 
@@ -106,12 +111,12 @@ route component
 
 Four properties the CLAUDE.md requires, and where each one lives:
 
-| requirement | where |
-|---|---|
-| timeout | `bounded-fetch.ts`, `DEFAULT_TIMEOUT_MS = 15_000` |
-| response-size limit | `bounded-fetch.ts`, `maxBytes` — checked on `content-length` **and** while streaming |
-| cache | `edge-cache.ts` (Cloudflare Cache API) + `s-maxage=300, stale-while-revalidate=3600` in `responses.ts` |
-| manual fallback | `unavailable()` in `responses.ts` returns **HTTP 200** with `available: false`; the page then renders `PUBLIC_DATA_FALLBACK_MESSAGE` and lets the visitor type the number |
+| requirement         | where                                                                                                                                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| timeout             | `bounded-fetch.ts`, `DEFAULT_TIMEOUT_MS = 15_000`                                                                                                                         |
+| response-size limit | `bounded-fetch.ts`, `maxBytes` — checked on `content-length` **and** while streaming                                                                                      |
+| cache               | `edge-cache.ts` (Cloudflare Cache API) + `s-maxage=300, stale-while-revalidate=3600` in `responses.ts`                                                                    |
+| manual fallback     | `unavailable()` in `responses.ts` returns **HTTP 200** with `available: false`; the page then renders `PUBLIC_DATA_FALLBACK_MESSAGE` and lets the visitor type the number |
 
 ⚠️ **The fallback answers 200, not an error status, on purpose.** An upstream outage is a normal
 state for this site, not a failure of this site: the calculator still works, the visitor just fills
@@ -122,8 +127,8 @@ one field by hand. A 5xx here would make a working page look broken to a browser
 There is one driven boundary in this codebase, and it is **not** modelled as a port. Stated plainly
 so the omission is not read as an oversight — see Divergences below.
 
-| conversation | what stands in for a port | adapters |
-|---|---|---|
+| conversation                | what stands in for a port                                                                                   | adapters                                             |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | "what does public data say" | the HTTP endpoints under `src/routes/api.*.ts`, whose JSON shape is typed in `src/lib/public-data/types.ts` | `server/adapters/aneel.ts`, `server/adapters/anp.ts` |
 
 `PublicDataResult<T>` — a union of the data and `PublicDataUnavailable` — is the closest thing to a
@@ -132,7 +137,31 @@ port contract here: both adapters return it, the client consumes it, and the dis
 
 ## Decisions
 
-*Context, decision, and what it rules out. Newest first. A superseded entry stays, marked.*
+_Context, decision, and what it rules out. Newest first. A superseded entry stays, marked._
+
+### D4 — The canonical URL is the no-slash form, and the asset server serves it
+
+**Context.** Prerendering writes `dist/client/<route>/index.html`. `wrangler.jsonc` declared no
+`assets` block, so the asset server ran on its default `html_handling` of `auto-trailing-slash`,
+which answers `/calculadora-irpf-2026` with a **307** to `/calculadora-irpf-2026/`. Every
+canonical tag and all 50 sitemap entries use the no-slash form, so the canonical URL was a URL
+that never returned 200 — across the 24 pages that declare one. Google's AdSense review had
+rejected the site three days earlier; `ADS-CRAWL-05` is this.
+
+**Decision.** `"assets": { "html_handling": "drop-trailing-slash" }`. The published form now
+serves 200 directly and the slash form redirects to it. Decided 2026-09-10, verified on workerd
+via `wrangler dev` over the build **and** on the deployed branch preview — not on `vite preview`,
+which does not use the asset server and is exactly why `pnpm run test:seo` never caught this.
+
+**Rules out.** Rewriting every canonical and the sitemap to the trailing-slash form. That fixes
+the mismatch too, and leaves 50 URLs redirecting instead of zero. Inverting the direction removes
+the redirect from every URL Google is given; what still 307s is a form nothing links to, nothing
+sitemaps and no canonical declares.
+
+**What it does not fix.** The residual redirect is still a 307 rather than a 301. Cloudflare's
+`html_handling` status code is not configurable, so `ADS-CRAWL-04` is closed in substance and not
+in letter. Changing it would mean putting a redirect layer in front of the asset server, which
+buys a status code on a URL nobody publishes.
 
 ### D3 — IRPF 2026 is the official Receita table **plus** the Lei 15.270/2025 redutor
 
@@ -184,7 +213,7 @@ carries no `-env` segment and neither carries an owner prefix.
 
 **Rules out.** The rename, on four measured grounds: the name is an address, not a label
 (`calcule-brasil.lucas-hdo.workers.dev` answers 200 while an invented sibling answers 404);
-changing `name` in `wrangler.jsonc` creates a *second* Worker rather than renaming the first;
+changing `name` in `wrangler.jsonc` creates a _second_ Worker rather than renaming the first;
 deployment history — every rollback target the site currently has — belongs to the script and does
 not follow; and the apex route is dashboard state, since `wrangler.jsonc` declares no `routes`
 block.
@@ -196,14 +225,15 @@ decision; both only raise the price of a rename.
 
 ## Divergences from the house style
 
-| what | house style says | here | why |
-|---|---|---|---|
-| **No `ports/` and no `application/` layer** | four layers always — domain, ports, application, adapters | two: a pure domain (`lib/calculators/`) and a driven side (`server/`), with route components orchestrating directly | This is a site of pure functions plus **two read-only adapters**. There is no write path, no transaction, no second implementation of anything, and no use case shared by two entry points. A port here would be a contract with exactly one implementation and one caller. **Stated as a position, not an accident.** |
-| **`server/` is not `adapters/driven/`** | driving and driven, everywhere, never mixed vocabularies | `src/server/` for the driven side, `src/routes/` for the driving side | The framework owns `src/routes/` — TanStack Start file-based routing is not negotiable without leaving the framework. Renaming only `server/` would put half the vocabulary in place and half not, which is worse than neither. |
-| **Domain identifiers are in Portuguese** | everything that lands in the repo is English (`language` skill) | `calcularInssEmpregado`, `aliquota`, `deducao`, `salarioBruto` and ~47 more lines under `lib/calculators/` | **Not a position — a violation with a plan.** `docs/plans/english-domain-identifiers/` is four slices that close it. Recorded here so it is not mistaken for a deliberate carve-out of the product-is-Portuguese rule: this is code, not copy. |
-| **No `.mcp.json`, no `docs/.obsidian/`** | the scaffold ships both; `docs/` is an Obsidian vault | neither is present | `docs/` here is plain markdown read in an editor and on GitHub. The two belong together — the `obsidian` MCP server exists to serve a vault — and neither is used. Recorded 2026-09-04 as deliberate, so the next audit finds a reason instead of an omission. |
-| **No `.claude/statusline.sh`, no `statusLine` key** | the scaffold ships both | `.claude/settings.json` carries the `hooks` block only, byte-identical to the template | Per-machine cosmetics. The hooks are the half that does work. Recorded 2026-09-04 as deliberate. |
-| **`docs/` has no `postmortem/`, `roadmap/`, `product/`, `diagrams/`** | the vault ships all of them | `architecture/`, `pitches/`, `plans/`, `research/` and `deploy.md` | Empty folders are maintenance surface. Each is created the first time it has a real document, not before — `research/` was created on 2026-09-04 when it got one. Recorded 2026-09-04. |
+| what                                                                  | house style says                                                                                                        | here                                                                                                                                                   | why                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **No `ports/` and no `application/` layer**                           | four layers always — domain, ports, application, adapters                                                               | two: a pure domain (`lib/calculators/`) and a driven side (`server/`), with route components orchestrating directly                                    | This is a site of pure functions plus **two read-only adapters**. There is no write path, no transaction, no second implementation of anything, and no use case shared by two entry points. A port here would be a contract with exactly one implementation and one caller. **Stated as a position, not an accident.**                                                                                                                                                           |
+| **`server/` is not `adapters/driven/`**                               | driving and driven, everywhere, never mixed vocabularies                                                                | `src/server/` for the driven side, `src/routes/` for the driving side                                                                                  | The framework owns `src/routes/` — TanStack Start file-based routing is not negotiable without leaving the framework. Renaming only `server/` would put half the vocabulary in place and half not, which is worse than neither.                                                                                                                                                                                                                                                  |
+| **Domain identifiers are in Portuguese**                              | everything that lands in the repo is English (`language` skill)                                                         | `calcularInssEmpregado`, `aliquota`, `deducao`, `salarioBruto` and ~47 more lines under `lib/calculators/`                                             | **Not a position — a violation with a plan.** `docs/plans/english-domain-identifiers/` is four slices that close it. Recorded here so it is not mistaken for a deliberate carve-out of the product-is-Portuguese rule: this is code, not copy.                                                                                                                                                                                                                                   |
+| **The core is not deterministic, and does not claim to be**           | the house style's second commitment is a replayable core: no floats in state, seeded rng behind a port, state as a fold | none of the seven rules is implemented, and `money.ts:20` is `Math.round(amount * 100) / 100` — float arithmetic with a rounding step, not fixed point | Nothing here is persisted and nothing is replayed: there is no state, no command log and no second replica, so rules 2–7 have no subject. Rule 1 does have one — the arithmetic should give the same centavo on every machine — and float rounding is where a cent can move. **Recorded 2026-09-10 as a divergence rather than a gap**, because adopting fixed point across 12 calculators is a decision about this project's ambitions, not a defect anyone has been bitten by. |
+| **No `.mcp.json`, no `docs/.obsidian/`**                              | the scaffold ships both; `docs/` is an Obsidian vault                                                                   | neither is present                                                                                                                                     | `docs/` here is plain markdown read in an editor and on GitHub. The two belong together — the `obsidian` MCP server exists to serve a vault — and neither is used. Recorded 2026-09-04 as deliberate, so the next audit finds a reason instead of an omission.                                                                                                                                                                                                                   |
+| **No `.claude/statusline.sh`, no `statusLine` key**                   | the scaffold ships both                                                                                                 | `.claude/settings.json` carries the `hooks` block only, byte-identical to the template                                                                 | Per-machine cosmetics. The hooks are the half that does work. Recorded 2026-09-04 as deliberate.                                                                                                                                                                                                                                                                                                                                                                                 |
+| **`docs/` has no `postmortem/`, `roadmap/`, `product/`, `diagrams/`** | the vault ships all of them                                                                                             | `architecture/`, `pitches/`, `plans/`, `research/` and `deploy.md`                                                                                     | Empty folders are maintenance surface. Each is created the first time it has a real document, not before — `research/` was created on 2026-09-04 when it got one. Recorded 2026-09-04.                                                                                                                                                                                                                                                                                           |
 
 ## What is not in the repository
 
@@ -234,23 +264,56 @@ The violations that exist right now.
       | filing, assets | R$ 300 mil **and** R$ 800 mil | **R$ 800.000,00** |
       | pension deduction | "R$ 63.454/ano (13%)" **and** "12%" | **12% do rendimento tributável, no R$ ceiling** |
       The R$ 63.454 figure was a category error rather than a stale number: the Receita's own FAQ
-      says *"até o limite de 12% do rendimento tributável"* and names no monetary cap, so every
+      says _"até o limite de 12% do rendimento tributável"_ and names no monetary cap, so every
       reference was deleted rather than updated. What stays open is smaller and unavoidable: this
       site's calculators compute **ano-calendário 2026**, filed in 2027, and those thresholds are
       not published. The copy now gives the current figure, says which year it covers, and says the
       next is not out — which is accurate today and needs revisiting when the Receita publishes.
-- [ ] **Two route components are past the hard 200-line limit by more than 3x**:
-      `calculadora-conta-de-luz.tsx` (723) and `calculadora-custo-carro.tsx` (692). They hold form
-      state, persistence, public-data fetching, editorial copy and JSON-LD in one file.
-      `livingAlone.ts` (225) and `carCost.ts` (317) are over it in the domain.
-      Plan: `docs/plans/oversized-functions/`.
+- [ ] **The `oversized-functions` plan closed all four slices and the two files got bigger.**
+      Measured 2026-09-10:
+
+      | file | 2026-09-04 (`aaad430`) | now | |
+          |---|---|---|---|
+          | `calculadora-conta-de-luz.tsx` | 723 | **825** | +102 |
+          | `calculadora-custo-carro.tsx` | 692 | **811** | +119 |
+          | `livingAlone.ts` | 225 | 225 | — |
+          | `carCost.ts` | 317 | 298 | −19 |
+
+          The slice subjects are accurate about what they measured: `ElectricityPage` did go from 559
+          lines to 197, and `CarCostPage` from 477 to 66. But `git show --stat` on both commits lists
+          **one source file each** — the route file itself, plus docs. Nothing was extracted to a new
+          module, so the sub-components landed beside the function they came out of and the file grew
+          by the wiring.
+
+          **This entry used to describe a file problem** — "they hold form state, persistence,
+          public-data fetching, editorial copy and JSON-LD in one file" — and none of those concerns
+          left the file. `calculadora-conta-de-luz.tsx` now holds `TariffSection`, `ApplianceRow`,
+          `ApplianceSection`, `ElectricityResults`, `ConsumptionTable`, a 95-line `ElectricityArticle`
+          of editorial JSX, the FAQ array and `DEFAULT_APPLIANCES`, then the route and the page.
+
+          Function size and file size are two limits, and the plan moved one at the cost of the other.
+          `src/components/calculator/` already holds 8 shared calculator components and is the obvious
+          destination. **Whether to reopen the plan or to record the file limit as a divergence for
+          route components is a decision nobody has taken** — it is recorded here so the four
+          `status: done` slices are not read as this gap being closed.
+
+          Note also that by this entry's own standard — file line count against 200 — **20 files are
+          over**, so naming two was always a selection rather than a census. The two named are the
+          extremes.
+
+- [ ] **`blog/quanto-custa-morar-sozinho.tsx` is 278 lines**, up from 147. Introduced 2026-09-10
+      by the content rewrite that took the article from 286 to 1127 words, which was the fix for
+      an AdSense `ADS-CONTENT-03` failure. It is prose in JSX rather than logic, but the 200-line
+      limit does not carve that out, and the same tension applies to the six other blog and
+      `comparar` files over 200. Recorded rather than resolved: the same open decision as the
+      entry above.
 - [ ] **Portuguese identifiers in the domain.** See Divergences.
       Plan: `docs/plans/english-domain-identifiers/`.
 - [ ] **`/calculadora-clt-vs-pj` overstates what a PJ must invoice, and its FAQ was right all
       along.** Researched 2026-09-05: `docs/research/2026-09-05-pj-tax-model/research.md`. The
       module charges `INSS_RATE_PJ = 0.2` uncapped on the whole invoice. The sócio's contribution
       is **11%**, **capped at the RGPS ceiling** (`0,11 × 8.475,55 = R$ 932,31/month`), and levied
-      on the **pró-labore**, not the invoice — the 20% is the *patronal* contribution, owed by the
+      on the **pró-labore**, not the invoice — the 20% is the _patronal_ contribution, owed by the
       company, and only outside Simples Nacional. At a CLT gross of R$ 10.000 the module invents
       R$ 2.413,72 a month of contribution nobody owes, and answers +67% where the source's worked
       case is +30% to +40%. **The FAQ's "25% a 40%" needs no change; the arithmetic does.** The
@@ -273,31 +336,46 @@ The violations that exist right now.
       `aliquotaIrpfAtual` is hardcoded at 22,5% with no control, yet "Economia IRPF/ano" is shown
       as though it were the visitor's own figure.
 - [ ] **`nextId()` draws ids from `Date.now()` at module scope**, in
-      `calculadora-conta-de-luz.tsx:44` and again in `calculadora-assinaturas.tsx`.
-      `DEFAULT_APPLIANCES` calls it while the module is evaluated, so a prerendered page bakes in
-      build-time ids and the browser generates different ones. The `architecture` skill's
-      determinism rules name the remedy — derive ids from a stable key rather than drawing them.
-      ⚠️ **No production symptom was found**, so this is latent rather than broken: see the
-      correction below. Low priority; recorded so it is not rediscovered as a surprise.
+      `calculadora-conta-de-luz.tsx:44` — and **only** there.
 
-      **Correction, 2026-09-05.** An earlier version of this entry claimed
-      `/calculadora-conta-de-luz` fails hydration in production and blamed `nextId()`. **Both
-      halves were wrong**, and the measurement that settled it is worth keeping:
+      ⚠️ **Correction, 2026-09-10.** This entry used to add "and again in
+          `calculadora-assinaturas.tsx`". That was wrong when written, not stale. That module's
+          `nextId` is `` `subscription-${++id}` `` — a pure counter, with no clock in it — and
+          `git log -S "Date.now" -- src/routes/calculadora-assinaturas.tsx` returns nothing, so it
+          never had one. It is the shape determinism rule 5 asks for, and it was being listed as a
+          violation of it. Kept visible because this file's standard is "measured, not remembered",
+          and this one was remembered.
 
-      | where | result |
-      |---|---|
-      | dev server, `/calculadora-conta-de-luz` | hydration fails |
-      | dev server, `/metodologia` — static, no calculator state | hydration fails too |
-      | `<main>`, `<header>`, `<footer>` SSR vs client on `/metodologia` | **byte-identical**, 19.647 chars |
-      | `<head>` SSR vs client | **differs** |
-      | the differing element | `<link rel="stylesheet" href="/@tanstack-start/styles.css?routes=…" data-tanstack-router-dev-styles="true">` |
-      | that element in production | **absent** — `document.querySelectorAll('[data-tanstack-router-dev-styles]').length === 0` |
-      | production console, `/metodologia` and `/calculadora-conta-de-luz` | **no errors at all** |
+          Two other `Date.now()` call sites exist and are **not** this bug:
+          `calculadora-custo-carro.tsx:118` and `:225` read the clock for a fuel-price cache TTL,
+          which is a cache deciding whether it is stale rather than state drawing its identity.
+          `components/ui/sidebar.tsx:643` uses `Math.random()` for a skeleton's width — cosmetic, in
+          an unmodified shadcn primitive, and never in state.
+          `DEFAULT_APPLIANCES` calls it while the module is evaluated, so a prerendered page bakes in
+          build-time ids and the browser generates different ones. The `architecture` skill's
+          determinism rules name the remedy — derive ids from a stable key rather than drawing them.
+          ⚠️ **No production symptom was found**, so this is latent rather than broken: see the
+          correction below. Low priority; recorded so it is not rediscovered as a surprise.
 
-      The mismatch is TanStack Start's **dev-only** stylesheet injection. The `nextId` id
-      difference visible in React's tree diff is downstream of hydration already having aborted on
-      the head, not its cause. The lesson for the next reader: a hydration error in `pnpm run dev`
-      is not evidence of one in production, and the deployed preview is the cheap way to tell.
+          **Correction, 2026-09-05.** An earlier version of this entry claimed
+          `/calculadora-conta-de-luz` fails hydration in production and blamed `nextId()`. **Both
+          halves were wrong**, and the measurement that settled it is worth keeping:
+
+          | where | result |
+          |---|---|
+          | dev server, `/calculadora-conta-de-luz` | hydration fails |
+          | dev server, `/metodologia` — static, no calculator state | hydration fails too |
+          | `<main>`, `<header>`, `<footer>` SSR vs client on `/metodologia` | **byte-identical**, 19.647 chars |
+          | `<head>` SSR vs client | **differs** |
+          | the differing element | `<link rel="stylesheet" href="/@tanstack-start/styles.css?routes=…" data-tanstack-router-dev-styles="true">` |
+          | that element in production | **absent** — `document.querySelectorAll('[data-tanstack-router-dev-styles]').length === 0` |
+          | production console, `/metodologia` and `/calculadora-conta-de-luz` | **no errors at all** |
+
+          The mismatch is TanStack Start's **dev-only** stylesheet injection. The `nextId` id
+          difference visible in React's tree diff is downstream of hydration already having aborted on
+          the head, not its cause. The lesson for the next reader: a hydration error in `pnpm run dev`
+          is not evidence of one in production, and the deployed preview is the cheap way to tell.
+
 - [ ] **`ADSENSE-CHECKLIST.md` sits at the repo root**, dated 2026-06-26 with 3 of 7 fixes still
       open. It is a roadmap document living outside `docs/`, and it has not moved in two months.
 - [ ] **No test covers the two adapters.** `aneel.ts` and `anp.ts` parse third-party formats — an
