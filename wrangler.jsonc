@@ -4,6 +4,15 @@
   "compatibility_date": "2026-06-23",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+  // Prerendering writes `<route>/index.html`, and the asset server's default
+  // `auto-trailing-slash` then answers the canonical form with a 307 to the
+  // trailing-slash one. Every canonical tag and every sitemap entry uses the
+  // no-slash form, so the default made the canonical URL a URL that never
+  // returns 200. Dropping the slash instead serves it directly, which is the
+  // form already published everywhere.
+  "assets": {
+    "html_handling": "drop-trailing-slash",
+  },
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,

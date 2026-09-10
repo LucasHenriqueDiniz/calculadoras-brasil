@@ -4,6 +4,7 @@ export const EDITORIAL_RESPONSIBLE = "Calcule Brasil";
 
 export const SEO_PAGES = [
   { path: "/", changefreq: "weekly", priority: 1 },
+  { path: "/calculadoras", changefreq: "monthly", priority: 0.8 },
   { path: "/calculadora-custo-carro", changefreq: "monthly", priority: 0.9 },
   { path: "/calculadora-morar-sozinho", changefreq: "monthly", priority: 0.9 },
   { path: "/calculadora-conta-de-luz", changefreq: "monthly", priority: 0.9 },
