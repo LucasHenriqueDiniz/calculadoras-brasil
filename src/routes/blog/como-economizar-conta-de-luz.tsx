@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
+import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
+import { RelatedPosts } from "@/components/calculator/RelatedPosts";
+import { relatedPostsForPost } from "@/data/calculators";
 import { absoluteUrl } from "@/lib/site";
 import { getBlogPost } from "@/lib/blog";
+import { lastmodFor } from "@/lib/seo-pages";
 
 const post = getBlogPost("como-economizar-conta-de-luz")!;
 
@@ -11,7 +15,7 @@ const articleSchema = {
   headline: post.title,
   description: post.description,
   datePublished: post.publishedAt,
-  dateModified: post.updatedAt,
+  dateModified: lastmodFor(`/blog/${post.slug}`),
   author: { "@type": "Organization", name: post.author },
 };
 
@@ -124,6 +128,11 @@ function BlogPost() {
             economiza R$ 60-120. Em 1 ano: R$ 720-1.440.
           </p>
         </Prose>
+
+        <div className="mx-auto max-w-3xl space-y-10 px-4 pb-14 sm:px-6">
+          <RelatedCalculators excludeSlug="conta-de-luz" />
+          <RelatedPosts slugs={relatedPostsForPost("como-economizar-conta-de-luz")} />
+        </div>
       </article>
     </PageShell>
   );

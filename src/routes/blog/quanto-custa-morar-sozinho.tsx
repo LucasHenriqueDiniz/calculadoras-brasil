@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
+import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
+import { RelatedPosts } from "@/components/calculator/RelatedPosts";
+import { relatedPostsForPost } from "@/data/calculators";
 import { absoluteUrl } from "@/lib/site";
 import { getBlogPost } from "@/lib/blog";
+import { lastmodFor } from "@/lib/seo-pages";
 
 const POST_SLUG = "quanto-custa-morar-sozinho";
 const post = getBlogPost(POST_SLUG)!;
@@ -13,7 +17,7 @@ const articleSchema = {
   headline: post.title,
   description: post.description,
   datePublished: post.publishedAt,
-  dateModified: post.updatedAt,
+  dateModified: lastmodFor(`/blog/${post.slug}`),
   author: { "@type": "Organization", name: post.author },
 };
 
@@ -272,6 +276,11 @@ function BlogPost() {
             citados não são cotações e mudam com o tempo.
           </p>
         </Prose>
+
+        <div className="mx-auto max-w-3xl space-y-10 px-4 pb-14 sm:px-6">
+          <RelatedCalculators excludeSlug="morar-sozinho" />
+          <RelatedPosts slugs={relatedPostsForPost("quanto-custa-morar-sozinho")} />
+        </div>
       </article>
     </PageShell>
   );

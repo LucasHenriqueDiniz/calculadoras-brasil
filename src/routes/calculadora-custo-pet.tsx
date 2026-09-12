@@ -12,6 +12,8 @@ import {
 import { CopyResultButton, ResetButton, ShareResultButton } from "@/components/calculator/actions";
 import { FAQSection, type FAQItem } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
+import { RelatedPosts } from "@/components/calculator/RelatedPosts";
+import { relatedPostsFor } from "@/data/calculators";
 import { Prose } from "@/components/layout/PageShell";
 import { formatBRL } from "@/lib/format";
 import { calculatePetCost, type PetCostInput } from "@/lib/calculators/petCost";
@@ -251,6 +253,7 @@ function PetPage() {
       <div className="mx-auto max-w-6xl space-y-10 px-4 pb-16 sm:px-6">
         <FAQSection items={FAQ} />
         <RelatedCalculators slugs={["morar-sozinho", "assinaturas", "custo-carro"]} />
+        <RelatedPosts slugs={relatedPostsFor("custo-pet")} />
       </div>
     </CalculatorLayout>
   );

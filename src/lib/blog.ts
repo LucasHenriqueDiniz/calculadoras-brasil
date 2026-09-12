@@ -7,7 +7,6 @@ export interface BlogPost {
   imageAlt: string;
   author: string;
   publishedAt: string;
-  updatedAt: string;
   readingTime: number;
   keywords: string[];
   faqs: Array<{ question: string; answer: string }>;
@@ -16,7 +15,7 @@ export interface BlogPost {
 export const blogPosts: Record<string, BlogPost> = {
   "quanto-custa-ter-carro": {
     slug: "quanto-custa-ter-carro",
-    title: "Quanto custa ter um carro no Brasil em 2024",
+    title: "Quanto custa ter um carro no Brasil",
     description:
       "Guia completo dos custos reais de manter um carro: combustível, IPVA, seguro, manutenção e depreciação. Inclui dicas de economia.",
     category: "guia",
@@ -24,7 +23,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Custos mensais de ter um carro",
     author: "Calcule Brasil",
     publishedAt: "2026-06-25",
-    updatedAt: "2026-06-25",
     readingTime: 8,
     keywords: [
       "quanto custa ter um carro",
@@ -78,7 +76,7 @@ export const blogPosts: Record<string, BlogPost> = {
 
   "quanto-custa-morar-sozinho": {
     slug: "quanto-custa-morar-sozinho",
-    title: "Quanto custa morar sozinho - Guia 2024",
+    title: "Quanto custa morar sozinho: o guia completo",
     description:
       "Descobrir quanto custa sair de casa e morar sozinho. Custos iniciais, mensais, por cidade e dicas de economia.",
     category: "guia",
@@ -86,7 +84,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Custo mensal de morar sozinho",
     author: "Calcule Brasil",
     publishedAt: "2026-06-25",
-    updatedAt: "2026-06-25",
     readingTime: 10,
     keywords: [
       "quanto custa morar sozinho",
@@ -137,7 +134,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Dicas para economizar energia",
     author: "Calcule Brasil",
     publishedAt: "2026-06-25",
-    updatedAt: "2026-06-25",
     readingTime: 6,
     keywords: [
       "como economizar conta de luz",
@@ -188,7 +184,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Custo anual de cuidar de um pet",
     author: "Calcule Brasil",
     publishedAt: "2026-06-25",
-    updatedAt: "2026-06-25",
     readingTime: 7,
     keywords: ["custo pet anual", "quanto custa ter um cachorro", "custos com gato"],
     faqs: [
@@ -235,7 +230,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Análise de assinaturas que valem a pena",
     author: "Calcule Brasil",
     publishedAt: "2026-06-25",
-    updatedAt: "2026-06-25",
     readingTime: 8,
     keywords: [
       "assinaturas que valem a pena",
@@ -286,7 +280,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Calculadora IRPF 2026 - Imposto de Renda",
     author: "Calcule Brasil",
     publishedAt: "2026-06-25",
-    updatedAt: "2026-06-25",
     readingTime: 12,
     keywords: [
       "calculadora IRPF 2026",
@@ -365,7 +358,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Guia completo IRPF 2026",
     author: "Calcule Brasil",
     publishedAt: "2026-06-26",
-    updatedAt: "2026-06-26",
     readingTime: 18,
     keywords: [
       "guia IRPF 2026",
@@ -404,7 +396,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Desconto de salário líquido",
     author: "Calcule Brasil",
     publishedAt: "2026-06-27",
-    updatedAt: "2026-06-27",
     readingTime: 16,
     keywords: [
       "salário líquido",
@@ -458,7 +449,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Custos de ser autônomo no Brasil",
     author: "Calcule Brasil",
     publishedAt: "2026-06-28",
-    updatedAt: "2026-06-28",
     readingTime: 15,
     keywords: [
       "autônomo",
@@ -512,7 +502,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Deduções do IRPF organizadas por categoria",
     author: "Calcule Brasil",
     publishedAt: "2026-07-01",
-    updatedAt: "2026-07-01",
     readingTime: 8,
     keywords: [
       "deduções IRPF",
@@ -564,7 +553,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Família revisando dependentes no imposto de renda",
     author: "Calcule Brasil",
     publishedAt: "2026-07-02",
-    updatedAt: "2026-07-02",
     readingTime: 6,
     keywords: [
       "dependentes IRPF",
@@ -616,7 +604,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Recibo de pagamento autônomo preenchido",
     author: "Calcule Brasil",
     publishedAt: "2026-07-03",
-    updatedAt: "2026-07-03",
     readingTime: 8,
     keywords: [
       "RPA autônomo",
@@ -668,7 +655,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Pessoa negociando salário com dados financeiros",
     author: "Calcule Brasil",
     publishedAt: "2026-07-04",
-    updatedAt: "2026-07-04",
     readingTime: 7,
     keywords: [
       "negociar salário",
@@ -719,7 +705,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Planejamento tributário pessoal",
     author: "Calcule Brasil",
     publishedAt: "2026-06-29",
-    updatedAt: "2026-06-29",
     readingTime: 17,
     keywords: [
       "planejamento tributário",
@@ -773,7 +758,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Comparação CLT vs PJ",
     author: "Calcule Brasil",
     publishedAt: "2026-06-30",
-    updatedAt: "2026-06-30",
     readingTime: 16,
     keywords: [
       "CLT vs PJ",
@@ -826,7 +810,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Contador e documentos contábeis",
     author: "Calcule Brasil",
     publishedAt: "2026-07-01",
-    updatedAt: "2026-07-01",
     readingTime: 6,
     keywords: ["contador PJ", "custo contador", "imposto PJ", "contabilidade"],
     faqs: [
@@ -873,7 +856,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Tabela de alíquotas IRPF 2026",
     author: "Calcule Brasil",
     publishedAt: "2026-07-02",
-    updatedAt: "2026-07-02",
     readingTime: 5,
     keywords: ["tabela IRPF", "alíquota IRPF 2026", "limite isenção"],
     faqs: [
@@ -929,7 +911,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Autônomo formal e informal",
     author: "Calcule Brasil",
     publishedAt: "2026-07-03",
-    updatedAt: "2026-07-03",
     readingTime: 6,
     keywords: ["autônomo formal", "MEI", "autônomo informal", "contribuição INSS"],
     faqs: [
@@ -975,7 +956,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Cálculo de salário PJ",
     author: "Calcule Brasil",
     publishedAt: "2026-07-04",
-    updatedAt: "2026-07-04",
     readingTime: 7,
     keywords: ["salário PJ", "como calcular PJ", "ganho líquido PJ", "imposto PJ"],
     faqs: [
@@ -1022,7 +1002,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Comparação de regimes IRPF",
     author: "Calcule Brasil",
     publishedAt: "2026-07-05",
-    updatedAt: "2026-07-05",
     readingTime: 6,
     keywords: ["regime simplificado", "regime completo", "IRPF 2026", "dedução IRPF"],
     faqs: [
@@ -1069,7 +1048,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Decisão entre continuar CLT ou virar PJ",
     author: "Calcule Brasil",
     publishedAt: "2026-07-06",
-    updatedAt: "2026-07-06",
     readingTime: 8,
     keywords: ["quando virar PJ", "vale a pena virar PJ", "CLT vs PJ decisão", "PJ mascarado"],
     faqs: [
@@ -1116,7 +1094,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Autônomo organizando comprovantes de despesas dedutíveis",
     author: "Calcule Brasil",
     publishedAt: "2026-07-07",
-    updatedAt: "2026-07-07",
     readingTime: 8,
     keywords: [
       "despesas dedutíveis autônomo",
@@ -1168,7 +1145,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Comparação de custos entre MEI e PJ",
     author: "Calcule Brasil",
     publishedAt: "2026-07-08",
-    updatedAt: "2026-07-08",
     readingTime: 8,
     keywords: ["MEI vs PJ", "custo MEI", "custo PJ", "Simples Nacional", "quanto custa abrir PJ"],
     faqs: [
@@ -1215,7 +1191,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Comparação de salário líquido entre setores",
     author: "Calcule Brasil",
     publishedAt: "2026-07-09",
-    updatedAt: "2026-07-09",
     readingTime: 7,
     keywords: [
       "salário líquido por setor",
@@ -1267,7 +1242,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Planejamento de aposentadoria antecipada",
     author: "Calcule Brasil",
     publishedAt: "2026-07-10",
-    updatedAt: "2026-07-10",
     readingTime: 9,
     keywords: [
       "aposentadoria antecipada",
@@ -1319,7 +1293,6 @@ export const blogPosts: Record<string, BlogPost> = {
     imageAlt: "Investimentos isentos de imposto de renda",
     author: "Calcule Brasil",
     publishedAt: "2026-07-11",
-    updatedAt: "2026-07-11",
     readingTime: 8,
     keywords: [
       "investimentos isentos IRPF",
@@ -1364,4 +1337,17 @@ export const blogPosts: Record<string, BlogPost> = {
 
 export function getBlogPost(slug: string): BlogPost | undefined {
   return blogPosts[slug];
+}
+
+export const blogCategoryLabels: Record<BlogPost["category"], string> = {
+  guia: "Guias",
+  analise: "Análises",
+  dica: "Dicas rápidas",
+  educacao: "Fundamentos",
+  noticia: "Notícias",
+};
+
+/** Every post, newest first. Drives the blog index, which is what keeps the posts linked. */
+export function listBlogPosts(): BlogPost[] {
+  return Object.values(blogPosts).sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 }

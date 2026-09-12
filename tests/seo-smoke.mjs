@@ -22,6 +22,7 @@ const PUBLIC_ROUTES = [
   "/calculadora-clt-vs-pj",
   "/calculadora-previdencia-complementar",
   "/calculadora-beneficios-fiscais",
+  "/blog",
   "/blog/quanto-custa-ter-carro",
   "/blog/quanto-custa-morar-sozinho",
   "/blog/como-economizar-conta-de-luz",
@@ -134,6 +135,8 @@ try {
   await waitForServer(preview);
 
   const titles = new Set();
+  const internalLinks = new Map();
+  const dateModifiedByPath = new Map();
   for (const path of PUBLIC_ROUTES) {
     const response = await fetch(`${BASE_URL}${path}`, {
       headers: { "user-agent": "seo-smoke-test" },
@@ -160,6 +163,15 @@ try {
       `${path} must have an absolute canonical`,
     );
 
+    internalLinks.set(
+      path,
+      new Set(
+        [...html.matchAll(/<a\b[^>]*href=["'](\/[^"'#?]*)["']/gi)].map((match) =>
+          match[1] === "/" ? "/" : match[1].replace(/\/$/, ""),
+        ),
+      ),
+    );
+
     const h1Count = (html.match(/<h1\b/gi) ?? []).length;
     assert.equal(h1Count, 1, `${path} must have exactly one H1`);
     assert.ok(textContent(html).length >= 300, `${path} must carry text content in the HTML`);
@@ -181,7 +193,46 @@ try {
       assert.ok(types.has("FAQPage"), `${path} must declare FAQPage`);
       assert.match(html, /<time\b[^>]*datetime=["']2026-06-23["']/i);
     }
+
+    // Collected for every route, not only the calculators: a page whose JSON-LD
+    // contradicts its own sitemap entry is what teaches Google to ignore
+    // `lastmod` altogether.
+    dateModifiedByPath.set(path, [
+      ...new Set([...decodeHtml(html).matchAll(/"dateModified":"([^"]+)"/g)].map((m) => m[1])),
+    ]);
   }
+
+  // Every `dateModified` a page publishes must be the date the sitemap publishes
+  // for that URL: a disagreement here is invisible on the page itself.
+  const sitemapForDates = await (await fetch(`${BASE_URL}/sitemap.xml`)).text();
+  const lastmodByUrl = new Map(
+    [...sitemapForDates.matchAll(/<loc>([^<]+)<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/g)].map(
+      (match) => [match[1], match[2]],
+    ),
+  );
+  for (const [path, dates] of dateModifiedByPath) {
+    for (const dateModified of dates) {
+      assert.equal(
+        dateModified,
+        lastmodByUrl.get(`${CANONICAL_ORIGIN}${path}`),
+        `${path} must publish the same dateModified as its sitemap lastmod`,
+      );
+    }
+  }
+
+  // A URL that only the sitemap points at is a URL Google can decline to crawl.
+  const linkedFromElsewhere = new Set();
+  for (const [source, hrefs] of internalLinks) {
+    for (const href of hrefs) {
+      if (href !== source) linkedFromElsewhere.add(href);
+    }
+  }
+  const orphans = PUBLIC_ROUTES.filter((path) => path !== "/" && !linkedFromElsewhere.has(path));
+  assert.deepEqual(
+    orphans,
+    [],
+    `every public route must be reachable by an internal link: ${orphans.join(", ")}`,
+  );
 
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
@@ -220,7 +271,7 @@ try {
   assert.equal(og.readUInt32BE(20), 630, "The OG image must be 630 px tall");
   assert.ok(ogStats.size < 500_000, "The OG image must be under 500 KB");
 
-  console.log(`SEO smoke test passed for ${PUBLIC_ROUTES.length} routes.`);
+  console.log(`SEO smoke test passed for ${PUBLIC_ROUTES.length} routes, none of them orphaned.`);
 } catch (error) {
   console.error(previewOutput);
   throw error;
