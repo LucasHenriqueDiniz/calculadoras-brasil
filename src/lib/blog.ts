@@ -78,7 +78,7 @@ export const blogPosts: Record<string, BlogPost> = {
     slug: "quanto-custa-morar-sozinho",
     title: "Quanto custa morar sozinho: o guia completo",
     description:
-      "Descobrir quanto custa sair de casa e morar sozinho. Custos iniciais, mensais, por cidade e dicas de economia.",
+      "Quanto custa sair de casa e morar sozinho: custos iniciais, gastos mensais, os custos que ninguém soma e por que a regra dos 30% engana no Brasil.",
     category: "guia",
     imageUrl: "/blog/morar-sozinho.jpg",
     imageAlt: "Custo mensal de morar sozinho",
