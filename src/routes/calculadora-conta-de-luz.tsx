@@ -14,13 +14,14 @@ import {
 } from "@/components/calculator/results";
 import { FAQSection, type FAQItem } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
+import { RelatedPosts } from "@/components/calculator/RelatedPosts";
 import { CopyResultButton, ResetButton, ShareResultButton } from "@/components/calculator/actions";
 import { Prose } from "@/components/layout/PageShell";
 import { PublicDataField } from "@/components/public-data/PublicDataField";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getCalculator } from "@/data/calculators";
+import { getCalculator, relatedPostsFor } from "@/data/calculators";
 import { formatBRL, formatNumber, parseBRNumber } from "@/lib/format";
 import {
   APPLIANCE_PRESETS,
@@ -819,6 +820,7 @@ function ElectricityPage() {
         <RelatedCalculators
           slugs={["morar-sozinho", "custo-carro", "assinaturas", "custo-mudanca", "custo-pet"]}
         />
+        <RelatedPosts slugs={relatedPostsFor("conta-de-luz")} />
       </div>
     </CalculatorLayout>
   );

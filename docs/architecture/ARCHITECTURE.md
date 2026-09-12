@@ -39,9 +39,9 @@ src/
   lib/
     calculators/        THE DOMAIN. 12 calculators + inss-constants, irpf-constants, money. Pure.
     public-data/        browser-side client for the two public-data endpoints
-    seo-pages.ts        50 paths. Drives BOTH the sitemap and the prerender
-    schema-builders.ts  JSON-LD builders (WebApplication, BreadcrumbList, FAQPage)
-    structured-data.ts  site.ts  format.ts  blog.ts  chart-colors.ts
+    seo-pages.ts        51 paths + per-page lastmod. Drives BOTH the sitemap and the prerender
+    structured-data.ts  JSON-LD builders (WebApplication, BreadcrumbList, FAQPage)
+    site.ts  format.ts  blog.ts  chart-colors.ts
     error-page.ts  utils.ts
   data/
     calculators.ts      metadata for the 12 calculators, keyed by slug
@@ -144,7 +144,7 @@ _Context, decision, and what it rules out. Newest first. A superseded entry stay
 **Context.** Prerendering writes `dist/client/<route>/index.html`. `wrangler.jsonc` declared no
 `assets` block, so the asset server ran on its default `html_handling` of `auto-trailing-slash`,
 which answers `/calculadora-irpf-2026` with a **307** to `/calculadora-irpf-2026/`. Every
-canonical tag and all 50 sitemap entries use the no-slash form, so the canonical URL was a URL
+canonical tag and all 51 sitemap entries use the no-slash form, so the canonical URL was a URL
 that never returned 200 — across the 24 pages that declare one. Google's AdSense review had
 rejected the site three days earlier; `ADS-CRAWL-05` is this.
 

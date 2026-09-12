@@ -11,6 +11,8 @@ import {
 import { CopyResultButton, ResetButton, ShareResultButton } from "@/components/calculator/actions";
 import { FAQSection, type FAQItem } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
+import { RelatedPosts } from "@/components/calculator/RelatedPosts";
+import { relatedPostsFor } from "@/data/calculators";
 import { Prose } from "@/components/layout/PageShell";
 import { formatBRL } from "@/lib/format";
 import { calculateIrpf, type IrpfInput } from "@/lib/calculators/irpf";
@@ -346,6 +348,7 @@ function IrpfCalculator() {
       <FAQSection items={FAQ} />
 
       <RelatedCalculators excludeSlug="irpf-2026" />
+      <RelatedPosts slugs={relatedPostsFor("irpf-2026")} />
     </CalculatorLayout>
   );
 }

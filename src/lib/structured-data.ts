@@ -1,4 +1,4 @@
-import { SITE_REVIEW_DATE } from "@/lib/seo-pages";
+import { lastmodFor } from "@/lib/seo-pages";
 import { SITE_URL, absoluteUrl } from "@/lib/site";
 
 interface StructuredFaq {
@@ -24,6 +24,10 @@ export function calculatorStructuredData({
   faq,
 }: CalculatorStructuredDataOptions) {
   const pageUrl = url ?? absoluteUrl(path ?? "/");
+  // Callers may name the page either way. Deriving the route from whichever one
+  // arrived keeps `dateModified` on the page's own date instead of silently
+  // falling back to the home page's.
+  const routePath = path ?? new URL(pageUrl).pathname;
 
   const schemas = [
     {
@@ -38,7 +42,7 @@ export function calculatorStructuredData({
         applicationCategory,
         operatingSystem: "Web",
         inLanguage: "pt-BR",
-        dateModified: SITE_REVIEW_DATE,
+        dateModified: lastmodFor(routePath),
         publisher: { "@id": `${SITE_URL}/#organization` },
         offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
       }),
@@ -105,7 +109,7 @@ export function comparisonStructuredData({
         headline: name,
         description,
         inLanguage: "pt-BR",
-        dateModified: SITE_REVIEW_DATE,
+        dateModified: lastmodFor(path),
         author: { "@id": `${SITE_URL}/#organization` },
         publisher: { "@id": `${SITE_URL}/#organization` },
       }),

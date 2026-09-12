@@ -12,6 +12,8 @@ import {
 import { CopyResultButton, ResetButton, ShareResultButton } from "@/components/calculator/actions";
 import { FAQSection, type FAQItem } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
+import { RelatedPosts } from "@/components/calculator/RelatedPosts";
+import { relatedPostsFor } from "@/data/calculators";
 import { Prose } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -289,6 +291,7 @@ function SubscriptionsPage() {
       <div className="mx-auto max-w-6xl space-y-10 px-4 pb-16 sm:px-6">
         <FAQSection items={FAQ} />
         <RelatedCalculators slugs={["morar-sozinho", "conta-de-luz", "custo-pet"]} />
+        <RelatedPosts slugs={relatedPostsFor("assinaturas")} />
       </div>
     </CalculatorLayout>
   );

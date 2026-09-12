@@ -2,9 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
 import { FAQSection } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
+import { RelatedPosts } from "@/components/calculator/RelatedPosts";
+import { relatedPostsForPost } from "@/data/calculators";
 import { Button } from "@/components/ui/button";
 import { absoluteUrl } from "@/lib/site";
 import { getBlogPost } from "@/lib/blog";
+import { lastmodFor } from "@/lib/seo-pages";
 
 const post = getBlogPost("guia-irpf-2026")!;
 
@@ -14,7 +17,7 @@ const articleSchema = {
   headline: post.title,
   description: post.description,
   datePublished: post.publishedAt,
-  dateModified: post.updatedAt,
+  dateModified: lastmodFor(`/blog/${post.slug}`),
   author: { "@type": "Organization", name: post.author },
   image: post.imageUrl,
 };
@@ -320,7 +323,10 @@ function BlogPost() {
 
         <FAQSection items={post.faqs} />
 
-        <RelatedCalculators excludeSlug="irpf-2026" />
+        <div className="mx-auto max-w-3xl space-y-10 px-4 pb-14 sm:px-6">
+          <RelatedCalculators excludeSlug="irpf-2026" />
+          <RelatedPosts slugs={relatedPostsForPost("guia-irpf-2026")} />
+        </div>
       </article>
     </PageShell>
   );

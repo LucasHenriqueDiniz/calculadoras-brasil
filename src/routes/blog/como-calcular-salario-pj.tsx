@@ -2,9 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
 import { FAQSection } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
+import { RelatedPosts } from "@/components/calculator/RelatedPosts";
+import { relatedPostsForPost } from "@/data/calculators";
 import { Button } from "@/components/ui/button";
 import { absoluteUrl } from "@/lib/site";
 import { getBlogPost } from "@/lib/blog";
+import { lastmodFor } from "@/lib/seo-pages";
 
 const post = getBlogPost("como-calcular-salario-pj")!;
 
@@ -24,7 +27,7 @@ const articleSchema = {
   headline: post.title,
   description: post.description,
   datePublished: post.publishedAt,
-  dateModified: post.updatedAt,
+  dateModified: lastmodFor(`/blog/${post.slug}`),
   author: { "@type": "Organization", name: post.author },
 };
 
@@ -123,7 +126,10 @@ function BlogPost() {
         </Prose>
 
         <FAQSection items={post.faqs} />
-        <RelatedCalculators excludeSlug="clt-vs-pj" />
+        <div className="mx-auto max-w-3xl space-y-10 px-4 pb-14 sm:px-6">
+          <RelatedCalculators excludeSlug="clt-vs-pj" />
+          <RelatedPosts slugs={relatedPostsForPost("como-calcular-salario-pj")} />
+        </div>
       </article>
     </PageShell>
   );
