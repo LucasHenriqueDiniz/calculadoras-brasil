@@ -8,9 +8,11 @@ on:
 
 # Every job repeats the same preamble on purpose: these are independent
 # runners, and typecheck, lint and tests do not depend on one another.
-# The build is NOT here — Workers Builds compiles and publishes on every push
-# and reports back as a commit check. Running `vite build` here would discover
-# the same thing twice.
+# The build is NOT a job of its own — Workers Builds compiles and publishes on
+# every push and reports back as a commit check, so a `vite build` job would
+# discover the same thing twice. SEO Smoke is the one exception that builds: it
+# asserts against the HTML the server actually returns, and reaching that HTML
+# means serving a `dist/` with `vite preview`.
 # The pnpm action is given no 'version' — it reads the packageManager field of
 # package.json, which is what keeps CI and local machines on the same version.
 
@@ -54,3 +56,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run test
 
+  seo:
+    name: SEO Smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - run: pnpm run test:seo

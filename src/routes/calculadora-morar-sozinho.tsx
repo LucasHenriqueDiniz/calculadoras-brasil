@@ -11,9 +11,10 @@ import {
 } from "@/components/calculator/results";
 import { FAQSection, type FAQItem } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
+import { RelatedPosts } from "@/components/calculator/RelatedPosts";
 import { CopyResultButton, ResetButton, ShareResultButton } from "@/components/calculator/actions";
 import { Prose } from "@/components/layout/PageShell";
-import { getCalculator } from "@/data/calculators";
+import { getCalculator, relatedPostsFor } from "@/data/calculators";
 import { formatBRL } from "@/lib/format";
 import {
   calculateLivingAloneCost,
@@ -482,6 +483,7 @@ function LivingAlonePage() {
         <RelatedCalculators
           slugs={["custo-carro", "conta-de-luz", "assinaturas", "custo-mudanca", "custo-pet"]}
         />
+        <RelatedPosts slugs={relatedPostsFor("morar-sozinho")} />
       </div>
     </CalculatorLayout>
   );

@@ -86,8 +86,10 @@ export interface CltVsPjResult {
  * (1/12), plus FGTS, holiday pay with its third and the usual allowances.
  *
  * ⚠️ A modelling assumption, not a figure from the legislation — and the one the
- * page's whole thesis rests on ("é comum ser preciso faturar entre 25% e 40% a
- * mais como PJ"). Moving it moves every verdict this calculator gives.
+ * page's whole thesis rests on: together with the uncapped PJ contribution
+ * below it puts the break-even invoice 50-80% above the gross salary, which is
+ * the band the page now states. Moving it moves every verdict this calculator
+ * gives, and the copy on the route with it.
  */
 const CLT_BENEFITS_RATE = 1 / 12 + 0.15;
 

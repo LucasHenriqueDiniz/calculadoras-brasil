@@ -5,6 +5,8 @@ import { CurrencyInput, NumberInput } from "@/components/calculator/fields";
 import { ResultSummaryCard, BreakdownTable, DisclaimerBox } from "@/components/calculator/results";
 import { FAQSection } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
+import { RelatedPosts } from "@/components/calculator/RelatedPosts";
+import { relatedPostsFor } from "@/data/calculators";
 import { formatBRL } from "@/lib/format";
 import {
   calculateTaxFreeBenefits,
@@ -164,6 +166,7 @@ function Calculator() {
       <FAQSection items={FAQ} />
 
       <RelatedCalculators excludeSlug="beneficios-fiscais" />
+      <RelatedPosts slugs={relatedPostsFor("beneficios-fiscais")} />
     </CalculatorLayout>
   );
 }

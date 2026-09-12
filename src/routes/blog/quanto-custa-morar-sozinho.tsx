@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
+import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
+import { RelatedPosts } from "@/components/calculator/RelatedPosts";
+import { relatedPostsForPost } from "@/data/calculators";
 import { absoluteUrl } from "@/lib/site";
 import { getBlogPost } from "@/lib/blog";
+import { lastmodFor } from "@/lib/seo-pages";
 
 const POST_SLUG = "quanto-custa-morar-sozinho";
 const post = getBlogPost(POST_SLUG)!;
@@ -26,7 +30,7 @@ const articleSchema = {
   headline: post.title,
   description: post.description,
   datePublished: post.publishedAt,
-  dateModified: post.updatedAt,
+  dateModified: lastmodFor(`/blog/${post.slug}`),
   author: { "@type": "Organization", name: post.author },
   publisher: {
     "@type": "Organization",
@@ -49,7 +53,7 @@ export const Route = createFileRoute("/blog/quanto-custa-morar-sozinho")({
       { property: "og:type", content: "article" },
       { property: "og:url", content: absoluteUrl(`/blog/${post.slug}`) },
       { property: "article:published_time", content: post.publishedAt },
-      { property: "article:modified_time", content: post.updatedAt },
+      { property: "article:modified_time", content: lastmodFor(`/blog/${post.slug}`) },
       { property: "article:author", content: post.author },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(`/blog/${post.slug}`) }],
@@ -312,33 +316,9 @@ function BlogPost() {
           </p>
         </Prose>
 
-        {/* RELATED CONTENT */}
-        <div className="mt-12 border-t border-border pt-8">
-          <h3 className="mb-6 text-lg font-semibold">Conteúdo relacionado</h3>
-          <ul className="grid gap-4 md:grid-cols-2">
-            <li>
-              <a
-                href="/calculadora-morar-sozinho"
-                className="block rounded-lg border border-border p-4 hover:border-primary hover:bg-surface"
-              >
-                <h4 className="font-semibold">Calculadora de custo para morar sozinho</h4>
-                <p className="text-sm text-muted-foreground">
-                  Simule o custo mensal com os seus valores
-                </p>
-              </a>
-            </li>
-            <li>
-              <a
-                href="/blog/quanto-custa-ter-carro"
-                className="block rounded-lg border border-border p-4 hover:border-primary hover:bg-surface"
-              >
-                <h4 className="font-semibold">Quanto custa ter um carro no Brasil</h4>
-                <p className="text-sm text-muted-foreground">
-                  O custo que costuma pesar mais que o aluguel
-                </p>
-              </a>
-            </li>
-          </ul>
+        <div className="mx-auto max-w-3xl space-y-10 px-4 pb-14 sm:px-6">
+          <RelatedCalculators excludeSlug="morar-sozinho" />
+          <RelatedPosts slugs={relatedPostsForPost("quanto-custa-morar-sozinho")} />
         </div>
       </article>
     </PageShell>

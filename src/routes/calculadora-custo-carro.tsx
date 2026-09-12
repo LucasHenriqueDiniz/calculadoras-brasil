@@ -17,11 +17,12 @@ import {
 } from "@/components/calculator/results";
 import { FAQSection, type FAQItem } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
+import { RelatedPosts } from "@/components/calculator/RelatedPosts";
 import { CopyResultButton, ResetButton, ShareResultButton } from "@/components/calculator/actions";
 import { Prose } from "@/components/layout/PageShell";
 import { PublicDataField } from "@/components/public-data/PublicDataField";
 import { Button } from "@/components/ui/button";
-import { getCalculator } from "@/data/calculators";
+import { getCalculator, relatedPostsFor } from "@/data/calculators";
 import { formatBRL, parseBRNumber } from "@/lib/format";
 import {
   calculateCarCost,
@@ -423,6 +424,7 @@ function CarCostPage() {
         <RelatedCalculators
           slugs={["morar-sozinho", "conta-de-luz", "assinaturas", "custo-mudanca"]}
         />
+        <RelatedPosts slugs={relatedPostsFor("custo-carro")} />
       </div>
     </CalculatorLayout>
   );

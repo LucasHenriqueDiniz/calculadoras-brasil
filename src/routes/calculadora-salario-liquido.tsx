@@ -6,6 +6,8 @@ import { DisclaimerBox, ResultSummaryCard, BreakdownTable } from "@/components/c
 import { CopyResultButton, ResetButton, ShareResultButton } from "@/components/calculator/actions";
 import { FAQSection, type FAQItem } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
+import { RelatedPosts } from "@/components/calculator/RelatedPosts";
+import { relatedPostsFor } from "@/data/calculators";
 import { Prose } from "@/components/layout/PageShell";
 import { formatBRL } from "@/lib/format";
 import { calculateNetSalary, type NetSalaryInput } from "@/lib/calculators/salarioLiquido";
@@ -287,6 +289,7 @@ function SalarioLiquidoCalculator() {
       <FAQSection items={FAQ} />
 
       <RelatedCalculators excludeSlug="salario-liquido" />
+      <RelatedPosts slugs={relatedPostsFor("salario-liquido")} />
     </CalculatorLayout>
   );
 }
