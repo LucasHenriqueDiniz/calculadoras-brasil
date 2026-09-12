@@ -11,6 +11,19 @@ import { lastmodFor } from "@/lib/seo-pages";
 const POST_SLUG = "quanto-custa-morar-sozinho";
 const post = getBlogPost(POST_SLUG)!;
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: post.faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.answer,
+    },
+  })),
+};
+
 const articleSchema = {
   "@context": "https://schema.org",
   "@type": "Article",
@@ -19,6 +32,14 @@ const articleSchema = {
   datePublished: post.publishedAt,
   dateModified: lastmodFor(`/blog/${post.slug}`),
   author: { "@type": "Organization", name: post.author },
+  publisher: {
+    "@type": "Organization",
+    name: "Calcule Brasil",
+    logo: {
+      "@type": "ImageObject",
+      url: `${absoluteUrl("/og-image.png")}`,
+    },
+  },
 };
 
 export const Route = createFileRoute("/blog/quanto-custa-morar-sozinho")({
@@ -26,11 +47,20 @@ export const Route = createFileRoute("/blog/quanto-custa-morar-sozinho")({
     meta: [
       { title: `${post.title} | Calcule Brasil` },
       { name: "description", content: post.description },
+      { name: "keywords", content: post.keywords.join(", ") },
       { property: "og:title", content: post.title },
       { property: "og:description", content: post.description },
+      { property: "og:type", content: "article" },
+      { property: "og:url", content: absoluteUrl(`/blog/${post.slug}`) },
+      { property: "article:published_time", content: post.publishedAt },
+      { property: "article:modified_time", content: lastmodFor(`/blog/${post.slug}`) },
+      { property: "article:author", content: post.author },
     ],
     links: [{ rel: "canonical", href: absoluteUrl(`/blog/${post.slug}`) }],
-    scripts: [{ type: "application/ld+json", children: JSON.stringify(articleSchema) }],
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify(articleSchema) },
+      { type: "application/ld+json", children: JSON.stringify(faqSchema) },
+    ],
   }),
   component: BlogPost,
 });
@@ -40,7 +70,7 @@ function BlogPost() {
     <PageShell>
       <article>
         <PageHeader
-          eyebrow={`${post.category} • ${post.readingTime} min de leitura`}
+          eyebrow={`${post.category.charAt(0).toUpperCase() + post.category.slice(1)} • ${post.readingTime} min de leitura`}
           title={post.title}
           description={post.description}
         />
@@ -253,6 +283,15 @@ function BlogPost() {
               descontam 5-10%.
             </li>
           </ol>
+
+          {/* FAQ */}
+          <h2>Perguntas frequentes</h2>
+          {post.faqs.map((faq, i) => (
+            <div key={i} className="mb-6">
+              <h3>{faq.question}</h3>
+              <p>{faq.answer}</p>
+            </div>
+          ))}
 
           {/* LIMITATIONS */}
           <h2>O que essas faixas não capturam</h2>
