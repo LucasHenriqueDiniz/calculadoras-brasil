@@ -69,36 +69,21 @@ export const SIMPLIFIED_DEDUCTION_RATE_ANNUAL = 0.2;
 export const MAX_SIMPLIFIED_DEDUCTION_ANNUAL = 17640.0;
 
 /**
- * Desconto simplificado, monthly. Only half of this pair is sourced, so the two
- * halves are labelled rather than presented as one figure from the research note.
- *
- * INFERRED — this rate. No monthly source read for that research gives any
- * percentage at all; 20% is the ANNUAL rate, carried across on the assumption
- * that the monthly discount is the same proportion under a lower ceiling. It is
- * a separate constant from the annual rate for exactly that reason: the day
- * Receita Federal publishes a monthly percentage, only one of the two moves.
- *
- * The inference is free today, and provably rather than by luck: 607,20 / 0,20
- * is R$ 3.036,00, and 80% of R$ 3.036,00 is R$ 2.428,80 — the exempt ceiling
- * itself. So below R$ 3.036 of gross both readings (a rate under a cap, or a
- * flat R$ 607,20) leave the base inside the exemption, and above it both
- * subtract the same R$ 607,20. They can never produce a different withholding.
- * They do differ in `baseImponivelMensal` below R$ 3.036 — at a gross of
- * R$ 1.000 this reading gives R$ 800,00 and the flat one R$ 392,80 — but no
- * route renders that field. The equivalence is pinned by the net-salary
- * calculator's own suite, in the case named "withholds what a flat R$ 607,20
- * reading of the ceiling would", so an edit that moves the rate or the ceiling
- * apart fails there instead of shipping.
- */
-export const SIMPLIFIED_DEDUCTION_RATE_MONTHLY = 0.2;
-
-/**
- * SOURCED — the monthly ceiling on that discount. Receita Federal's own monthly
- * table states "Limite do desconto simplificado: R$ 607,20" and nothing more
- * (fetches/receita-federal-tabelas-2026.md). Note it is NOT the annual ceiling
+ * SOURCED — the desconto simplificado mensal, a flat amount and not a ceiling on
+ * a percentage. Lei 9.250/1995, art. 4º, § 2º (wording of Lei 14.663/2023, art.
+ * 6º): "desconto simplificado mensal, correspondente a 25% (vinte e cinco por
+ * cento) do valor máximo da faixa com alíquota zero da tabela progressiva mensal,
+ * caso seja mais benéfico ao contribuinte". 25% of R$ 2.428,80 is R$ 607,20,
+ * which is also the "Limite do desconto simplificado" the Receita's monthly table
+ * prints (fetches/receita-federal-tabelas-2026.md). It is NOT the annual figure
  * divided by twelve (17.640,00 / 12 = 1.470,00).
+ *
+ * This used to be read as `min(20% × gross, R$ 607,20)`, carrying the ANNUAL 20%
+ * across. The statute has no percentage of income in it, and the two readings
+ * never withheld different amounts — below R$ 3.036 both leave the base inside
+ * the exemption — so dropping the 20% changes no tax, only a base nobody renders.
  */
-export const MAX_SIMPLIFIED_DEDUCTION_MONTHLY = 607.2;
+export const SIMPLIFIED_DEDUCTION_MONTHLY = 607.2;
 
 // Lei 15.270/2025, monthly reduction (Art. 3º-A). Applied to the tax the table
 // produces rather than changing the brackets, which is why no table expresses it.

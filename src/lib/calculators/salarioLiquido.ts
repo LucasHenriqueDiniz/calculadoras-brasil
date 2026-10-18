@@ -8,18 +8,23 @@
  * the monthly incidence table and the monthly Lei 15.270/2025 reduction, both of
  * which differ from their annual counterparts by more than a factor of twelve.
  *
- * Both axes meet here, so every field that could be read either way says which
- * one it is. Where a name carries no axis, the doc comment above it does.
+ * It also decides which deductions exist. Lei 9.250/1995, art. 4º, lists what
+ * the MONTHLY base may deduct: the INSS contribution, a fixed amount per
+ * dependant, private pension contributions, court-ordered alimony and two items
+ * outside this calculator's scope. Health and education are not on that list:
+ * they are art. 8º, the annual adjustment, and belong to the IRPF calculator.
+ * Against all of those, § 2º offers a flat desconto simplificado "caso seja mais
+ * benéfico ao contribuinte" — so the month is taxed on whichever of the two
+ * lowers the base more, and the visitor does not get to pick the worse one.
  *
+ * Every amount here is monthly unless its name says otherwise.
  * The rules themselves live in `irpf-constants.ts`, alongside their sources.
  */
 
 import { calculateEmployeeInss } from "./inss-constants";
 import {
-  DEDUCTION_PER_DEPENDENT_ANNUAL,
-  MAX_DEDUCTION_EDUCATION_ANNUAL,
-  MAX_SIMPLIFIED_DEDUCTION_MONTHLY,
-  SIMPLIFIED_DEDUCTION_RATE_MONTHLY,
+  DEDUCTION_PER_DEPENDENT_MONTHLY,
+  SIMPLIFIED_DEDUCTION_MONTHLY,
   findMonthlyTaxBracket,
   monthlyReductionLei15270,
 } from "./irpf-constants";
@@ -27,33 +32,31 @@ import { roundToCentavos } from "./money";
 
 export interface NetSalaryInput {
   monthlyGrossSalary: number;
-  /** Annual amounts: they feed the annual deduction chain, not the monthly one. */
   dependants: number;
-  educationDeduction: number;
-  healthDeduction: number;
-  supplementaryPensionDeduction: number;
+  /** Monthly contribution to a PGBL-type private pension plan: art. 4º, V. */
+  monthlyPrivatePension: number;
   hasMealAllowance: boolean;
   hasTransportAllowance: boolean;
   hasUnionDue: boolean;
-  /**
-   * Desconto simplificado instead of the itemised deductions above. It replaces
-   * every one of them, dependants included — see `calculateNetSalary`.
-   */
-  simplifiedRegime: boolean;
 }
+
+/** Which of art. 4º's two routes to the monthly base the withholding took. */
+export type MonthlyDeduction = "legal" | "simplified";
 
 export interface NetSalaryResult {
   monthlyGrossSalary: number;
   annualGrossSalary: number;
   inssWithheld: number;
-  monthlyBaseAfterInss: number;
-  /** Annual total of the three itemised deductions, after their caps and floors. */
-  totalDeductions: number;
-  /** Annual dependant allowance. Reported even under the simplified regime, where it does not apply. */
+  /** Art. 4º, III: R$ 189,59 per dependant. */
   dependantAllowance: number;
-  /** Annual itemised assessable base. Not what the simplified regime taxes. */
-  annualAssessableBase: number;
-  /** The monthly base actually taken to the table, whichever regime is in force. */
+  /** Art. 4º, V. */
+  privatePensionDeduction: number;
+  /** INSS, dependants and private pension: every art. 4º deduction this page asks about. */
+  legalDeductions: number;
+  /** Art. 4º, § 2º: the flat alternative to all of the above, capped at the gross. */
+  simplifiedDeduction: number;
+  /** The more beneficial of the two, which is the one the law applies. */
+  deductionApplied: MonthlyDeduction;
   monthlyAssessableBase: number;
   /** What the monthly table produces, before the Lei 15.270/2025 reduction. */
   taxFromTable: number;
@@ -67,11 +70,6 @@ export interface NetSalaryResult {
   nonTaxableBenefits: number;
   totalMonthlyIncome: number;
   effectiveIrpfRate: number;
-  savings: {
-    fromDependants: number;
-    fromDeductions: number;
-    total: number;
-  };
 }
 
 export function calculateNetSalary(input: NetSalaryInput): NetSalaryResult {
@@ -82,43 +80,23 @@ export function calculateNetSalary(input: NetSalaryInput): NetSalaryResult {
   //    Each rate applies only to the slice of the salary inside its bracket.
   const inssWithheld = calculateEmployeeInss(monthlyGrossSalary);
 
-  // 2. IRPF base after INSS
-  const monthlyBaseAfterInss = monthlyGrossSalary - inssWithheld;
+  // 2. the two routes to the monthly base. Tax is non-decreasing in the base and
+  //    the reduction depends on the gross alone, so the larger deduction is the
+  //    more beneficial one; a tie takes the legal route, which costs nothing.
+  const dependantAllowance = Math.max(input.dependants, 0) * DEDUCTION_PER_DEPENDENT_MONTHLY;
+  const privatePensionDeduction = Math.max(input.monthlyPrivatePension, 0);
+  const legalDeductions = inssWithheld + dependantAllowance + privatePensionDeduction;
+  const simplifiedDeduction = Math.min(SIMPLIFIED_DEDUCTION_MONTHLY, monthlyGrossSalary);
+  const deductionApplied: MonthlyDeduction =
+    simplifiedDeduction > legalDeductions ? "simplified" : "legal";
 
-  // 3. annual itemised deductions.
-  //    Health is uncapped on purpose: no official ceiling was found for it.
-  const educationDeduction = Math.min(
-    Math.max(input.educationDeduction, 0),
-    MAX_DEDUCTION_EDUCATION_ANNUAL,
+  const monthlyAssessableBase = Math.max(
+    monthlyGrossSalary -
+      (deductionApplied === "simplified" ? simplifiedDeduction : legalDeductions),
+    0,
   );
-  const healthDeduction = Math.max(input.healthDeduction, 0);
-  const supplementaryPensionDeduction = Math.max(input.supplementaryPensionDeduction, 0);
-  const totalDeductions = educationDeduction + healthDeduction + supplementaryPensionDeduction;
 
-  const annualCalculationBase = Math.max(monthlyBaseAfterInss * 12 - totalDeductions, 0);
-  const dependantAllowance = Math.max(input.dependants, 0) * DEDUCTION_PER_DEPENDENT_ANNUAL;
-  const annualAssessableBase = Math.max(annualCalculationBase - dependantAllowance, 0);
-
-  // 4. the monthly base the table is applied to.
-  //
-  //    Itemised: the annual chain above, spread evenly over the year.
-  //    Simplified: the desconto simplificado REPLACES every legal deduction —
-  //    INSS and dependants included — so it starts again from the gross salary.
-  //    The Receita's own worked example confirms the shape: R$ 5.000,00 less the
-  //    R$ 607,20 ceiling gives a base of R$ 4.392,80 — the gross less the ceiling,
-  //    with no INSS taken off first.
-  const monthlyAssessableBase = input.simplifiedRegime
-    ? Math.max(
-        monthlyGrossSalary -
-          Math.min(
-            monthlyGrossSalary * SIMPLIFIED_DEDUCTION_RATE_MONTHLY,
-            MAX_SIMPLIFIED_DEDUCTION_MONTHLY,
-          ),
-        0,
-      )
-    : annualAssessableBase / 12;
-
-  // 5. monthly IRPF withheld: the table, then the reduction on top of it.
+  // 3. monthly IRPF withheld: the table, then the reduction on top of it.
   //
   //    Both are rounded to the centavo, because both are legally denominated in
   //    it and the reduction's first band is a centavo literal. Left in binary
@@ -133,15 +111,15 @@ export function calculateNetSalary(input: NetSalaryInput): NetSalaryResult {
   );
   const estimatedIrpfWithheld = roundToCentavos(Math.max(taxFromTable - reductionLei15270, 0));
 
-  // 6. union dues
+  // 4. union dues
   const unionDue = input.hasUnionDue ? monthlyGrossSalary * 0.0033 : 0; // roughly one hour of pay
 
-  // 7. transport allowance, deducted from the gross
+  // 5. transport allowance, deducted from the gross
   const transportAllowanceDeduction = input.hasTransportAllowance
     ? Math.min(monthlyGrossSalary * 0.06, 250)
     : 0;
 
-  // 8. net salary
+  // 6. net salary
   const monthlyNetSalary =
     monthlyGrossSalary -
     inssWithheld -
@@ -149,13 +127,8 @@ export function calculateNetSalary(input: NetSalaryInput): NetSalaryResult {
     unionDue -
     transportAllowanceDeduction;
 
-  // 9. non-taxable benefits
+  // 7. non-taxable benefits
   const nonTaxableBenefits = input.hasMealAllowance ? 360 : 0; // roughly R$ 360/month in meal allowance
-
-  // 10. monthly share of what the itemised deductions took off the base.
-  //     Zero under the simplified regime, where neither of them reduces anything.
-  const savingsFromDependants = input.simplifiedRegime ? 0 : dependantAllowance / 12;
-  const savingsFromDeductions = input.simplifiedRegime ? 0 : totalDeductions / 12;
 
   const effectiveIrpfRate =
     monthlyGrossSalary > 0 ? (estimatedIrpfWithheld / monthlyGrossSalary) * 100 : 0;
@@ -164,10 +137,11 @@ export function calculateNetSalary(input: NetSalaryInput): NetSalaryResult {
     monthlyGrossSalary,
     annualGrossSalary,
     inssWithheld,
-    monthlyBaseAfterInss,
-    totalDeductions,
     dependantAllowance,
-    annualAssessableBase,
+    privatePensionDeduction,
+    legalDeductions,
+    simplifiedDeduction,
+    deductionApplied,
     monthlyAssessableBase,
     taxFromTable,
     reductionLei15270,
@@ -179,10 +153,5 @@ export function calculateNetSalary(input: NetSalaryInput): NetSalaryResult {
     nonTaxableBenefits,
     totalMonthlyIncome: monthlyNetSalary + nonTaxableBenefits,
     effectiveIrpfRate,
-    savings: {
-      fromDependants: savingsFromDependants,
-      fromDeductions: savingsFromDeductions,
-      total: savingsFromDependants + savingsFromDeductions,
-    },
   };
 }

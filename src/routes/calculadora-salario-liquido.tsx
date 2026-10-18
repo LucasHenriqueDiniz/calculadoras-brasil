@@ -22,13 +22,10 @@ const PAGE_DESCRIPTION =
 const DEFAULTS: NetSalaryInput = {
   monthlyGrossSalary: 5000,
   dependants: 0,
-  educationDeduction: 0,
-  healthDeduction: 0,
-  supplementaryPensionDeduction: 0,
+  monthlyPrivatePension: 0,
   hasMealAllowance: false,
   hasTransportAllowance: false,
   hasUnionDue: false,
-  simplifiedRegime: false,
 };
 
 const FAQ: FAQItem[] = [
@@ -45,7 +42,7 @@ const FAQ: FAQItem[] = [
   {
     question: "O INSS é obrigatório?",
     answer:
-      "Sim. Empregados CLT pagam INSS de 8% a 14% automaticamente. É obrigatório para ter direito a benefícios (auxílio-doença, maternidade, aposentadoria).",
+      "Sim. Empregados CLT pagam INSS de 7,5% a 14%, com cada alíquota aplicada só sobre a parte do salário dentro da sua faixa. É obrigatório para ter direito a benefícios (auxílio-doença, maternidade, aposentadoria).",
   },
   {
     question: "Vale refeição reduz meu imposto?",
@@ -60,12 +57,17 @@ const FAQ: FAQItem[] = [
   {
     question: "Como reduzir meu desconto de IRPF?",
     answer:
-      "Contribuindo para previdência complementar (até 12% do rendimento tributável), gastos com educação e saúde, e incluindo todos os dependentes. Use a calculadora para ver o impacto.",
+      "Na folha, só reduzem a retenção os dependentes, a contribuição a previdência complementar do tipo PGBL e a pensão alimentícia judicial. Gastos com saúde e educação não entram no desconto mensal: eles reduzem o imposto no ajuste anual da declaração.",
   },
   {
     question: "Posso negociar um salário bruto maior?",
     answer:
       "Sim. Conhecendo a diferença bruto→líquido, você pode negociar melhor. Peça o salário bruto que resulta no líquido desejado, não ao contrário.",
+  },
+  {
+    question: "O que é o desconto simplificado mensal?",
+    answer:
+      "É um desconto fixo de R$ 607,20 que a fonte pagadora pode usar no lugar das deduções legais (INSS, dependentes, previdência) quando ele for mais vantajoso para você, como prevê o art. 4º, § 2º, da Lei 9.250/1995. Em 2026 isso acontece, sem dependentes, para salários até cerca de R$ 5.755: abaixo disso o INSS é menor que R$ 607,20. A calculadora aplica sozinha o que for mais vantajoso.",
   },
   {
     question: "O resultado da calculadora é garantido?",
@@ -97,7 +99,7 @@ export const Route = createFileRoute("/calculadora-salario-liquido")({
 });
 
 function SalarioLiquidoCalculator() {
-  const [input, setInput] = usePersistedState<NetSalaryInput>("salario-liquido-input-v2", DEFAULTS);
+  const [input, setInput] = usePersistedState<NetSalaryInput>("salario-liquido-input-v3", DEFAULTS);
   const result = useMemo(() => calculateNetSalary(input), [input]);
 
   const handleReset = () => setInput(DEFAULTS);
@@ -130,30 +132,27 @@ function SalarioLiquidoCalculator() {
       </FormSection>
 
       <FormSection
-        title="Deduções permitidas (opcional)"
-        description="Gastos que reduzem sua base de IRPF"
+        title="Deduções da retenção mensal (opcional)"
+        description="O que a lei deixa abater da base do imposto retido na folha"
       >
         <CurrencyInput
-          label="Gastos mensais com educação"
+          label="Previdência complementar mensal (PGBL)"
           placeholder="0"
-          value={input.educationDeduction}
-          onChange={(value) => setInput({ ...input, educationDeduction: value })}
-          hint="Sua educação ou de dependentes (limite: R$ 3.561,50/ano)"
+          value={input.monthlyPrivatePension}
+          onChange={(value) => setInput({ ...input, monthlyPrivatePension: value })}
+          hint="Contribuição mensal a PGBL. VGBL não reduz o imposto."
         />
-        <CurrencyInput
-          label="Gastos mensais com saúde"
-          placeholder="0"
-          value={input.healthDeduction}
-          onChange={(value) => setInput({ ...input, healthDeduction: value })}
-          hint="Médico, dentista, medicamentos, plano de saúde (sem limite)"
-        />
-        <CurrencyInput
-          label="Previdência complementar mensal"
-          placeholder="0"
-          value={input.supplementaryPensionDeduction}
-          onChange={(value) => setInput({ ...input, supplementaryPensionDeduction: value })}
-          hint="PGBL: limite de 12% do rendimento tributável. VGBL não é dedutível."
-        />
+        <p className="text-sm text-muted-foreground">
+          Gastos com saúde e educação não entram no desconto mensal da folha: eles reduzem o imposto
+          no ajuste anual. Para simular esse efeito, use a{" "}
+          <a
+            href="/calculadora-irpf-2026"
+            className="text-primary underline-offset-2 hover:underline"
+          >
+            calculadora de IRPF
+          </a>
+          .
+        </p>
       </FormSection>
 
       <FormSection
@@ -219,6 +218,18 @@ function SalarioLiquidoCalculator() {
             label: "Desconto INSS (7,5% a 14%)",
             value: `- ${formatBRL(result.inssWithheld)}`,
             subtext: "Contribuição para seguridade social",
+          },
+          {
+            label: "Abatimento na base do IR",
+            value: formatBRL(
+              result.deductionApplied === "simplified"
+                ? result.simplifiedDeduction
+                : result.legalDeductions,
+            ),
+            subtext:
+              result.deductionApplied === "simplified"
+                ? `Desconto simplificado, mais vantajoso que as deduções legais (${formatBRL(result.legalDeductions)}). Reduz só a base do imposto, não sai do salário.`
+                : `Deduções legais (INSS, dependentes e previdência), mais vantajosas que o desconto simplificado (${formatBRL(result.simplifiedDeduction)}). Reduzem só a base do imposto.`,
           },
           {
             label: "Desconto IRPF (retenção)",

@@ -38,11 +38,15 @@ const OLD_NET_SALARY_KEY = "salario-liquido-input";
  * whole file testing a key nobody stores under, and passing.
  */
 const IRPF_KEY = "irpf-2026-input-v2";
-const NET_SALARY_KEY = "salario-liquido-input-v2";
+const NET_SALARY_KEY = "salario-liquido-input-v3";
 
 const ROUTE_KEYS: ReadonlyArray<readonly [string, string, string]> = [
   ["src/routes/calculadora-irpf-2026.tsx", IRPF_KEY, OLD_IRPF_KEY],
   ["src/routes/calculadora-salario-liquido.tsx", NET_SALARY_KEY, OLD_NET_SALARY_KEY],
+  // v3: health and education left the monthly calculation and the private
+  // pension became a monthly amount (docs/plans/adsense-reapplication, slice 3).
+  // A v2 form would hand the page a pension figure read on the wrong axis.
+  ["src/routes/calculadora-salario-liquido.tsx", NET_SALARY_KEY, "salario-liquido-input-v2"],
   // Slices 3 and 4 of docs/plans/english-domain-identifiers/ bumped three more
   // keys for the same reason. Without a row here, a revert to an unbumped key
   // would pass the suite and hand a returning visitor a form of undefineds.
@@ -68,13 +72,10 @@ const IRPF_DEFAULTS: IrpfInput = {
 const NET_SALARY_DEFAULTS: NetSalaryInput = {
   monthlyGrossSalary: 5000,
   dependants: 0,
-  educationDeduction: 0,
-  healthDeduction: 0,
-  supplementaryPensionDeduction: 0,
+  monthlyPrivatePension: 0,
   hasMealAllowance: false,
   hasTransportAllowance: false,
   hasUnionDue: false,
-  simplifiedRegime: false,
 };
 
 /** A form saved by the pre-rename build, field for field. */

@@ -1,5 +1,5 @@
 ---
-status: todo
+status: doing
 ---
 
 # Slice 3 — Salário líquido: answer the competitor, then build what only this site can
