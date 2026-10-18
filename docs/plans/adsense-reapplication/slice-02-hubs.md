@@ -1,5 +1,5 @@
 ---
-status: todo
+status: doing
 ---
 
 # Slice 2 — Give each hub a reason to exist, or redirect it
@@ -68,3 +68,52 @@ This is Google's clock, not ours. Slices 3–5 proceed while it runs.
 If the Soft 404 survives a re-crawl with a guide in place, redirect `/calculadoras` to `/`. Two
 pages competing to be the list of calculators is the problem either way, and one of them can
 simply stop existing.
+
+---
+
+## What actually happened — 2026-10-18
+
+Built on top of slice 1's branch, so the hubs list only what survived the cut.
+
+| hub | before | after |
+|---|---|---|
+| `/calculadoras` | the same 12 cards as `/`, grouped by topic, behind a search box | **a guide by situation**: "vou sair de casa", "recebi uma proposta de emprego", "trabalho por conta própria", "imposto de renda", "carro", "pet", "cortar gastos fixos". Each calculator appears with one sentence on when it is the right one there. The data is `src/data/calculator-guide.ts`. |
+| `/comparar` | 1 card left after slice 1 | **301 to `/comparar/energia`**, in `public/_redirects`. "Comparar" leaves the header and footer. The energia page's back link goes to `/calculadora-conta-de-luz`, and its breadcrumb drops the `/comparar` level. It stays linked from the guide's "cortar gastos fixos" situation. |
+| `/blog` | grouped by category ("Guias", "Análises"…) | **grouped by the calculator each post explains**, with a link to that calculator. `BlogPost` gains `calculator`. The unused `blogCategoryLabels` is deleted. |
+| `/` | "Seis ferramentas", over a grid of 12 | the count comes from `calculators.length`. The text links to the guide, and a new "Quem faz o Calcule Brasil" section names the author already named on `/sobre`, says what the site is not, and links to `/sobre`. The meta description now covers the tax calculators. |
+
+Each sentence about a calculator was checked against what its module computes, not against its
+tagline. For example, `beneficios-fiscais` computes the gross salary that would match the
+benefit at the IRPF rate the visitor types, and the guide says exactly that. One claim was caught
+and rewritten: `/metodologia` covers only the six household calculators, not the tax rules, so
+the guide points to each tax calculator's own page for its rates and ceilings.
+
+**Tests.**
+- `tests/calculator-guide.test.ts`: every guide slug exists, and every calculator is placed at
+  least once. Mutating a slug turned both red.
+- `tests/blog.test.ts`: every post names an existing calculator. A misspelt slug turned it red.
+- Unit suite at 286, `tsc` and `eslint` green.
+- `test:seo` green on **28** routes, none orphaned, with the new `/comparar` rule exercised as a
+  real 301.
+- In the browser, against `pnpm run dev`:
+  - `/calculadoras`, `/blog` and `/` render with no console errors;
+  - the header and footer no longer link `/comparar`;
+  - `vite dev` answers `/comparar` with 200, because the dev server does not apply `_redirects`.
+    `vite preview`, which `test:seo` uses, does.
+
+**Not done, by design.** `Done when` is Google's verdict: no Soft 404 on `/calculadoras`, and
+`/blog` known and crawled. That needs this deployed to production and re-crawled.
+`sitestats inspect` now exists in the `site-stats` skill to read it:
+
+```
+sitestats inspect calculebrasil https://calculebrasil.com/ https://calculebrasil.com/calculadoras https://calculebrasil.com/blog
+```
+
+On 2026-10-18 it read `Soft 404` for `/calculadoras` and `Discovered – currently not indexed`
+for `/comparar`.
+
+⚠️ **Owner:** after deploy, "Request indexing" for `/`, `/calculadoras` and `/blog`.
+
+**Seen, and left out of scope.** The four surviving articles render their category in lower case
+as the eyebrow, for example "guia • 6 min". #16 fixed that on the one article slice 1 then
+redirected.

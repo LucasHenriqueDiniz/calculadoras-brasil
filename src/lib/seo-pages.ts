@@ -13,8 +13,8 @@ export const EDITORIAL_RESPONSIBLE = "Calcule Brasil";
  * test fails when the two disagree — which is what catches a date left behind.
  */
 export const SEO_PAGES = [
-  { path: "/", lastmod: "2026-09-02", changefreq: "weekly", priority: 1 },
-  { path: "/calculadoras", lastmod: "2026-09-02", changefreq: "monthly", priority: 0.8 },
+  { path: "/", lastmod: "2026-10-18", changefreq: "weekly", priority: 1 },
+  { path: "/calculadoras", lastmod: "2026-10-18", changefreq: "monthly", priority: 0.8 },
   {
     path: "/calculadora-custo-carro",
     lastmod: "2026-09-12",
@@ -67,7 +67,7 @@ export const SEO_PAGES = [
     changefreq: "monthly",
     priority: 0.8,
   },
-  { path: "/blog", lastmod: "2026-09-12", changefreq: "weekly", priority: 0.85 },
+  { path: "/blog", lastmod: "2026-10-18", changefreq: "weekly", priority: 0.85 },
   {
     path: "/blog/como-economizar-conta-de-luz",
     lastmod: "2026-09-12",
@@ -105,8 +105,7 @@ export const SEO_PAGES = [
     changefreq: "monthly",
     priority: 0.75,
   },
-  { path: "/comparar", lastmod: "2026-09-02", changefreq: "monthly", priority: 0.75 },
-  { path: "/comparar/energia", lastmod: "2026-08-06", changefreq: "monthly", priority: 0.7 },
+  { path: "/comparar/energia", lastmod: "2026-10-18", changefreq: "monthly", priority: 0.7 },
   { path: "/sobre", lastmod: "2026-09-02", changefreq: "yearly", priority: 0.5 },
   { path: "/metodologia", lastmod: "2026-09-02", changefreq: "monthly", priority: 0.7 },
   { path: "/privacidade", lastmod: "2026-08-06", changefreq: "yearly", priority: 0.3 },
