@@ -18,13 +18,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Calculadoras simples para custos do dia a dia no Brasil: carro, morar sozinho, conta de luz, assinaturas, mudança e pet.",
+          "Calculadoras gratuitas para custos do dia a dia, salário líquido, CLT vs PJ, IRPF e INSS no Brasil, com fórmulas e premissas abertas.",
       },
       { property: "og:title", content: "Calcule Brasil | Decisões do dia a dia" },
       {
         property: "og:description",
         content:
-          "Estime quanto custa ter carro, morar sozinho, sua conta de luz, assinaturas, mudança e pet.",
+          "Quanto custa ter carro, morar sozinho ou adotar um pet, e quanto sobra do salário depois de INSS e imposto de renda.",
       },
       { property: "og:url", content: absoluteUrl("/") },
     ],
@@ -126,7 +126,12 @@ function Home() {
             Escolha uma calculadora
           </h2>
           <p className="mt-2 text-muted-foreground">
-            Seis ferramentas para os gastos mais comuns no orçamento brasileiro.
+            {calculators.length} ferramentas para os custos da casa, do carro e do pet, e para o que
+            sobra do salário depois de INSS e imposto de renda. Não sabe por qual começar?{" "}
+            <Link to="/calculadoras" className="font-medium text-primary hover:underline">
+              Veja qual usar em cada situação
+            </Link>
+            .
           </p>
         </div>
 
@@ -229,6 +234,28 @@ function Home() {
               </Link>
             </li>
           </ul>
+
+          <div className="mt-14 max-w-3xl space-y-4 text-pretty leading-relaxed text-foreground/85">
+            <h2 className="font-display text-2xl text-foreground sm:text-3xl">
+              Quem faz o Calcule Brasil
+            </h2>
+            <p>
+              O Calcule Brasil é um projeto independente, criado e mantido por Lucas Henrique Diniz
+              Ostroski, desenvolvedor full-stack. Não é banco, corretora nem escritório de
+              contabilidade: não vende produto financeiro e não indica investimento. O que o site
+              oferece são as contas, feitas com regras e dados públicos, para que você chegue à sua
+              decisão com os números na mão.
+            </p>
+            <p>
+              Cada calculadora mostra o que considera e o que deixa de fora. Quando uma regra muda,
+              como a tabela do imposto de renda de 2026, a calculadora e os textos que dependem dela
+              são revisados juntos.{" "}
+              <Link to="/sobre" className="font-medium text-primary hover:underline">
+                Conheça o projeto
+              </Link>
+              .
+            </p>
+          </div>
         </div>
       </section>
     </PageShell>

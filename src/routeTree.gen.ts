@@ -42,7 +42,6 @@ import { Route as BlogCustoPetAnualRouteImport } from './routes/blog/custo-pet-a
 import { Route as BlogDeducoesIrpfEsquecaRouteImport } from './routes/blog/deducoes-irpf-esqueca'
 import { Route as BlogDespesasDedutiveisAutonomoRouteImport } from './routes/blog/despesas-dedutiveis-autonomo'
 import { Route as BlogInvestimentosIsentosIrpfRouteImport } from './routes/blog/investimentos-isentos-irpf'
-import { Route as CompararIndexRouteImport } from './routes/comparar/index'
 import { Route as CompararEnergiaRouteImport } from './routes/comparar/energia'
 import { Route as ApiLocationsCitiesRouteImport } from './routes/api.locations.cities'
 import { Route as ApiLocationsStatesRouteImport } from './routes/api.locations.states'
@@ -221,11 +220,6 @@ const BlogInvestimentosIsentosIrpfRoute =
     path: '/investimentos-isentos-irpf',
     getParentRoute: () => BlogRoute,
   } as any)
-const CompararIndexRoute = CompararIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => CompararRoute,
-} as any)
 const CompararEnergiaRoute = CompararEnergiaRouteImport.update({
   id: '/energia',
   path: '/energia',
@@ -282,7 +276,6 @@ export interface FileRoutesByFullPath {
   '/blog/investimentos-isentos-irpf': typeof BlogInvestimentosIsentosIrpfRoute
   '/comparar/energia': typeof CompararEnergiaRoute
   '/blog/': typeof BlogIndexRoute
-  '/comparar/': typeof CompararIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
   '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
@@ -302,6 +295,7 @@ export interface FileRoutesByTo {
   '/calculadora-previdencia-complementar': typeof CalculadoraPrevidenciaComplementarRoute
   '/calculadora-salario-liquido': typeof CalculadoraSalarioLiquidoRoute
   '/calculadoras': typeof CalculadorasRoute
+  '/comparar': typeof CompararRouteWithChildren
   '/contato': typeof ContatoRoute
   '/metodologia': typeof MetodologiaRoute
   '/privacidade': typeof PrivacidadeRoute
@@ -320,7 +314,6 @@ export interface FileRoutesByTo {
   '/blog/investimentos-isentos-irpf': typeof BlogInvestimentosIsentosIrpfRoute
   '/comparar/energia': typeof CompararEnergiaRoute
   '/blog': typeof BlogIndexRoute
-  '/comparar': typeof CompararIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
   '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
@@ -361,7 +354,6 @@ export interface FileRoutesById {
   '/blog/investimentos-isentos-irpf': typeof BlogInvestimentosIsentosIrpfRoute
   '/comparar/energia': typeof CompararEnergiaRoute
   '/blog/': typeof BlogIndexRoute
-  '/comparar/': typeof CompararIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
   '/api/public-data/sources': typeof ApiPublicDataSourcesRoute
@@ -403,7 +395,6 @@ export interface FileRouteTypes {
     | '/blog/investimentos-isentos-irpf'
     | '/comparar/energia'
     | '/blog/'
-    | '/comparar/'
     | '/api/locations/cities'
     | '/api/locations/states'
     | '/api/public-data/sources'
@@ -423,6 +414,7 @@ export interface FileRouteTypes {
     | '/calculadora-previdencia-complementar'
     | '/calculadora-salario-liquido'
     | '/calculadoras'
+    | '/comparar'
     | '/contato'
     | '/metodologia'
     | '/privacidade'
@@ -441,7 +433,6 @@ export interface FileRouteTypes {
     | '/blog/investimentos-isentos-irpf'
     | '/comparar/energia'
     | '/blog'
-    | '/comparar'
     | '/api/locations/cities'
     | '/api/locations/states'
     | '/api/public-data/sources'
@@ -481,7 +472,6 @@ export interface FileRouteTypes {
     | '/blog/investimentos-isentos-irpf'
     | '/comparar/energia'
     | '/blog/'
-    | '/comparar/'
     | '/api/locations/cities'
     | '/api/locations/states'
     | '/api/public-data/sources'
@@ -751,13 +741,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogInvestimentosIsentosIrpfRouteImport
       parentRoute: typeof BlogRoute
     }
-    '/comparar/': {
-      id: '/comparar/'
-      path: '/'
-      fullPath: '/comparar/'
-      preLoaderRoute: typeof CompararIndexRouteImport
-      parentRoute: typeof CompararRoute
-    }
     '/comparar/energia': {
       id: '/comparar/energia'
       path: '/energia'
@@ -815,12 +798,10 @@ const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
 interface CompararRouteChildren {
   CompararEnergiaRoute: typeof CompararEnergiaRoute
-  CompararIndexRoute: typeof CompararIndexRoute
 }
 
 const CompararRouteChildren: CompararRouteChildren = {
   CompararEnergiaRoute: CompararEnergiaRoute,
-  CompararIndexRoute: CompararIndexRoute,
 }
 
 const CompararRouteWithChildren = CompararRoute._addFileChildren(

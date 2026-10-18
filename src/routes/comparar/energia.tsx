@@ -118,11 +118,11 @@ function EnergiaComparison() {
 
         <div className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
           <Link
-            to="/comparar"
+            to="/calculadora-conta-de-luz"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
-            Voltar para comparações
+            Calcular a conta de luz por aparelho
           </Link>
         </div>
 

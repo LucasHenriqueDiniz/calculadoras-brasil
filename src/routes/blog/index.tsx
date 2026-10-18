@@ -1,33 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, BookOpen, Newspaper } from "lucide-react";
 import { PageShell } from "@/components/layout/PageShell";
-import { blogCategoryLabels, listBlogPosts, type BlogPost } from "@/lib/blog";
+import { calculators } from "@/data/calculators";
+import { listBlogPosts, type BlogPost } from "@/lib/blog";
 import { absoluteUrl } from "@/lib/site";
 
 const DESCRIPTION =
-  "Guias, análises e explicações sobre IRPF, salário líquido, CLT vs PJ, custo de vida e contas da casa. Tudo em português claro, com as contas abertas.";
+  "Cada texto explica a conta por trás de uma calculadora do site: deduções do IRPF, despesas do autônomo, conta de luz, assinaturas e o custo de um pet.";
 
 const posts = listBlogPosts();
 
 /**
- * Display order for the category sections. A full Record rather than an array,
- * so a category added to `BlogPost` fails to compile here instead of quietly
- * dropping its posts off the page.
+ * One section per calculator, in the order the calculators are listed, holding
+ * the posts that explain it. A calculator with no post gets no section.
  */
-const CATEGORY_RANK: Record<BlogPost["category"], number> = {
-  guia: 0,
-  analise: 1,
-  dica: 2,
-  educacao: 3,
-  noticia: 4,
-};
-
-const sections = (Object.keys(CATEGORY_RANK) as BlogPost["category"][])
-  .sort((a, b) => CATEGORY_RANK[a] - CATEGORY_RANK[b])
-  .map((category) => ({
-    category,
-    label: blogCategoryLabels[category],
-    items: posts.filter((post) => post.category === category),
+const sections = calculators
+  .map((calculator) => ({
+    calculator,
+    items: posts.filter((post) => post.calculator === calculator.slug),
   }))
   .filter((section) => section.items.length > 0);
 
@@ -134,11 +124,20 @@ function BlogIndex() {
       </section>
 
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16">
-        {sections.map((section) => (
-          <section key={section.category} className="mb-14 last:mb-0">
-            <h2 className="font-display text-2xl text-foreground">{section.label}</h2>
+        {sections.map(({ calculator, items }) => (
+          <section key={calculator.slug} className="mb-14 last:mb-0">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+              <h2 className="font-display text-2xl text-foreground">{calculator.shortTitle}</h2>
+              <Link
+                to={calculator.path}
+                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+              >
+                Abrir a calculadora <ArrowRight className="h-4 w-4" aria-hidden />
+              </Link>
+            </div>
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{calculator.tagline}.</p>
             <ul className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {section.items.map((post) => (
+              {items.map((post) => (
                 <li key={post.slug}>
                   <PostCard post={post} />
                 </li>
