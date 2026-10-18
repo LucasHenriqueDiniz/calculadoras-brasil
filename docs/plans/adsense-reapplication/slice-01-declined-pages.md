@@ -1,5 +1,5 @@
 ---
-status: todo
+status: doing
 ---
 
 # Slice 1 — Merge or remove the 22 pages Google declined
@@ -99,3 +99,84 @@ If the redirect mechanism takes more than one attempt on workerd, ship the **rem
 sitemap and the internal links** first, with the route files left in place. A page Google declined
 and nothing links to does no harm for a few days, and the redirect lands in a follow-up. Do not
 ship a redirect verified only on `vite preview`.
+
+---
+
+## What actually happened — 2026-10-18
+
+**Triage.** 20 pages redirect with a 301 and 2 are removed. The full table, with the served status
+per path, is `triage.tsv` next to this file. It is the input to the `Done when` loop.
+
+| target | redirected from |
+|---|---|
+| `/calculadora-irpf-2026` | `blog/calculadora-irpf-2026`, `blog/guia-irpf-2026`, `blog/tabela-irpf-2026-completa`, `blog/simplificado-vs-completo` |
+| `/calculadora-clt-vs-pj` | `blog/clt-vs-pj-comparacao`, `blog/quando-virar-pj`, `blog/como-calcular-salario-pj` |
+| `/calculadora-inss-autonomo` | `blog/quanto-custa-ser-autonomo`, `blog/recibo-rpa-autonomo`, `blog/formal-vs-informal` |
+| `/calculadora-salario-liquido` | `blog/salario-liquido-entenda`, `blog/salario-por-setor-2026` |
+| `/blog/deducoes-irpf-esqueca` | `blog/dependentes-irpf-economia`, `blog/planejamento-tributario` (its sections are deductions, PGBL, health, education and exempt investments) |
+| `/calculadora-assinaturas` | `comparar/streaming`, `comparar/academia` (the calculator already covers gym and streaming) |
+| `/calculadora-custo-carro` | `blog/quanto-custa-ter-carro` |
+| `/calculadora-morar-sozinho` | `blog/quanto-custa-morar-sozinho` |
+| `/calculadora-previdencia-complementar` | `blog/aposentadoria-early-retirement` |
+| `/calculadora-custo-mudanca` | `comparar/mudanca` |
+| **removed, 404** | `blog/negociar-salario-melhor` (salary negotiation, which no calculator answers), `blog/mei-vs-pj-custo` (MEI against PJ, which no calculator computes; `contador-necessario-pj` mentions MEI twice) |
+
+No page was kept.
+
+**Two deviations from the plan, both deliberate.**
+
+1. **No 410.** Cloudflare's `_redirects` for Workers static assets supports 301, 302, 303, 307
+   and 308, and nothing else (https://developers.cloudflare.com/workers/static-assets/redirects/,
+   fetched 2026-10-18). A removed route already answers 404, which the browser confirmed against
+   production for three unknown paths. So "removed" means 404. Google treats 404 and 410 alike
+   for a page it never indexed.
+2. **No content was folded into the targets.** Folding is writing, and the writing for each
+   calculator is slices 3–5, which start from a competitor answer. Moving paragraphs now would
+   decide that content before the answer exists. The deleted articles are recoverable as
+   `git show 9242ae4:src/routes/blog/<slug>.tsx`, and slices 3–5 read the ones redirected to
+   their calculator before they write.
+
+**The redirect mechanism is `public/_redirects`**, copied by the build to
+`dist/client/_redirects` with 20 rules. Probed under `vite preview` (port 4174) on 2026-10-18:
+
+| request | answer |
+|---|---|
+| `/blog/quanto-custa-ter-carro` | `301 → /calculadora-custo-carro` |
+| `/comparar/streaming` | `301 → /calculadora-assinaturas` |
+| `/blog/negociar-salario-melhor` | `404` |
+| `/calculadora-irpf-2026` | `200` |
+| `/calculadora-irpf-2026/` | `307 → /calculadora-irpf-2026` |
+| `/blog/quanto-custa-ter-carro/` | `307 → /blog/quanto-custa-ter-carro`, then the 301: two hops, on a form nothing links |
+
+⚠️ **`vite preview` runs the Workers asset server here.** It applied both `_redirects` and
+`html_handling`, using `@cloudflare/vite-plugin` 1.54.2 and wrangler 4.127.1. D4 says the
+opposite, and now carries a dated note saying so. The consequence for this plan: the smoke test
+exercises the real redirects, and the deployed preview stays the final check rather than the only
+one.
+
+**Tests.**
+- `tests/seo-smoke.mjs` reads `dist/client/_redirects`. Every rule must be a 301 whose source is
+  not a public route and whose `Location` is one.
+- Mutation, run against the built file and then restored. Pointing `guia-irpf-2026` at a removed
+  page made it fail ("must redirect to a public route"). A rule redirecting the live
+  `/calculadora-irpf-2026` also made it fail, through that page's canonical check.
+- A dropped rule is **not** caught by the smoke test. The removed page would 404 instead of 301,
+  and the `Done when` loop against `triage.tsv` is what catches that.
+
+**Also changed.**
+- `irpf-2026` had only declined posts as `relatedPosts`. It now lists the two indexed IRPF
+  articles, `deducoes-irpf-esqueca` and `investimentos-isentos-irpf`.
+- `salario-liquido` has none left. `RelatedPosts` renders nothing for an empty list.
+- `/comparar` lists one comparison, and its meta copy no longer names the three that left.
+  Whether a hub with one child should exist is slice 2's call.
+- README: 49 → 29 prerendered pages.
+
+**Gate.** `pnpm run check` passes every step except the last, `pnpm audit`:
+- 282 unit tests, `tsc`, `eslint`, build, `test:seo` on 29 routes, `wrangler deploy --dry-run`;
+- `pnpm audit` reports 21 advisories in `undici` 7.29.0, through miniflare. The lockfile is
+  untouched here, so they predate this slice. Raised as a separate task.
+
+**Not done yet, and it is what `Done when` asks for:**
+- the `triage.tsv` loop against the **deployed** preview. That needs a pushed branch and a PR,
+  because Workers Builds uploads a preview version on pull requests (`docs/deploy.md`).
+- ⚠️ the owner's "Request indexing" for the merge targets.

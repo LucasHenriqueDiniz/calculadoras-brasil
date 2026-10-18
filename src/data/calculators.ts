@@ -106,11 +106,7 @@ export const calculators: CalculatorMeta[] = [
       "Valor anual de IPVA, seguro e licenciamento",
       "Tempo planejado de uso do veículo",
     ],
-    relatedPosts: [
-      "quanto-custa-ter-carro",
-      "quanto-custa-morar-sozinho",
-      "assinaturas-que-valem-a-pena",
-    ],
+    relatedPosts: ["assinaturas-que-valem-a-pena"],
   },
   {
     slug: "morar-sozinho",
@@ -137,11 +133,7 @@ export const calculators: CalculatorMeta[] = [
       "Hábito alimentar (em casa, delivery, refeições fora)",
       "Renda líquida mensal",
     ],
-    relatedPosts: [
-      "quanto-custa-morar-sozinho",
-      "como-economizar-conta-de-luz",
-      "assinaturas-que-valem-a-pena",
-    ],
+    relatedPosts: ["como-economizar-conta-de-luz", "assinaturas-que-valem-a-pena"],
   },
   {
     slug: "conta-de-luz",
@@ -167,11 +159,7 @@ export const calculators: CalculatorMeta[] = [
       "Dias de uso por mês",
       "Tarifa de energia (R$/kWh) da sua conta",
     ],
-    relatedPosts: [
-      "como-economizar-conta-de-luz",
-      "quanto-custa-morar-sozinho",
-      "assinaturas-que-valem-a-pena",
-    ],
+    relatedPosts: ["como-economizar-conta-de-luz", "assinaturas-que-valem-a-pena"],
   },
   {
     slug: "assinaturas",
@@ -196,11 +184,7 @@ export const calculators: CalculatorMeta[] = [
       "Frequência (mensal ou anual)",
       "Categoria (streaming, software, academia, etc.)",
     ],
-    relatedPosts: [
-      "assinaturas-que-valem-a-pena",
-      "quanto-custa-morar-sozinho",
-      "como-economizar-conta-de-luz",
-    ],
+    relatedPosts: ["assinaturas-que-valem-a-pena", "como-economizar-conta-de-luz"],
   },
   {
     slug: "custo-mudanca",
@@ -226,7 +210,7 @@ export const calculators: CalculatorMeta[] = [
       "Necessidade de comprar móveis ou eletrodomésticos",
       "Caução, primeiro aluguel e taxas do imóvel novo",
     ],
-    relatedPosts: ["quanto-custa-morar-sozinho", "como-economizar-conta-de-luz", "custo-pet-anual"],
+    relatedPosts: ["como-economizar-conta-de-luz", "custo-pet-anual"],
   },
   {
     slug: "custo-pet",
@@ -252,7 +236,7 @@ export const calculators: CalculatorMeta[] = [
       "Frequência de banho/tosa",
       "Plano de saúde pet (sim/não)",
     ],
-    relatedPosts: ["custo-pet-anual", "quanto-custa-morar-sozinho", "assinaturas-que-valem-a-pena"],
+    relatedPosts: ["custo-pet-anual", "assinaturas-que-valem-a-pena"],
   },
   {
     slug: "irpf-2026",
@@ -282,12 +266,7 @@ export const calculators: CalculatorMeta[] = [
       "Contribuição com previdência complementar",
       "Regime tributário (completo ou simplificado)",
     ],
-    relatedPosts: [
-      "calculadora-irpf-2026",
-      "guia-irpf-2026",
-      "tabela-irpf-2026-completa",
-      "simplificado-vs-completo",
-    ],
+    relatedPosts: ["deducoes-irpf-esqueca", "investimentos-isentos-irpf"],
   },
   {
     slug: "salario-liquido",
@@ -315,12 +294,7 @@ export const calculators: CalculatorMeta[] = [
       "Contribuição previdência complementar",
       "Se tem vale refeição, transporte, sindicato",
     ],
-    relatedPosts: [
-      "salario-liquido-entenda",
-      "salario-por-setor-2026",
-      "negociar-salario-melhor",
-      "tabela-irpf-2026-completa",
-    ],
+    relatedPosts: [],
   },
   {
     slug: "inss-autonomo",
@@ -345,12 +319,7 @@ export const calculators: CalculatorMeta[] = [
       "Régime preferido (20% ou 11%)",
       "Tempo de contribuição planejado",
     ],
-    relatedPosts: [
-      "quanto-custa-ser-autonomo",
-      "recibo-rpa-autonomo",
-      "despesas-dedutiveis-autonomo",
-      "formal-vs-informal",
-    ],
+    relatedPosts: ["despesas-dedutiveis-autonomo"],
   },
   {
     slug: "clt-vs-pj",
@@ -376,13 +345,7 @@ export const calculators: CalculatorMeta[] = [
       "Número de dependentes",
       "Despesas mensais estimadas PJ",
     ],
-    relatedPosts: [
-      "clt-vs-pj-comparacao",
-      "quando-virar-pj",
-      "como-calcular-salario-pj",
-      "mei-vs-pj-custo",
-      "contador-necessario-pj",
-    ],
+    relatedPosts: ["contador-necessario-pj"],
   },
   {
     slug: "previdencia-complementar",
@@ -408,11 +371,7 @@ export const calculators: CalculatorMeta[] = [
       "Tempo até aposentadoria",
       "Alíquota IRPF estimada",
     ],
-    relatedPosts: [
-      "aposentadoria-early-retirement",
-      "investimentos-isentos-irpf",
-      "planejamento-tributario",
-    ],
+    relatedPosts: ["investimentos-isentos-irpf"],
   },
   {
     slug: "beneficios-fiscais",
@@ -437,12 +396,7 @@ export const calculators: CalculatorMeta[] = [
       "Valor de vale transporte mensal",
       "Alíquota IRPF atual",
     ],
-    relatedPosts: [
-      "deducoes-irpf-esqueca",
-      "dependentes-irpf-economia",
-      "planejamento-tributario",
-      "investimentos-isentos-irpf",
-    ],
+    relatedPosts: ["deducoes-irpf-esqueca", "investimentos-isentos-irpf"],
   },
 ];
 

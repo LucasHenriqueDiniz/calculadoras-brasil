@@ -200,6 +200,12 @@ sitemaps and no canonical declares.
 in letter. Changing it would mean putting a redirect layer in front of the asset server, which
 buys a status code on a URL nobody publishes.
 
+⚠️ **Note, 2026-10-18.** `vite preview` now runs the Workers asset server: with
+`@cloudflare/vite-plugin` 1.54.2 it answered `/calculadora-irpf-2026/` with a 307 to the no-slash
+form, and applied `public/_redirects`. Whether the claim above held in September was not
+re-checked; it does not hold now. The decision itself is unaffected. See
+`docs/plans/adsense-reapplication/slice-01-declined-pages.md`.
+
 ### D3 — IRPF 2026 is the official Receita table **plus** the Lei 15.270/2025 redutor
 
 **Context.** `calculateIrpf` carries a bracket table that matches no published source, and its

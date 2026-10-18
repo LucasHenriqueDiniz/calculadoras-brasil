@@ -35,37 +35,15 @@ import { Route as ApiFuelPricesRouteImport } from './routes/api.fuel-prices'
 import { Route as ApiHealthRouteImport } from './routes/api.health'
 import { Route as ApiVehicleEfficiencyRouteImport } from './routes/api.vehicle-efficiency'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
-import { Route as BlogAposentadoriaEarlyRetirementRouteImport } from './routes/blog/aposentadoria-early-retirement'
 import { Route as BlogAssinaturasQueValemAPenaRouteImport } from './routes/blog/assinaturas-que-valem-a-pena'
-import { Route as BlogCalculadoraIrpf2026RouteImport } from './routes/blog/calculadora-irpf-2026'
-import { Route as BlogCltVsPjComparacaoRouteImport } from './routes/blog/clt-vs-pj-comparacao'
-import { Route as BlogComoCalcularSalarioPjRouteImport } from './routes/blog/como-calcular-salario-pj'
 import { Route as BlogComoEconomizarContaDeLuzRouteImport } from './routes/blog/como-economizar-conta-de-luz'
 import { Route as BlogContadorNecessarioPjRouteImport } from './routes/blog/contador-necessario-pj'
 import { Route as BlogCustoPetAnualRouteImport } from './routes/blog/custo-pet-anual'
 import { Route as BlogDeducoesIrpfEsquecaRouteImport } from './routes/blog/deducoes-irpf-esqueca'
-import { Route as BlogDependentesIrpfEconomiaRouteImport } from './routes/blog/dependentes-irpf-economia'
 import { Route as BlogDespesasDedutiveisAutonomoRouteImport } from './routes/blog/despesas-dedutiveis-autonomo'
-import { Route as BlogFormalVsInformalRouteImport } from './routes/blog/formal-vs-informal'
-import { Route as BlogGuiaIrpf2026RouteImport } from './routes/blog/guia-irpf-2026'
 import { Route as BlogInvestimentosIsentosIrpfRouteImport } from './routes/blog/investimentos-isentos-irpf'
-import { Route as BlogMeiVsPjCustoRouteImport } from './routes/blog/mei-vs-pj-custo'
-import { Route as BlogNegociarSalarioMelhorRouteImport } from './routes/blog/negociar-salario-melhor'
-import { Route as BlogPlanejamentoTributarioRouteImport } from './routes/blog/planejamento-tributario'
-import { Route as BlogQuandoVirarPjRouteImport } from './routes/blog/quando-virar-pj'
-import { Route as BlogQuantoCustaMorarSozinhoRouteImport } from './routes/blog/quanto-custa-morar-sozinho'
-import { Route as BlogQuantoCustaSerAutonomoRouteImport } from './routes/blog/quanto-custa-ser-autonomo'
-import { Route as BlogQuantoCustaTerCarroRouteImport } from './routes/blog/quanto-custa-ter-carro'
-import { Route as BlogReciboRpaAutonomoRouteImport } from './routes/blog/recibo-rpa-autonomo'
-import { Route as BlogSalarioLiquidoEntendaRouteImport } from './routes/blog/salario-liquido-entenda'
-import { Route as BlogSalarioPorSetor2026RouteImport } from './routes/blog/salario-por-setor-2026'
-import { Route as BlogSimplificadoVsCompletoRouteImport } from './routes/blog/simplificado-vs-completo'
-import { Route as BlogTabelaIrpf2026CompletaRouteImport } from './routes/blog/tabela-irpf-2026-completa'
 import { Route as CompararIndexRouteImport } from './routes/comparar/index'
-import { Route as CompararAcademiaRouteImport } from './routes/comparar/academia'
 import { Route as CompararEnergiaRouteImport } from './routes/comparar/energia'
-import { Route as CompararMudancaRouteImport } from './routes/comparar/mudanca'
-import { Route as CompararStreamingRouteImport } from './routes/comparar/streaming'
 import { Route as ApiLocationsCitiesRouteImport } from './routes/api.locations.cities'
 import { Route as ApiLocationsStatesRouteImport } from './routes/api.locations.states'
 import { Route as ApiPublicDataSourcesRouteImport } from './routes/api.public-data.sources'
@@ -203,32 +181,10 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/',
   getParentRoute: () => BlogRoute,
 } as any)
-const BlogAposentadoriaEarlyRetirementRoute =
-  BlogAposentadoriaEarlyRetirementRouteImport.update({
-    id: '/aposentadoria-early-retirement',
-    path: '/aposentadoria-early-retirement',
-    getParentRoute: () => BlogRoute,
-  } as any)
 const BlogAssinaturasQueValemAPenaRoute =
   BlogAssinaturasQueValemAPenaRouteImport.update({
     id: '/assinaturas-que-valem-a-pena',
     path: '/assinaturas-que-valem-a-pena',
-    getParentRoute: () => BlogRoute,
-  } as any)
-const BlogCalculadoraIrpf2026Route = BlogCalculadoraIrpf2026RouteImport.update({
-  id: '/calculadora-irpf-2026',
-  path: '/calculadora-irpf-2026',
-  getParentRoute: () => BlogRoute,
-} as any)
-const BlogCltVsPjComparacaoRoute = BlogCltVsPjComparacaoRouteImport.update({
-  id: '/clt-vs-pj-comparacao',
-  path: '/clt-vs-pj-comparacao',
-  getParentRoute: () => BlogRoute,
-} as any)
-const BlogComoCalcularSalarioPjRoute =
-  BlogComoCalcularSalarioPjRouteImport.update({
-    id: '/como-calcular-salario-pj',
-    path: '/como-calcular-salario-pj',
     getParentRoute: () => BlogRoute,
   } as any)
 const BlogComoEconomizarContaDeLuzRoute =
@@ -253,99 +209,16 @@ const BlogDeducoesIrpfEsquecaRoute = BlogDeducoesIrpfEsquecaRouteImport.update({
   path: '/deducoes-irpf-esqueca',
   getParentRoute: () => BlogRoute,
 } as any)
-const BlogDependentesIrpfEconomiaRoute =
-  BlogDependentesIrpfEconomiaRouteImport.update({
-    id: '/dependentes-irpf-economia',
-    path: '/dependentes-irpf-economia',
-    getParentRoute: () => BlogRoute,
-  } as any)
 const BlogDespesasDedutiveisAutonomoRoute =
   BlogDespesasDedutiveisAutonomoRouteImport.update({
     id: '/despesas-dedutiveis-autonomo',
     path: '/despesas-dedutiveis-autonomo',
     getParentRoute: () => BlogRoute,
   } as any)
-const BlogFormalVsInformalRoute = BlogFormalVsInformalRouteImport.update({
-  id: '/formal-vs-informal',
-  path: '/formal-vs-informal',
-  getParentRoute: () => BlogRoute,
-} as any)
-const BlogGuiaIrpf2026Route = BlogGuiaIrpf2026RouteImport.update({
-  id: '/guia-irpf-2026',
-  path: '/guia-irpf-2026',
-  getParentRoute: () => BlogRoute,
-} as any)
 const BlogInvestimentosIsentosIrpfRoute =
   BlogInvestimentosIsentosIrpfRouteImport.update({
     id: '/investimentos-isentos-irpf',
     path: '/investimentos-isentos-irpf',
-    getParentRoute: () => BlogRoute,
-  } as any)
-const BlogMeiVsPjCustoRoute = BlogMeiVsPjCustoRouteImport.update({
-  id: '/mei-vs-pj-custo',
-  path: '/mei-vs-pj-custo',
-  getParentRoute: () => BlogRoute,
-} as any)
-const BlogNegociarSalarioMelhorRoute =
-  BlogNegociarSalarioMelhorRouteImport.update({
-    id: '/negociar-salario-melhor',
-    path: '/negociar-salario-melhor',
-    getParentRoute: () => BlogRoute,
-  } as any)
-const BlogPlanejamentoTributarioRoute =
-  BlogPlanejamentoTributarioRouteImport.update({
-    id: '/planejamento-tributario',
-    path: '/planejamento-tributario',
-    getParentRoute: () => BlogRoute,
-  } as any)
-const BlogQuandoVirarPjRoute = BlogQuandoVirarPjRouteImport.update({
-  id: '/quando-virar-pj',
-  path: '/quando-virar-pj',
-  getParentRoute: () => BlogRoute,
-} as any)
-const BlogQuantoCustaMorarSozinhoRoute =
-  BlogQuantoCustaMorarSozinhoRouteImport.update({
-    id: '/quanto-custa-morar-sozinho',
-    path: '/quanto-custa-morar-sozinho',
-    getParentRoute: () => BlogRoute,
-  } as any)
-const BlogQuantoCustaSerAutonomoRoute =
-  BlogQuantoCustaSerAutonomoRouteImport.update({
-    id: '/quanto-custa-ser-autonomo',
-    path: '/quanto-custa-ser-autonomo',
-    getParentRoute: () => BlogRoute,
-  } as any)
-const BlogQuantoCustaTerCarroRoute = BlogQuantoCustaTerCarroRouteImport.update({
-  id: '/quanto-custa-ter-carro',
-  path: '/quanto-custa-ter-carro',
-  getParentRoute: () => BlogRoute,
-} as any)
-const BlogReciboRpaAutonomoRoute = BlogReciboRpaAutonomoRouteImport.update({
-  id: '/recibo-rpa-autonomo',
-  path: '/recibo-rpa-autonomo',
-  getParentRoute: () => BlogRoute,
-} as any)
-const BlogSalarioLiquidoEntendaRoute =
-  BlogSalarioLiquidoEntendaRouteImport.update({
-    id: '/salario-liquido-entenda',
-    path: '/salario-liquido-entenda',
-    getParentRoute: () => BlogRoute,
-  } as any)
-const BlogSalarioPorSetor2026Route = BlogSalarioPorSetor2026RouteImport.update({
-  id: '/salario-por-setor-2026',
-  path: '/salario-por-setor-2026',
-  getParentRoute: () => BlogRoute,
-} as any)
-const BlogSimplificadoVsCompletoRoute =
-  BlogSimplificadoVsCompletoRouteImport.update({
-    id: '/simplificado-vs-completo',
-    path: '/simplificado-vs-completo',
-    getParentRoute: () => BlogRoute,
-  } as any)
-const BlogTabelaIrpf2026CompletaRoute =
-  BlogTabelaIrpf2026CompletaRouteImport.update({
-    id: '/tabela-irpf-2026-completa',
-    path: '/tabela-irpf-2026-completa',
     getParentRoute: () => BlogRoute,
   } as any)
 const CompararIndexRoute = CompararIndexRouteImport.update({
@@ -353,24 +226,9 @@ const CompararIndexRoute = CompararIndexRouteImport.update({
   path: '/',
   getParentRoute: () => CompararRoute,
 } as any)
-const CompararAcademiaRoute = CompararAcademiaRouteImport.update({
-  id: '/academia',
-  path: '/academia',
-  getParentRoute: () => CompararRoute,
-} as any)
 const CompararEnergiaRoute = CompararEnergiaRouteImport.update({
   id: '/energia',
   path: '/energia',
-  getParentRoute: () => CompararRoute,
-} as any)
-const CompararMudancaRoute = CompararMudancaRouteImport.update({
-  id: '/mudanca',
-  path: '/mudanca',
-  getParentRoute: () => CompararRoute,
-} as any)
-const CompararStreamingRoute = CompararStreamingRouteImport.update({
-  id: '/streaming',
-  path: '/streaming',
   getParentRoute: () => CompararRoute,
 } as any)
 const ApiLocationsCitiesRoute = ApiLocationsCitiesRouteImport.update({
@@ -415,36 +273,14 @@ export interface FileRoutesByFullPath {
   '/api/fuel-prices': typeof ApiFuelPricesRoute
   '/api/health': typeof ApiHealthRoute
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
-  '/blog/aposentadoria-early-retirement': typeof BlogAposentadoriaEarlyRetirementRoute
   '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
-  '/blog/calculadora-irpf-2026': typeof BlogCalculadoraIrpf2026Route
-  '/blog/clt-vs-pj-comparacao': typeof BlogCltVsPjComparacaoRoute
-  '/blog/como-calcular-salario-pj': typeof BlogComoCalcularSalarioPjRoute
   '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
   '/blog/contador-necessario-pj': typeof BlogContadorNecessarioPjRoute
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
   '/blog/deducoes-irpf-esqueca': typeof BlogDeducoesIrpfEsquecaRoute
-  '/blog/dependentes-irpf-economia': typeof BlogDependentesIrpfEconomiaRoute
   '/blog/despesas-dedutiveis-autonomo': typeof BlogDespesasDedutiveisAutonomoRoute
-  '/blog/formal-vs-informal': typeof BlogFormalVsInformalRoute
-  '/blog/guia-irpf-2026': typeof BlogGuiaIrpf2026Route
   '/blog/investimentos-isentos-irpf': typeof BlogInvestimentosIsentosIrpfRoute
-  '/blog/mei-vs-pj-custo': typeof BlogMeiVsPjCustoRoute
-  '/blog/negociar-salario-melhor': typeof BlogNegociarSalarioMelhorRoute
-  '/blog/planejamento-tributario': typeof BlogPlanejamentoTributarioRoute
-  '/blog/quando-virar-pj': typeof BlogQuandoVirarPjRoute
-  '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
-  '/blog/quanto-custa-ser-autonomo': typeof BlogQuantoCustaSerAutonomoRoute
-  '/blog/quanto-custa-ter-carro': typeof BlogQuantoCustaTerCarroRoute
-  '/blog/recibo-rpa-autonomo': typeof BlogReciboRpaAutonomoRoute
-  '/blog/salario-liquido-entenda': typeof BlogSalarioLiquidoEntendaRoute
-  '/blog/salario-por-setor-2026': typeof BlogSalarioPorSetor2026Route
-  '/blog/simplificado-vs-completo': typeof BlogSimplificadoVsCompletoRoute
-  '/blog/tabela-irpf-2026-completa': typeof BlogTabelaIrpf2026CompletaRoute
-  '/comparar/academia': typeof CompararAcademiaRoute
   '/comparar/energia': typeof CompararEnergiaRoute
-  '/comparar/mudanca': typeof CompararMudancaRoute
-  '/comparar/streaming': typeof CompararStreamingRoute
   '/blog/': typeof BlogIndexRoute
   '/comparar/': typeof CompararIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
@@ -475,36 +311,14 @@ export interface FileRoutesByTo {
   '/api/fuel-prices': typeof ApiFuelPricesRoute
   '/api/health': typeof ApiHealthRoute
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
-  '/blog/aposentadoria-early-retirement': typeof BlogAposentadoriaEarlyRetirementRoute
   '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
-  '/blog/calculadora-irpf-2026': typeof BlogCalculadoraIrpf2026Route
-  '/blog/clt-vs-pj-comparacao': typeof BlogCltVsPjComparacaoRoute
-  '/blog/como-calcular-salario-pj': typeof BlogComoCalcularSalarioPjRoute
   '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
   '/blog/contador-necessario-pj': typeof BlogContadorNecessarioPjRoute
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
   '/blog/deducoes-irpf-esqueca': typeof BlogDeducoesIrpfEsquecaRoute
-  '/blog/dependentes-irpf-economia': typeof BlogDependentesIrpfEconomiaRoute
   '/blog/despesas-dedutiveis-autonomo': typeof BlogDespesasDedutiveisAutonomoRoute
-  '/blog/formal-vs-informal': typeof BlogFormalVsInformalRoute
-  '/blog/guia-irpf-2026': typeof BlogGuiaIrpf2026Route
   '/blog/investimentos-isentos-irpf': typeof BlogInvestimentosIsentosIrpfRoute
-  '/blog/mei-vs-pj-custo': typeof BlogMeiVsPjCustoRoute
-  '/blog/negociar-salario-melhor': typeof BlogNegociarSalarioMelhorRoute
-  '/blog/planejamento-tributario': typeof BlogPlanejamentoTributarioRoute
-  '/blog/quando-virar-pj': typeof BlogQuandoVirarPjRoute
-  '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
-  '/blog/quanto-custa-ser-autonomo': typeof BlogQuantoCustaSerAutonomoRoute
-  '/blog/quanto-custa-ter-carro': typeof BlogQuantoCustaTerCarroRoute
-  '/blog/recibo-rpa-autonomo': typeof BlogReciboRpaAutonomoRoute
-  '/blog/salario-liquido-entenda': typeof BlogSalarioLiquidoEntendaRoute
-  '/blog/salario-por-setor-2026': typeof BlogSalarioPorSetor2026Route
-  '/blog/simplificado-vs-completo': typeof BlogSimplificadoVsCompletoRoute
-  '/blog/tabela-irpf-2026-completa': typeof BlogTabelaIrpf2026CompletaRoute
-  '/comparar/academia': typeof CompararAcademiaRoute
   '/comparar/energia': typeof CompararEnergiaRoute
-  '/comparar/mudanca': typeof CompararMudancaRoute
-  '/comparar/streaming': typeof CompararStreamingRoute
   '/blog': typeof BlogIndexRoute
   '/comparar': typeof CompararIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
@@ -538,36 +352,14 @@ export interface FileRoutesById {
   '/api/fuel-prices': typeof ApiFuelPricesRoute
   '/api/health': typeof ApiHealthRoute
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
-  '/blog/aposentadoria-early-retirement': typeof BlogAposentadoriaEarlyRetirementRoute
   '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
-  '/blog/calculadora-irpf-2026': typeof BlogCalculadoraIrpf2026Route
-  '/blog/clt-vs-pj-comparacao': typeof BlogCltVsPjComparacaoRoute
-  '/blog/como-calcular-salario-pj': typeof BlogComoCalcularSalarioPjRoute
   '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
   '/blog/contador-necessario-pj': typeof BlogContadorNecessarioPjRoute
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
   '/blog/deducoes-irpf-esqueca': typeof BlogDeducoesIrpfEsquecaRoute
-  '/blog/dependentes-irpf-economia': typeof BlogDependentesIrpfEconomiaRoute
   '/blog/despesas-dedutiveis-autonomo': typeof BlogDespesasDedutiveisAutonomoRoute
-  '/blog/formal-vs-informal': typeof BlogFormalVsInformalRoute
-  '/blog/guia-irpf-2026': typeof BlogGuiaIrpf2026Route
   '/blog/investimentos-isentos-irpf': typeof BlogInvestimentosIsentosIrpfRoute
-  '/blog/mei-vs-pj-custo': typeof BlogMeiVsPjCustoRoute
-  '/blog/negociar-salario-melhor': typeof BlogNegociarSalarioMelhorRoute
-  '/blog/planejamento-tributario': typeof BlogPlanejamentoTributarioRoute
-  '/blog/quando-virar-pj': typeof BlogQuandoVirarPjRoute
-  '/blog/quanto-custa-morar-sozinho': typeof BlogQuantoCustaMorarSozinhoRoute
-  '/blog/quanto-custa-ser-autonomo': typeof BlogQuantoCustaSerAutonomoRoute
-  '/blog/quanto-custa-ter-carro': typeof BlogQuantoCustaTerCarroRoute
-  '/blog/recibo-rpa-autonomo': typeof BlogReciboRpaAutonomoRoute
-  '/blog/salario-liquido-entenda': typeof BlogSalarioLiquidoEntendaRoute
-  '/blog/salario-por-setor-2026': typeof BlogSalarioPorSetor2026Route
-  '/blog/simplificado-vs-completo': typeof BlogSimplificadoVsCompletoRoute
-  '/blog/tabela-irpf-2026-completa': typeof BlogTabelaIrpf2026CompletaRoute
-  '/comparar/academia': typeof CompararAcademiaRoute
   '/comparar/energia': typeof CompararEnergiaRoute
-  '/comparar/mudanca': typeof CompararMudancaRoute
-  '/comparar/streaming': typeof CompararStreamingRoute
   '/blog/': typeof BlogIndexRoute
   '/comparar/': typeof CompararIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
@@ -602,36 +394,14 @@ export interface FileRouteTypes {
     | '/api/fuel-prices'
     | '/api/health'
     | '/api/vehicle-efficiency'
-    | '/blog/aposentadoria-early-retirement'
     | '/blog/assinaturas-que-valem-a-pena'
-    | '/blog/calculadora-irpf-2026'
-    | '/blog/clt-vs-pj-comparacao'
-    | '/blog/como-calcular-salario-pj'
     | '/blog/como-economizar-conta-de-luz'
     | '/blog/contador-necessario-pj'
     | '/blog/custo-pet-anual'
     | '/blog/deducoes-irpf-esqueca'
-    | '/blog/dependentes-irpf-economia'
     | '/blog/despesas-dedutiveis-autonomo'
-    | '/blog/formal-vs-informal'
-    | '/blog/guia-irpf-2026'
     | '/blog/investimentos-isentos-irpf'
-    | '/blog/mei-vs-pj-custo'
-    | '/blog/negociar-salario-melhor'
-    | '/blog/planejamento-tributario'
-    | '/blog/quando-virar-pj'
-    | '/blog/quanto-custa-morar-sozinho'
-    | '/blog/quanto-custa-ser-autonomo'
-    | '/blog/quanto-custa-ter-carro'
-    | '/blog/recibo-rpa-autonomo'
-    | '/blog/salario-liquido-entenda'
-    | '/blog/salario-por-setor-2026'
-    | '/blog/simplificado-vs-completo'
-    | '/blog/tabela-irpf-2026-completa'
-    | '/comparar/academia'
     | '/comparar/energia'
-    | '/comparar/mudanca'
-    | '/comparar/streaming'
     | '/blog/'
     | '/comparar/'
     | '/api/locations/cities'
@@ -662,36 +432,14 @@ export interface FileRouteTypes {
     | '/api/fuel-prices'
     | '/api/health'
     | '/api/vehicle-efficiency'
-    | '/blog/aposentadoria-early-retirement'
     | '/blog/assinaturas-que-valem-a-pena'
-    | '/blog/calculadora-irpf-2026'
-    | '/blog/clt-vs-pj-comparacao'
-    | '/blog/como-calcular-salario-pj'
     | '/blog/como-economizar-conta-de-luz'
     | '/blog/contador-necessario-pj'
     | '/blog/custo-pet-anual'
     | '/blog/deducoes-irpf-esqueca'
-    | '/blog/dependentes-irpf-economia'
     | '/blog/despesas-dedutiveis-autonomo'
-    | '/blog/formal-vs-informal'
-    | '/blog/guia-irpf-2026'
     | '/blog/investimentos-isentos-irpf'
-    | '/blog/mei-vs-pj-custo'
-    | '/blog/negociar-salario-melhor'
-    | '/blog/planejamento-tributario'
-    | '/blog/quando-virar-pj'
-    | '/blog/quanto-custa-morar-sozinho'
-    | '/blog/quanto-custa-ser-autonomo'
-    | '/blog/quanto-custa-ter-carro'
-    | '/blog/recibo-rpa-autonomo'
-    | '/blog/salario-liquido-entenda'
-    | '/blog/salario-por-setor-2026'
-    | '/blog/simplificado-vs-completo'
-    | '/blog/tabela-irpf-2026-completa'
-    | '/comparar/academia'
     | '/comparar/energia'
-    | '/comparar/mudanca'
-    | '/comparar/streaming'
     | '/blog'
     | '/comparar'
     | '/api/locations/cities'
@@ -724,36 +472,14 @@ export interface FileRouteTypes {
     | '/api/fuel-prices'
     | '/api/health'
     | '/api/vehicle-efficiency'
-    | '/blog/aposentadoria-early-retirement'
     | '/blog/assinaturas-que-valem-a-pena'
-    | '/blog/calculadora-irpf-2026'
-    | '/blog/clt-vs-pj-comparacao'
-    | '/blog/como-calcular-salario-pj'
     | '/blog/como-economizar-conta-de-luz'
     | '/blog/contador-necessario-pj'
     | '/blog/custo-pet-anual'
     | '/blog/deducoes-irpf-esqueca'
-    | '/blog/dependentes-irpf-economia'
     | '/blog/despesas-dedutiveis-autonomo'
-    | '/blog/formal-vs-informal'
-    | '/blog/guia-irpf-2026'
     | '/blog/investimentos-isentos-irpf'
-    | '/blog/mei-vs-pj-custo'
-    | '/blog/negociar-salario-melhor'
-    | '/blog/planejamento-tributario'
-    | '/blog/quando-virar-pj'
-    | '/blog/quanto-custa-morar-sozinho'
-    | '/blog/quanto-custa-ser-autonomo'
-    | '/blog/quanto-custa-ter-carro'
-    | '/blog/recibo-rpa-autonomo'
-    | '/blog/salario-liquido-entenda'
-    | '/blog/salario-por-setor-2026'
-    | '/blog/simplificado-vs-completo'
-    | '/blog/tabela-irpf-2026-completa'
-    | '/comparar/academia'
     | '/comparar/energia'
-    | '/comparar/mudanca'
-    | '/comparar/streaming'
     | '/blog/'
     | '/comparar/'
     | '/api/locations/cities'
@@ -976,39 +702,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof BlogRoute
     }
-    '/blog/aposentadoria-early-retirement': {
-      id: '/blog/aposentadoria-early-retirement'
-      path: '/aposentadoria-early-retirement'
-      fullPath: '/blog/aposentadoria-early-retirement'
-      preLoaderRoute: typeof BlogAposentadoriaEarlyRetirementRouteImport
-      parentRoute: typeof BlogRoute
-    }
     '/blog/assinaturas-que-valem-a-pena': {
       id: '/blog/assinaturas-que-valem-a-pena'
       path: '/assinaturas-que-valem-a-pena'
       fullPath: '/blog/assinaturas-que-valem-a-pena'
       preLoaderRoute: typeof BlogAssinaturasQueValemAPenaRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/calculadora-irpf-2026': {
-      id: '/blog/calculadora-irpf-2026'
-      path: '/calculadora-irpf-2026'
-      fullPath: '/blog/calculadora-irpf-2026'
-      preLoaderRoute: typeof BlogCalculadoraIrpf2026RouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/clt-vs-pj-comparacao': {
-      id: '/blog/clt-vs-pj-comparacao'
-      path: '/clt-vs-pj-comparacao'
-      fullPath: '/blog/clt-vs-pj-comparacao'
-      preLoaderRoute: typeof BlogCltVsPjComparacaoRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/como-calcular-salario-pj': {
-      id: '/blog/como-calcular-salario-pj'
-      path: '/como-calcular-salario-pj'
-      fullPath: '/blog/como-calcular-salario-pj'
-      preLoaderRoute: typeof BlogComoCalcularSalarioPjRouteImport
       parentRoute: typeof BlogRoute
     }
     '/blog/como-economizar-conta-de-luz': {
@@ -1039,32 +737,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogDeducoesIrpfEsquecaRouteImport
       parentRoute: typeof BlogRoute
     }
-    '/blog/dependentes-irpf-economia': {
-      id: '/blog/dependentes-irpf-economia'
-      path: '/dependentes-irpf-economia'
-      fullPath: '/blog/dependentes-irpf-economia'
-      preLoaderRoute: typeof BlogDependentesIrpfEconomiaRouteImport
-      parentRoute: typeof BlogRoute
-    }
     '/blog/despesas-dedutiveis-autonomo': {
       id: '/blog/despesas-dedutiveis-autonomo'
       path: '/despesas-dedutiveis-autonomo'
       fullPath: '/blog/despesas-dedutiveis-autonomo'
       preLoaderRoute: typeof BlogDespesasDedutiveisAutonomoRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/formal-vs-informal': {
-      id: '/blog/formal-vs-informal'
-      path: '/formal-vs-informal'
-      fullPath: '/blog/formal-vs-informal'
-      preLoaderRoute: typeof BlogFormalVsInformalRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/guia-irpf-2026': {
-      id: '/blog/guia-irpf-2026'
-      path: '/guia-irpf-2026'
-      fullPath: '/blog/guia-irpf-2026'
-      preLoaderRoute: typeof BlogGuiaIrpf2026RouteImport
       parentRoute: typeof BlogRoute
     }
     '/blog/investimentos-isentos-irpf': {
@@ -1074,90 +751,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogInvestimentosIsentosIrpfRouteImport
       parentRoute: typeof BlogRoute
     }
-    '/blog/mei-vs-pj-custo': {
-      id: '/blog/mei-vs-pj-custo'
-      path: '/mei-vs-pj-custo'
-      fullPath: '/blog/mei-vs-pj-custo'
-      preLoaderRoute: typeof BlogMeiVsPjCustoRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/negociar-salario-melhor': {
-      id: '/blog/negociar-salario-melhor'
-      path: '/negociar-salario-melhor'
-      fullPath: '/blog/negociar-salario-melhor'
-      preLoaderRoute: typeof BlogNegociarSalarioMelhorRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/planejamento-tributario': {
-      id: '/blog/planejamento-tributario'
-      path: '/planejamento-tributario'
-      fullPath: '/blog/planejamento-tributario'
-      preLoaderRoute: typeof BlogPlanejamentoTributarioRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/quando-virar-pj': {
-      id: '/blog/quando-virar-pj'
-      path: '/quando-virar-pj'
-      fullPath: '/blog/quando-virar-pj'
-      preLoaderRoute: typeof BlogQuandoVirarPjRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/quanto-custa-morar-sozinho': {
-      id: '/blog/quanto-custa-morar-sozinho'
-      path: '/quanto-custa-morar-sozinho'
-      fullPath: '/blog/quanto-custa-morar-sozinho'
-      preLoaderRoute: typeof BlogQuantoCustaMorarSozinhoRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/quanto-custa-ser-autonomo': {
-      id: '/blog/quanto-custa-ser-autonomo'
-      path: '/quanto-custa-ser-autonomo'
-      fullPath: '/blog/quanto-custa-ser-autonomo'
-      preLoaderRoute: typeof BlogQuantoCustaSerAutonomoRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/quanto-custa-ter-carro': {
-      id: '/blog/quanto-custa-ter-carro'
-      path: '/quanto-custa-ter-carro'
-      fullPath: '/blog/quanto-custa-ter-carro'
-      preLoaderRoute: typeof BlogQuantoCustaTerCarroRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/recibo-rpa-autonomo': {
-      id: '/blog/recibo-rpa-autonomo'
-      path: '/recibo-rpa-autonomo'
-      fullPath: '/blog/recibo-rpa-autonomo'
-      preLoaderRoute: typeof BlogReciboRpaAutonomoRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/salario-liquido-entenda': {
-      id: '/blog/salario-liquido-entenda'
-      path: '/salario-liquido-entenda'
-      fullPath: '/blog/salario-liquido-entenda'
-      preLoaderRoute: typeof BlogSalarioLiquidoEntendaRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/salario-por-setor-2026': {
-      id: '/blog/salario-por-setor-2026'
-      path: '/salario-por-setor-2026'
-      fullPath: '/blog/salario-por-setor-2026'
-      preLoaderRoute: typeof BlogSalarioPorSetor2026RouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/simplificado-vs-completo': {
-      id: '/blog/simplificado-vs-completo'
-      path: '/simplificado-vs-completo'
-      fullPath: '/blog/simplificado-vs-completo'
-      preLoaderRoute: typeof BlogSimplificadoVsCompletoRouteImport
-      parentRoute: typeof BlogRoute
-    }
-    '/blog/tabela-irpf-2026-completa': {
-      id: '/blog/tabela-irpf-2026-completa'
-      path: '/tabela-irpf-2026-completa'
-      fullPath: '/blog/tabela-irpf-2026-completa'
-      preLoaderRoute: typeof BlogTabelaIrpf2026CompletaRouteImport
-      parentRoute: typeof BlogRoute
-    }
     '/comparar/': {
       id: '/comparar/'
       path: '/'
@@ -1165,32 +758,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CompararIndexRouteImport
       parentRoute: typeof CompararRoute
     }
-    '/comparar/academia': {
-      id: '/comparar/academia'
-      path: '/academia'
-      fullPath: '/comparar/academia'
-      preLoaderRoute: typeof CompararAcademiaRouteImport
-      parentRoute: typeof CompararRoute
-    }
     '/comparar/energia': {
       id: '/comparar/energia'
       path: '/energia'
       fullPath: '/comparar/energia'
       preLoaderRoute: typeof CompararEnergiaRouteImport
-      parentRoute: typeof CompararRoute
-    }
-    '/comparar/mudanca': {
-      id: '/comparar/mudanca'
-      path: '/mudanca'
-      fullPath: '/comparar/mudanca'
-      preLoaderRoute: typeof CompararMudancaRouteImport
-      parentRoute: typeof CompararRoute
-    }
-    '/comparar/streaming': {
-      id: '/comparar/streaming'
-      path: '/streaming'
-      fullPath: '/comparar/streaming'
-      preLoaderRoute: typeof CompararStreamingRouteImport
       parentRoute: typeof CompararRoute
     }
     '/api/locations/cities': {
@@ -1218,80 +790,36 @@ declare module '@tanstack/react-router' {
 }
 
 interface BlogRouteChildren {
-  BlogAposentadoriaEarlyRetirementRoute: typeof BlogAposentadoriaEarlyRetirementRoute
   BlogAssinaturasQueValemAPenaRoute: typeof BlogAssinaturasQueValemAPenaRoute
-  BlogCalculadoraIrpf2026Route: typeof BlogCalculadoraIrpf2026Route
-  BlogCltVsPjComparacaoRoute: typeof BlogCltVsPjComparacaoRoute
-  BlogComoCalcularSalarioPjRoute: typeof BlogComoCalcularSalarioPjRoute
   BlogComoEconomizarContaDeLuzRoute: typeof BlogComoEconomizarContaDeLuzRoute
   BlogContadorNecessarioPjRoute: typeof BlogContadorNecessarioPjRoute
   BlogCustoPetAnualRoute: typeof BlogCustoPetAnualRoute
   BlogDeducoesIrpfEsquecaRoute: typeof BlogDeducoesIrpfEsquecaRoute
-  BlogDependentesIrpfEconomiaRoute: typeof BlogDependentesIrpfEconomiaRoute
   BlogDespesasDedutiveisAutonomoRoute: typeof BlogDespesasDedutiveisAutonomoRoute
-  BlogFormalVsInformalRoute: typeof BlogFormalVsInformalRoute
-  BlogGuiaIrpf2026Route: typeof BlogGuiaIrpf2026Route
   BlogInvestimentosIsentosIrpfRoute: typeof BlogInvestimentosIsentosIrpfRoute
-  BlogMeiVsPjCustoRoute: typeof BlogMeiVsPjCustoRoute
-  BlogNegociarSalarioMelhorRoute: typeof BlogNegociarSalarioMelhorRoute
-  BlogPlanejamentoTributarioRoute: typeof BlogPlanejamentoTributarioRoute
-  BlogQuandoVirarPjRoute: typeof BlogQuandoVirarPjRoute
-  BlogQuantoCustaMorarSozinhoRoute: typeof BlogQuantoCustaMorarSozinhoRoute
-  BlogQuantoCustaSerAutonomoRoute: typeof BlogQuantoCustaSerAutonomoRoute
-  BlogQuantoCustaTerCarroRoute: typeof BlogQuantoCustaTerCarroRoute
-  BlogReciboRpaAutonomoRoute: typeof BlogReciboRpaAutonomoRoute
-  BlogSalarioLiquidoEntendaRoute: typeof BlogSalarioLiquidoEntendaRoute
-  BlogSalarioPorSetor2026Route: typeof BlogSalarioPorSetor2026Route
-  BlogSimplificadoVsCompletoRoute: typeof BlogSimplificadoVsCompletoRoute
-  BlogTabelaIrpf2026CompletaRoute: typeof BlogTabelaIrpf2026CompletaRoute
   BlogIndexRoute: typeof BlogIndexRoute
 }
 
 const BlogRouteChildren: BlogRouteChildren = {
-  BlogAposentadoriaEarlyRetirementRoute: BlogAposentadoriaEarlyRetirementRoute,
   BlogAssinaturasQueValemAPenaRoute: BlogAssinaturasQueValemAPenaRoute,
-  BlogCalculadoraIrpf2026Route: BlogCalculadoraIrpf2026Route,
-  BlogCltVsPjComparacaoRoute: BlogCltVsPjComparacaoRoute,
-  BlogComoCalcularSalarioPjRoute: BlogComoCalcularSalarioPjRoute,
   BlogComoEconomizarContaDeLuzRoute: BlogComoEconomizarContaDeLuzRoute,
   BlogContadorNecessarioPjRoute: BlogContadorNecessarioPjRoute,
   BlogCustoPetAnualRoute: BlogCustoPetAnualRoute,
   BlogDeducoesIrpfEsquecaRoute: BlogDeducoesIrpfEsquecaRoute,
-  BlogDependentesIrpfEconomiaRoute: BlogDependentesIrpfEconomiaRoute,
   BlogDespesasDedutiveisAutonomoRoute: BlogDespesasDedutiveisAutonomoRoute,
-  BlogFormalVsInformalRoute: BlogFormalVsInformalRoute,
-  BlogGuiaIrpf2026Route: BlogGuiaIrpf2026Route,
   BlogInvestimentosIsentosIrpfRoute: BlogInvestimentosIsentosIrpfRoute,
-  BlogMeiVsPjCustoRoute: BlogMeiVsPjCustoRoute,
-  BlogNegociarSalarioMelhorRoute: BlogNegociarSalarioMelhorRoute,
-  BlogPlanejamentoTributarioRoute: BlogPlanejamentoTributarioRoute,
-  BlogQuandoVirarPjRoute: BlogQuandoVirarPjRoute,
-  BlogQuantoCustaMorarSozinhoRoute: BlogQuantoCustaMorarSozinhoRoute,
-  BlogQuantoCustaSerAutonomoRoute: BlogQuantoCustaSerAutonomoRoute,
-  BlogQuantoCustaTerCarroRoute: BlogQuantoCustaTerCarroRoute,
-  BlogReciboRpaAutonomoRoute: BlogReciboRpaAutonomoRoute,
-  BlogSalarioLiquidoEntendaRoute: BlogSalarioLiquidoEntendaRoute,
-  BlogSalarioPorSetor2026Route: BlogSalarioPorSetor2026Route,
-  BlogSimplificadoVsCompletoRoute: BlogSimplificadoVsCompletoRoute,
-  BlogTabelaIrpf2026CompletaRoute: BlogTabelaIrpf2026CompletaRoute,
   BlogIndexRoute: BlogIndexRoute,
 }
 
 const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
 interface CompararRouteChildren {
-  CompararAcademiaRoute: typeof CompararAcademiaRoute
   CompararEnergiaRoute: typeof CompararEnergiaRoute
-  CompararMudancaRoute: typeof CompararMudancaRoute
-  CompararStreamingRoute: typeof CompararStreamingRoute
   CompararIndexRoute: typeof CompararIndexRoute
 }
 
 const CompararRouteChildren: CompararRouteChildren = {
-  CompararAcademiaRoute: CompararAcademiaRoute,
   CompararEnergiaRoute: CompararEnergiaRoute,
-  CompararMudancaRoute: CompararMudancaRoute,
-  CompararStreamingRoute: CompararStreamingRoute,
   CompararIndexRoute: CompararIndexRoute,
 }
 

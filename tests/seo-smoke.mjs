@@ -23,36 +23,14 @@ const PUBLIC_ROUTES = [
   "/calculadora-previdencia-complementar",
   "/calculadora-beneficios-fiscais",
   "/blog",
-  "/blog/quanto-custa-ter-carro",
-  "/blog/quanto-custa-morar-sozinho",
   "/blog/como-economizar-conta-de-luz",
   "/blog/custo-pet-anual",
   "/blog/assinaturas-que-valem-a-pena",
-  "/blog/calculadora-irpf-2026",
-  "/blog/guia-irpf-2026",
-  "/blog/salario-liquido-entenda",
-  "/blog/quanto-custa-ser-autonomo",
   "/blog/deducoes-irpf-esqueca",
-  "/blog/dependentes-irpf-economia",
-  "/blog/recibo-rpa-autonomo",
-  "/blog/negociar-salario-melhor",
-  "/blog/planejamento-tributario",
-  "/blog/clt-vs-pj-comparacao",
-  "/blog/salario-por-setor-2026",
-  "/blog/mei-vs-pj-custo",
   "/blog/investimentos-isentos-irpf",
-  "/blog/quando-virar-pj",
-  "/blog/aposentadoria-early-retirement",
   "/blog/despesas-dedutiveis-autonomo",
   "/blog/contador-necessario-pj",
-  "/blog/tabela-irpf-2026-completa",
-  "/blog/formal-vs-informal",
-  "/blog/como-calcular-salario-pj",
-  "/blog/simplificado-vs-completo",
   "/comparar",
-  "/comparar/streaming",
-  "/comparar/academia",
-  "/comparar/mudanca",
   "/comparar/energia",
   "/sobre",
   "/metodologia",
@@ -236,6 +214,29 @@ try {
 
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
+
+  // `_redirects` is applied by the Workers asset server, which the Cloudflare
+  // Vite plugin runs under `vite preview`, so every rule is exercised for real:
+  // the source answers 301 to a route that renders, and is not itself public.
+  const redirectRules = (
+    await readFile(new URL("../dist/client/_redirects", import.meta.url), "utf8")
+  )
+    .split("\n")
+    .filter((line) => line.trim() && !line.startsWith("#"))
+    .map((line) => line.trim().split(/\s+/));
+  assert.ok(redirectRules.length > 0, "dist/client/_redirects must carry its rules");
+  for (const [source, target, status] of redirectRules) {
+    assert.equal(status, "301", `${source} must redirect permanently`);
+    assert.ok(!PUBLIC_ROUTES.includes(source), `${source} is redirected and must not be public`);
+    assert.ok(PUBLIC_ROUTES.includes(target), `${source} must redirect to a public route`);
+    const response = await fetch(`${BASE_URL}${source}`, { redirect: "manual" });
+    assert.equal(response.status, 301, `${source} must answer 301`);
+    assert.equal(
+      new URL(response.headers.get("location") ?? "", BASE_URL).pathname,
+      target,
+      `${source} must redirect to ${target}`,
+    );
+  }
 
   const invalidFuel = await fetch(`${BASE_URL}/api/fuel-prices`);
   assert.equal(invalidFuel.status, 400, "The fuel API must return HTTP 400 on invalid input");
