@@ -176,6 +176,16 @@ one.
 - `pnpm audit` reports 21 advisories in `undici` 7.29.0, through miniflare. The lockfile is
   untouched here, so they predate this slice. Raised as a separate task.
 
+**Merge conflict with #16, resolved for the redirect.** #16 (authored 2026-09-12, merged into
+`main` on 2026-10-18 while this PR was open) rendered the six FAQs of
+`blog/quanto-custa-morar-sozinho` and completed its meta. This slice redirects that article to
+`/calculadora-morar-sozinho`. The merge keeps the redirect, which is what D5 decided for every
+declined page. Google crawled the article on 2026-09-22 and declined it, and #16 changes its
+markup, not what it says. #16's version stays recoverable as
+`git show 12d2a23:src/routes/blog/quanto-custa-morar-sozinho.tsx`. Its FAQs are the first thing
+slice 5 reads for the morar-sozinho calculator. Reversing this means deleting one line of
+`public/_redirects` and restoring those two files from `12d2a23`.
+
 **Not done yet, and it is what `Done when` asks for:**
 - the `triage.tsv` loop against the **deployed** preview. That needs a pushed branch and a PR,
   because Workers Builds uploads a preview version on pull requests (`docs/deploy.md`).
