@@ -61,3 +61,52 @@ on one page, not across eleven.
 
 If the builder wants to change `calculateNetSalary`'s signature, stop. The table consumes the
 module as it is. Changing a tested formula to suit a presentation is the wrong direction.
+
+---
+
+## What actually happened — 2026-10-18
+
+**The competitor answer came first, and it reversed the premise.** Position 1 on Google Brasil was
+buk.com.br. Its public script applies Lei 9.250, art. 4º, § 2º: the R$ 607,20 simplified discount
+when it beats INSS plus dependants. Ours did not, so on its own default of R$ 5.000 it withheld
+R$ 23,78 from a salary the 2026 law exempts. Two more defects turned up on the same page:
+- health and education were deducted from the monthly base, which art. 4º does not allow;
+- the "mensal" pension field was divided by twelve.
+
+The owner chose to fix before building, and that became its own commit, `dca8d9d`:
+- the more beneficial route applies automatically;
+- health and education leave the monthly calculation and point to the IRPF calculator;
+- the pension is read as typed;
+- the storage key moves to v3.
+
+Mutation checks: putting each defect back turned 5, 6 and 1 tests red. Every statutory claim
+cites Planalto: `docs/research/2026-10-18-adsense-added-value/fetches/`.
+
+**Then the difference.** It comes from three pieces of code:
+- `buildNetSalaryTable` is a pure function next to the module, and every row is a
+  `calculateNetSalary` call;
+- `simplifiedRouteCeiling` finds where INSS reaches R$ 607,20: R$ 5.754,90 with no dependants,
+  and below the exempt range with one;
+- a page section built on them: a 16-row table from the minimum wage to R$ 20.000, three findings
+  in prose and a worked example at R$ 6.000. Every figure in it is computed; none is typed.
+
+| check | result |
+|---|---|
+| unit, `salario-liquido.test.ts` | 73 green. 4 rows pinned to hand computations from the published tables. Returning gross as net turned 5 red. |
+| `test:seo` | green on 28 routes. Asserts the prerendered page carries the table, the R$ 5.000 net (R$ 4.498,49) and the R$ 6.000 withholding (R$ 385,10). |
+| both ends, form against table | **8 of 8** on `pnpm run dev`: R$ 1.621, 3.500, 4.500, 5.000, 5.500, 6.000, 7.000 and 20.000 typed into the form gave the table's net to the centavo |
+| external cross-check | the R$ 4.500 row reproduces the Receita's own worked example: base 3.892,80, table 200,39, reduced to zero |
+| size | the section is 702 words; the prerendered main content is 1.517 |
+
+The added-value answer is in `docs/research/2026-10-18-adsense-added-value/research.md`. In short,
+the leader applies the rule silently, and ours now applies it, says so, and shows it across 16
+salaries.
+
+**Is it worth repeating?** Yes, with one change to the method: **read the competitor's
+calculation before writing anything**. Here, doing so found a defect in ours that no word count or
+auditor row would have shown. Slice 4 starts with the same defect, already found in `cltVsPj.ts`,
+and with a note on `calculateIrpf`; both are recorded in its Needs.
+
+**Still to do:** the 8 typed checks again on the deployed preview of this branch's PR, as the
+Tests section asks. ⚠️ **Owner:** "Request indexing" for `/calculadora-salario-liquido` after the
+merge.

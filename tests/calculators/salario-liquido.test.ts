@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { calculateNetSalary, type NetSalaryInput } from "../../src/lib/calculators/salarioLiquido";
+import {
+  buildNetSalaryTable,
+  calculateNetSalary,
+  simplifiedRouteCeiling,
+  type NetSalaryInput,
+} from "../../src/lib/calculators/salarioLiquido";
 import {
   IRPF_MONTHLY_TABLE_2026,
   SIMPLIFIED_DEDUCTION_MONTHLY,
@@ -422,8 +427,8 @@ describe("calculateNetSalary — the more beneficial route (Lei 9.250, art. 4º,
   });
 
   /**
-   * INSS reaches R$ 607,20 at a gross of R$ 5.754,93: 599,5144 at R$ 5.700,00
-   * plus 14% of the next R$ 54,93. Either side of it, the larger deduction wins.
+   * INSS reaches R$ 607,20 at a gross of R$ 5.754,90: 599,5144 at R$ 5.700,00
+   * plus 14% of the next R$ 54,90. Either side of it, the larger deduction wins.
    */
   it("switches to the legal route once INSS alone passes R$ 607,20", () => {
     expect(netSalary({ monthlyGrossSalary: 5754 }).deductionApplied).toBe("simplified");
@@ -680,5 +685,91 @@ describe("calculateNetSalary — degenerate input", () => {
 
   it("reports a zero effective rate at a zero salary instead of dividing by zero", () => {
     expect(netSalary({ monthlyGrossSalary: 0 }).effectiveIrpfRate).toBe(0);
+  });
+});
+
+describe("buildNetSalaryTable — the page's salary table", () => {
+  const grosses = [1621, 3000, 5000, 5500, 6000, 8000, 20_000];
+  const rows = buildNetSalaryTable(grosses);
+
+  it("returns one row per salary, in order", () => {
+    expect(rows.map((row) => row.monthlyGrossSalary)).toEqual(grosses);
+  });
+
+  it("is the form's own answer on every row", () => {
+    for (const dependants of [0, 2]) {
+      for (const row of buildNetSalaryTable(grosses, dependants)) {
+        const form = netSalary({ monthlyGrossSalary: row.monthlyGrossSalary, dependants });
+
+        expect(row.monthlyNetSalary).toBe(form.monthlyNetSalary);
+        expect(row.estimatedIrpfWithheld).toBe(form.estimatedIrpfWithheld);
+        expect(row.deductionApplied).toBe(form.deductionApplied);
+      }
+    }
+  });
+
+  /**
+   * The equality above alone is a tautology: a builder and a form that were both
+   * wrong would agree. These four rows are computed by hand from the published
+   * 2026 tables and the statute, one per situation the table has to get right:
+   *
+   * - R$ 5.000: simplified route, base 4.392,80, table 312,89, reduction 312,89, IR 0;
+   *   net = 5.000 − 501,5144 = 4.498,4856
+   * - R$ 5.500: simplified route, base 4.892,80 at 27,5% − 908,73 = 436,79;
+   *   reduction 978,62 − 0,133145 × 5.500 = 246,32; IR 190,47; INSS 571,5144
+   * - R$ 6.000: legal route (INSS 641,5144), base 5.358,4856, table 564,85;
+   *   reduction 179,75; IR 385,10
+   * - R$ 8.000: legal route (INSS 921,5144), base 7.078,4856, table 1.037,85;
+   *   past the phase-out, IR 1.037,85
+   */
+  it.each([
+    { gross: 5000, route: "simplified", irrf: 0, net: 4498.4856 },
+    { gross: 5500, route: "simplified", irrf: 190.47, net: 4738.0156 },
+    { gross: 6000, route: "legal", irrf: 385.1, net: 4973.3856 },
+    { gross: 8000, route: "legal", irrf: 1037.85, net: 6040.6356 },
+  ])("matches the hand computation at R$ $gross", ({ gross, route, irrf, net }) => {
+    const [row] = buildNetSalaryTable([gross]);
+
+    expect(row.deductionApplied).toBe(route);
+    expect(row.estimatedIrpfWithheld).toBeCloseTo(irrf, 2);
+    expect(row.monthlyNetSalary).toBeCloseTo(net, 4);
+    expect(row.netShare).toBeCloseTo(net / gross, 6);
+  });
+});
+
+describe("simplifiedRouteCeiling", () => {
+  /** INSS reaches R$ 607,20 at 5.700 + (607,20 − 599,5144) / 0,14 = R$ 5.754,90. */
+  it("finds the gross where INSS alone reaches R$ 607,20", () => {
+    expect(simplifiedRouteCeiling(0)).toBeCloseTo(5754.9, 1);
+    expect(netSalary({ monthlyGrossSalary: simplifiedRouteCeiling(0) - 1 }).deductionApplied).toBe(
+      "simplified",
+    );
+    expect(netSalary({ monthlyGrossSalary: simplifiedRouteCeiling(0) + 1 }).deductionApplied).toBe(
+      "legal",
+    );
+  });
+
+  /**
+   * What the page says in prose: with a dependant, the simplified route only wins
+   * below R$ 4.400 or so, where the 2026 reduction already zeroes the tax, so it
+   * never changes what is withheld.
+   */
+  it("moves below the exempt range once there is a dependant", () => {
+    expect(simplifiedRouteCeiling(1)).toBeLessThan(5000);
+
+    for (let monthlyGrossSalary = 0; monthlyGrossSalary <= 9000; monthlyGrossSalary += 5) {
+      const legalOnly = withholdingOnRoute(
+        monthlyGrossSalary,
+        officialInss(monthlyGrossSalary) + 189.59,
+      );
+      expect(
+        netSalary({ monthlyGrossSalary, dependants: 1 }).estimatedIrpfWithheld,
+        `gross R$ ${monthlyGrossSalary}`,
+      ).toBeCloseTo(legalOnly, 2);
+    }
+  });
+
+  it("is zero when the dependants alone exceed the discount", () => {
+    expect(simplifiedRouteCeiling(4)).toBe(0);
   });
 });

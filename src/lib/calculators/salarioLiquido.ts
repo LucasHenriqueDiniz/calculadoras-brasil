@@ -155,3 +155,80 @@ export function calculateNetSalary(input: NetSalaryInput): NetSalaryResult {
     effectiveIrpfRate,
   };
 }
+
+/** One line of the page's salary table: the breakdown a visitor would get for that gross. */
+export interface NetSalaryTableRow {
+  monthlyGrossSalary: number;
+  inssWithheld: number;
+  deductionApplied: MonthlyDeduction;
+  /** What the applied route took off the base. */
+  baseDeduction: number;
+  taxFromTable: number;
+  reductionLei15270: number;
+  estimatedIrpfWithheld: number;
+  monthlyNetSalary: number;
+  /** Net as a share of gross, 0–1. */
+  netShare: number;
+}
+
+/**
+ * The page's table, built by the calculator itself. Every row is exactly what
+ * typing that gross into the form returns, with no benefits, union due or
+ * pension, because it IS that call: a table that could disagree with the form
+ * would be a second calculator.
+ */
+export function buildNetSalaryTable(
+  grossSalaries: readonly number[],
+  dependants = 0,
+): NetSalaryTableRow[] {
+  return grossSalaries.map((monthlyGrossSalary) => {
+    const result = calculateNetSalary({
+      monthlyGrossSalary,
+      dependants,
+      monthlyPrivatePension: 0,
+      hasMealAllowance: false,
+      hasTransportAllowance: false,
+      hasUnionDue: false,
+    });
+
+    return {
+      monthlyGrossSalary: result.monthlyGrossSalary,
+      inssWithheld: result.inssWithheld,
+      deductionApplied: result.deductionApplied,
+      baseDeduction:
+        result.deductionApplied === "simplified"
+          ? result.simplifiedDeduction
+          : result.legalDeductions,
+      taxFromTable: result.taxFromTable,
+      reductionLei15270: result.reductionLei15270,
+      estimatedIrpfWithheld: result.estimatedIrpfWithheld,
+      monthlyNetSalary: result.monthlyNetSalary,
+      netShare:
+        result.monthlyGrossSalary > 0 ? result.monthlyNetSalary / result.monthlyGrossSalary : 0,
+    };
+  });
+}
+
+/**
+ * The gross at which the legal deductions of a worker with `dependants`
+ * dependants reach the flat simplified discount: below it, art. 4º § 2º's route
+ * is the more beneficial. Bisection, because INSS is progressive and capped.
+ * Returns 0 when the dependants alone already exceed the discount.
+ */
+export function simplifiedRouteCeiling(dependants = 0): number {
+  const needed =
+    SIMPLIFIED_DEDUCTION_MONTHLY - Math.max(dependants, 0) * DEDUCTION_PER_DEPENDENT_MONTHLY;
+  if (needed <= 0) return 0;
+
+  let low = 0;
+  let high = 20_000;
+  for (let step = 0; step < 100; step += 1) {
+    const middle = (low + high) / 2;
+    if (calculateEmployeeInss(middle) < needed) {
+      low = middle;
+    } else {
+      high = middle;
+    }
+  }
+  return roundToCentavos((low + high) / 2);
+}
