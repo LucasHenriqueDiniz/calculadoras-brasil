@@ -1,0 +1,181 @@
+{
+  "site": "calculebrasil",
+  "start": "2025-06-01",
+  "end": "2026-10-16",
+  "dimensions": [
+    "page"
+  ],
+  "rows": [
+    {
+      "keys": [
+        "https://calculebrasil.com/calculadora-assinaturas"
+      ],
+      "clicks": 4,
+      "impressions": 143,
+      "ctr": 0.027972027972027972,
+      "position": 6.489510489510489
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/"
+      ],
+      "clicks": 1,
+      "impressions": 19,
+      "ctr": 0.05263157894736842,
+      "position": 9.526315789473685
+    },
+    {
+      "keys": [
+        "http://calculebrasil.com/"
+      ],
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 2
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/blog/assinaturas-que-valem-a-pena"
+      ],
+      "clicks": 0,
+      "impressions": 2,
+      "ctr": 0,
+      "position": 9
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/blog/contador-necessario-pj"
+      ],
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 10
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/blog/custo-pet-anual"
+      ],
+      "clicks": 0,
+      "impressions": 2,
+      "ctr": 0,
+      "position": 10
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/blog/quanto-custa-morar-sozinho"
+      ],
+      "clicks": 0,
+      "impressions": 3,
+      "ctr": 0,
+      "position": 15
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/calculadora-beneficios-fiscais"
+      ],
+      "clicks": 0,
+      "impressions": 3,
+      "ctr": 0,
+      "position": 9.666666666666666
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/calculadora-clt-vs-pj"
+      ],
+      "clicks": 0,
+      "impressions": 75,
+      "ctr": 0,
+      "position": 88.10666666666667
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/calculadora-conta-de-luz"
+      ],
+      "clicks": 0,
+      "impressions": 235,
+      "ctr": 0,
+      "position": 8.208510638297874
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/calculadora-custo-pet"
+      ],
+      "clicks": 0,
+      "impressions": 58,
+      "ctr": 0,
+      "position": 7.827586206896552
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/calculadora-irpf-2026"
+      ],
+      "clicks": 0,
+      "impressions": 15,
+      "ctr": 0,
+      "position": 38.53333333333333
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/calculadora-morar-sozinho"
+      ],
+      "clicks": 0,
+      "impressions": 6,
+      "ctr": 0,
+      "position": 7
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/calculadora-salario-liquido"
+      ],
+      "clicks": 0,
+      "impressions": 80,
+      "ctr": 0,
+      "position": 84.475
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/calculadoras"
+      ],
+      "clicks": 0,
+      "impressions": 6,
+      "ctr": 0,
+      "position": 3.6666666666666665
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/comparar/energia"
+      ],
+      "clicks": 0,
+      "impressions": 2,
+      "ctr": 0,
+      "position": 7.5
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/metodologia"
+      ],
+      "clicks": 0,
+      "impressions": 10,
+      "ctr": 0,
+      "position": 4.8
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/sobre"
+      ],
+      "clicks": 0,
+      "impressions": 10,
+      "ctr": 0,
+      "position": 5.6
+    },
+    {
+      "keys": [
+        "https://calculebrasil.com/termos"
+      ],
+      "clicks": 0,
+      "impressions": 6,
+      "ctr": 0,
+      "position": 3.6666666666666665
+    }
+  ]
+}
