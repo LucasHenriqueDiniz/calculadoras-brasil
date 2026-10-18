@@ -1,5 +1,5 @@
 ---
-status: doing
+status: done
 ---
 
 # Slice 1 — Merge or remove the 22 pages Google declined
@@ -68,12 +68,20 @@ A link left pointing at a redirect is a defect, not a nicety.
 On the deployed branch preview, for every row of the triage table:
 
 ```
-while read -r path expected; do
-  got=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "$PREVIEW$path")
-  [ "$got" = "$expected" ] && echo "ok   $path" || echo "FAIL $path -> $got (want $expected)"
+PREVIEW=https://docs-adsense-reapplication-calcule-brasil.lucas-hdo.workers.dev
+while IFS=$'\t' read -r src expected; do
+  got=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "$PREVIEW$src")
+  gs=${got%% *}; gl=${got#* }; gl=${gl#$PREVIEW}; gl=${gl% }
+  es=${expected%% *}; el=${expected#* }; el=${el#https://calculebrasil.com}; el=${el% }
+  [ "$gs" = "$es" ] && [ "$gl" = "$el" ] && echo "ok   $src" || echo "FAIL $src -> $got (want $expected)"
   sleep 2
 done < docs/plans/adsense-reapplication/triage.tsv
 ```
+
+⚠️ **Do not name the loop variable `path`.** In zsh, `path` is tied to `PATH`, and assigning it
+erased `curl` and `sleep` from the lookup, which turned the first run into 22 false `FAIL`s. The
+comparison is on status plus target **path**, because the preview's `Location` resolves against
+the preview host and not against `calculebrasil.com`.
 
 prints no `FAIL`. The `sleep` is deliberate. On 2026-10-18, about 120 scripted requests in a few
 minutes were followed by this machine's `curl` getting no response from the site for over 20
@@ -186,7 +194,16 @@ markup, not what it says. #16's version stays recoverable as
 slice 5 reads for the morar-sozinho calculator. Reversing this means deleting one line of
 `public/_redirects` and restoring those two files from `12d2a23`.
 
-**Not done yet, and it is what `Done when` asks for:**
-- the `triage.tsv` loop against the **deployed** preview. That needs a pushed branch and a PR,
-  because Workers Builds uploads a preview version on pull requests (`docs/deploy.md`).
-- ⚠️ the owner's "Request indexing" for the merge targets.
+**Done when, met on 2026-10-18** against the branch preview of #17. Cloudflare's PR comment
+names commit `eeb7f23` as the one deployed, and the merge `a92df17` changed no file the preview
+serves.
+
+| check | result |
+|---|---|
+| `triage.tsv` loop | **22 ok, 0 FAIL**: 20 × `301` to the planned path, 2 × `404` |
+| targets and hubs on the preview | `/calculadora-irpf-2026`, `/calculadora-morar-sozinho`, `/blog`, `/comparar` and `/comparar/energia` all `200` |
+| internal links to removed paths | none. The one match, `"mudanca"` in `src/routes/metodologia.tsx:30`, is the id of the moving-cost methodology section, not a link. The bare-slug pattern is too broad for `/comparar/*` slugs, and is kept because it is what catches `blogPosts` keys. |
+| `pnpm run test:seo` | green, 29 routes |
+
+⚠️ **Still the owner's:** after the merge to `main`, "Request indexing" in Search Console for the
+merge targets.
