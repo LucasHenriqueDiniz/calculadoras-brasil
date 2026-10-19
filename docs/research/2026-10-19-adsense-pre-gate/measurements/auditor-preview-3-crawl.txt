@@ -1,0 +1,42 @@
+Crawl — https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev
+==========================================================================
+
+[PASS] crawl
+         - 28 pages fetched, 28 readable HTML
+[PASS] ADS-CRAWL-01 pages reachable
+         - blocked_by_robots=0, ok=28, pages=28, stopped_reason=None
+[PASS] ADS-CRAWL-04 redirect chains
+         - max_hops_seen=0, redirected_pages=0, verified_stateless=False
+[MISS] ADS-CRAWL-05 stable URLs
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/: canonical points to https://calculebrasil.com/
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadoras: canonical points to https://calculebrasil.com/calculadoras
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog: canonical points to https://calculebrasil.com/blog
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/sobre: canonical points to https://calculebrasil.com/sobre
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/metodologia: canonical points to https://calculebrasil.com/metodologia
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/contato: canonical points to https://calculebrasil.com/contato
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-custo-carro: canonical points to https://calculebrasil.com/calculadora-custo-carro
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-morar-sozinho: canonical points to https://calculebrasil.com/calculadora-morar-sozinho
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-conta-de-luz: canonical points to https://calculebrasil.com/calculadora-conta-de-luz
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-assinaturas: canonical points to https://calculebrasil.com/calculadora-assinaturas
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-custo-mudanca: canonical points to https://calculebrasil.com/calculadora-custo-mudanca
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-custo-pet: canonical points to https://calculebrasil.com/calculadora-custo-pet
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-irpf-2026: canonical points to https://calculebrasil.com/calculadora-irpf-2026
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-salario-liquido: canonical points to https://calculebrasil.com/calculadora-salario-liquido
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-inss-autonomo: canonical points to https://calculebrasil.com/calculadora-inss-autonomo
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-clt-vs-pj: canonical points to https://calculebrasil.com/calculadora-clt-vs-pj
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-previdencia-complementar: canonical points to https://calculebrasil.com/calculadora-previdencia-complementar
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-beneficios-fiscais: canonical points to https://calculebrasil.com/calculadora-beneficios-fiscais
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/privacidade: canonical points to https://calculebrasil.com/privacidade
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/termos: canonical points to https://calculebrasil.com/termos
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/comparar/energia: canonical points to https://calculebrasil.com/comparar/energia
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/como-economizar-conta-de-luz: canonical points to https://calculebrasil.com/blog/como-economizar-conta-de-luz
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/assinaturas-que-valem-a-pena: canonical points to https://calculebrasil.com/blog/assinaturas-que-valem-a-pena
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/custo-pet-anual: canonical points to https://calculebrasil.com/blog/custo-pet-anual
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/investimentos-isentos-irpf: canonical points to https://calculebrasil.com/blog/investimentos-isentos-irpf
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/deducoes-irpf-esqueca: canonical points to https://calculebrasil.com/blog/deducoes-irpf-esqueca
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/despesas-dedutiveis-autonomo: canonical points to https://calculebrasil.com/blog/despesas-dedutiveis-autonomo
+         - https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/contador-necessario-pj: canonical points to https://calculebrasil.com/blog/contador-necessario-pj
+         - 28 page(s) declare a canonical and the two-session comparison was not made (verify_two_sessions=False): canonical stability across independent sessions is unverified
+
+4 checks: PASS=3, MISS=1
+Verdict: nothing failed, but something could not be observed. Not a pass — see the MISS lines.

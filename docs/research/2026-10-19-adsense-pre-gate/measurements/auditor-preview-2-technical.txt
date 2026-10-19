@@ -1,0 +1,18 @@
+Technical checks — https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev
+=====================================================================================
+
+[PASS] ADS-CRAWL-01 reachable
+         - HTTP 200 in 319ms
+[note] ADS-CRAWL-06 availability
+         - TLS: served over HTTPS
+         - DNS: host feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev resolved
+         - response time: 319ms for the whole chain
+         - uptime: not observed — one request cannot establish reliability over time. This quarter of ADS-CRAWL-06 needs monitoring, not an audit run
+[PASS] ADS-CRAWL-02 robots.txt
+         - Mediapartners-Google, Googlebot and AdsBot are all allowed at /
+[WARN] ADS-CRAWL-07 sitemap
+         - sitemap is hosted on calculebrasil.com, not feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev
+         - sitemap advertises 51 URL(s) and none of them are inside https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/ (e.g. https://calculebrasil.com/)
+
+4 checks: PASS=2, note=1, WARN=1
+Verdict: worst status is WARNING. Not ready.
