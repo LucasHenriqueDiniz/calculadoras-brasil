@@ -92,11 +92,12 @@ Unanswered owner rows are exactly what the 26 June checklist assumed.
 | owner rows | `grep -c '^| ADS-' docs/adsense/owner-attestations.md` = 12 |
 | checklist | `test ! -e ADSENSE-CHECKLIST.md` |
 | old pitch | `status: done` |
-| `/metodologia` text depth | PASS, 1678 words, against the local server. Run against production after the merge |
+| `/metodologia` text depth | PASS, 1678 words, locally and on the deployed preview `feat-adsense-closeout` (2026-10-19). Production after the merge |
 | `/sobre` text depth | 363 words, a note in the 300–449 band, not a failure |
 | unit | 386 green. Mutants killed: the R$ 250 cap and the monthly union due (1 red each) |
 | `test:seo` | 28 routes; all 12 calculator sections on `/metodologia`, no "35% da renda", and the disclosure on `/sobre` |
 | browser | R$ 6.000 with a R$ 400 commute: vale-transporte R$ 360,00, net R$ 4.613,39, union R$ 200,00 in March only |
+| deployed preview | `feat-adsense-closeout`: the new salário líquido fields and FAQ, /metodologia's CLT assumption, R$ 178,31 and ANTT date, /sobre's disclosure: 11/11 |
 | `pnpm run check` | stops at `pnpm audit`, on findings that predate this work; a separate task |
 
 **Not done here, and worth a look before slice 7:** the 7 blog articles slice 1 kept were not
