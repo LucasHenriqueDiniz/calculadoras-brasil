@@ -6,7 +6,7 @@ decided:
 
 # Does the finished stack pass slice 7's gate before it reaches production?
 
-> On the measurable half, yes. On a preview of the whole stack, no `auto` row fails. The five non-passing lines are two preview artifacts, two utility pages under a word threshold that is not Google's, and a web overlap the auditor never measures. The other half of the gate is Google's own view: Soft 404s and coverage. It cannot be measured until the stack is merged, deployed and re-crawled, so D7 is not written yet.
+> On the measurable half, yes, first on a preview of the whole stack and then on production after the merge: no `auto` row fails, the 22 triaged URLs answer as triaged, and every calculator serves its new table. Google's half does not pass yet. `/calculadoras` is still a Soft 404, last crawled on 2026-10-13, and no URL has been crawled since the deploy. D7 waits for a re-crawl.
 
 ## What was blocking
 
@@ -85,22 +85,62 @@ The gate asks for no Soft 404. `/calculadoras` gained editorial content in slice
 re-classifies a page only after it re-crawls the deployed version. AdSense still reports the
 site as `NEEDS_ATTENTION` (`measurements/adsense-site-state.txt`).
 
+### 6. On production after the merge, 2026-10-19 (measured)
+
+The stack, #17 to #32, was merged as squash commits on 2026-10-19, and production serves `main` at
+`1b607bb`. Its tree is the one the full gate passed on (`bf6daff`), plus the deployed-preview table
+for slice 2 that the stack had lost.
+
+| check | result |
+|---|---|
+| slice-1 triage, 22 URLs | 22 of 22 answer with their status and target (`measurements/triage-production.txt`) |
+| internal links to removed paths | none; the two matches are the `mudanca` section id on `/metodologia` |
+| new content on 14 pages | 26 of 26 strings, every calculator's table included |
+| auditor, completeness | 5 PASS |
+| auditor, technical | 3 PASS and 1 note. The preview's sitemap WARN is gone |
+| auditor, crawl with `--verify-canonical --verify-stateless` | 4 PASS on 28 pages. The preview's canonical MISS is gone |
+| auditor, text depth on 28 routes | 24 PASS, 2 notes (`/` 445, `/sobre` 363), 2 WARN (`/termos` 180, `/contato` 123) |
+| auditor, duplicates on 22 URLs | PASS; the web-overlap row MISS as always |
+| AdSense | `NEEDS_ATTENTION` |
+
+Raw outputs: `measurements/auditor-production-*.txt`.
+
+**This machine's `curl` got no response from the site, while Python and the browser did.** It
+connected over IPv4 and IPv6 and then timed out, with or without a browser user agent. Python's
+client got 200 in 0,26 s on the same URL. The checks above ran from Python, 2 seconds apart. Slice 1
+recorded the same symptom after a burst of requests on 2026-10-18. The likely cause is Cloudflare
+holding `curl`'s TLS signature from this address. It is not a fault of the site.
+
+**Google's view on the same day** (`measurements/url-inspection-production-2026-10-19.json`), for
+the 28 URLs:
+
+| coverage | 2026-10-18 | 2026-10-19 |
+|---|---|---|
+| Submitted and indexed | 20 | 20 |
+| Discovered – currently not indexed | 5 | 4 |
+| URL is unknown to Google | 2 | 3 |
+| Soft 404 | 1 | 1 (`/calculadoras`, last crawled 2026-10-13) |
+
+No URL had been crawled since the deploy. The three changes are among the pages not indexed:
+`/blog` and `/privacidade` went from discovered to unknown, and `/contato` the other way. The
+eight URLs not indexed are `/calculadoras`, `/calculadora-custo-carro`,
+`/calculadora-custo-mudanca`, `/calculadora-inss-autonomo`,
+`/calculadora-previdencia-complementar`, `/blog`, `/privacidade` and `/contato`.
+
 ## Verdict
 
-**Do not request review yet, and do not write D7 yet.** The measurable half of the gate passes on
-the preview. The other half needs, in this order:
+**Do not request review yet, and do not write D7 yet.** Three of the gate's four conditions pass on
+production. The fourth, no Soft 404, waits on Google:
 
-1. the owner merges #17 → #32;
-2. on production, the slice-1 `curl` loop and `test:seo`, and the auditor's five scripts again,
-   paced as here;
-3. "Solicitar indexação" for the changed pages, then a wait for the re-crawl;
-4. `sitestats inspect` over the 28 URLs: no Soft 404, and each `lastCrawlTime` after the deploy;
-5. then D7, and the one review request.
+1. ⚠️ **Owner:** in Search Console, resubmit `sitemap.xml`, which now lists 28 URLs instead of 51.
+   Then "Solicitar indexação", in this order, as the daily quota allows: `/calculadoras` first,
+   because it is the Soft 404; then the four calculators not indexed; then the eight
+   indexed calculators whose content changed most.
+2. When `sitestats inspect` shows `/calculadoras` crawled after 2026-10-19 and not a Soft 404:
+   D7, then one review request.
 
 ## What this does not establish
 
-- **That production will pass.** A preview is not the deployed site. The two artifacts above
-  should disappear there, but that has to be measured.
 - **That Google will index more of the 28.** Coverage is Google's call, and it moves on Google's
   crawl schedule.
 - **That the `judgement` rows pass.** Every one now cites written evidence:

@@ -79,13 +79,26 @@ scratch script, added to `sitestats` the same way `inspect` was in slice 2. A `R
 - **D7 is not written yet.** The research's verdict: do not request review until steps 1–4
   below have run.
 
+### Production, 2026-10-19
+
+The owner merged #17 → #32. Each was a squash, replayed onto `main` by a script that stopped at
+anything unexpected. `main`'s final tree is the one the full gate passed on. On production:
+
+| gate condition | state |
+|---|---|
+| no public URL is a Soft 404 | ❌ `/calculadoras` is still Soft 404, last crawled 2026-10-13, before slice 2 |
+| sitemap URLs kept, triaged URLs serve their status | ✅ 28 in the sitemap; 22 of 22 triaged URLs as triaged |
+| no `auto` row fails | ✅ completeness, technical, crawl (with both verifications), duplicates; text depth WARN only on `/termos` and `/contato` |
+| every `judgement` row cites written evidence | ✅ the added-value research note and `docs/adsense/owner-attestations.md` |
+
+Details: [[2026-10-19-adsense-pre-gate]], finding 6.
+
 ### Remaining, in order
 
-1. ⚠️ **Owner:** merge #17 → #32.
-2. On production: the slice-1 `curl` loop, `test:seo` against the live site, and the five auditor
-   scripts again, paced as on 2026-10-19. The two preview artifacts should be gone.
-3. ⚠️ **Owner:** "Solicitar indexação" for the changed pages, then wait for the re-crawl.
-4. `sitestats inspect` over the 28 URLs: no Soft 404, and every `lastCrawlTime` after the deploy.
-   On 2026-10-18 the 28 were 20 indexed, 5 discovered and not indexed, 2 unknown and 1 Soft 404
-   (`/calculadoras`).
-5. D7 in ARCHITECTURE.md, then ⚠️ **owner:** one review request.
+1. ⚠️ **Owner:** resubmit `sitemap.xml` in Search Console, then "Solicitar indexação" for
+   `/calculadoras` first, then `/calculadora-custo-carro`, `/calculadora-custo-mudanca`,
+   `/calculadora-inss-autonomo`, `/calculadora-previdencia-complementar`, then the indexed
+   calculators that changed.
+2. `sitestats inspect` over the 28 URLs until `/calculadoras` is crawled after 2026-10-19 and is
+   not a Soft 404.
+3. D7 in ARCHITECTURE.md, then ⚠️ **owner:** one review request.

@@ -1,0 +1,19 @@
+Completeness — https://calculebrasil.com
+========================================
+
+[PASS] ADS-COMPLETE-01 home page is finished
+         - no unfinished markers found
+[PASS] ADS-UX-05 about page
+         - https://calculebrasil.com/sobre (462 words)
+         - contact: mailto:lucas.hdo@hotmail.com, email lucas.hdo@hotmail.com, profile https://www.linkedin.com/in/lucas-diniz-ostroski/
+[PASS] ADS-UX-05 contact page
+         - https://calculebrasil.com/contato (213 words)
+         - contact: mailto:lucas.hdo@hotmail.com, email lucas.hdo@hotmail.com
+[PASS] ADS-AUTHOR-02 contact channel
+         - mailto:lucas.hdo@hotmail.com, email lucas.hdo@hotmail.com
+         - reachability not tested: presence in the HTML is not delivery
+[PASS] ADS-COMPLETE-01 navigation
+         - all 19 navigation links followed, none broken; every directory they came from answers 404 or 410 for a URL that does not exist, so HTTP 200 from it means the page is there
+
+5 checks: PASS=5
+Verdict: every check observed its condition and passed.

@@ -1,0 +1,14 @@
+Crawl — https://calculebrasil.com
+=================================
+
+[PASS] crawl
+         - 28 pages fetched, 28 readable HTML
+[PASS] ADS-CRAWL-01 pages reachable
+         - blocked_by_robots=0, ok=28, pages=28, stopped_reason=None
+[PASS] ADS-CRAWL-04 redirect chains
+         - max_hops_seen=0, redirected_pages=0, verified_stateless=True
+[PASS] ADS-CRAWL-05 stable URLs
+         - pages=28, session_urls=[], verified_two_sessions=True, with_canonical=28
+
+4 checks: PASS=4
+Verdict: every check observed its condition and passed.

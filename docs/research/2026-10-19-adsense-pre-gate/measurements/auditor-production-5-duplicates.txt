@@ -1,0 +1,10 @@
+Duplicate content
+=================
+
+[PASS] ADS-CONTENT-02 (part) 22 URLs
+         - no near-duplicate groups
+[MISS] ADS-CONTENT-OVERLAP compared against the web
+         - not measured: ADS-CONTENT-OVERLAP asks for similarity against the top 5 search results and this script performs no search
+
+2 checks: PASS=1, MISS=1
+Verdict: nothing failed, but something could not be observed. Not a pass — see the MISS lines.
