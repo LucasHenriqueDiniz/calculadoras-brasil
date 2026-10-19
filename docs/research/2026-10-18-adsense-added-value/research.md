@@ -40,7 +40,8 @@ Measured against claimed is marked in every row.
 | Previdência complementar | calculadora previdência privada pgbl | portal.icatuseguros.com.br | see below | **built** (slice 4) |
 | Benefícios fiscais | — (no SERP read; the defects were in the arithmetic) | — | see below | **built** (slice 4) |
 | Conta de luz | calculadora conta de luz por aparelho | portal.elfsm.com.br | see below | **built** (slice 5) |
-| the other 5 household calculators | — | — | — | slice 5 |
+| Custo de carro | calculadora custo de carro | calculadoras.rioclaro.com.br | see below | **built** (slice 5) |
+| the other 4 household calculators | — | — | — | slice 5 |
 
 ## Salário líquido
 
@@ -284,6 +285,65 @@ at prerender time. The table uses one example tariff instead and takes no public
   - the form matches the table on 6/6 shared rows;
   - `test:seo` asserts the table and the 56,9 kWh row.
 
+## Custo de carro
+
+### What the leader does (measured)
+
+calculadoras.rioclaro.com.br, an investment adviser (`fetches/rioclaro-custo-do-carro.md`). It is
+broader than ours where ours is thinnest:
+
+- the cost of capital, the money tied up in the car at 14% a year;
+- financing;
+- a five-year table with falling depreciation;
+- a comparison with Uber and public transport.
+
+It takes one fuel price and one km/l, so it cannot compare a flex car's two fuels.
+
+### What ours did before today (measured)
+
+- **Flex compared the fuels at the same km/l.** A litre of ethanol went as far as a litre of
+  gasoline. At the page's own defaults, R$ 6,00 and R$ 4,20, exactly the 70% its FAQ calls the
+  break-even, the form said ethanol was R$ 137,35 a month cheaper.
+- **An FAQ charging an insurance that no longer exists:** "DPVAT (obrigatório) custa R$ 150-200/ano".
+  LC 207/2024 revoked the DPVAT law, and LC 211/2024 revoked the SPVAT that replaced it
+  (`fetches/planalto-lc-207-211-2024.md`).
+- **Ranges with no source:** cost per car class, cost per km, insurance, maintenance, parking,
+  "depreciação representa 30-40%" (it is 21% at the defaults), "reduz consumo 3-5%" and IPVA
+  "2-4%".
+- **A worked example the calculator contradicted:** "próximo de R$ 1.500, quase o triplo", where
+  the calculator said R$ 1.582,85, 3,5 times the fuel.
+- **The ANP badge a day early:** "cache atualizado em 09/10/2026" for a survey ending 10/10, the
+  same midnight-UTC read as the review date.
+
+### What ours does now that the leader does not
+
+- **Ethanol at its own yield.** The 70% rule, measured rather than repeated: across the 261
+  combustion flex rows of Inmetro's PBE 2026, ethanol's combined km/l is a median 70,0% of
+  gasoline's, from 66,4% to 72,6% (`fetches/inmetro-pbev-2026.md`). That is the default, and the
+  visitor can type their own car's figure.
+- **A table of the 27 states.** It is built by the calculator under flex from the ANP's weekly
+  state averages, with the week stated. Ethanol was cheaper in 11 states in the week of
+  04–10/10/2026. The saving ran from R$ 67,59 a month in Mato Grosso to R$ 1,09 in Pará.
+- **Every FAQ figure from the calculator**, the unsourced ranges gone, and the DPVAT answer
+  corrected from the statute.
+
+**The live data is a dated snapshot, not a build-time fetch.** `scripts/refresh-anp-snapshot.mjs`
+reads one ANP workbook through the app's adapter and writes `src/data/anp-weekly-snapshot.ts`, so
+the build never depends on gov.br. Slice 5's `PublicDataUnavailable` case moves with it: when
+the ANP fails, the script throws and writes nothing, and the page keeps the last week. A state
+with no price is a tested row, "sem preço de etanol", as Amapá's was.
+
+**Not taken from the leader: the cost of capital and financing.** They are real costs. At the
+leader's defaults the cost of capital alone is R$ 1.167 a month, 30% of its total. They would add
+inputs, and their defaults would need a source this note did not read. The FAQ now says
+financing is not simulated.
+
+- **Verified:**
+  - hand cases: the tie at 70%, São Paulo at R$ 64,5345 a month;
+  - 2 mutants killed, the yield removed (6 red) and the yield fallback removed (1 red);
+  - the form matches the table in 3 states: SP, RN with gasoline ahead and PA at R$ 1,09;
+  - `test:seo` asserts the table and its 27 state rows.
+
 ## What this does not establish
 
 - **That Google will judge it added value.** It is the kind of thing Google's own text names, as
@@ -296,6 +356,8 @@ at prerender time. The table uses one example tariff instead and takes no public
 - **That the SERP is the reviewer's.** One snapshot, from one machine, signed-in state unknown.
 - **The example tariff of R$ 0,95/kWh.** It predates this note and was not sourced. Every figure in
   the conta de luz table scales with it.
+- **That the fuel table is current.** It is one ANP week, 04–10/10/2026, and moves only when the
+  snapshot script is run again.
 - **Eletrobrás's figures for a 2026 refrigerator.** They are 2013 averages, quoted by IDEC; the
   primary table was not found.
 
@@ -308,4 +370,9 @@ at prerender time. The table uses one example tariff instead and takes no public
 - [Google Brasil SERP](https://www.google.com.br/search?q=calculadora+conta+de+luz+por+aparelho&hl=pt-BR&gl=br&num=10) — `fetches/serp-calculadora-conta-de-luz-por-aparelho.md` — the 10 organic results
 - [ELFSM, simulação de consumo](https://portal.elfsm.com.br/consumo/simulacao-de-consumo/) — `fetches/elfsm-simulacao-de-consumo.md` — position 1, its form and its reference powers
 - [IDEC, dicas de como economizar na conta de luz](https://idec.org.br/o-idec/sala-de-imprensa/release/idec-da-dicas-de-como-economizar-na-conta-de-luz) — `fetches/idec-eletrobras-consumo.md` — Eletrobrás's monthly consumption for refrigerators and freezer
+- [Google Brasil SERP](https://www.google.com.br/search?q=calculadora+custo+de+carro&hl=pt-BR&gl=br&num=10) — `fetches/serp-calculadora-custo-de-carro.md` — the 9 organic results
+- [Rio Claro, custo do carro](https://calculadoras.rioclaro.com.br/custo-do-carro/) — `fetches/rioclaro-custo-do-carro.md` — position 1, inputs and result
+- [Inmetro, PBE Veicular 2026](https://www.gov.br/inmetro/pt-br/assuntos/avaliacao-da-conformidade/programa-brasileiro-de-etiquetagem/tabelas-de-eficiencia-energetica/veiculos-automotivos-pbe-veicular) — `fetches/inmetro-pbev-2026.md`, `measurements/pbev-2026-ethanol-yield.*` — ethanol's yield over 261 flex cars
+- [ANP, levantamento semanal](https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/levantamento-de-precos-de-combustiveis-ultimas-semanas-pesquisadas) — `fetches/anp-levantamento-semanal-2026-10-04.md` — state averages for 04–10/10/2026
+- [LC 207/2024](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp207.htm) and [LC 211/2024](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp211.htm) — `fetches/planalto-lc-207-211-2024.md` — the end of DPVAT and SPVAT
 - Secondary, search results only and not fetched: BP Money, Contabilidade.com and others saying payroll applies the more beneficial route. They agree with the statute; nothing rests on them.

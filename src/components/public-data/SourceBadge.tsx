@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ExternalLink, FileText } from "lucide-react";
+import { formatShortDate } from "@/lib/format";
 
 interface SourceBadgeProps {
   sourceName: string;
@@ -14,11 +15,13 @@ export function SourceBadge({
   sourceUrl,
   sourcePeriod,
 }: SourceBadgeProps) {
-  const formattedDate = sourceLastUpdated
-    ? new Intl.DateTimeFormat("pt-BR").format(new Date(sourceLastUpdated))
-    : "data não disponível";
+  // The sources date their data by calendar day ("2026-10-10"). Read as a local
+  // time, that was midnight UTC, the evening before in Brasília: the ANP week
+  // ending 10/10 showed as "09/10". It is the data's date, not when our cache
+  // last refreshed, which the old label claimed.
+  const formattedDate = sourceLastUpdated ? formatShortDate(sourceLastUpdated) : "não disponível";
 
-  const label = `Fonte: ${sourceName}${sourcePeriod ? `, período ${sourcePeriod}` : ""}, cache atualizado em ${formattedDate}`;
+  const label = `Fonte: ${sourceName}${sourcePeriod ? `, período ${sourcePeriod}` : ""}, dados de ${formattedDate}`;
 
   const pill =
     "inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground";

@@ -303,6 +303,21 @@ try {
   );
   assert.ok(electricityPage.includes("56,9 kWh"), "the refrigerator row must show 56,9 kWh");
 
+  // The fuel table, built from the dated ANP snapshot: one row per state.
+  const carHtml = await (await fetch(`${BASE_URL}/calculadora-custo-carro`)).text();
+  const carPage = textContent(carHtml).replaceAll("\u00a0", " ");
+  assert.ok(
+    carPage.includes("Etanol ou gasolina em cada estado"),
+    "the fuel table must be prerendered",
+  );
+  assert.ok(
+    carPage.includes("levantamento semanal da ANP de"),
+    "the fuel table must say which ANP week it is",
+  );
+  const fuelTable = carHtml.slice(carHtml.indexOf("Etanol ou gasolina em cada estado"));
+  const stateRows = fuelTable.slice(0, fuelTable.indexOf("</table>")).match(/<th scope="row"/g);
+  assert.equal(stateRows?.length, 27, "the fuel table must have a row for each of the 27 states");
+
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 

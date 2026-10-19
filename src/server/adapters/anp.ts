@@ -141,7 +141,13 @@ function findStatesSheet(files: Record<string, Uint8Array>): Uint8Array | undefi
   return files[`xl/${target.replace(/^\/+/, "")}`];
 }
 
-export async function fetchAnpFuelPrice(uf: string, fuel: string): Promise<FuelPriceResult | null> {
+interface AnpStatesSheet {
+  workbookUrl: string;
+  rows: Map<string, string>[];
+}
+
+/** The latest weekly workbook's ESTADOS sheet, fetched and parsed once. */
+async function readLatestStatesSheet(): Promise<AnpStatesSheet> {
   const workbookUrl = await findLatestWorkbookUrl();
   const { bytes } = await fetchBounded(workbookUrl, {
     maxBytes: 2_000_000,
@@ -159,7 +165,14 @@ export async function fetchAnpFuelPrice(uf: string, fuel: string): Promise<FuelP
   }
 
   const sharedStrings = readSharedStrings(decodeUtf8(sharedStringsFile));
-  const rows = readRows(decodeUtf8(statesSheet), sharedStrings);
+  return { workbookUrl, rows: readRows(decodeUtf8(statesSheet), sharedStrings) };
+}
+
+function priceFromSheet(
+  { workbookUrl, rows }: AnpStatesSheet,
+  uf: string,
+  fuel: string,
+): FuelPriceResult | null {
   const state = STATE_BY_UF[uf];
   const acceptedProducts = PRODUCTS[fuel] ?? [];
 
@@ -195,4 +208,19 @@ export async function fetchAnpFuelPrice(uf: string, fuel: string): Promise<FuelP
     lastUpdated: endDate,
     isStale: ageDays > 14,
   };
+}
+
+export async function fetchAnpFuelPrice(uf: string, fuel: string): Promise<FuelPriceResult | null> {
+  return priceFromSheet(await readLatestStatesSheet(), uf, fuel);
+}
+
+/**
+ * Every state's average for each fuel, from ONE download of the weekly
+ * workbook. Asking fetchAnpFuelPrice 27 times would fetch it 27 times.
+ */
+export async function fetchAnpPricesByState(fuels: readonly string[]): Promise<FuelPriceResult[]> {
+  const sheet = await readLatestStatesSheet();
+  return Object.keys(STATE_BY_UF).flatMap((uf) =>
+    fuels.flatMap((fuel) => priceFromSheet(sheet, uf, fuel) ?? []),
+  );
 }
