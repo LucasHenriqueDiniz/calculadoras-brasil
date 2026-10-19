@@ -124,3 +124,28 @@ Same as slice 4: one PR per calculator.
 | hand cases | tie at 70%; São Paulo R$ 485,3169 − R$ 420,7824 = R$ 64,5345 a month |
 | `test:seo` | 28 routes; the fuel table, its ANP week, and 27 state rows |
 | both ends | 3 of 3 states typed into the form match the table: SP (ethanol, R$ 64,53), RN (gasoline, R$ 44,69), PA (ethanol, R$ 1,09) |
+
+### Morar sozinho — 2026-10-18
+
+- **Leader:** customorarsozinho.com.br, a site built for the query. City ranges "estimados", with
+  no source, and a paid plan.
+- **Defects:**
+  - the FAQ called 50–70% of income "apertado", where the calculator says "atenção";
+  - 9 of 12 answers gave figures with no source.
+- **#16's FAQs, read as slice 1 asked:** their topics were worth keeping, their figures were not.
+  One was against the law: the agency fee is the landlord's (Lei 8.245, art. 22, VII), not "1
+  aluguel" from the tenant. They are folded in, corrected from the statute: who pays the fees,
+  the condo and the IPTU, the three-month cap on a deposit, one guarantee, and advance rent.
+- **New:** a 22-row table, built by the calculator, of a 40 m² flat at FipeZAP's September 2026
+  rent per m² plus DIEESE's September cesta básica, in reais and minimum wages. It runs from São
+  Paulo, R$ 3.553,71, to Teresina, R$ 2.002,15. `FINANCIAL_STATUS_BANDS` is exported, and the FAQ
+  reads its bands from it.
+- **Data:** transcribed from two PDFs into `src/data/capital-living-costs.ts`. Nothing is fetched
+  at build or at runtime, so there is no `PublicDataUnavailable` path; the month is on the page.
+
+| check | result |
+|---|---|
+| unit | 359 green. Mutant killed: the basket dropped from the total (3 red) |
+| hand cases | São Paulo 65,78 × 40 + 922,51 = R$ 3.553,71; Teresina 32,59 × 40 + 698,55 = R$ 2.002,15 |
+| `test:seo` | 28 routes; 22 capital rows and São Paulo's R$ 3.553,71 prerendered |
+| both ends | 2 of 2 capitals typed into the form match the table: SP R$ 3.553,71 (219,2% of R$ 1.621), Teresina R$ 2.002,15 |

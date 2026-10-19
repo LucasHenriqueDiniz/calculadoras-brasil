@@ -41,7 +41,8 @@ Measured against claimed is marked in every row.
 | Benefícios fiscais | — (no SERP read; the defects were in the arithmetic) | — | see below | **built** (slice 4) |
 | Conta de luz | calculadora conta de luz por aparelho | portal.elfsm.com.br | see below | **built** (slice 5) |
 | Custo de carro | calculadora custo de carro | calculadoras.rioclaro.com.br | see below | **built** (slice 5) |
-| the other 4 household calculators | — | — | — | slice 5 |
+| Morar sozinho | calculadora morar sozinho | customorarsozinho.com.br | see below | **built** (slice 5) |
+| the other 3 household calculators | — | — | — | slice 5 |
 
 ## Salário líquido
 
@@ -344,6 +345,53 @@ financing is not simulated.
   - the form matches the table in 3 states: SP, RN with gasoline ahead and PA at R$ 1,09;
   - `test:seo` asserts the table and its 27 state rows.
 
+## Morar sozinho
+
+### What the leader does (measured)
+
+customorarsozinho.com.br, a site built for the query (`fetches/customorarsozinho-calculadora.md`):
+
+- a form that starts from 13 capitals and the type of home;
+- a table of "custo mensal total" for 8 capitals, as ranges marked "Valores estimados", with no
+  source;
+- rules of thumb with no source;
+- a paid plan.
+
+### What ours did before today (measured)
+
+- **An FAQ that contradicted the calculator.** It called 50–70% of income "apertado". The
+  calculator labels that band "Atenção" and keeps "Apertado" for 70–90%.
+- **Figures with no source** in 9 of 12 answers: cost by city, rent in SP, RJ and BH, condo and
+  IPTU, energy, the reserve, "comida caseira é 60% mais barata".
+- **#16's FAQs, written for the article slice 1 redirected here, had a legal error.** They listed
+  "taxa de imobiliária (geralmente 1 aluguel)" among the tenant's costs. Lei 8.245/1991, art. 22,
+  VII, puts intermediation and administration fees on the landlord, and art. 43 makes charging
+  beyond rent and permitted charges a contravenção (`fetches/planalto-lei-8245-1991.md`).
+
+### What ours does now that the leader does not
+
+- **A table of 22 capitals with sourced figures.** It shows a 40 m² flat at each city's average
+  rent per m² in FipeZAP's September 2026 report, plus the DIEESE/Conab cesta básica for the same
+  month (`fetches/fipezap-locacao-2026-09.md`, `fetches/dieese-cesta-basica-2026-09.md`). The
+  calculator adds the two and expresses them in minimum wages. The table runs from R$ 3.553,71 in
+  São Paulo, 2,2 minimum wages, to R$ 2.002,15 in Teresina. It says that it is a floor, and that
+  one-bedroom flats cost more per m² than the city average.
+- **The lease rules from the statute.** Who pays the agency fee, extraordinary condo expenses and
+  the IPTU; the cap of three months on a cash deposit; one guarantee per contract; and when rent
+  can be charged in advance. These are #16's topics, corrected.
+- **FAQ bands read from the module** (`FINANCIAL_STATUS_BANDS`), so the FAQ cannot drift from
+  the calculator again.
+
+**Data, not a live fetch.** Both reports are PDFs, transcribed into
+`src/data/capital-living-costs.ts` with the month and the source URLs. The FipeZAP values were
+extracted by script and agree with the report's own summary paragraph, all 22 of them.
+
+- **Verified:**
+  - hand cases: São Paulo 65,78 × 40 + 922,51 = R$ 3.553,71, and Teresina R$ 2.002,15;
+  - 1 mutant killed (the basket dropped, 3 red);
+  - the form matches the table for SP and Teresina;
+  - `test:seo` asserts 22 capital rows and São Paulo's total.
+
 ## What this does not establish
 
 - **That Google will judge it added value.** It is the kind of thing Google's own text names, as
@@ -358,6 +406,8 @@ financing is not simulated.
   the conta de luz table scales with it.
 - **That the fuel table is current.** It is one ANP week, 04–10/10/2026, and moves only when the
   snapshot script is run again.
+- **That a 40 m² flat at the city's average rent per m² is what a person living alone pays.** It is
+  the table's scenario. FipeZAP publishes rent by size only nationally.
 - **Eletrobrás's figures for a 2026 refrigerator.** They are 2013 averages, quoted by IDEC; the
   primary table was not found.
 
@@ -375,4 +425,9 @@ financing is not simulated.
 - [Inmetro, PBE Veicular 2026](https://www.gov.br/inmetro/pt-br/assuntos/avaliacao-da-conformidade/programa-brasileiro-de-etiquetagem/tabelas-de-eficiencia-energetica/veiculos-automotivos-pbe-veicular) — `fetches/inmetro-pbev-2026.md`, `measurements/pbev-2026-ethanol-yield.*` — ethanol's yield over 261 flex cars
 - [ANP, levantamento semanal](https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/levantamento-de-precos-de-combustiveis-ultimas-semanas-pesquisadas) — `fetches/anp-levantamento-semanal-2026-10-04.md` — state averages for 04–10/10/2026
 - [LC 207/2024](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp207.htm) and [LC 211/2024](https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp211.htm) — `fetches/planalto-lc-207-211-2024.md` — the end of DPVAT and SPVAT
+- [Google Brasil SERP](https://www.google.com.br/search?q=calculadora+morar+sozinho&hl=pt-BR&gl=br&num=10) — `fetches/serp-calculadora-morar-sozinho.md` — the 9 organic results
+- [Custo Morar Sozinho](https://www.customorarsozinho.com.br) — `fetches/customorarsozinho-calculadora.md` — position 1
+- [FipeZAP Locação, setembro de 2026](https://downloads.fipe.org.br/indices/fipezap/fipezap-202609-residencial-locacao.pdf) — `fetches/fipezap-locacao-2026-09.md`, `measurements/fipezap-2026-09-city-prices.*` — rent per m² in 22 capitals
+- [DIEESE, cesta básica de setembro de 2026](https://www.dieese.org.br/analisecestabasica/2026/202609cestabasica.html) — `fetches/dieese-cesta-basica-2026-09.md` — the basket in 27 capitals
+- [Lei 8.245/1991](https://www.planalto.gov.br/ccivil_03/leis/l8245.htm) — `fetches/planalto-lei-8245-1991.md` — who pays what in a lease
 - Secondary, search results only and not fetched: BP Money, Contabilidade.com and others saying payroll applies the more beneficial route. They agree with the statute; nothing rests on them.

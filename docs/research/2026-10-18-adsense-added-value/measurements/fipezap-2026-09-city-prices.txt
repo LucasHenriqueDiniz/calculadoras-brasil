@@ -1,0 +1,22 @@
+setembro/2026 | [('SÃO PAULO', 'SP')] | 65,78
+setembro/2026 | [('RIO DE JANEIRO', 'RJ')] | 61,86
+setembro/2026 | [('BRASÍLIA', 'DF')] | 53,84
+setembro/2026 | [('SALVADOR', 'BA')] | 55,40
+setembro/2026 | [('PORTO ALEGRE', 'RS')] | 46,78
+setembro/2026 | [('CURITIBA', 'PR')] | 49,44
+setembro/2026 | [('BELO HORIZONTE', 'MG')] | 50,78
+setembro/2026 | [('RECIFE', 'PE')] | 64,39
+setembro/2026 | [('FORTALEZA', 'CE')] | 42,22
+setembro/2026 | [('FLORIANÓPOLIS', 'SC')] | 61,81
+setembro/2026 | [('GOIÂNIA', 'GO')] | 43,86
+setembro/2026 | [('VITÓRIA', 'ES')] | 57,06
+setembro/2026 | [('CAMPO GRANDE', 'MS')] | 32,95
+setembro/2026 | [('CUIABÁ', 'MT')] | 48,90
+setembro/2026 | [('ARACAJU', 'SE')] | 36,04
+setembro/2026 | [('JOÃO PESSOA', 'PB')] | 51,86
+setembro/2026 | [('MACEIÓ', 'AL')] | 56,63
+setembro/2026 | [('NATAL', 'RN')] | 45,71
+setembro/2026 | [('SÃO LUÍS', 'MA')] | 57,99
+setembro/2026 | [('TERESINA', 'PI')] | 32,59
+setembro/2026 | [('BELÉM', 'PA')] | 62,25
+setembro/2026 | [('MANAUS', 'AM')] | 53,05

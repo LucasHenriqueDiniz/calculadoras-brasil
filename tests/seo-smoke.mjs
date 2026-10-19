@@ -318,6 +318,24 @@ try {
   const stateRows = fuelTable.slice(0, fuelTable.indexOf("</table>")).match(/<th scope="row"/g);
   assert.equal(stateRows?.length, 27, "the fuel table must have a row for each of the 27 states");
 
+  // The capitals table: FipeZAP rent and DIEESE basket, one row per capital both cover.
+  const livingHtml = await (await fetch(`${BASE_URL}/calculadora-morar-sozinho`)).text();
+  const capitalsTable = livingHtml.slice(
+    livingHtml.indexOf("Quanto custa morar sozinho em cada capital"),
+  );
+  const capitalRows = capitalsTable
+    .slice(0, capitalsTable.indexOf("</table>"))
+    .match(/<th scope="row"/g);
+  assert.equal(
+    capitalRows?.length,
+    22,
+    "the capitals table must have a row for each of 22 capitals",
+  );
+  assert.ok(
+    textContent(livingHtml).replaceAll("\u00a0", " ").includes("R$ 3.553,71"),
+    "São Paulo's row must show R$ 3.553,71",
+  );
+
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 
