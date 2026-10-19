@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { calculateIrpf, type IrpfInput } from "../../src/lib/calculators/irpf";
+import {
+  buildRegimeThresholdTable,
+  calculateIrpf,
+  compareIrpfRegimes,
+  type IrpfInput,
+} from "../../src/lib/calculators/irpf";
 import { INSS_CEILING, calculateEmployeeInss } from "../../src/lib/calculators/inss-constants";
 
 /**
@@ -144,29 +149,41 @@ describe("calculateIrpf — INSS withheld", () => {
 });
 
 describe("calculateIrpf — itemised deductions", () => {
-  it("caps education at the documented limit", () => {
+  /** Lei 9.250, art. 8º, II, "b": "até o limite anual individual" — per person. */
+  it("caps education per person: the taxpayer and each dependant", () => {
     expect(irpf({ grossAnnualIncome: 100_000, educationDeduction: 1_000 }).educationDeduction).toBe(
       1_000,
     );
     expect(
       irpf({ grossAnnualIncome: 100_000, educationDeduction: 99_999 }).educationDeduction,
     ).toBe(3561.5);
+    expect(
+      irpf({ grossAnnualIncome: 100_000, educationDeduction: 99_999, dependants: 2 })
+        .educationDeduction,
+    ).toBe(3 * 3561.5);
   });
 
-  it("caps health, which the module itself flags as having no legal cap", () => {
-    expect(irpf({ grossAnnualIncome: 100_000, healthDeduction: 1_000 }).healthDeduction).toBe(
-      1_000,
-    );
+  /**
+   * Lei 9.250, art. 8º, II, "a": medical expenses carry no limit. The R$ 2.666,67
+   * this module used to cap them at was invented, and said so in its own comment.
+   */
+  it("does not cap health, as the statute sets no limit", () => {
     expect(irpf({ grossAnnualIncome: 100_000, healthDeduction: 99_999 }).healthDeduction).toBe(
-      2666.67,
+      99_999,
     );
+    expect(irpf({ grossAnnualIncome: 100_000, healthDeduction: -500 }).healthDeduction).toBe(0);
   });
 
-  it("does not cap supplementary pension, and floors it at zero", () => {
+  /** "Até o limite de 12% do rendimento tributável" — the Receita's FAQ. */
+  it("caps private pension at 12% of income, and floors it at zero", () => {
+    expect(
+      irpf({ grossAnnualIncome: 100_000, supplementaryPensionDeduction: 5_000 })
+        .supplementaryPensionDeduction,
+    ).toBe(5_000);
     expect(
       irpf({ grossAnnualIncome: 100_000, supplementaryPensionDeduction: 50_000 })
         .supplementaryPensionDeduction,
-    ).toBe(50_000);
+    ).toBeCloseTo(12_000, 6);
     expect(
       irpf({ grossAnnualIncome: 100_000, supplementaryPensionDeduction: -5_000 })
         .supplementaryPensionDeduction,
@@ -178,14 +195,14 @@ describe("calculateIrpf — itemised deductions", () => {
       grossAnnualIncome: 100_000,
       educationDeduction: 99_999,
       healthDeduction: 99_999,
-      supplementaryPensionDeduction: 5_000,
+      supplementaryPensionDeduction: 50_000,
     });
 
-    expect(result.totalDeductions).toBeCloseTo(3561.5 + 2666.67 + 5_000, 2);
+    expect(result.totalDeductions).toBeCloseTo(3561.5 + 99_999 + 12_000, 2);
   });
 
   it("never drives the calculation base below zero", () => {
-    const result = irpf({ grossAnnualIncome: 10_000, supplementaryPensionDeduction: 999_999 });
+    const result = irpf({ grossAnnualIncome: 10_000, healthDeduction: 999_999 });
 
     expect(result.fullCalculationBase).toBe(0);
     expect(result.calculatedTax).toBe(0);
@@ -345,5 +362,97 @@ describe("calculateIrpf — degenerate input", () => {
     for (const grossAnnualIncome of [0, 1, 10_000, 50_000, 250_000]) {
       expect(irpf({ grossAnnualIncome }).taxDue).toBeGreaterThanOrEqual(0);
     }
+  });
+});
+
+describe("compareIrpfRegimes — both ways to file", () => {
+  /**
+   * R$ 100.000 a year with R$ 20.000 of health expenses, by hand:
+   * INSS 968,18 × 12 = 11.618,17; complete base 100.000 − 11.618,17 − 20.000 =
+   * 68.381,83, taxed 27,5% − 10.904,66 = 7.900,34. Simplified: 100.000 − 17.640 =
+   * 82.360, taxed 11.744,34. Past R$ 88.200 neither has a reduction.
+   */
+  it("prefers the complete return when the deductions pay for it", () => {
+    const result = compareIrpfRegimes({
+      grossAnnualIncome: 100_000,
+      dependants: 0,
+      educationDeduction: 0,
+      healthDeduction: 20_000,
+      supplementaryPensionDeduction: 0,
+    });
+
+    expect(result.legal.taxDue).toBeCloseTo(7900.34, 2);
+    expect(result.simplified.taxDue).toBeCloseTo(11744.34, 2);
+    expect(result.better).toBe("legal");
+    expect(result.saving).toBeCloseTo(3844, 2);
+  });
+
+  it("prefers the simplified one when there is nothing but INSS to deduct", () => {
+    const result = compareIrpfRegimes({
+      grossAnnualIncome: 100_000,
+      dependants: 0,
+      educationDeduction: 0,
+      healthDeduction: 0,
+      supplementaryPensionDeduction: 0,
+    });
+
+    expect(result.better).toBe("simplified");
+    expect(result.simplified.taxDue).toBeLessThan(result.legal.taxDue);
+  });
+
+  it("calls a tie for the simplified one, which needs no receipts", () => {
+    const result = compareIrpfRegimes({
+      grossAnnualIncome: 30_000,
+      dependants: 0,
+      educationDeduction: 0,
+      healthDeduction: 0,
+      supplementaryPensionDeduction: 0,
+    });
+
+    expect(result.legal.taxDue).toBe(0);
+    expect(result.simplified.taxDue).toBe(0);
+    expect(result.better).toBe("simplified");
+    expect(result.saving).toBe(0);
+  });
+});
+
+describe("buildRegimeThresholdTable — when the complete return starts to pay", () => {
+  /**
+   * The property the table states: with deductions just above the threshold the
+   * complete return owes less, and just below it does not — checked through
+   * compareIrpfRegimes, the function the form uses, at every row.
+   */
+  it("puts the tipping point exactly where the two regimes cross", () => {
+    for (const row of buildRegimeThresholdTable([70_000, 90_000, 120_000, 240_000])) {
+      expect(row.deductionsToBeatSimplified).not.toBeNull();
+      const threshold = row.deductionsToBeatSimplified ?? 0;
+      const at = (health: number) =>
+        compareIrpfRegimes({
+          grossAnnualIncome: row.grossAnnualIncome,
+          dependants: 0,
+          educationDeduction: 0,
+          healthDeduction: health,
+          supplementaryPensionDeduction: 0,
+        });
+
+      expect(at(threshold + 1).better, `R$ ${row.grossAnnualIncome}`).toBe("legal");
+      expect(at(Math.max(threshold - 1, 0)).better).toBe("simplified");
+    }
+  });
+
+  /** Up to R$ 60.000 the 2026 reduction zeroes the simplified return, so nothing needs beating. */
+  it("has no threshold where the simplified return already owes nothing", () => {
+    const [row] = buildRegimeThresholdTable([60_000]);
+
+    expect(row.taxSimplified).toBe(0);
+    expect(row.deductionsToBeatSimplified).toBeNull();
+  });
+
+  it("caps the simplified discount at R$ 17.640 from R$ 88.200 up", () => {
+    const [below, at, above] = buildRegimeThresholdTable([60_000, 88_200, 200_000]);
+
+    expect(below.simplifiedDiscount).toBeCloseTo(12_000, 6);
+    expect(at.simplifiedDiscount).toBeCloseTo(17_640, 6);
+    expect(above.simplifiedDiscount).toBeCloseTo(17_640, 6);
   });
 });
