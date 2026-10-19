@@ -105,5 +105,26 @@ happens in slice 7, so nothing is gained by batching here.
 | `test:seo` | 28 routes; the break-even table and the R$ 5.000 row prerendered |
 | both ends | 5 of 5 salaries typed into the form match the table; the break-even invoice reads "Empate técnico" |
 
-Still open for this slice: IRPF 2026, INSS autônomo, previdência complementar and benefícios
-fiscais.
+### IRPF 2026 — 2026-10-18
+
+- **Leader:** the Receita's own simulator. It is official and bare, and its annual tab is
+  exercício 2026.
+- **Module** (`042769d`), against Lei 9.250 art. 8º on Planalto:
+  - health uncapped, since the R$ 2.666,67 was invented;
+  - education capped per person;
+  - PGBL capped at 12%;
+  - `compareIrpfRegimes`;
+  - `buildRegimeThresholdTable`.
+  Four mutants killed.
+- **Page:**
+  - both regimes side by side, with the better one named;
+  - a 9-row table of the deductions the complete return needs beyond INSS;
+  - the tax year stated up front, with a link to the Receita's simulator for the 2026 return;
+  - FAQ corrected: no uniforms, transport or pharmacy medicines, and education per person;
+  - rates with a decimal comma.
+- **Checked in the form:**
+  - the hand case matches;
+  - the R$ 120.000 threshold flips between one real above and one real below;
+  - `test:seo` asserts the table and the tax-year notice.
+
+Still open for this slice: INSS autônomo, previdência complementar and benefícios fiscais.

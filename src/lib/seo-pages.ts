@@ -41,7 +41,7 @@ export const SEO_PAGES = [
     priority: 0.9,
   },
   { path: "/calculadora-custo-pet", lastmod: "2026-09-12", changefreq: "monthly", priority: 0.9 },
-  { path: "/calculadora-irpf-2026", lastmod: "2026-09-12", changefreq: "monthly", priority: 0.95 },
+  { path: "/calculadora-irpf-2026", lastmod: "2026-10-18", changefreq: "monthly", priority: 0.95 },
   {
     path: "/calculadora-salario-liquido",
     lastmod: "2026-10-18",

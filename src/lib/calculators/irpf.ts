@@ -135,13 +135,13 @@ export function calculateIrpf(input: IrpfInput): IrpfResult {
 
     const { rate, deduction } = findAnnualTaxBracket(simplifiedCalculationBase);
     calculatedTax = Math.max(simplifiedCalculationBase * rate - deduction, 0);
-    marginalRate = rate > 0 ? `${(rate * 100).toFixed(1)}%` : "Isento";
+    marginalRate = rate > 0 ? `${(rate * 100).toFixed(1).replace(".", ",")}%` : "Isento";
   } else {
     // full regime: itemised deductions
     simplifiedCalculationBase = fullCalculationBase;
     const { rate, deduction } = findAnnualTaxBracket(assessableBase);
     calculatedTax = Math.max(assessableBase * rate - deduction, 0);
-    marginalRate = rate > 0 ? `${(rate * 100).toFixed(1)}%` : "Isento";
+    marginalRate = rate > 0 ? `${(rate * 100).toFixed(1).replace(".", ",")}%` : "Isento";
   }
 
   // 8. Lei 15.270/2025 reduction, applied to the tax the table produced.

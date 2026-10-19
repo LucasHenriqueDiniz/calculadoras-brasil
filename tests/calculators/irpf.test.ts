@@ -114,7 +114,9 @@ describe("calculateIrpf — the progressive table is self-consistent", () => {
    */
   it("applies a rate to every base, and that rate never goes down", () => {
     const marginalRateAt = (base: number) =>
-      Number.parseFloat(irpf({ grossAnnualIncome: incomeForBase(base) }).marginalRate) || 0;
+      Number.parseFloat(
+        irpf({ grossAnnualIncome: incomeForBase(base) }).marginalRate.replace(",", "."),
+      ) || 0;
 
     let previous = 0;
 

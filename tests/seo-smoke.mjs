@@ -236,6 +236,21 @@ try {
   );
   assert.ok(cltVsPjPage.includes("R$ 6.560,89"), "the R$ 5.000 row must show its break-even");
 
+  // The IRPF regime table: the R$ 120.000 row, whose simplified tax the IRPF tests
+  // derive by hand (102.360 × 27,5% − 10.904,66).
+  const irpfPage = textContent(
+    await (await fetch(`${BASE_URL}/calculadora-irpf-2026`)).text(),
+  ).replaceAll("\u00a0", " ");
+  assert.ok(
+    irpfPage.includes("Quando a declaração completa compensa"),
+    "the IRPF regime table must be prerendered",
+  );
+  assert.ok(irpfPage.includes("R$ 17.244,34"), "the R$ 120.000 row must show its simplified tax");
+  assert.ok(
+    irpfPage.includes("ano-calendário 2026"),
+    "the IRPF page must say which tax year it models",
+  );
+
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 
