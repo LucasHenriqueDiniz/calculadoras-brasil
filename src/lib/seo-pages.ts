@@ -54,7 +54,7 @@ export const SEO_PAGES = [
     changefreq: "monthly",
     priority: 0.9,
   },
-  { path: "/calculadora-clt-vs-pj", lastmod: "2026-09-12", changefreq: "monthly", priority: 0.9 },
+  { path: "/calculadora-clt-vs-pj", lastmod: "2026-10-18", changefreq: "monthly", priority: 0.9 },
   {
     path: "/calculadora-previdencia-complementar",
     lastmod: "2026-09-12",

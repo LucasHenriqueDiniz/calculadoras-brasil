@@ -51,7 +51,10 @@ const ROUTE_KEYS: ReadonlyArray<readonly [string, string, string]> = [
   // keys for the same reason. Without a row here, a revert to an unbumped key
   // would pass the suite and hand a returning visitor a form of undefineds.
   ["src/routes/calculadora-inss-autonomo.tsx", "inss-autonomo-input-v2", "inss-autonomo-input"],
-  ["src/routes/calculadora-clt-vs-pj.tsx", "clt-vs-pj-input-v2", "clt-vs-pj-input"],
+  ["src/routes/calculadora-clt-vs-pj.tsx", "clt-vs-pj-input-v3", "clt-vs-pj-input"],
+  // v3: the PJ field became company costs, which shelter no tax under the
+  // Simples (decision D6); a v2 form would hand it a deductible-expense figure.
+  ["src/routes/calculadora-clt-vs-pj.tsx", "clt-vs-pj-input-v3", "clt-vs-pj-input-v2"],
   ["src/routes/calculadora-beneficios-fiscais.tsx", "beneficios-input-v2", "beneficios-input"],
   [
     "src/routes/calculadora-previdencia-complementar.tsx",

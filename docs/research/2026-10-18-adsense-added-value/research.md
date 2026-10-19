@@ -34,7 +34,8 @@ Measured against claimed is marked in every row.
 | calculator | query | #1 on 2026-10-18 | what ours does that #1 does not | status |
 |---|---|---|---|---|
 | salário líquido | calculadora salário líquido 2026 | buk.com.br | see below | **built** (slice 3) |
-| the other 11 | — | — | — | slices 4–5 |
+| CLT vs PJ | calculadora clt vs pj | nagringa.dev | see below | **built** (slice 4) |
+| the other 10 | — | — | — | slices 4–5 |
 
 ## Salário líquido
 
@@ -85,6 +86,46 @@ The added value is **correctness made visible**: the same rule the leader applie
 it matters, across the salaries a visitor compares. It is not a longer page for its own sake. The section adds 702 words, counting the
 table's cells, and takes the prerendered main content to 1.517 words, measured on the build. Its
 value is that it is the part no competitor read had.
+
+## CLT vs PJ
+
+### What the leader does (measured, not its formulas)
+
+nagringa.dev asks for far more than this page ever did: CLT benefits, PLR, currency, PJ regime,
+activity, service export and accountant. Its copy names the Simples Nacional, the Fator R, Anexos
+III and V, Lucro Presumido and MEI
+(`../2026-10-18-pj-simples-nacional/fetches/nagringa-calculadora-clt-vs-pj.md`). Its formulas were
+not read.
+
+### What ours did before today (measured on the module, 2026-09-05 and 2026-10-18)
+
+The PJ side was not a PJ:
+- 20% INSS, uncapped, on the whole invoice;
+- the IRPF table applied to the whole invoice;
+- no Simples Nacional.
+
+The CLT side missed the simplified discount at R$ 4.878–5.754. At a CLT salary of R$ 10.000 it
+put the break-even at +67%. The September research had flagged all of it and left the PJ model as
+a product decision.
+
+### What ours does now that the leader does not
+
+Built on the Simples Nacional model of D6, with every figure from Planalto
+(`../2026-10-18-pj-simples-nacional/`):
+
+| | ours | NaGringa | how verified |
+|---|---|---|---|
+| the DAS by the effective-rate formula, Anexos III and V, Fator R | yes | named in its copy | oracle from LC 123's tables, swept over invoices from 250 to 120.000 |
+| **chooses the pró-labore, and says which and why** | three strategies, including the one that keeps the distribution at R$ 50.000 | not visible | tests; breakdown line |
+| **2026's 10% on distributions above R$ 50.000, as a cliff on the total** | yes, and avoided when a larger pró-labore pays less | FAQ mentions the question | tests |
+| **a break-even table across 11 CLT salaries** | yes, built by the calculator | one scenario at a time | 5 of 5 typed salaries matched the table; at the break-even invoice the page reads "Empate técnico" |
+| breadth of CLT inputs (PLR, benefits, currency) | no | yes | — |
+
+Two defects turned up while building, both found by tests and fixed:
+- **The Fator R decided in floating point.** At R$ 7.334, 28% read as 27,99…%, and the company
+  was put in Anexo V, losing R$ 648.
+- **The break-even rounded to the nearest centavo.** It could land one centavo short of the
+  package.
 
 ## What this does not establish
 
