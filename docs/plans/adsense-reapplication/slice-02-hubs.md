@@ -117,3 +117,16 @@ for `/comparar`.
 **Seen, and left out of scope.** The four surviving articles render their category in lower case
 as the eyebrow, for example "guia • 6 min". #16 fixed that on the one article slice 1 then
 redirected.
+
+**Deployed preview, 2026-10-18** (branch preview of #18, commit `e320551a`):
+
+| check | result |
+|---|---|
+| `/comparar` | `301 → /comparar/energia` |
+| `/comparar/energia`, `/calculadoras`, `/blog`, `/` | `200` |
+| `/calculadoras` | renders the guide: its H1, "Vou sair de casa", "Quero cortar gastos fixos", and the energia link |
+| header and footer | no `href="/comparar"` |
+| `/` | "12 ferramentas", "Quem faz o Calcule Brasil" and the guide link present; "Seis ferramentas" gone |
+| slice 1 still holds | `/blog/quanto-custa-ter-carro` → `301 → /calculadora-custo-carro` |
+
+Google's verdict on the Soft 404 still waits for production and a re-crawl.
