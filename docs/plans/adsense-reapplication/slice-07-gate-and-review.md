@@ -2,7 +2,7 @@
 status: todo
 ---
 
-# Slice 7 — Gate, record D6, request review once
+# Slice 7 — Gate, record D7, request review once
 
 ## Delivers
 
@@ -13,7 +13,7 @@ status: todo
    Pace it, one script at a time with pauses between them. Slice 1's `Done when` records why: a
    burst of scripted requests on 2026-10-18 was followed by this machine being unable to reach
    the site.
-3. **D6** in `ARCHITECTURE.md`, inserted above D5:
+3. **D7** in `ARCHITECTURE.md`, inserted at the top of the decisions:
    - the decision to reapply;
    - the coverage numbers before and after;
    - the auditor verdict;

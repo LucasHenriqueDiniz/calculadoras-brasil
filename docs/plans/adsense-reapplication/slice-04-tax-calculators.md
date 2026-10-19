@@ -1,5 +1,5 @@
 ---
-status: todo
+status: doing
 ---
 
 # Slice 4 — The five tax calculators, on the pattern slice 3 proved
@@ -67,3 +67,43 @@ in the PR for every calculator that gained a table.
 
 Ship the calculators one PR each rather than holding five for the slowest. The review only
 happens in slice 7, so nothing is gained by batching here.
+
+---
+
+## What actually happened — 2026-10-18 (CLT vs PJ; the other four are still to do)
+
+1. **CLT side** (`20ba562`): now one `calculateNetSalary` call, so it takes the more beneficial
+   route. Forcing the legal route turns 2 tests red.
+2. **The competitor reading changed the scope.** The leader, nagringa.dev, models the Simples,
+   the Fator R and the pró-labore, and our PJ side was the 2026-09-05 note's known defect. The
+   owner chose the real model. The research came first, all from Planalto, and D6 records the
+   model (`8bf8ef5`).
+3. **The model**, in three files:
+   - `irpf-monthly.ts`: the shared monthly income tax, so the CLT salary and the pró-labore
+     follow one rule;
+   - `simples-nacional.ts`: the annexes and the effective rate;
+   - the PJ side of `cltVsPj.ts`: three pró-labore strategies, the best kept.
+   The third strategy, the one that holds the distribution at R$ 50.000, was not in D6 as first
+   written. Without it the net fell about R$ 5.000 at the dividend threshold, and D6's text now
+   includes it.
+4. **What the tests found**, every one of them fixed:
+   - the Fator R decided in floating point (R$ 7.334 put in Anexo V);
+   - a pró-labore of 2.800,0000000000005;
+   - the effective rate falling 2,5 points at RBT12 3,6M. That is the sublimit, so the model stops
+     there and says so on the page;
+   - the break-even rounding a centavo short;
+   - a one-centavo surplus reading as "PJ é melhor".
+5. **The page**: CLT and PJ breakdowns line by line, a dependants field, a costs field instead of
+   the old "deductible expenses", an 11-row break-even table, and sections on the Fator R, the
+   R$ 50.000 rule and what is not modelled. Every figure is computed. The storage key moves to v3.
+
+| check | result |
+|---|---|
+| unit | 313 green across the suite. 5 mutants killed: INSS at 20%, no ceiling, float Fator R, no threshold strategy, 10% on the excess |
+| oracle | PJ net equals the best strategy from the statutes' own arithmetic at every R$ 250 up to R$ 120.000, with costs 0 and 300 and 0 and 2 dependants |
+| smoothness | the PJ net never falls and never rises more than the raise, from R$ 1.000 to R$ 150.000 |
+| `test:seo` | 28 routes; the break-even table and the R$ 5.000 row prerendered |
+| both ends | 5 of 5 salaries typed into the form match the table; the break-even invoice reads "Empate técnico" |
+
+Still open for this slice: IRPF 2026, INSS autônomo, previdência complementar and benefícios
+fiscais.

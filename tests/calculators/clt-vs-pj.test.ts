@@ -1,16 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildBreakEvenTable,
   calculateCltVsPj,
   type CltVsPjInput,
   type CltVsPjResult,
 } from "../../src/lib/calculators/cltVsPj";
 import { INSS_CEILING, calculateEmployeeInss } from "../../src/lib/calculators/inss-constants";
+import { calculateNetSalary } from "../../src/lib/calculators/salarioLiquido";
 
 const BASELINE: CltVsPjInput = {
   cltGrossSalary: 8_000,
   monthlyPjOffer: 12_000,
   dependants: 0,
-  pjDeductibleExpenses: 0,
+  pjMonthlyCosts: 0,
 };
 
 function compare(overrides: Partial<CltVsPjInput> = {}): CltVsPjResult {
@@ -38,8 +40,9 @@ const MONTHLY_TABLE = [
 const BRACKET_BOUNDARIES = [2428.8, 2826.65, 3751.05, 4664.68];
 
 /**
- * The two sides share one implementation of the monthly table but reach it from
- * different income, so the table tests run against both. `grossForBase` maps an
+ * The CLT side reaches the monthly table through `monthlyIncomeTax`, the same
+ * function the pró-labore uses; the PJ side is checked against an oracle of its
+ * own further down, because its table input is a pró-labore, not the invoice. `grossForBase` maps an
  * assessable base back to the income that produces it, which is what lets a test
  * name a bracket boundary and land the module exactly on it.
  */
@@ -56,13 +59,6 @@ const TAX_PATHS = [
       ),
     detail: (gross: number) => compare({ cltGrossSalary: gross }).cltDetail,
     net: (gross: number) => compare({ cltGrossSalary: gross }).cltNet,
-  },
-  {
-    name: "PJ",
-    // The invoice less the 20% pró-labore contribution, with no expenses.
-    grossForBase: (base: number) => base / 0.8,
-    detail: (gross: number) => compare({ monthlyPjOffer: gross }).pjDetail,
-    net: (gross: number) => compare({ monthlyPjOffer: gross }).pjNet,
   },
 ] as const;
 
@@ -195,18 +191,58 @@ describe("calculateCltVsPj — the CLT side", () => {
   });
 
   /**
-   * R$ 4.000 a month. INSS takes R$ 368,60, so the base is R$ 3.631,40, and the
-   * 15% row of the monthly table charges 3.631,40 × 0,15 − 394,16 = R$ 150,55.
-   * The Lei 15.270/2025 reduction covers up to R$ 312,89 at this income, so the
-   * withholding is nil and the net is the gross less INSS.
+   * R$ 4.000 a month. INSS takes R$ 368,60, less than the R$ 607,20 desconto
+   * simplificado, so Lei 9.250, art. 4º, § 2º takes the simplified route: the base
+   * is 4.000 − 607,20 = R$ 3.392,80, and the 15% row charges
+   * 3.392,80 × 0,15 − 394,16 = R$ 114,76. The Lei 15.270/2025 reduction covers up
+   * to R$ 312,89 at this income, so the withholding is nil and the net is the
+   * gross less INSS. (The legal route would have taxed R$ 150,55 from the table,
+   * also reduced to nil, which is why this case alone could not catch the
+   * missing route.)
    */
   it("leaves a R$ 4.000 salary untaxed, which is what Lei 15.270/2025 is for", () => {
     const { cltDetail, cltNet } = compare({ cltGrossSalary: 4_000 });
 
-    expect(cltDetail.taxFromTable).toBe(150.55);
-    expect(cltDetail.reductionLei15270).toBe(150.55);
+    expect(cltDetail.assessableBase).toBeCloseTo(3392.8, 2);
+    expect(cltDetail.taxFromTable).toBe(114.76);
+    expect(cltDetail.reductionLei15270).toBe(114.76);
     expect(cltDetail.irpfWithheld).toBe(0);
     expect(cltNet).toBe(3631.4);
+  });
+
+  /**
+   * R$ 5.000 a month, no dependants: the case that could. On the legal route the
+   * base is 5.000 − 501,51 = R$ 4.498,49 and the table charges R$ 336,67, which the
+   * R$ 312,89 reduction leaves at R$ 23,78. On the simplified route the base is
+   * R$ 4.392,80, the table charges exactly R$ 312,89 and nothing is withheld. The
+   * statute picks the second; the copy of the CLT rules this module used to carry
+   * picked the first.
+   */
+  it("withholds nothing at R$ 5.000, taking the more beneficial route", () => {
+    const { cltDetail, cltNet } = compare({ cltGrossSalary: 5_000 });
+
+    expect(cltDetail.assessableBase).toBeCloseTo(4392.8, 2);
+    expect(cltDetail.irpfWithheld).toBe(0);
+    expect(cltNet).toBe(4498.49);
+  });
+
+  it("nets exactly what the net-salary calculator nets, at every CLT salary", () => {
+    for (let cltGrossSalary = 0; cltGrossSalary <= 12_000; cltGrossSalary += 7) {
+      for (const dependants of [0, 2]) {
+        const net = calculateNetSalary({
+          monthlyGrossSalary: cltGrossSalary,
+          dependants,
+          monthlyPrivatePension: 0,
+          hasMealAllowance: false,
+          hasTransportAllowance: false,
+          hasUnionDue: false,
+        });
+
+        expect(compare({ cltGrossSalary, dependants }).cltNet, `R$ ${cltGrossSalary}`).toBe(
+          Math.round(net.monthlyNetSalary * 100) / 100,
+        );
+      }
+    }
   });
 
   /**
@@ -283,12 +319,17 @@ describe("calculateCltVsPj — dependants", () => {
     expect(one.cltNet).toBeGreaterThan(none.cltNet);
   });
 
-  it("never touches the PJ side, which shelters income with expenses instead", () => {
-    const none = compare({ dependants: 0 });
-    const three = compare({ dependants: 3 });
+  /**
+   * The dependants are the worker's, whichever contract pays them, so they lower
+   * the withholding on the pró-labore too — where there is any. At R$ 30.000
+   * invoiced the pró-labore is R$ 8.400 and does pay tax.
+   */
+  it("lowers the pró-labore withholding as well, where there is one", () => {
+    const none = compare({ monthlyPjOffer: 30_000, dependants: 0 });
+    const three = compare({ monthlyPjOffer: 30_000, dependants: 3 });
 
-    expect(three.pjNet).toBe(none.pjNet);
-    expect(three.breakEvenPjOffer).toBeGreaterThan(none.breakEvenPjOffer);
+    expect(three.pjDetail.irpfWithheld).toBeLessThan(none.pjDetail.irpfWithheld);
+    expect(three.pjNet).toBeGreaterThan(none.pjNet);
   });
 
   it("treats a negative count as none rather than as a surcharge", () => {
@@ -296,80 +337,244 @@ describe("calculateCltVsPj — dependants", () => {
   });
 });
 
-describe("calculateCltVsPj — the PJ side", () => {
+/**
+ * LC 123/2006, Anexos III and V, transcribed from
+ * docs/research/2026-10-18-pj-simples-nacional/fetches/planalto-lc-123-2006-art-18-anexos.md
+ * rather than imported, so the oracle below shares no code with the module.
+ */
+const ANNEX_III = [
+  [180_000, 0.06, 0],
+  [360_000, 0.112, 9_360],
+  [720_000, 0.135, 17_640],
+  [1_800_000, 0.16, 35_640],
+  [3_600_000, 0.21, 125_640],
+  [4_800_000, 0.33, 648_000],
+] as const;
+const ANNEX_V = [
+  [180_000, 0.155, 0],
+  [360_000, 0.18, 4_500],
+  [720_000, 0.195, 9_900],
+  [1_800_000, 0.205, 17_100],
+  [3_600_000, 0.23, 62_100],
+  [4_800_000, 0.305, 540_000],
+] as const;
+
+const cents = (value: number) => Math.round(value * 100) / 100;
+
+/** The published monthly table, then the statute's reduction, on the more beneficial route. */
+function oracleMonthlyTax(income: number, legal: number): number {
+  const table = [
+    [2428.8, 0, 0],
+    [2826.65, 0.075, 182.16],
+    [3751.05, 0.15, 394.16],
+    [4664.68, 0.225, 675.49],
+    [Infinity, 0.275, 908.73],
+  ] as const;
+  const taxOn = (base: number) => {
+    const [, rate, deduction] = table.find(([upTo]) => base <= upTo)!;
+    return cents(Math.max(base * rate - deduction, 0));
+  };
+  const reduce = (tax: number) => {
+    if (income <= 5000) return Math.min(312.89, tax);
+    if (income <= 7350) return Math.min(Math.max(978.62 - 0.133145 * income, 0), tax);
+    return 0;
+  };
+  const route = (deduction: number) => {
+    const tax = taxOn(Math.max(income - deduction, 0));
+    return cents(Math.max(tax - cents(reduce(tax)), 0));
+  };
+  return Math.min(route(legal), route(Math.min(607.2, income)));
+}
+
+/** The PJ net of one pró-labore, from the statutes alone. */
+function oraclePjNet(invoice: number, proLabore: number, costs: number, dependants: number) {
+  const rbt12 = invoice * 12;
+  // "igual ou superior a 28%", decided in whole centavos as the statute's threshold is exact.
+  const bands =
+    Math.round(proLabore * 100) * 100 >= 28 * Math.round(invoice * 100) ? ANNEX_III : ANNEX_V;
+  const [, rate, deduction] = bands.find(([upTo]) => rbt12 <= upTo) ?? bands[bands.length - 1];
+  const das = cents(invoice * ((rbt12 * rate - deduction) / rbt12));
+  const inss = cents(0.11 * Math.min(proLabore, 8475.55));
+  const irpf = oracleMonthlyTax(proLabore, inss + dependants * 189.59);
+  const distribution = cents(invoice - das - proLabore - costs);
+  const dividendTax = distribution > 50_000 ? cents(distribution * 0.1) : 0;
+  return cents(invoice - das - costs - inss - irpf - dividendTax);
+}
+
+describe("calculateCltVsPj — the PJ side, a Simples Nacional company (D6)", () => {
   /**
-   * R$ 8.000 invoiced. 20% pró-labore contribution and a 5% accounting fee, so
-   * the base is R$ 6.400 and the top row charges 6.400 × 0,275 − 908,73 =
-   * R$ 851,27, past the reduction's reach.
+   * R$ 10.000 invoiced. RBT12 is R$ 120.000, the first band of Anexo III: DAS 6%,
+   * R$ 600. Pró-labore 28%, R$ 2.800, which meets the Fator R. INSS 11%, R$ 308.
+   * The simplified R$ 607,20 beats the R$ 308 of legal deductions, leaving a base
+   * of R$ 2.192,80, inside the exemption. Distributed: 10.000 − 600 − 2.800 =
+   * R$ 6.600. Net 10.000 − 600 − 308 = R$ 9.092.
    */
-  it("nets R$ 5.148,73 out of a R$ 8.000 invoice", () => {
-    const { pjDetail, pjNet } = compare({ monthlyPjOffer: 8_000 });
+  it("nets R$ 9.092 out of a R$ 10.000 invoice", () => {
+    const { pjDetail, pjNet } = compare({ monthlyPjOffer: 10_000 });
 
-    expect(pjDetail.inssWithheld).toBeCloseTo(1_600, 2);
-    expect(pjDetail.accountantFee).toBeCloseTo(400, 2);
-    expect(pjDetail.taxFromTable).toBe(851.27);
-    expect(pjDetail.reductionLei15270).toBe(0);
-    expect(pjNet).toBe(5148.73);
-  });
-
-  /**
-   * R$ 4.000 invoiced: a base of R$ 3.200 in the 15% row charges
-   * 3.200 × 0,15 − 394,16 = R$ 85,84, which the reduction covers in full.
-   */
-  it("applies the same Lei 15.270/2025 reduction to a small invoice", () => {
-    const { pjDetail, pjNet } = compare({ monthlyPjOffer: 4_000 });
-
-    expect(pjDetail.taxFromTable).toBe(85.84);
-    expect(pjDetail.reductionLei15270).toBe(85.84);
+    expect(pjDetail.annex).toBe("III");
+    expect(pjDetail.strategy).toBe("fatorR");
+    expect(pjDetail.dasEffectiveRate).toBeCloseTo(0.06, 10);
+    expect(pjDetail.das).toBe(600);
+    expect(pjDetail.proLabore).toBe(2800);
+    expect(pjDetail.inssWithheld).toBe(308);
     expect(pjDetail.irpfWithheld).toBe(0);
-    expect(pjNet).toBe(3_000);
-  });
-
-  /** ⚠️ The PJ twin of the CLT wiring test above, and the same silent failure. */
-  it.each([2_000, 4_000, 8_000, 20_000])("nets %s down by all three costs", (monthlyPjOffer) => {
-    const { pjDetail, pjNet } = compare({ monthlyPjOffer });
-
-    expect(pjNet).toBeCloseTo(
-      monthlyPjOffer - pjDetail.inssWithheld - pjDetail.accountantFee - pjDetail.irpfWithheld,
-      2,
-    );
+    expect(pjDetail.distribution).toBe(6600);
+    expect(pjNet).toBe(9092);
   });
 
   /**
-   * A deductible expense can only shelter income from tax. It can never raise
-   * the net by more than it costs — a shield worth more than the expense would
-   * be a money pump — and it can never lower it either.
+   * R$ 20.000 invoiced, RBT12 R$ 240.000, second band: (240.000 × 11,2% −
+   * 9.360) / 240.000 = 7,3%, so R$ 1.460. Pró-labore R$ 5.600, INSS R$ 616, now
+   * above R$ 607,20, so the legal route: base 4.984, table 4.984 × 27,5% − 908,73
+   * = 461,87, reduction 978,62 − 0,133145 × 5.600 = 233,01, IRPF R$ 228,86.
    */
-  it.each([500, 2_000, 5_000, 20_000])(
-    "shelters tax with %s of expenses, and no more",
-    (pjDeductibleExpenses) => {
-      const withoutExpenses = compare({ monthlyPjOffer: 15_000, pjDeductibleExpenses: 0 });
-      const withExpenses = compare({ monthlyPjOffer: 15_000, pjDeductibleExpenses });
-      const gain = withExpenses.pjNet - withoutExpenses.pjNet;
+  it("prices the second band at its effective rate, and taxes the pró-labore", () => {
+    const { pjDetail, pjNet } = compare({ monthlyPjOffer: 20_000 });
 
-      expect(gain).toBeGreaterThanOrEqual(0);
-      expect(gain).toBeLessThanOrEqual(pjDeductibleExpenses);
+    expect(pjDetail.dasEffectiveRate).toBeCloseTo(0.073, 10);
+    expect(pjDetail.das).toBe(1460);
+    expect(pjDetail.inssWithheld).toBe(616);
+    expect(pjDetail.taxFromTable).toBe(461.87);
+    expect(pjDetail.reductionLei15270).toBe(233.01);
+    expect(pjDetail.irpfWithheld).toBe(228.86);
+    expect(pjNet).toBe(17695.14);
+  });
+
+  /**
+   * The model's whole claim, against an oracle built from the statutes with no
+   * code from the module: the net is the better of the two pró-labore strategies,
+   * at every invoice, cost and dependant count swept.
+   */
+  it("nets the better of the two pró-labore strategies, everywhere", () => {
+    for (let monthlyPjOffer = 250; monthlyPjOffer <= 120_000; monthlyPjOffer += 250) {
+      for (const pjMonthlyCosts of [0, 300]) {
+        for (const dependants of [0, 2]) {
+          // 28% of the invoice, rounded up to the centavo so that it meets the
+          // threshold, computed in whole centavos as the statute's threshold is exact.
+          const fatorR = Math.min(
+            monthlyPjOffer,
+            Math.max(1621, Math.ceil((Math.round(monthlyPjOffer * 100) * 28) / 100) / 100),
+          );
+          const minimumWage = Math.min(monthlyPjOffer, 1621);
+          const strategies = [
+            oraclePjNet(monthlyPjOffer, fatorR, pjMonthlyCosts, dependants),
+            oraclePjNet(monthlyPjOffer, minimumWage, pjMonthlyCosts, dependants),
+          ];
+          // And the pró-labore that leaves exactly R$ 50.000 to distribute, per annex.
+          for (const [bands, isIII] of [
+            [ANNEX_III, true],
+            [ANNEX_V, false],
+          ] as const) {
+            const rbt12 = monthlyPjOffer * 12;
+            const [, rate, deduction] =
+              bands.find(([upTo]) => rbt12 <= upTo) ?? bands[bands.length - 1];
+            const das = cents(monthlyPjOffer * ((rbt12 * rate - deduction) / rbt12));
+            const proLabore = cents(monthlyPjOffer - das - pjMonthlyCosts - 50_000);
+            const meetsFatorR =
+              Math.round(proLabore * 100) * 100 >= 28 * Math.round(monthlyPjOffer * 100);
+            if (proLabore >= 1621 && meetsFatorR === isIII) {
+              strategies.push(oraclePjNet(monthlyPjOffer, proLabore, pjMonthlyCosts, dependants));
+            }
+          }
+          const expected = Math.max(...strategies);
+
+          expect(
+            compare({ monthlyPjOffer, pjMonthlyCosts, dependants }).pjNet,
+            `R$ ${monthlyPjOffer}, costs ${pjMonthlyCosts}, ${dependants} dependant(s)`,
+          ).toBeCloseTo(expected, 2);
+        }
+      }
+    }
+  });
+
+  /**
+   * Under the Simples Nacional the DAS is charged on revenue, so a cost shelters
+   * no tax: it comes off the net real for real, while the distribution stays
+   * under the R$ 50.000 threshold.
+   */
+  it.each([300, 2_000, 5_000])("takes %s of costs off the net, real for real", (pjMonthlyCosts) => {
+    const without = compare({ monthlyPjOffer: 15_000, pjMonthlyCosts: 0 }).pjNet;
+    const withCosts = compare({ monthlyPjOffer: 15_000, pjMonthlyCosts }).pjNet;
+
+    expect(cents(without - withCosts)).toBe(pjMonthlyCosts);
+  });
+
+  /**
+   * Lei 9.250, art. 6º-A: past R$ 50.000 of distribution in a month, 10% of the
+   * WHOLE distribution is withheld. Pinned as the statute's cliff, not smoothed.
+   */
+  it("withholds 10% of the whole distribution once it passes R$ 50.000", () => {
+    const sweep = [10_000, 50_000, 200_000, 290_000].map((monthlyPjOffer) =>
+      compare({ monthlyPjOffer }),
+    );
+    const over = sweep.filter((r) => r.pjDetail.distribution > 50_000);
+    const under = sweep.filter((r) => r.pjDetail.distribution <= 50_000);
+
+    expect(over.length).toBeGreaterThan(0);
+    expect(under.length).toBeGreaterThan(0);
+    for (const r of over) {
+      expect(r.pjDetail.dividendWithholding).toBe(cents(r.pjDetail.distribution * 0.1));
+    }
+    for (const r of under) {
+      expect(r.pjDetail.dividendWithholding).toBe(0);
+    }
+  });
+
+  /** Past R$ 3,6 milhões a year the sixth band takes ISS out of the DAS, which this model does not charge. */
+  it("flags revenue past the R$ 3,6 milhões sublimit instead of passing it off as covered", () => {
+    expect(compare({ monthlyPjOffer: 300_000 }).pjDetail.withinModel).toBe(true);
+    expect(compare({ monthlyPjOffer: 300_000.01 }).pjDetail.withinModel).toBe(false);
+  });
+
+  /**
+   * At R$ 90.000 the Fator R pró-labore would distribute more than R$ 50.000 and
+   * lose 10% of all of it; raising the pró-labore until exactly R$ 50.000 is left
+   * costs less, and the model finds that as an accountant would.
+   */
+  it("raises the pró-labore to stay at the R$ 50.000 threshold when that pays", () => {
+    const { pjDetail } = compare({ monthlyPjOffer: 90_000 });
+
+    expect(pjDetail.strategy).toBe("dividendThreshold");
+    expect(pjDetail.distribution).toBe(50_000);
+    expect(pjDetail.dividendWithholding).toBe(0);
+  });
+
+  it("nets nothing from an empty invoice, rather than a loss", () => {
+    expect(compare({ monthlyPjOffer: 0 }).pjNet).toBe(0);
+  });
+
+  /** ⚠️ The headline must contain every cost the breakdown reports. */
+  it.each([2_000, 10_000, 30_000, 90_000])(
+    "nets %s down by every item it lists",
+    (monthlyPjOffer) => {
+      const { pjDetail, pjNet } = compare({ monthlyPjOffer, pjMonthlyCosts: 300 });
+
+      expect(pjNet).toBeCloseTo(
+        monthlyPjOffer -
+          pjDetail.das -
+          pjDetail.costs -
+          pjDetail.inssWithheld -
+          pjDetail.irpfWithheld -
+          pjDetail.dividendWithholding,
+        2,
+      );
     },
   );
 
   /**
-   * Once expenses have taken the tax to zero there is nothing left to shelter,
-   * so the net stops moving — and stops exactly at the invoice less the
-   * contribution and the fee.
+   * Through the point where the distribution reaches R$ 50.000 as well: the
+   * statute's 10% on the whole distribution is a cliff for any fixed pró-labore,
+   * and the `dividendThreshold` strategy is what keeps it out of the net.
    */
-  it("stops rewarding expenses once the tax is already zero", () => {
-    const monthlyPjOffer = 8_000;
-    const large = compare({ monthlyPjOffer, pjDeductibleExpenses: 50_000 }).pjNet;
-    const larger = compare({ monthlyPjOffer, pjDeductibleExpenses: 100_000 }).pjNet;
-
-    expect(larger).toBe(large);
-    expect(large).toBe(6_000);
+  it("moves smoothly across the whole range the model covers", () => {
+    expect(
+      firstNonSmoothPoint((monthlyPjOffer) => compare({ monthlyPjOffer }).pjNet, 1_000, 150_000, 1),
+    ).toBeUndefined();
   });
 
-  it("treats a negative expense as none", () => {
-    expect(compare({ pjDeductibleExpenses: -1_000 }).pjNet).toBe(
-      compare({ pjDeductibleExpenses: 0 }).pjNet,
-    );
+  it("treats negative costs as none", () => {
+    expect(compare({ pjMonthlyCosts: -1_000 }).pjNet).toBe(compare({ pjMonthlyCosts: 0 }).pjNet);
   });
 });
 
@@ -381,13 +586,22 @@ describe("calculateCltVsPj — the break-even proposal", () => {
    * near it, on it, since the search solves for the figure instead of stepping
    * towards it in R$ 100 jumps.
    */
-  it.each([3_000, 8_000, 15_000, 25_000])(
-    "names the invoice that matches a %s salary",
+  it.each([3_000, 5_000, 8_000, 15_000, 25_000])(
+    "names an invoice that reaches a %s salary's package, with and without costs",
     (cltGrossSalary) => {
-      const result = compare({ cltGrossSalary });
-      const atThatInvoice = compare({ cltGrossSalary, monthlyPjOffer: result.breakEvenPjOffer });
+      for (const pjMonthlyCosts of [0, 300]) {
+        const result = compare({ cltGrossSalary, pjMonthlyCosts });
+        const atThatInvoice = compare({
+          cltGrossSalary,
+          pjMonthlyCosts,
+          monthlyPjOffer: result.breakEvenPjOffer,
+        });
 
-      expect(atThatInvoice.pjNet).toBe(result.cltWithBenefits);
+        // Reaches, not "equals": the net moves on a centavo grid, so the smallest
+        // invoice that reaches the package can pass it by a centavo.
+        expect(atThatInvoice.pjNet).toBeGreaterThanOrEqual(result.cltWithBenefits);
+        expect(atThatInvoice.pjNet - result.cltWithBenefits).toBeLessThanOrEqual(0.011);
+      }
     },
   );
 
@@ -420,11 +634,12 @@ describe("calculateCltVsPj — the break-even proposal", () => {
     },
   );
 
-  it("does depend on the expenses, which are part of the question", () => {
-    const withoutExpenses = compare({ pjDeductibleExpenses: 0 }).breakEvenPjOffer;
-    const withExpenses = compare({ pjDeductibleExpenses: 3_000 }).breakEvenPjOffer;
+  it("does depend on the company's costs, which are part of the question", () => {
+    const withoutCosts = compare({ pjMonthlyCosts: 0 }).breakEvenPjOffer;
+    const withCosts = compare({ pjMonthlyCosts: 3_000 }).breakEvenPjOffer;
 
-    expect(withExpenses).toBeLessThan(withoutExpenses);
+    // Costs shelter no tax under the Simples, so they can only raise the invoice needed.
+    expect(withCosts).toBeGreaterThan(withoutCosts);
   });
 
   it("asks for nothing when there is no CLT package to match", () => {
@@ -537,18 +752,31 @@ describe("calculateCltVsPj — the verdict the page renders", () => {
       cltGrossSalary: gross,
       monthlyPjOffer: 4_000,
       dependants: 0,
-      pjDeductibleExpenses: 0,
+      pjMonthlyCosts: 0,
     }).breakEvenPjOffer;
 
     const tied = calculateCltVsPj({
       cltGrossSalary: gross,
       monthlyPjOffer: matching,
       dependants: 0,
-      pjDeductibleExpenses: 0,
+      pjMonthlyCosts: 0,
     });
 
     expect(tied.analysis.isTie).toBe(true);
     expect(Math.abs(tied.difference)).toBeLessThan(0.01);
+  });
+
+  /** The break-even invoice can pass the package by a centavo; that is still a draw. */
+  it.each([3_000, 5_000, 15_000])("calls the break-even a tie for %s, with costs", (gross) => {
+    const { breakEvenPjOffer } = compare({ cltGrossSalary: gross, pjMonthlyCosts: 300 });
+    const atIt = compare({
+      cltGrossSalary: gross,
+      pjMonthlyCosts: 300,
+      monthlyPjOffer: breakEvenPjOffer,
+    });
+
+    expect(atIt.analysis.isTie).toBe(true);
+    expect(atIt.analysis.rationale).toMatch(/empatam/);
   });
 
   it.each([0, 8_000])(
@@ -558,7 +786,7 @@ describe("calculateCltVsPj — the verdict the page renders", () => {
         cltGrossSalary,
         monthlyPjOffer: 5_000,
         dependants: 0,
-        pjDeductibleExpenses: 0,
+        pjMonthlyCosts: 0,
       });
 
       expect(result.analysis.hasBaseForPercentage).toBe(cltGrossSalary > 0);
@@ -624,5 +852,47 @@ describe("calculateCltVsPj — degenerate input", () => {
     expect(result.monthlyPjOffer).toBe(0);
     expect(result.cltNet).toBe(0);
     expect(result.pjNet).toBe(0);
+  });
+});
+
+describe("buildBreakEvenTable — the page's break-even table", () => {
+  const salaries = [3_000, 5_000, 8_000, 15_000, 30_000];
+  const rows = buildBreakEvenTable(salaries, 300);
+
+  it("returns one row per salary, each the form's own break-even", () => {
+    expect(rows.map((row) => row.cltGrossSalary)).toEqual(salaries);
+    for (const row of rows) {
+      const form = calculateCltVsPj({
+        cltGrossSalary: row.cltGrossSalary,
+        monthlyPjOffer: 0,
+        dependants: 0,
+        pjMonthlyCosts: 300,
+      });
+      expect(row.breakEvenPjOffer).toBe(form.breakEvenPjOffer);
+      expect(row.cltWithBenefits).toBe(form.cltWithBenefits);
+    }
+  });
+
+  /**
+   * Against the statutes, not the module: at each row's break-even invoice the
+   * oracle's PJ net reaches the CLT package, and a centavo less does not. Only
+   * the Fator R strategy is in play this low, which the row also reports.
+   */
+  it("lands each break-even on the CLT package by the statutes' own arithmetic", () => {
+    for (const row of rows) {
+      const proLabore = (invoice: number) =>
+        Math.min(invoice, Math.max(1621, Math.ceil((Math.round(invoice * 100) * 28) / 100) / 100));
+      const net = (invoice: number) => oraclePjNet(invoice, proLabore(invoice), 300, 0);
+
+      expect(row.strategy).toBe("fatorR");
+      expect(net(row.breakEvenPjOffer)).toBeGreaterThanOrEqual(row.cltWithBenefits - 0.005);
+      expect(net(row.breakEvenPjOffer - 0.01)).toBeLessThan(row.cltWithBenefits);
+    }
+  });
+
+  it("reports the margin over the gross salary as a share", () => {
+    for (const row of rows) {
+      expect(row.aboveGross).toBeCloseTo(row.breakEvenPjOffer / row.cltGrossSalary - 1, 10);
+    }
   });
 });

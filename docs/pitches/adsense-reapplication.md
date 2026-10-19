@@ -117,7 +117,7 @@ takes days or weeks to re-crawl, and that wait runs while the longer steps are b
    - a full `/adsense-site-auditor` run against the deployed site fails no `auto` row;
    - every `judgement` row cites written evidence rather than structure.
 
-   The decision to reapply is D6, dated, with the coverage numbers in it. The request itself is an
+   The decision to reapply is D7, dated, with the coverage numbers in it. The request itself is an
    owner action in the AdSense panel.
 
 ## Architecture
@@ -150,7 +150,7 @@ What the work touches:
   `sitestats inspect`, in the `site-stats` skill, so every slice can run it. That skill is a
   machine-setup step, not a commit to this repo.
 - **Docs:** `docs/research/<date>-adsense-added-value/` for the per-calculator answers and their
-  fetches, and `docs/architecture/ARCHITECTURE.md` for D5 and D6. `ADSENSE-CHECKLIST.md` is deleted
+  fetches, and `docs/architecture/ARCHITECTURE.md` for D5, D6 and D7. `ADSENSE-CHECKLIST.md` is deleted
   or rewritten.
 
 All copy a visitor reads stays in Brazilian Portuguese, per `CLAUDE.md`.
@@ -201,7 +201,7 @@ No new routes. Existing public routes that change:
       `ADS-SITE-01/02`, `ADS-PROG-01/04/07`, `ADS-PRIV-08/09/10`.
 - [ ] `ADSENSE-CHECKLIST.md` retired.
 - [ ] [[adsense-low-value-rejection]] reconciled and marked done.
-- [ ] D5 (strategy, written 2026-10-18) and D6 (reapply) in `ARCHITECTURE.md`.
+- [ ] D5 (strategy, written 2026-10-18), D6 (the PJ model, 2026-10-18) and D7 (reapply) in `ARCHITECTURE.md`.
 - [ ] Full `/adsense-site-auditor` run and full URL Inspection run against the deployed site.
 - [ ] One review request in the AdSense panel, by the owner, after the gate.
 
@@ -287,7 +287,7 @@ evidence.
       the served status matches the triage table.
 - [ ] URL Inspection shows **no Soft 404** on any public URL, with a crawl later than the deploy.
 - [ ] Every URL left in the sitemap is one the work chose to keep. The number indexed is recorded
-      in D6, before and after.
+      in D7, before and after.
 - [ ] Each of the 12 calculators has its top competitor fetched and a written answer to *"what
       does ours do that this one does not"*. No answer is "nothing" without a recorded decision.
 - [ ] Engine-generated content matches the calculator UI on every input checked, with the count
@@ -300,5 +300,5 @@ evidence.
 - [ ] A full `/adsense-site-auditor` run against the deployed site fails no `auto` row, and every
       `judgement` row cites evidence.
 - [ ] `pnpm run check` and `pnpm run test:seo` are green.
-- [ ] D6 in `ARCHITECTURE.md` records the decision to reapply, its date, and the evidence.
+- [ ] D7 in `ARCHITECTURE.md` records the decision to reapply, its date, and the evidence.
 - [ ] One review requested. The AdSense API reports `GETTING_READY`, then a verdict.

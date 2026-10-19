@@ -225,6 +225,17 @@ try {
   assert.ok(salaryPage.includes("R$ 4.498,49"), "the R$ 5.000 row must show its net salary");
   assert.ok(salaryPage.includes("R$ 385,10"), "the R$ 6.000 row must show its withholding");
 
+  // The CLT vs PJ break-even table, prerendered with the R$ 5.000 row the module
+  // tests pin through buildBreakEvenTable.
+  const cltVsPjPage = textContent(
+    await (await fetch(`${BASE_URL}/calculadora-clt-vs-pj`)).text(),
+  ).replaceAll("\u00a0", " ");
+  assert.ok(
+    cltVsPjPage.includes("Quanto faturar como PJ para empatar com a CLT"),
+    "the CLT vs PJ break-even table must be prerendered",
+  );
+  assert.ok(cltVsPjPage.includes("R$ 6.560,89"), "the R$ 5.000 row must show its break-even");
+
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 

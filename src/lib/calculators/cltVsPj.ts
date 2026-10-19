@@ -11,6 +11,10 @@
  * monthly incidence table and the monthly Lei 15.270/2025 reduction, neither of
  * which is its annual counterpart divided by twelve.
  *
+ * The PJ is a one-person service company in the Simples Nacional (decision D6
+ * in docs/architecture/ARCHITECTURE.md): a DAS on the invoice, a pró-labore
+ * taxed like a salary, and the rest distributed as profit.
+ *
  * The rules themselves live in `irpf-constants.ts`, alongside their sources —
  * the same module the net-salary calculator reads. Two calculators on this site
  * answer the same monthly CLT question, so they must agree to the centavo, and
@@ -18,24 +22,30 @@
  * review.
  */
 
-import { calculateEmployeeInss } from "./inss-constants";
-import {
-  DEDUCTION_PER_DEPENDENT_MONTHLY,
-  findMonthlyTaxBracket,
-  monthlyReductionLei15270,
-} from "./irpf-constants";
+import { INSS_CEILING, MINIMUM_WAGE } from "./inss-constants";
+import { DEDUCTION_PER_DEPENDENT_MONTHLY } from "./irpf-constants";
+import { monthlyIncomeTax } from "./irpf-monthly";
 import { roundToCentavos } from "./money";
+import { calculateNetSalary } from "./salarioLiquido";
+import {
+  SIMPLES_MODEL_REVENUE_LIMIT,
+  annexFor,
+  fatorRProLabore,
+  simplesEffectiveRate,
+  type SimplesAnnex,
+} from "./simples-nacional";
 
 export interface CltVsPjInput {
   cltGrossSalary: number;
   monthlyPjOffer: number;
-  /**
-   * Dependants claimed against the CLT withholding base. They lower the CLT tax
-   * and never touch the PJ side, where the invoice is sheltered by
-   * `pjDeductibleExpenses` instead.
-   */
+  /** The worker's dependants: they lower the withholding on the CLT salary and on the pró-labore alike. */
   dependants: number;
-  pjDeductibleExpenses: number;
+  /**
+   * What the company spends each month: accountant, digital certificate,
+   * software. Under the Simples Nacional the DAS is charged on revenue, so this
+   * shelters no tax; it only leaves less to distribute.
+   */
+  pjMonthlyCosts: number;
 }
 
 /** How a monthly income tax was arrived at, in the order it is computed. */
@@ -52,6 +62,31 @@ export interface MonthlyIrpfDetail {
 /** The same, plus the contribution that shaped the base. */
 export type CltVsPjTaxDetail = MonthlyIrpfDetail & { inssWithheld: number };
 
+/** How the company sets the pró-labore, and therefore which annex it is taxed in. */
+export type ProLaboreStrategy = "fatorR" | "minimumWage" | "dividendThreshold";
+
+/** The PJ side, in the order the money moves. */
+export interface PjDetail extends CltVsPjTaxDetail {
+  strategy: ProLaboreStrategy;
+  annex: SimplesAnnex;
+  /** The DAS's effective rate, LC 123/2006 art. 18 § 1º-A, at twelve times this invoice. */
+  dasEffectiveRate: number;
+  das: number;
+  /** Paid by the company; INSS and IRPF on it are withheld from the partner. */
+  proLabore: number;
+  costs: number;
+  /** What is left in the company after the DAS, the pró-labore and the costs. */
+  distribution: number;
+  /** Lei 9.250, art. 6º-A: 10% of the whole distribution once it exceeds R$ 50.000 in a month. */
+  dividendWithholding: number;
+  /**
+   * False when twelve times the invoice is past R$ 3,6 milhões: there the sixth
+   * band takes ISS out of the DAS, which this model does not charge, so the net
+   * it shows is too high.
+   */
+  withinModel: boolean;
+}
+
 export interface CltVsPjResult {
   cltGrossSalary: number;
   monthlyPjOffer: number;
@@ -63,8 +98,7 @@ export interface CltVsPjResult {
   breakEvenPjOffer: number;
   /** The CLT withholdings, plus the amortised benefits added on top of the net. */
   cltDetail: CltVsPjTaxDetail & { benefits: number };
-  /** The PJ withholdings, plus the accountant fee, which is a cost and not a tax. */
-  pjDetail: CltVsPjTaxDetail & { accountantFee: number };
+  pjDetail: PjDetail;
   analysis: {
     cltIsBetter: boolean;
     /** The two packages are level to within a centavo. `cltIsBetter` alone cannot say so. */
@@ -85,25 +119,24 @@ export interface CltVsPjResult {
  * The rights a CLT contract carries, amortised over the year: 13th salary
  * (1/12), plus FGTS, holiday pay with its third and the usual allowances.
  *
- * ⚠️ A modelling assumption, not a figure from the legislation — and the one the
- * page's whole thesis rests on: together with the uncapped PJ contribution
- * below it puts the break-even invoice 50-80% above the gross salary, which is
- * the band the page now states. Moving it moves every verdict this calculator
- * gives, and the copy on the route with it.
+ * ⚠️ A modelling assumption, not a figure from the legislation, and the one the
+ * break-even rests on most: with the Simples Nacional PJ of decision D6 it puts
+ * the break-even invoice roughly 10% to 40% above the gross salary for salaries
+ * from R$ 3.000 to R$ 30.000 — measured, see `buildBreakEvenTable`. Moving it
+ * moves every verdict this calculator gives. No research has examined it yet.
  */
 const CLT_BENEFITS_RATE = 1 / 12 + 0.15;
 
 /**
- * Pró-labore contribution, as a share of the invoice.
- *
- * ⚠️ Flat and uncapped on purpose-for-now: the RGPS ceiling is NOT applied here,
- * so a large invoice is charged 20% on all of it. Documented rather than fixed,
- * because unlike the income tax above no source in the research note covers it.
+ * The partner's contribution on the pró-labore: 20% (Lei 8.212/1991, art. 21)
+ * less the 9 points art. 30 § 4º lets the company's own contribution cover. The
+ * company's 20% is inside the DAS for Anexos III and V.
  */
-const INSS_RATE_PJ = 0.2;
+const PARTNER_INSS_RATE = 0.11;
 
-/** Accounting fee, as a share of the invoice. A cost, not a tax. */
-const ACCOUNTANT_FEE_RATE = 0.05;
+/** Lei 9.250, art. 6º-A: monthly distribution above which the whole of it is taxed. */
+const DIVIDEND_WITHHOLDING_THRESHOLD = 50_000;
+const DIVIDEND_WITHHOLDING_RATE = 0.1;
 
 /** A difference this small is a tie: both sides are rounded to the centavo. */
 const TIE_TOLERANCE = 0.01;
@@ -111,36 +144,49 @@ const TIE_TOLERANCE = 0.01;
 export function calculateCltVsPj(input: CltVsPjInput): CltVsPjResult {
   const cltGrossSalary = Math.max(input.cltGrossSalary, 0);
   const monthlyPjOffer = Math.max(input.monthlyPjOffer, 0);
-  const pjDeductibleExpenses = Math.max(input.pjDeductibleExpenses, 0);
+  const pjMonthlyCosts = Math.max(input.pjMonthlyCosts, 0);
+  const dependants = Math.max(input.dependants, 0);
 
   // ---- CLT side ----------------------------------------------------------
-  // INSS is progressive and capped at the RGPS ceiling, the same contribution
-  // the net-salary calculator withholds for this salary. A flat percentage
-  // would put the two calculators on different answers for the same input.
-  const cltInssWithheld = calculateEmployeeInss(cltGrossSalary);
-  const dependantAllowance = Math.max(input.dependants, 0) * DEDUCTION_PER_DEPENDENT_MONTHLY;
-  const cltTax = computeMonthlyIrpf(
-    cltGrossSalary,
-    cltGrossSalary - cltInssWithheld - dependantAllowance,
-  );
+  // The net-salary calculator's own answer for this salary, not a second copy
+  // of it. The copy this replaced took the legal route every time and missed
+  // the desconto simplificado mensal that Lei 9.250, art. 4º, § 2º applies when
+  // it is more beneficial — overstating the CLT withholding by up to R$ 23,78
+  // between R$ 4.878 and R$ 5.754 of gross, exactly where CLT and PJ are close.
+  // One call is what makes the two pages agree by construction.
+  const clt = calculateNetSalary({
+    monthlyGrossSalary: cltGrossSalary,
+    dependants: input.dependants,
+    monthlyPrivatePension: 0,
+    hasMealAllowance: false,
+    hasTransportAllowance: false,
+    hasUnionDue: false,
+  });
+  const cltInssWithheld = clt.inssWithheld;
+  const cltTax: MonthlyIrpfDetail = {
+    assessableBase: clt.monthlyAssessableBase,
+    taxFromTable: clt.taxFromTable,
+    reductionLei15270: clt.reductionLei15270,
+    irpfWithheld: clt.estimatedIrpfWithheld,
+  };
 
-  const cltNet = roundToCentavos(cltGrossSalary - cltInssWithheld - cltTax.irpfWithheld);
+  const cltNet = roundToCentavos(clt.monthlyNetSalary);
   const cltBenefits = cltGrossSalary * CLT_BENEFITS_RATE;
   const cltWithBenefits = roundToCentavos(cltNet + cltBenefits);
 
   // ---- PJ side -----------------------------------------------------------
-  const pj = computePjSide(monthlyPjOffer, pjDeductibleExpenses);
+  const pj = computePjSide(monthlyPjOffer, pjMonthlyCosts, dependants);
 
   // ---- The comparison ----------------------------------------------------
   // What a PJ must invoice to match the CLT package is a property of that
   // package and of the deductible expenses. It is solved for, not stepped
   // towards from the offer on the table, so two candidates weighing different
   // offers against the same salary are told the same figure.
-  const breakEvenPjOffer = solveBreakEvenPjOffer(cltWithBenefits, pjDeductibleExpenses);
+  const breakEvenPjOffer = solveBreakEvenPjOffer(cltWithBenefits, pjMonthlyCosts, dependants);
 
   const difference = roundToCentavos(pj.net - cltWithBenefits);
   const cltIsBetter = cltWithBenefits > pj.net;
-  const isTie = Math.abs(difference) < TIE_TOLERANCE;
+  const isTie = Math.abs(difference) <= TIE_TOLERANCE + 1e-9;
 
   // A percentage of nothing is not a number. Both fields are currency inputs
   // with no floor, so a visitor who clears them reaches this.
@@ -157,7 +203,7 @@ export function calculateCltVsPj(input: CltVsPjInput): CltVsPjResult {
     differencePercent,
     breakEvenPjOffer,
     cltDetail: { ...cltTax, inssWithheld: cltInssWithheld, benefits: cltBenefits },
-    pjDetail: { ...pj.tax, inssWithheld: pj.inssWithheld, accountantFee: pj.accountantFee },
+    pjDetail: pj,
     analysis: {
       cltIsBetter,
       isTie,
@@ -176,85 +222,139 @@ export function calculateCltVsPj(input: CltVsPjInput): CltVsPjResult {
   };
 }
 
-/** The PJ side of the comparison, for whatever invoice is being considered. */
-function computePjSide(monthlyPjOffer: number, pjDeductibleExpenses: number) {
-  const inssWithheld = monthlyPjOffer * INSS_RATE_PJ;
-  const accountantFee = monthlyPjOffer * ACCOUNTANT_FEE_RATE;
-  const tax = computeMonthlyIrpf(
-    monthlyPjOffer,
-    monthlyPjOffer - inssWithheld - pjDeductibleExpenses,
-  );
+/**
+ * The PJ side, for whatever invoice is being considered: every pró-labore an
+ * accountant would weigh, and the one that leaves the most in hand.
+ *
+ * - `fatorR`: 28% of the invoice (never below the minimum wage), which meets the
+ *   Fator R and taxes in Anexo III.
+ * - `minimumWage`: the minimum wage, which below roughly R$ 5.789 of invoice is
+ *   already 28% and lands in Anexo III too, and above it lands in Anexo V.
+ * - `dividendThreshold`: whatever pró-labore leaves exactly R$ 50.000 to
+ *   distribute, in either annex it qualifies for. Without it, art. 6º-A's 10% on
+ *   the WHOLE distribution would knock about R$ 5.000 off the net at the invoice
+ *   where the distribution crosses R$ 50.000 — a drop no accountant lets happen,
+ *   because a slightly larger pró-labore avoids it. With it, the net rises with
+ *   the invoice through that point.
+ *
+ * No pró-labore exceeds the invoice: a company cannot pay out more than it takes
+ * in, and an empty invoice nets nothing rather than a loss.
+ */
+function computePjSide(
+  monthlyPjOffer: number,
+  costs: number,
+  dependants: number,
+): PjDetail & { net: number } {
+  const at = (proLabore: number, strategy: ProLaboreStrategy) =>
+    pjSideAt(monthlyPjOffer, Math.min(monthlyPjOffer, proLabore), strategy, costs, dependants);
 
-  return {
-    inssWithheld,
-    accountantFee,
-    tax,
-    net: roundToCentavos(monthlyPjOffer - inssWithheld - accountantFee - tax.irpfWithheld),
-  };
+  const candidates = [
+    at(Math.max(MINIMUM_WAGE, fatorRProLabore(monthlyPjOffer)), "fatorR"),
+    at(MINIMUM_WAGE, "minimumWage"),
+  ];
+
+  for (const annex of ["III", "V"] as const) {
+    const das = roundToCentavos(monthlyPjOffer * simplesEffectiveRate(annex, monthlyPjOffer * 12));
+    const proLabore = roundToCentavos(
+      monthlyPjOffer - das - costs - DIVIDEND_WITHHOLDING_THRESHOLD,
+    );
+    if (proLabore >= MINIMUM_WAGE && annexFor(proLabore, monthlyPjOffer) === annex) {
+      candidates.push(at(proLabore, "dividendThreshold"));
+    }
+  }
+
+  return candidates.reduce((best, candidate) => (candidate.net > best.net ? candidate : best));
 }
 
-/**
- * Monthly income tax on a base: the table, then the Lei 15.270/2025 reduction
- * on top of it.
- *
- * Both are rounded to the centavo, because both are legally denominated in it
- * and the reduction's first band is a centavo literal. Left in binary floating
- * point, the statute's own exempt case misses by 1.1e-13 and a salary the
- * statute declares exempt is withheld a sliver of tax.
- *
- * Reached from the PJ side too: a pró-labore is income taxed by the progressive
- * table, and relieving only one of the two sides would make the verdict an
- * artefact of the relief rather than of the arrangement.
- */
-function computeMonthlyIrpf(
-  monthlyGrossIncome: number,
-  monthlyAssessableBase: number,
-): MonthlyIrpfDetail {
-  const assessableBase = Math.max(monthlyAssessableBase, 0);
-  const { rate, deduction } = findMonthlyTaxBracket(assessableBase);
-  const taxFromTable = roundToCentavos(Math.max(assessableBase * rate - deduction, 0));
-  const reductionLei15270 = roundToCentavos(
-    monthlyReductionLei15270(monthlyGrossIncome, taxFromTable),
+function pjSideAt(
+  monthlyPjOffer: number,
+  requestedProLabore: number,
+  strategy: ProLaboreStrategy,
+  costs: number,
+  dependants: number,
+): PjDetail & { net: number } {
+  const proLabore = roundToCentavos(requestedProLabore);
+  const rbt12 = monthlyPjOffer * 12;
+  const annex = annexFor(proLabore, monthlyPjOffer);
+  const dasEffectiveRate = simplesEffectiveRate(annex, rbt12);
+  const das = roundToCentavos(monthlyPjOffer * dasEffectiveRate);
+
+  const inssWithheld = roundToCentavos(PARTNER_INSS_RATE * Math.min(proLabore, INSS_CEILING));
+  const tax = monthlyIncomeTax(
+    proLabore,
+    inssWithheld + dependants * DEDUCTION_PER_DEPENDENT_MONTHLY,
   );
 
+  const distribution = roundToCentavos(monthlyPjOffer - das - proLabore - costs);
+  const dividendWithholding =
+    distribution > DIVIDEND_WITHHOLDING_THRESHOLD
+      ? roundToCentavos(distribution * DIVIDEND_WITHHOLDING_RATE)
+      : 0;
+
   return {
-    assessableBase,
-    taxFromTable,
-    reductionLei15270,
-    irpfWithheld: roundToCentavos(Math.max(taxFromTable - reductionLei15270, 0)),
+    strategy,
+    annex,
+    dasEffectiveRate,
+    das,
+    proLabore,
+    inssWithheld,
+    assessableBase: tax.assessableBase,
+    taxFromTable: tax.taxFromTable,
+    reductionLei15270: tax.reductionLei15270,
+    irpfWithheld: tax.withheld,
+    costs,
+    distribution,
+    dividendWithholding,
+    withinModel: rbt12 <= SIMPLES_MODEL_REVENUE_LIMIT,
+    net: roundToCentavos(
+      monthlyPjOffer - das - costs - inssWithheld - tax.withheld - dividendWithholding,
+    ),
   };
 }
 
 /**
  * The smallest invoice whose net matches `target`, to the centavo.
  *
- * Bisection, not a fixed number of R$ 100 steps away from the offer: the net is
- * strictly increasing in the invoice — the worst marginal case keeps about 40
- * centavos of every extra real, once 25% of contributions and fee, 27,5% of tax
- * on 80% of the invoice and the reduction's phase-out are all taken off — so the
- * search always brackets the answer and always converges to it.
+ * Bisection, not a fixed number of R$ 100 steps away from the offer. Each
+ * strategy's net rises with the invoice: the marginal DAS is the band's nominal
+ * rate, at most 33%, and 28% of each extra real goes to a pró-labore that loses
+ * at most 11% + 27,5% of itself, so every real invoiced keeps well over half. The
+ * better of two rising nets rises too, so the search brackets the answer.
+ *
+ * ⚠️ One exception, from the statute and kept on purpose: past R$ 50.000 of
+ * monthly distribution, art. 6º-A takes 10% of the whole of it, so the net drops
+ * by about R$ 5.000 at that point. Targets that sit on the drop — CLT packages
+ * past roughly R$ 50.000 a month — can bisect to either side of it.
  */
-function solveBreakEvenPjOffer(target: number, pjDeductibleExpenses: number): number {
+function solveBreakEvenPjOffer(target: number, costs: number, dependants: number): number {
   if (target <= 0) {
     return 0;
   }
 
   let high = Math.max(target, 1);
-  while (computePjSide(high, pjDeductibleExpenses).net < target && high < Number.MAX_SAFE_INTEGER) {
+  while (computePjSide(high, costs, dependants).net < target && high < Number.MAX_SAFE_INTEGER) {
     high *= 2;
   }
 
   let low = 0;
   for (let step = 0; step < 100; step += 1) {
     const middle = (low + high) / 2;
-    if (computePjSide(middle, pjDeductibleExpenses).net < target) {
+    if (computePjSide(middle, costs, dependants).net < target) {
       low = middle;
     } else {
       high = middle;
     }
   }
 
-  return roundToCentavos(high);
+  // Up to the centavo, never to the nearest one: the net is computed on a
+  // centavo grid, and rounding `high` down can land a centavo short of the
+  // target — CLT R$ 5.000 with R$ 300 of costs bisected to R$ 6.560,88, which
+  // nets R$ 5.665,15 against a package of R$ 5.665,16.
+  let answer = Math.ceil(high * 100) / 100;
+  while (computePjSide(answer, costs, dependants).net < target) {
+    answer = roundToCentavos(answer + 0.01);
+  }
+  return answer;
 }
 
 /**
@@ -285,4 +385,54 @@ function writeRationale(verdict: {
   }
 
   return `PJ é ${verdict.differencePercent}% mais vantajoso. Ganho adicional: R$ ${verdict.difference.toFixed(2)}/mês.`;
+}
+
+/** One line of the page's break-even table. */
+export interface BreakEvenRow {
+  cltGrossSalary: number;
+  cltNet: number;
+  cltWithBenefits: number;
+  breakEvenPjOffer: number;
+  /** How far the break-even invoice sits above the gross salary, as a share: 0,25 is 25%. */
+  aboveGross: number;
+  /** How the PJ side is set up at that invoice. */
+  annex: SimplesAnnex;
+  strategy: ProLaboreStrategy;
+}
+
+/**
+ * The page's break-even table, built by the calculator itself: every row is the
+ * break-even the form would report for that salary, with the PJ side read at
+ * the break-even invoice.
+ */
+export function buildBreakEvenTable(
+  cltGrossSalaries: readonly number[],
+  pjMonthlyCosts: number,
+  dependants = 0,
+): BreakEvenRow[] {
+  return cltGrossSalaries.map((cltGrossSalary) => {
+    const atSalary = calculateCltVsPj({
+      cltGrossSalary,
+      monthlyPjOffer: 0,
+      dependants,
+      pjMonthlyCosts,
+    });
+    const atBreakEven = calculateCltVsPj({
+      cltGrossSalary,
+      monthlyPjOffer: atSalary.breakEvenPjOffer,
+      dependants,
+      pjMonthlyCosts,
+    });
+
+    return {
+      cltGrossSalary: atSalary.cltGrossSalary,
+      cltNet: atSalary.cltNet,
+      cltWithBenefits: atSalary.cltWithBenefits,
+      breakEvenPjOffer: atSalary.breakEvenPjOffer,
+      aboveGross:
+        atSalary.cltGrossSalary > 0 ? atSalary.breakEvenPjOffer / atSalary.cltGrossSalary - 1 : 0,
+      annex: atBreakEven.pjDetail.annex,
+      strategy: atBreakEven.pjDetail.strategy,
+    };
+  });
 }

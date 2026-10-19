@@ -22,13 +22,11 @@
  */
 
 import { calculateEmployeeInss } from "./inss-constants";
-import {
-  DEDUCTION_PER_DEPENDENT_MONTHLY,
-  SIMPLIFIED_DEDUCTION_MONTHLY,
-  findMonthlyTaxBracket,
-  monthlyReductionLei15270,
-} from "./irpf-constants";
+import { DEDUCTION_PER_DEPENDENT_MONTHLY, SIMPLIFIED_DEDUCTION_MONTHLY } from "./irpf-constants";
+import { monthlyIncomeTax, type MonthlyDeduction } from "./irpf-monthly";
 import { roundToCentavos } from "./money";
+
+export type { MonthlyDeduction } from "./irpf-monthly";
 
 export interface NetSalaryInput {
   monthlyGrossSalary: number;
@@ -39,9 +37,6 @@ export interface NetSalaryInput {
   hasTransportAllowance: boolean;
   hasUnionDue: boolean;
 }
-
-/** Which of art. 4º's two routes to the monthly base the withholding took. */
-export type MonthlyDeduction = "legal" | "simplified";
 
 export interface NetSalaryResult {
   monthlyGrossSalary: number;
@@ -80,46 +75,33 @@ export function calculateNetSalary(input: NetSalaryInput): NetSalaryResult {
   //    Each rate applies only to the slice of the salary inside its bracket.
   const inssWithheld = calculateEmployeeInss(monthlyGrossSalary);
 
-  // 2. the two routes to the monthly base. Tax is non-decreasing in the base and
-  //    the reduction depends on the gross alone, so the larger deduction is the
-  //    more beneficial one; a tie takes the legal route, which costs nothing.
+  // 2. the monthly income tax: art. 4º's more beneficial route, the table, then
+  //    the Lei 15.270/2025 reduction. Shared with the CLT vs PJ calculator.
   const dependantAllowance = Math.max(input.dependants, 0) * DEDUCTION_PER_DEPENDENT_MONTHLY;
   const privatePensionDeduction = Math.max(input.monthlyPrivatePension, 0);
-  const legalDeductions = inssWithheld + dependantAllowance + privatePensionDeduction;
-  const simplifiedDeduction = Math.min(SIMPLIFIED_DEDUCTION_MONTHLY, monthlyGrossSalary);
-  const deductionApplied: MonthlyDeduction =
-    simplifiedDeduction > legalDeductions ? "simplified" : "legal";
-
-  const monthlyAssessableBase = Math.max(
-    monthlyGrossSalary -
-      (deductionApplied === "simplified" ? simplifiedDeduction : legalDeductions),
-    0,
+  const tax = monthlyIncomeTax(
+    monthlyGrossSalary,
+    inssWithheld + dependantAllowance + privatePensionDeduction,
   );
+  const {
+    legalDeductions,
+    simplifiedDeduction,
+    deductionApplied,
+    taxFromTable,
+    reductionLei15270,
+  } = tax;
+  const monthlyAssessableBase = tax.assessableBase;
+  const estimatedIrpfWithheld = tax.withheld;
 
-  // 3. monthly IRPF withheld: the table, then the reduction on top of it.
-  //
-  //    Both are rounded to the centavo, because both are legally denominated in
-  //    it and the reduction's first band is a centavo literal. Left in binary
-  //    floating point, the statute's own exempt case misses by 1.1e-13: the table
-  //    yields 312,89000000000004 where the law says 312,89, the R$ 312,89 cap
-  //    then fails to cover it, and a salary the statute declares exempt is
-  //    withheld a sliver of tax.
-  const { rate, deduction } = findMonthlyTaxBracket(monthlyAssessableBase);
-  const taxFromTable = roundToCentavos(Math.max(monthlyAssessableBase * rate - deduction, 0));
-  const reductionLei15270 = roundToCentavos(
-    monthlyReductionLei15270(monthlyGrossSalary, taxFromTable),
-  );
-  const estimatedIrpfWithheld = roundToCentavos(Math.max(taxFromTable - reductionLei15270, 0));
-
-  // 4. union dues
+  // 3. union dues
   const unionDue = input.hasUnionDue ? monthlyGrossSalary * 0.0033 : 0; // roughly one hour of pay
 
-  // 5. transport allowance, deducted from the gross
+  // 4. transport allowance, deducted from the gross
   const transportAllowanceDeduction = input.hasTransportAllowance
     ? Math.min(monthlyGrossSalary * 0.06, 250)
     : 0;
 
-  // 6. net salary
+  // 5. net salary
   const monthlyNetSalary =
     monthlyGrossSalary -
     inssWithheld -
@@ -127,7 +109,7 @@ export function calculateNetSalary(input: NetSalaryInput): NetSalaryResult {
     unionDue -
     transportAllowanceDeduction;
 
-  // 7. non-taxable benefits
+  // 6. non-taxable benefits
   const nonTaxableBenefits = input.hasMealAllowance ? 360 : 0; // roughly R$ 360/month in meal allowance
 
   const effectiveIrpfRate =

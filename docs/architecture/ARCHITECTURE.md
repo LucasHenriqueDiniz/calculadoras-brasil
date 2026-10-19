@@ -139,6 +139,48 @@ port contract here: both adapters return it, the client consumes it, and the dis
 
 _Context, decision, and what it rules out. Newest first. A superseded entry stays, marked._
 
+### D6 — The PJ side is a one-person service company in the Simples Nacional
+
+**Context.** `/calculadora-clt-vs-pj` charged the PJ 20% INSS, uncapped, on the whole invoice, and
+taxed the whole invoice with the IRPF table. `docs/research/2026-09-05-pj-tax-model/research.md`
+showed this invents R$ 2.413 a month of contribution at a CLT salary of R$ 10.000 and biases every
+verdict toward CLT. It left the fix as a product decision. Slice 4 of
+`docs/plans/adsense-reapplication/` found the page ranking first for the query modelling Simples,
+Fator R and pró-labore.
+
+**Decision.** The PJ is a one-person service company in the Simples Nacional. Its net is:
+- the invoice;
+- less the DAS at the effective rate of LC 123/2006, art. 18, § 1º-A, with RBT12 taken as twelve
+  times the monthly invoice;
+- less 11% INSS on the pró-labore, capped at the RGPS ceiling;
+- less the IRPF on the pró-labore, on the same monthly rules as `calculateNetSalary`;
+- less the company's costs;
+- less 10% on the whole distribution when it exceeds R$ 50.000 in a month (Lei 9.250, art. 6º-A).
+
+Three pró-labore strategies are computed, and the best net is kept, as an accountant would:
+- 28% of the invoice, which meets the Fator R and taxes in Anexo III;
+- the minimum wage, which taxes in Anexo V;
+- whatever pró-labore leaves exactly R$ 50.000 to distribute, when that pays.
+
+The third was added the same day, after the tests showed the net falling by about R$ 5.000
+where the distribution crosses the threshold.
+
+Above R$ 3,6 milhões a year the page warns rather than computes, because the effective rate
+falls there as ISS leaves the DAS.
+
+Decided 2026-10-18, by the owner, choosing among the four options the 2026-09-05 note listed. Sources:
+`docs/research/2026-10-18-pj-simples-nacional/research.md`, all primary.
+
+**Rules out.**
+- The flat 20% and the table on the whole invoice.
+- A fixed accountant percentage. Costs are a monthly amount the visitor gives.
+- Modelling Lucro Presumido, MEI or service export on this page. Each is a different calculator,
+  and the page says it does not cover them.
+
+**What it does not settle.**
+- The tax reform's effect on the DAS (LC 214/2025, not read).
+- The CLT side's `1/12 + 15%` for 13th, FGTS and holidays, which no research has examined.
+
 ### D5 — Cut what Google declined, and measure by what Google keeps, not by word count
 
 **Context.** AdSense rejected the site for "Conteúdo de baixo valor" on 2026-09-07. That was at
@@ -160,7 +202,7 @@ mechanical row of the 2026-09-10 audit. On 2026-10-18, Google's own APIs showed 
    calculators also by a written answer to what each does that its top competitor does not.
 3. Added value on a calculator comes from the site's own engine, as tables and worked examples,
    and not from more prose.
-4. Review is requested once, after all of it ships, recorded as D6.
+4. Review is requested once, after all of it ships, recorded as D7 (D6 went to the PJ model).
 
 Decided 2026-10-18. Pitch: `docs/pitches/adsense-reapplication.md`.
 
@@ -352,8 +394,10 @@ The violations that exist right now.
       entry above.
 - [ ] **Portuguese identifiers in the domain.** See Divergences.
       Plan: `docs/plans/english-domain-identifiers/`.
-- [ ] **`/calculadora-clt-vs-pj` overstates what a PJ must invoice, and its FAQ was right all
-      along.** Researched 2026-09-05: `docs/research/2026-09-05-pj-tax-model/research.md`. The
+- [x] **`/calculadora-clt-vs-pj` overstates what a PJ must invoice, and its FAQ was right all
+      along.** ✅ Resolved 2026-10-18 by D6: the PJ is a one-person Simples Nacional company, the
+      11% is capped and levied on the pró-labore, and the break-even now sits 10%–39% above the
+      gross for salaries of R$ 3.000–30.000. Researched 2026-09-05: `docs/research/2026-09-05-pj-tax-model/research.md`. The
       module charges `INSS_RATE_PJ = 0.2` uncapped on the whole invoice. The sócio's contribution
       is **11%**, **capped at the RGPS ceiling** (`0,11 × 8.475,55 = R$ 932,31/month`), and levied
       on the **pró-labore**, not the invoice — the 20% is the _patronal_ contribution, owed by the
@@ -363,18 +407,19 @@ The violations that exist right now.
       module also models no Simples Nacional at all, while the page's own FAQ and disclaimer
       describe one. Which of the four options to take is a product decision the research
       deliberately leaves open — they range from capping the contribution to modelling the Fator R.
-- [ ] **`/calculadora-salario-liquido` labels annual inputs as monthly.** The fields read "Gastos
+- [x] **`/calculadora-salario-liquido` labels annual inputs as monthly.** ✅ Resolved 2026-10-18
+      (commit `dca8d9d`): the question below was settled in law, since Lei 9.250 art. 4º has no
+      health or education in the monthly base, so both fields left the page, and the pension
+      is read as typed. The fields read "Gastos
       **mensais** com educação/saúde" and "Previdência complementar **mensal**", and the module
       consumes them as annual amounts — a 12x error for anyone who fills them. The education hint
       contradicts its own label in one line: "Gastos mensais… (limite: R$ 3.561,50/**ano**)".
       Pre-existing, and entangled with the open question of whether those deductions belong in a
       monthly withholding at all (in law they belong to the annual adjustment).
-- [ ] **Result fields nothing renders.** `cltVsPj.detalhesClt`/`detalhesPj`,
-      `salarioLiquido.irpfPelaTabela`/`reducaoLei15270`/`baseImponivelMensal`,
-      `previdencia.projecao`/`rendimentoTotal`. Two whole input paths are unreachable from the UI
-      too: `CltVsPjInput.dependentes` and `SalarioLiquidoInput.regimeSimplificado` — the latter is
-      a branch this work built, tested and justified for a path no route can reach. Each wants a
-      decision: render it or remove it.
+- [ ] **Result fields nothing renders.** `previdencia.projecao`/`rendimentoTotal`. Narrowed
+      2026-10-18: the CLT vs PJ details, the dependants input and the salary breakdown are now
+      rendered, and `regimeSimplificado` is gone, because the law picks the route and the module
+      now does too.
 - [ ] **`previdenciaComplementar` headlines a saving from a rate the visitor cannot set.**
       `aliquotaIrpfAtual` is hardcoded at 22,5% with no control, yet "Economia IRPF/ano" is shown
       as though it were the visitor's own figure.
