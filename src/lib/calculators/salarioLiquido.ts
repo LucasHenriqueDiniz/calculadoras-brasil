@@ -33,9 +33,30 @@ export interface NetSalaryInput {
   dependants: number;
   /** Monthly contribution to a PGBL-type private pension plan: art. 4º, V. */
   monthlyPrivatePension: number;
-  hasMealAllowance: boolean;
-  hasTransportAllowance: boolean;
+  /** The meal or food allowance credited each month, as the payslip shows it. */
+  monthlyMealAllowance: number;
+  /** What the commute costs a month; zero when the worker takes no vale-transporte. */
+  monthlyTransportCost: number;
+  /** Whether the worker authorised the contribuição sindical (CLT, art. 579). */
   hasUnionDue: boolean;
+}
+
+/** Lei 7.418/1985, art. 4º, parágrafo único: the worker's share of the commute. */
+export const TRANSPORT_EMPLOYEE_SHARE = 0.06;
+
+/**
+ * What the worker pays towards the vale-transporte: 6% of the base salary, but
+ * never more than the commute costs, because the employer pays only what
+ * exceeds that 6%. It used to be min(6%, R$ 250), an invented cap: on R$ 6.000
+ * with a R$ 400 commute it took R$ 250 where the law takes R$ 360.
+ */
+export function transportEmployeeShare(monthlyGrossSalary: number, monthlyTransportCost: number) {
+  return roundToCentavos(
+    Math.min(
+      Math.max(monthlyTransportCost, 0),
+      Math.max(monthlyGrossSalary, 0) * TRANSPORT_EMPLOYEE_SHARE,
+    ),
+  );
 }
 
 export interface NetSalaryResult {
@@ -58,7 +79,12 @@ export interface NetSalaryResult {
   /** The monthly Lei 15.270/2025 reduction applied, never more than the tax due. */
   reductionLei15270: number;
   estimatedIrpfWithheld: number;
-  unionDue: number;
+  /**
+   * The contribuição sindical, when authorised: one day's pay, deducted once a
+   * year from March's payroll (CLT, arts. 580, I, and 582). It is not part of
+   * the monthly net; it used to be taken every month at 0,33% of the gross.
+   */
+  unionDueInMarch: number;
   transportAllowanceDeduction: number;
   monthlyNetSalary: number;
   annualNetSalary: number;
@@ -93,24 +119,21 @@ export function calculateNetSalary(input: NetSalaryInput): NetSalaryResult {
   const monthlyAssessableBase = tax.assessableBase;
   const estimatedIrpfWithheld = tax.withheld;
 
-  // 3. union dues
-  const unionDue = input.hasUnionDue ? monthlyGrossSalary * 0.0033 : 0; // roughly one hour of pay
+  // 3. the contribuição sindical: one day of a monthly salary, in March only
+  const unionDueInMarch = input.hasUnionDue ? roundToCentavos(monthlyGrossSalary / 30) : 0;
 
-  // 4. transport allowance, deducted from the gross
-  const transportAllowanceDeduction = input.hasTransportAllowance
-    ? Math.min(monthlyGrossSalary * 0.06, 250)
-    : 0;
+  // 4. the worker's share of the vale-transporte, deducted from the gross
+  const transportAllowanceDeduction = transportEmployeeShare(
+    monthlyGrossSalary,
+    input.monthlyTransportCost,
+  );
 
   // 5. net salary
   const monthlyNetSalary =
-    monthlyGrossSalary -
-    inssWithheld -
-    estimatedIrpfWithheld -
-    unionDue -
-    transportAllowanceDeduction;
+    monthlyGrossSalary - inssWithheld - estimatedIrpfWithheld - transportAllowanceDeduction;
 
-  // 6. non-taxable benefits
-  const nonTaxableBenefits = input.hasMealAllowance ? 360 : 0; // roughly R$ 360/month in meal allowance
+  // 6. non-taxable benefits: the meal allowance the worker says they receive
+  const nonTaxableBenefits = Math.max(input.monthlyMealAllowance, 0);
 
   const effectiveIrpfRate =
     monthlyGrossSalary > 0 ? (estimatedIrpfWithheld / monthlyGrossSalary) * 100 : 0;
@@ -128,7 +151,7 @@ export function calculateNetSalary(input: NetSalaryInput): NetSalaryResult {
     taxFromTable,
     reductionLei15270,
     estimatedIrpfWithheld,
-    unionDue,
+    unionDueInMarch,
     transportAllowanceDeduction,
     monthlyNetSalary,
     annualNetSalary: monthlyNetSalary * 12,
@@ -168,8 +191,8 @@ export function buildNetSalaryTable(
       monthlyGrossSalary,
       dependants,
       monthlyPrivatePension: 0,
-      hasMealAllowance: false,
-      hasTransportAllowance: false,
+      monthlyMealAllowance: 0,
+      monthlyTransportCost: 0,
       hasUnionDue: false,
     });
 

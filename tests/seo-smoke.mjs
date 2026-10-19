@@ -376,6 +376,35 @@ try {
     "the 10 kg adult dog must eat 177 g a day",
   );
 
+  // /metodologia describes every calculator; it once covered six and
+  // contradicted three.
+  const methodologyHtml = await (await fetch(`${BASE_URL}/metodologia`)).text();
+  const methodology = textContent(methodologyHtml);
+  for (const title of [
+    "Salário líquido",
+    "IRPF 2026",
+    "INSS autônomo",
+    "CLT vs PJ",
+    "Previdência complementar",
+    "Benefícios fiscais",
+    "Custo de carro",
+    "Morar sozinho",
+    "Conta de luz",
+    "Assinaturas",
+    "Custo de mudança",
+    "Custo de pet",
+  ]) {
+    assert.ok(
+      methodologyHtml.includes(`>${title}</h2>`),
+      `/metodologia must have a section for ${title}`,
+    );
+  }
+  assert.ok(!methodology.includes("35% da renda"), "/metodologia must not carry the old 35% rule");
+
+  // /sobre says how the content is produced, as the owner decided in slice 6.
+  const aboutPage = textContent(await (await fetch(`${BASE_URL}/sobre`)).text());
+  assert.ok(aboutPage.includes("Como o conteúdo é feito"), "/sobre must say how content is made");
+
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 

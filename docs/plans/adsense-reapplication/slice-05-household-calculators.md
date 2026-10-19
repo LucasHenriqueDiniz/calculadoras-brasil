@@ -245,3 +245,20 @@ least one defect in its arithmetic or a false statement:
 
 Each gained a computed table checked against the form, and every FAQ figure now comes from the
 calculator or a dated source. The owner's "Request indexing" remains, as in the other slices.
+
+### On the deployed previews — 2026-10-19
+
+Each page was fetched from a Cloudflare branch preview and its new figures read from the HTML. These
+are the figures the local checks above produced.
+
+| page | preview | checks |
+|---|---|---|
+| conta de luz | `feat-adsense-custo-mudanca` | table, 56,9 kWh, R$ 54,04, "Revisado em 18 de outubro de 2026": 4/4 |
+| custo de carro | `feat-adsense-custo-carro` | state table, the 04–10/10 week, SP R$ 64,53, review date: 4/4 |
+| morar sozinho | `feat-adsense-morar-sozinho` | capitals table, SP R$ 3.553,71, Teresina R$ 2.002,15, art. 22, VII: 4/4 |
+| assinaturas | `feat-adsense-assinaturas` | plans table, 8,4 and 9,6 months, the Netflix answer: 4/4 |
+| custo de mudança | `feat-adsense-custo-mudanca` | ANTT table, R$ 2.488,74, R$ 16.194,96, R$ 8.485,00: 4/4 |
+| custo de pet | `feat-adsense-closeout` | feeding table, 177 g, R$ 53,84, R$ 16,43, review date: 5/5 |
+
+25 of 25. The first pass used macOS `grep` on the one-line HTML and reported 20 false misses; the
+counts above are from Python.

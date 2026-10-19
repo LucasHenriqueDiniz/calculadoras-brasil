@@ -233,8 +233,8 @@ describe("calculateCltVsPj — the CLT side", () => {
           monthlyGrossSalary: cltGrossSalary,
           dependants,
           monthlyPrivatePension: 0,
-          hasMealAllowance: false,
-          hasTransportAllowance: false,
+          monthlyMealAllowance: 0,
+          monthlyTransportCost: 0,
           hasUnionDue: false,
         });
 

@@ -158,8 +158,8 @@ export function calculateCltVsPj(input: CltVsPjInput): CltVsPjResult {
     monthlyGrossSalary: cltGrossSalary,
     dependants: input.dependants,
     monthlyPrivatePension: 0,
-    hasMealAllowance: false,
-    hasTransportAllowance: false,
+    monthlyMealAllowance: 0,
+    monthlyTransportCost: 0,
     hasUnionDue: false,
   });
   const cltInssWithheld = clt.inssWithheld;

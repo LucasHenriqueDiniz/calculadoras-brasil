@@ -4,6 +4,7 @@ import {
   calculateNetSalary,
   simplifiedRouteCeiling,
   type NetSalaryInput,
+  transportEmployeeShare,
 } from "../../src/lib/calculators/salarioLiquido";
 import {
   IRPF_MONTHLY_TABLE_2026,
@@ -78,8 +79,8 @@ function publishedBracketProbes(): Array<{ base: number; rate: number }> {
 const NO_DEDUCTIONS: Omit<NetSalaryInput, "monthlyGrossSalary"> = {
   dependants: 0,
   monthlyPrivatePension: 0,
-  hasMealAllowance: false,
-  hasTransportAllowance: false,
+  monthlyMealAllowance: 0,
+  monthlyTransportCost: 0,
   hasUnionDue: false,
 };
 
@@ -550,46 +551,69 @@ describe("calculateNetSalary — benefits and other deductions", () => {
   const monthlyGrossSalary = 5000;
   const plain = netSalary({ monthlyGrossSalary });
 
-  it("adds the meal allowance outside the taxable salary", () => {
-    const result = netSalary({ monthlyGrossSalary, hasMealAllowance: true });
+  it("adds the meal allowance the worker receives, outside the taxable salary", () => {
+    // The amount the visitor types. It used to be a checkbox worth a fixed R$ 360.
+    const result = netSalary({ monthlyGrossSalary, monthlyMealAllowance: 800 });
 
-    expect(result.nonTaxableBenefits).toBe(360);
+    expect(result.nonTaxableBenefits).toBe(800);
     expect(result.monthlyNetSalary).toBeCloseTo(plain.monthlyNetSalary, 6);
-    expect(result.totalMonthlyIncome).toBeCloseTo(plain.monthlyNetSalary + 360, 6);
+    expect(result.totalMonthlyIncome).toBeCloseTo(plain.monthlyNetSalary + 800, 6);
   });
 
-  it("takes the transport allowance off the net, capped", () => {
-    const result = netSalary({ monthlyGrossSalary, hasTransportAllowance: true });
-
-    expect(result.transportAllowanceDeduction).toBe(250); // 6% of 5.000 is 300, above the cap
+  /**
+   * Lei 7.418/1985, art. 4º, parágrafo único: the employer pays what exceeds 6%
+   * of the base salary, so the worker pays 6%, or the whole commute when it
+   * costs less. By hand, on R$ 6.000 with a R$ 400 commute: 6% is R$ 360, below
+   * the commute, so R$ 360. The old min(6%, R$ 250) took R$ 250.
+   */
+  it("takes 6% of the salary for the vale-transporte, up to what the commute costs", () => {
     expect(
-      netSalary({ monthlyGrossSalary: 3000, hasTransportAllowance: true })
+      netSalary({ monthlyGrossSalary: 6000, monthlyTransportCost: 400 })
+        .transportAllowanceDeduction,
+    ).toBe(360);
+    expect(
+      netSalary({ monthlyGrossSalary: 3000, monthlyTransportCost: 400 })
         .transportAllowanceDeduction,
     ).toBe(180);
-    expect(result.nonTaxableBenefits).toBe(0);
-    expect(result.monthlyNetSalary).toBeCloseTo(plain.monthlyNetSalary - 250, 6);
+    expect(
+      netSalary({ monthlyGrossSalary, monthlyTransportCost: 220 }).transportAllowanceDeduction,
+    ).toBe(220);
+
+    const result = netSalary({ monthlyGrossSalary, monthlyTransportCost: 400 });
+    expect(result.monthlyNetSalary).toBeCloseTo(plain.monthlyNetSalary - 300, 6);
   });
 
-  it("takes the union due off the net", () => {
+  it("agrees with the benefícios calculator on the worker's share", () => {
+    // One rule, not two copies: the benefits page computes the employer's part
+    // as the commute less this share.
+    expect(transportEmployeeShare(3000, 400)).toBe(180);
+    expect(transportEmployeeShare(5000, 220)).toBe(220);
+  });
+
+  /**
+   * CLT, arts. 580, I, and 582: one day's pay, once a year, from March's
+   * payroll, and only when authorised. On R$ 5.000 that is R$ 166,67 in March,
+   * and nothing in the other eleven months. The old code took 0,33% every
+   * month, R$ 16,50.
+   */
+  it("takes the contribuição sindical as one day's pay in March, not every month", () => {
     const result = netSalary({ monthlyGrossSalary, hasUnionDue: true });
 
-    expect(result.unionDue).toBeCloseTo(16.5, 2);
-    expect(result.transportAllowanceDeduction).toBe(0);
-    expect(result.nonTaxableBenefits).toBe(0);
-    expect(result.monthlyNetSalary).toBeCloseTo(plain.monthlyNetSalary - 16.5, 2);
+    expect(result.unionDueInMarch).toBe(166.67);
+    expect(result.monthlyNetSalary).toBeCloseTo(plain.monthlyNetSalary, 6);
   });
 
-  it("leaves all three off when none is selected", () => {
+  it("leaves all three off when none is given", () => {
     expect(plain.nonTaxableBenefits).toBe(0);
     expect(plain.transportAllowanceDeduction).toBe(0);
-    expect(plain.unionDue).toBe(0);
+    expect(plain.unionDueInMarch).toBe(0);
   });
 
   it("does not let any benefit change the tax", () => {
     const all = netSalary({
       monthlyGrossSalary,
-      hasMealAllowance: true,
-      hasTransportAllowance: true,
+      monthlyMealAllowance: 800,
+      monthlyTransportCost: 400,
       hasUnionDue: true,
     });
 
