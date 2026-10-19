@@ -44,7 +44,7 @@ export const SEO_PAGES = [
   { path: "/calculadora-irpf-2026", lastmod: "2026-09-12", changefreq: "monthly", priority: 0.95 },
   {
     path: "/calculadora-salario-liquido",
-    lastmod: "2026-09-12",
+    lastmod: "2026-10-18",
     changefreq: "monthly",
     priority: 0.95,
   },

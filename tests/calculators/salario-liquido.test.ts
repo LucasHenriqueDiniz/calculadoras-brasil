@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { calculateNetSalary, type NetSalaryInput } from "../../src/lib/calculators/salarioLiquido";
-import { IRPF_MONTHLY_TABLE_2026 } from "../../src/lib/calculators/irpf-constants";
+import {
+  buildNetSalaryTable,
+  calculateNetSalary,
+  simplifiedRouteCeiling,
+  type NetSalaryInput,
+} from "../../src/lib/calculators/salarioLiquido";
+import {
+  IRPF_MONTHLY_TABLE_2026,
+  SIMPLIFIED_DEDUCTION_MONTHLY,
+} from "../../src/lib/calculators/irpf-constants";
 import { calculateIrpf } from "../../src/lib/calculators/irpf";
 import { INSS_CEILING, calculateEmployeeInss } from "../../src/lib/calculators/inss-constants";
 
@@ -69,13 +77,10 @@ function publishedBracketProbes(): Array<{ base: number; rate: number }> {
 
 const NO_DEDUCTIONS: Omit<NetSalaryInput, "monthlyGrossSalary"> = {
   dependants: 0,
-  educationDeduction: 0,
-  healthDeduction: 0,
-  supplementaryPensionDeduction: 0,
+  monthlyPrivatePension: 0,
   hasMealAllowance: false,
   hasTransportAllowance: false,
   hasUnionDue: false,
-  simplifiedRegime: false,
 };
 
 function netSalary(input: Partial<NetSalaryInput> & { monthlyGrossSalary: number }) {
@@ -120,49 +125,81 @@ function taxAtBase(base: number): number {
   return netSalary({ monthlyGrossSalary: grossForBase(base) }).taxFromTable;
 }
 
+/**
+ * The Lei 15.270/2025 monthly reduction, written out from the statute's own
+ * figures in docs/research/2026-09-04-irpf-2026-table/research.md rather than
+ * imported, so the oracle below shares no code with the module it checks.
+ */
+function statuteMonthlyReduction(gross: number, taxFromTable: number): number {
+  if (gross <= 5000) return Math.min(312.89, taxFromTable);
+  if (gross <= 7350) return Math.min(Math.max(978.62 - 0.133145 * gross, 0), taxFromTable);
+  return 0;
+}
+
+/**
+ * The withholding of one route to the base, from the publication alone:
+ * `deduction` off the gross, the published table, then the statute's reduction.
+ */
+function withholdingOnRoute(gross: number, deduction: number): number {
+  const tax = officialTableTax(Math.max(gross - deduction, 0));
+  const reduction = Math.round(statuteMonthlyReduction(gross, tax) * 100) / 100;
+  return Math.round(Math.max(tax - reduction, 0) * 100) / 100;
+}
+
+/** The employee INSS of 2026, from the published brackets, for the same reason. */
+function officialInss(gross: number): number {
+  const brackets = [
+    { upTo: 1621.0, rate: 0.075 },
+    { upTo: 2902.84, rate: 0.09 },
+    { upTo: 4354.27, rate: 0.12 },
+    { upTo: 8475.55, rate: 0.14 },
+  ];
+  let contribution = 0;
+  let floor = 0;
+  for (const { upTo, rate } of brackets) {
+    if (gross <= floor) break;
+    contribution += (Math.min(gross, upTo) - floor) * rate;
+    floor = upTo;
+  }
+  return contribution;
+}
+
 describe("calculateNetSalary — the ordinary case", () => {
   /**
-   * One salary, the whole breakdown. Every figure below was produced by running
-   * the module, but each is reachable by hand from the published 2026 tables,
-   * which is what makes it an assertion rather than a snapshot.
+   * One salary, the whole breakdown, each figure reachable by hand from the
+   * published 2026 tables:
+   *
+   * - INSS on R$ 6.000,00: R$ 641,5144
+   * - legal deductions: 641,5144 + 189,59 (one dependant) + 200,00 (PGBL) = R$ 1.031,1044,
+   *   which beats the R$ 607,20 simplified discount, so the legal route applies
+   * - base: R$ 4.968,8956; table: × 27,5% − 908,73 = R$ 457,72
+   * - reduction: 978,62 − 0,133145 × 6.000 = R$ 179,75; withheld R$ 277,97
    */
-  const result = netSalary({
-    monthlyGrossSalary: 6000,
-    dependants: 1,
-    educationDeduction: 3000,
-    healthDeduction: 1200,
-    supplementaryPensionDeduction: 2400,
-  });
+  const result = netSalary({ monthlyGrossSalary: 6000, dependants: 1, monthlyPrivatePension: 200 });
 
   it("withholds the progressive INSS contribution", () => {
     expect(result.inssWithheld).toBeCloseTo(641.51, 2);
-    expect(result.monthlyBaseAfterInss).toBeCloseTo(5358.49, 2);
   });
 
-  it("sums the annual itemised deductions and the dependant allowance", () => {
-    expect(result.totalDeductions).toBeCloseTo(3000 + 1200 + 2400, 2);
-    expect(result.dependantAllowance).toBeCloseTo(2275.08, 2);
-    expect(result.annualAssessableBase).toBeCloseTo(55426.75, 2);
+  it("totals the monthly legal deductions and takes them, being the larger", () => {
+    expect(result.dependantAllowance).toBeCloseTo(189.59, 2);
+    expect(result.privatePensionDeduction).toBe(200);
+    expect(result.legalDeductions).toBeCloseTo(1031.1044, 4);
+    expect(result.deductionApplied).toBe("legal");
+    expect(result.monthlyAssessableBase).toBeCloseTo(4968.8956, 4);
   });
 
-  it("taxes the monthly share of that base, then applies the reduction", () => {
-    expect(result.monthlyAssessableBase).toBeCloseTo(4618.9, 2);
-    expect(result.taxFromTable).toBeCloseTo(363.76, 2);
+  it("taxes that base, then applies the reduction", () => {
+    expect(result.taxFromTable).toBeCloseTo(457.72, 2);
     expect(result.reductionLei15270).toBeCloseTo(179.75, 2);
-    expect(result.estimatedIrpfWithheld).toBeCloseTo(184.01, 2);
+    expect(result.estimatedIrpfWithheld).toBeCloseTo(277.97, 2);
   });
 
   it("arrives at the net salary and the effective rate", () => {
-    // 6.000,00 gross, less 641,5144 of INSS and 184,01 of IRPF.
-    expect(result.monthlyNetSalary).toBeCloseTo(5174.4756, 4);
-    expect(result.annualNetSalary).toBeCloseTo(5174.4756 * 12, 4);
-    expect(result.effectiveIrpfRate).toBeCloseTo(3.0668, 4);
-  });
-
-  it("reports the monthly share of what the deductions took off the base", () => {
-    expect(result.savings.fromDependants).toBeCloseTo(189.59, 2);
-    expect(result.savings.fromDeductions).toBeCloseTo(550, 2);
-    expect(result.savings.total).toBeCloseTo(739.59, 2);
+    // 6.000,00 gross, less 641,5144 of INSS and 277,97 of IRPF.
+    expect(result.monthlyNetSalary).toBeCloseTo(5080.5156, 4);
+    expect(result.annualNetSalary).toBeCloseTo(5080.5156 * 12, 4);
+    expect(result.effectiveIrpfRate).toBeCloseTo(4.6328, 4);
   });
 });
 
@@ -272,22 +309,19 @@ describe("calculateNetSalary — the monthly table is the published one", () => 
    * The property a visitor would notice: a raise never leaves you taking home
    * less. Swept across the whole band where the table and the reduction interact.
    */
-  it.each([false, true])(
-    "leaves the net salary rising with the gross (simplifiedRegime=%s)",
-    (simplifiedRegime) => {
-      let previousNet = -Infinity;
-      let previousTax = -Infinity;
+  it("leaves the net salary rising with the gross", () => {
+    let previousNet = -Infinity;
+    let previousTax = -Infinity;
 
-      for (let monthlyGrossSalary = 0; monthlyGrossSalary <= 12_000; monthlyGrossSalary += 0.25) {
-        const result = netSalary({ monthlyGrossSalary, simplifiedRegime });
+    for (let monthlyGrossSalary = 0; monthlyGrossSalary <= 12_000; monthlyGrossSalary += 0.25) {
+      const result = netSalary({ monthlyGrossSalary });
 
-        expect(result.estimatedIrpfWithheld).toBeGreaterThanOrEqual(previousTax);
-        expect(result.monthlyNetSalary).toBeGreaterThanOrEqual(previousNet);
-        previousTax = result.estimatedIrpfWithheld;
-        previousNet = result.monthlyNetSalary;
-      }
-    },
-  );
+      expect(result.estimatedIrpfWithheld).toBeGreaterThanOrEqual(previousTax);
+      expect(result.monthlyNetSalary).toBeGreaterThanOrEqual(previousNet);
+      previousTax = result.estimatedIrpfWithheld;
+      previousNet = result.monthlyNetSalary;
+    }
+  });
 });
 
 describe("calculateNetSalary — the Lei 15.270/2025 reduction", () => {
@@ -297,9 +331,16 @@ describe("calculateNetSalary — the Lei 15.270/2025 reduction", () => {
    * R$ 5.000,00 less the R$ 607,20 simplified ceiling gives a base of
    * R$ 4.392,80, which the table taxes at R$ 312,89 — exactly the reduction the
    * statute grants in its first band, so the withholding is zero by construction.
+   *
+   * No regime is passed: the simplified discount is the more beneficial route at
+   * R$ 5.000 (INSS is R$ 501,51), so the law applies it. Before that was read
+   * from art. 4º, § 2º, the page's own default — R$ 5.000, no deductions — took the
+   * legal route and withheld R$ 23,78 from a salary the statute exempts.
    */
-  it("reproduces the statute's own first-band figure at R$ 5.000", () => {
-    const result = netSalary({ monthlyGrossSalary: 5000, simplifiedRegime: true });
+  it("reproduces the statute's own first-band figure at R$ 5.000, unprompted", () => {
+    const result = netSalary({ monthlyGrossSalary: 5000 });
+
+    expect(result.deductionApplied).toBe("simplified");
 
     expect(result.monthlyAssessableBase).toBeCloseTo(4392.8, 2);
     expect(result.taxFromTable).toBeCloseTo(312.89, 2);
@@ -372,15 +413,71 @@ describe("calculateNetSalary — the Lei 15.270/2025 reduction", () => {
   });
 });
 
-describe("calculateNetSalary — dependants and itemised deductions", () => {
-  it("deducts the 2026 annual allowance per dependant, uncapped in count", () => {
+describe("calculateNetSalary — the more beneficial route (Lei 9.250, art. 4º, § 2º)", () => {
+  it("is 25% of the exempt band's ceiling, as the statute words it", () => {
+    expect(SIMPLIFIED_DEDUCTION_MONTHLY).toBeCloseTo(0.25 * OFFICIAL_MONTHLY_TABLE_2026[0].upTo, 2);
+    expect(SIMPLIFIED_DEDUCTION_MONTHLY).toBe(607.2);
+  });
+
+  it("takes the simplified discount where it beats INSS alone", () => {
+    const result = netSalary({ monthlyGrossSalary: 5300 });
+
+    expect(result.deductionApplied).toBe("simplified");
+    expect(result.monthlyAssessableBase).toBeCloseTo(5300 - 607.2, 6);
+  });
+
+  /**
+   * INSS reaches R$ 607,20 at a gross of R$ 5.754,90: 599,5144 at R$ 5.700,00
+   * plus 14% of the next R$ 54,90. Either side of it, the larger deduction wins.
+   */
+  it("switches to the legal route once INSS alone passes R$ 607,20", () => {
+    expect(netSalary({ monthlyGrossSalary: 5754 }).deductionApplied).toBe("simplified");
+    expect(netSalary({ monthlyGrossSalary: 5756 }).deductionApplied).toBe("legal");
+  });
+
+  it("lets a dependant tip it back to the legal route", () => {
+    // 543,51 of INSS + 189,59 = 733,10, above the simplified 607,20.
+    expect(netSalary({ monthlyGrossSalary: 5300, dependants: 1 }).deductionApplied).toBe("legal");
+  });
+
+  /**
+   * The property itself, against the publication: whatever the salary and the
+   * dependants, the withholding is the lower of the two routes, each computed
+   * here from the published tables and the statute with no code from the module.
+   */
+  it("withholds the lower of the two routes, everywhere", () => {
+    for (let monthlyGrossSalary = 0; monthlyGrossSalary <= 12_000; monthlyGrossSalary += 5) {
+      for (const dependants of [0, 1, 2]) {
+        const legal = officialInss(monthlyGrossSalary) + dependants * 189.59;
+        const simplified = Math.min(607.2, monthlyGrossSalary);
+        const expected = Math.min(
+          withholdingOnRoute(monthlyGrossSalary, legal),
+          withholdingOnRoute(monthlyGrossSalary, simplified),
+        );
+
+        expect(
+          netSalary({ monthlyGrossSalary, dependants }).estimatedIrpfWithheld,
+          `gross R$ ${monthlyGrossSalary}, ${dependants} dependant(s)`,
+        ).toBeCloseTo(expected, 2);
+      }
+    }
+  });
+
+  it("is worth R$ 23,78 a month at R$ 5.000 against the legal route alone", () => {
+    expect(withholdingOnRoute(5000, officialInss(5000))).toBeCloseTo(23.78, 2);
+    expect(netSalary({ monthlyGrossSalary: 5000 }).estimatedIrpfWithheld).toBe(0);
+  });
+});
+
+describe("calculateNetSalary — dependants and private pension", () => {
+  it("deducts R$ 189,59 a month per dependant, uncapped in count", () => {
     expect(netSalary({ monthlyGrossSalary: 8000, dependants: 0 }).dependantAllowance).toBe(0);
     expect(netSalary({ monthlyGrossSalary: 8000, dependants: 1 }).dependantAllowance).toBeCloseTo(
-      2275.08,
+      189.59,
       2,
     );
     expect(netSalary({ monthlyGrossSalary: 8000, dependants: 3 }).dependantAllowance).toBeCloseTo(
-      6825.24,
+      568.77,
       2,
     );
   });
@@ -394,36 +491,46 @@ describe("calculateNetSalary — dependants and itemised deductions", () => {
     expect(three).toBeLessThan(one);
   });
 
-  it("caps education at the documented annual limit", () => {
-    expect(netSalary({ monthlyGrossSalary: 8000, educationDeduction: 1000 }).totalDeductions).toBe(
-      1000,
-    );
-    expect(
-      netSalary({ monthlyGrossSalary: 8000, educationDeduction: 99_999 }).totalDeductions,
-    ).toBe(3561.5);
+  /**
+   * The field is labelled monthly on the page, and it is read as monthly here.
+   * It used to be divided by twelve, so a R$ 500,00 monthly contribution lowered
+   * the base by R$ 41,67.
+   */
+  it("deducts the private pension contribution as the monthly amount typed", () => {
+    const none = netSalary({ monthlyGrossSalary: 8000 });
+    const withPension = netSalary({ monthlyGrossSalary: 8000, monthlyPrivatePension: 500 });
+
+    expect(withPension.privatePensionDeduction).toBe(500);
+    expect(none.monthlyAssessableBase - withPension.monthlyAssessableBase).toBeCloseTo(500, 6);
   });
 
   /**
-   * No official ceiling on health expenses was found in any source read for
-   * docs/research/2026-09-04-irpf-2026-table/research.md, so this module does not
-   * invent one.
+   * Health and education are art. 8º, the annual adjustment, and do not reach
+   * the monthly base. A form saved by the previous build still carries both
+   * fields; they must change nothing, which is also why the page's storage key
+   * moved to v3.
    */
-  it("does not cap health expenses", () => {
-    expect(netSalary({ monthlyGrossSalary: 8000, healthDeduction: 40_000 }).totalDeductions).toBe(
-      40_000,
+  it("ignores health and education, which belong to the annual adjustment", () => {
+    const stale = {
+      ...NO_DEDUCTIONS,
+      monthlyGrossSalary: 8000,
+      educationDeduction: 3000,
+      healthDeduction: 10_000,
+    } as NetSalaryInput;
+
+    expect(calculateNetSalary(stale).estimatedIrpfWithheld).toBe(
+      netSalary({ monthlyGrossSalary: 8000 }).estimatedIrpfWithheld,
     );
   });
 
-  it("floors every deduction at zero rather than letting one raise the tax", () => {
+  it("floors negative inputs at zero rather than letting one raise the tax", () => {
     const result = netSalary({
       monthlyGrossSalary: 8000,
-      educationDeduction: -1000,
-      healthDeduction: -1000,
-      supplementaryPensionDeduction: -1000,
+      monthlyPrivatePension: -1000,
       dependants: -2,
     });
 
-    expect(result.totalDeductions).toBe(0);
+    expect(result.privatePensionDeduction).toBe(0);
     expect(result.dependantAllowance).toBe(0);
     expect(result.estimatedIrpfWithheld).toBeCloseTo(
       netSalary({ monthlyGrossSalary: 8000 }).estimatedIrpfWithheld,
@@ -431,96 +538,11 @@ describe("calculateNetSalary — dependants and itemised deductions", () => {
     );
   });
 
-  it("never drives the calculation base below zero", () => {
-    const result = netSalary({
-      monthlyGrossSalary: 3000,
-      supplementaryPensionDeduction: 999_999,
-    });
+  it("never drives the base below zero", () => {
+    const result = netSalary({ monthlyGrossSalary: 3000, monthlyPrivatePension: 999_999 });
 
-    expect(result.annualAssessableBase).toBe(0);
     expect(result.monthlyAssessableBase).toBe(0);
     expect(result.estimatedIrpfWithheld).toBe(0);
-  });
-});
-
-describe("calculateNetSalary — the two regimes", () => {
-  it("discounts exactly 20% of the gross where the monthly ceiling does not bind", () => {
-    // 20% of R$ 3.000 is R$ 600, just under the R$ 607,20 monthly ceiling.
-    const result = netSalary({ monthlyGrossSalary: 3000, simplifiedRegime: true });
-
-    expect(3000 - result.monthlyAssessableBase).toBeCloseTo(600, 2);
-  });
-
-  /**
-   * A provenance hole, pinned so it cannot become an answer hole.
-   *
-   * The module reads the monthly desconto simplificado as
-   * `min(20% × bruto, R$ 607,20)`, but only the R$ 607,20 is sourced: the
-   * Receita's monthly table states a "limite" and no percentage at all
-   * (fetches/receita-federal-tabelas-2026.md). The 20% is the ANNUAL rate,
-   * carried across.
-   *
-   * It costs nothing today, and provably rather than by luck: `607,20 / 0,20` is
-   * R$ 3.036,00 and 80% of R$ 3.036,00 is R$ 2.428,80 — the exempt ceiling
-   * itself. Below that gross both readings leave the base inside the exemption;
-   * above it both subtract the same R$ 607,20. So the two readings cannot
-   * withhold different amounts, and this sweep measures that rather than trusting
-   * it. If an edit moves the rate or the ceiling apart, the inference stops being
-   * free and this fails.
-   *
-   * (They do differ in `monthlyAssessableBase` below R$ 3.036 — R$ 800,00 against
-   * R$ 392,80 at a gross of R$ 1.000 — which is why the pin is on the tax.)
-   */
-  it("withholds what a flat R$ 607,20 reading of the ceiling would", () => {
-    for (let monthlyGrossSalary = 0; monthlyGrossSalary <= 8000; monthlyGrossSalary += 6.25) {
-      const result = netSalary({ monthlyGrossSalary, simplifiedRegime: true });
-      const flatCeilingReading = officialTableTax(Math.max(monthlyGrossSalary - 607.2, 0));
-
-      expect(result.taxFromTable, `gross R$ ${monthlyGrossSalary}`).toBe(flatCeilingReading);
-    }
-  });
-
-  it("caps the simplified discount instead of scaling it without limit", () => {
-    const modest = netSalary({ monthlyGrossSalary: 8000, simplifiedRegime: true });
-    const large = netSalary({ monthlyGrossSalary: 40_000, simplifiedRegime: true });
-
-    expect(8000 - modest.monthlyAssessableBase).toBeCloseTo(607.2, 2);
-    expect(40_000 - large.monthlyAssessableBase).toBeCloseTo(607.2, 2);
-  });
-
-  /**
-   * The desconto simplificado replaces every deduction the legislation allows,
-   * dependants included. Subtracting both takes one of them twice.
-   * See docs/research/2026-09-04-irpf-2026-table/research.md, Findings §5.
-   */
-  it("ignores dependants and itemised deductions under the simplified regime", () => {
-    const bare = netSalary({ monthlyGrossSalary: 15_000, simplifiedRegime: true });
-    const loaded = netSalary({
-      monthlyGrossSalary: 15_000,
-      simplifiedRegime: true,
-      dependants: 3,
-      educationDeduction: 3000,
-      healthDeduction: 10_000,
-      supplementaryPensionDeduction: 20_000,
-    });
-
-    expect(loaded.estimatedIrpfWithheld).toBe(bare.estimatedIrpfWithheld);
-    // Still reported, so the page can explain what the regime gave up.
-    expect(loaded.dependantAllowance).toBeCloseTo(6825.24, 2);
-    expect(loaded.totalDeductions).toBeCloseTo(33_000, 2);
-    // …but claiming a saving from deductions that changed nothing would be a lie.
-    expect(loaded.savings.total).toBe(0);
-  });
-
-  it("computes a finite withholding under either regime", () => {
-    for (const monthlyGrossSalary of [0, 1621, 5000, 15_000, 50_000]) {
-      for (const simplifiedRegime of [false, true]) {
-        const result = netSalary({ monthlyGrossSalary, simplifiedRegime });
-
-        expect(Number.isFinite(result.estimatedIrpfWithheld)).toBe(true);
-        expect(result.estimatedIrpfWithheld).toBeGreaterThanOrEqual(0);
-      }
-    }
   });
 });
 
@@ -578,48 +600,48 @@ describe("calculateNetSalary — benefits and other deductions", () => {
 
 describe("calculateNetSalary — agrees with calculateIrpf on the table and the deductions", () => {
   /**
-   * The two modules implement the same 2026 table and the same deduction chain on
-   * the same inputs. This is the case that catches those two copies drifting
-   * apart — it asserts one module's output against the other's, never against a
-   * hard-coded pair.
+   * The two modules implement the same 2026 table and the deductions they share
+   * — INSS, dependants, private pension — on the same inputs. This is the case
+   * that catches those copies drifting apart; it asserts one module's output
+   * against the other's, never against a hard-coded pair.
    *
-   * ⚠️ It says nothing about the two Lei 15.270/2025 reductions, and the name is
-   * narrowed to admit it. R$ 100.000 a year is R$ 8.333,33 a month, past the
-   * monthly phase-out at R$ 7.350 and the annual one at R$ 88.200, so both
-   * reductions are zero here — asserted below rather than assumed. They could not
-   * be compared in any case: they are different statutory bands, and
-   * `312,89 × 12 = 3.754,68` is not the annual R$ 2.694,15.
+   * Health and education are left at zero because the monthly base cannot take
+   * them (art. 4º) while the annual one can (art. 8º): that is a difference in
+   * the law, not drift.
    *
-   * ⚠️ Health stays under R$ 2.666,67 on purpose. `irpf.ts` caps health at that
-   * figure, which its own comment records as invented (no official ceiling was
-   * found); this module does not. Above it the two disagree by construction, and
-   * that disagreement is a product decision, not something a test should settle.
+   * ⚠️ It says nothing about the two Lei 15.270/2025 reductions. R$ 100.000 a year
+   * is R$ 8.333,33 a month, past the monthly phase-out at R$ 7.350 and the annual
+   * one at R$ 88.200, so both are zero here — asserted below rather than assumed.
    */
-  const shared = {
-    dependants: 2,
-    educationDeduction: 4000,
-    healthDeduction: 2000,
-    supplementaryPensionDeduction: 1000,
-  };
   const grossAnnualIncome = 100_000;
-
-  const monthly = netSalary({ ...shared, monthlyGrossSalary: grossAnnualIncome / 12 });
-  const annual = calculateIrpf({ ...shared, grossAnnualIncome, simplifiedRegime: false });
-
-  it("caps education and totals the deductions identically", () => {
-    expect(monthly.totalDeductions).toBeCloseTo(annual.totalDeductions, 6);
+  const monthly = netSalary({
+    monthlyGrossSalary: grossAnnualIncome / 12,
+    dependants: 2,
+    monthlyPrivatePension: 1000 / 12,
+  });
+  const annual = calculateIrpf({
+    grossAnnualIncome,
+    dependants: 2,
+    educationDeduction: 0,
+    healthDeduction: 0,
+    supplementaryPensionDeduction: 1000,
+    simplifiedRegime: false,
   });
 
-  it("allows the same dependant amount", () => {
-    expect(monthly.dependantAllowance).toBeCloseTo(annual.dependantAllowance, 6);
+  it("takes the legal route, as the annual comparison assumes", () => {
+    expect(monthly.deductionApplied).toBe("legal");
+  });
+
+  it("allows the same dependant amount over a year", () => {
+    expect(monthly.dependantAllowance * 12).toBeCloseTo(annual.dependantAllowance, 2);
   });
 
   it("withholds the same INSS over a year", () => {
     expect(monthly.inssWithheld * 12).toBeCloseTo(annual.inssWithheld, 6);
   });
 
-  it("reaches the same annual assessable base", () => {
-    expect(monthly.annualAssessableBase).toBeCloseTo(annual.assessableBase, 6);
+  it("reaches the same assessable base over a year", () => {
+    expect(monthly.monthlyAssessableBase * 12).toBeCloseTo(annual.assessableBase, 2);
   });
 
   /** Keeps this comparison honest about which half of the legislation it reaches. */
@@ -632,8 +654,7 @@ describe("calculateNetSalary — agrees with calculateIrpf on the table and the 
    * The monthly and annual tables are the same table: every annual boundary is
    * twelve times its monthly one. The published parcels are each rounded to the
    * centavo independently, so twelve monthly withholdings land within a few
-   * centavos of the annual assessment rather than exactly on it — measured here
-   * at R$ 0,16.
+   * centavos of the annual assessment rather than exactly on it.
    */
   it("produces the same tax over a year, to within the parcels' own rounding", () => {
     expect(monthly.taxFromTable * 12).toBeCloseTo(annual.taxFromTable, 0);
@@ -651,7 +672,7 @@ describe("calculateNetSalary — degenerate input", () => {
       }
     }
 
-    expect(result.savings).toEqual({ fromDependants: 0, fromDeductions: 0, total: 0 });
+    expect(result.deductionApplied).toBe("legal");
   });
 
   it("clamps a negative salary to zero rather than paying the worker tax back", () => {
@@ -664,5 +685,91 @@ describe("calculateNetSalary — degenerate input", () => {
 
   it("reports a zero effective rate at a zero salary instead of dividing by zero", () => {
     expect(netSalary({ monthlyGrossSalary: 0 }).effectiveIrpfRate).toBe(0);
+  });
+});
+
+describe("buildNetSalaryTable — the page's salary table", () => {
+  const grosses = [1621, 3000, 5000, 5500, 6000, 8000, 20_000];
+  const rows = buildNetSalaryTable(grosses);
+
+  it("returns one row per salary, in order", () => {
+    expect(rows.map((row) => row.monthlyGrossSalary)).toEqual(grosses);
+  });
+
+  it("is the form's own answer on every row", () => {
+    for (const dependants of [0, 2]) {
+      for (const row of buildNetSalaryTable(grosses, dependants)) {
+        const form = netSalary({ monthlyGrossSalary: row.monthlyGrossSalary, dependants });
+
+        expect(row.monthlyNetSalary).toBe(form.monthlyNetSalary);
+        expect(row.estimatedIrpfWithheld).toBe(form.estimatedIrpfWithheld);
+        expect(row.deductionApplied).toBe(form.deductionApplied);
+      }
+    }
+  });
+
+  /**
+   * The equality above alone is a tautology: a builder and a form that were both
+   * wrong would agree. These four rows are computed by hand from the published
+   * 2026 tables and the statute, one per situation the table has to get right:
+   *
+   * - R$ 5.000: simplified route, base 4.392,80, table 312,89, reduction 312,89, IR 0;
+   *   net = 5.000 − 501,5144 = 4.498,4856
+   * - R$ 5.500: simplified route, base 4.892,80 at 27,5% − 908,73 = 436,79;
+   *   reduction 978,62 − 0,133145 × 5.500 = 246,32; IR 190,47; INSS 571,5144
+   * - R$ 6.000: legal route (INSS 641,5144), base 5.358,4856, table 564,85;
+   *   reduction 179,75; IR 385,10
+   * - R$ 8.000: legal route (INSS 921,5144), base 7.078,4856, table 1.037,85;
+   *   past the phase-out, IR 1.037,85
+   */
+  it.each([
+    { gross: 5000, route: "simplified", irrf: 0, net: 4498.4856 },
+    { gross: 5500, route: "simplified", irrf: 190.47, net: 4738.0156 },
+    { gross: 6000, route: "legal", irrf: 385.1, net: 4973.3856 },
+    { gross: 8000, route: "legal", irrf: 1037.85, net: 6040.6356 },
+  ])("matches the hand computation at R$ $gross", ({ gross, route, irrf, net }) => {
+    const [row] = buildNetSalaryTable([gross]);
+
+    expect(row.deductionApplied).toBe(route);
+    expect(row.estimatedIrpfWithheld).toBeCloseTo(irrf, 2);
+    expect(row.monthlyNetSalary).toBeCloseTo(net, 4);
+    expect(row.netShare).toBeCloseTo(net / gross, 6);
+  });
+});
+
+describe("simplifiedRouteCeiling", () => {
+  /** INSS reaches R$ 607,20 at 5.700 + (607,20 − 599,5144) / 0,14 = R$ 5.754,90. */
+  it("finds the gross where INSS alone reaches R$ 607,20", () => {
+    expect(simplifiedRouteCeiling(0)).toBeCloseTo(5754.9, 1);
+    expect(netSalary({ monthlyGrossSalary: simplifiedRouteCeiling(0) - 1 }).deductionApplied).toBe(
+      "simplified",
+    );
+    expect(netSalary({ monthlyGrossSalary: simplifiedRouteCeiling(0) + 1 }).deductionApplied).toBe(
+      "legal",
+    );
+  });
+
+  /**
+   * What the page says in prose: with a dependant, the simplified route only wins
+   * below R$ 4.400 or so, where the 2026 reduction already zeroes the tax, so it
+   * never changes what is withheld.
+   */
+  it("moves below the exempt range once there is a dependant", () => {
+    expect(simplifiedRouteCeiling(1)).toBeLessThan(5000);
+
+    for (let monthlyGrossSalary = 0; monthlyGrossSalary <= 9000; monthlyGrossSalary += 5) {
+      const legalOnly = withholdingOnRoute(
+        monthlyGrossSalary,
+        officialInss(monthlyGrossSalary) + 189.59,
+      );
+      expect(
+        netSalary({ monthlyGrossSalary, dependants: 1 }).estimatedIrpfWithheld,
+        `gross R$ ${monthlyGrossSalary}`,
+      ).toBeCloseTo(legalOnly, 2);
+    }
+  });
+
+  it("is zero when the dependants alone exceed the discount", () => {
+    expect(simplifiedRouteCeiling(4)).toBe(0);
   });
 });

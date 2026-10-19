@@ -30,6 +30,18 @@ ships.
 
 ## Needs
 
+- ⚠️ **Found in slice 3, and to fix before any table here:** `cltVsPj.ts` computes the CLT
+  withholding on the legal route only (INSS plus dependants). It never compares against the
+  R$ 607,20 desconto simplificado mensal, which Lei 9.250, art. 4º, § 2º applies "caso seja mais
+  benéfico ao contribuinte". The net salary module had the same defect: with no dependants it
+  overstated the withholding by up to R$ 23,78 a month between R$ 4.878 and R$ 5.754 of gross
+  (commit `dca8d9d`). The CLT side of the comparison inherits that error at exactly the salaries
+  where CLT against PJ is closest. Reuse `calculateNetSalary` for the CLT side, or the same
+  route rule, and test it with the same statute oracle.
+- ⚠️ `calculateIrpf` (annual) computes whichever regime it is handed. The annual declaration does
+  let the taxpayer choose, but the page should at least show which regime is more beneficial
+  before the visitor relies on the one picked.
+
 - Slice 3 done **and judged worth repeating**. If slice 3 changed its approach, this slice uses
   the changed one.
 - The four calculators measured on 2026-09-10 are re-fetched on this slice's date, so all twelve

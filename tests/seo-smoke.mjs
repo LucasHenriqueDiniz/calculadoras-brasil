@@ -211,6 +211,20 @@ try {
     `every public route must be reachable by an internal link: ${orphans.join(", ")}`,
   );
 
+  // The salary table is content Google reads, so it must be in the prerendered
+  // HTML rather than appear after hydration. Two figures computed by hand in
+  // tests/calculators/salario-liquido.test.ts: the R$ 5.000 net and the R$ 6.000
+  // withholding.
+  const salaryPage = textContent(
+    await (await fetch(`${BASE_URL}/calculadora-salario-liquido`)).text(),
+  ).replaceAll("\u00a0", " ");
+  assert.ok(
+    salaryPage.includes("Quanto sobra do salário em 2026, faixa a faixa"),
+    "the salary table must be prerendered",
+  );
+  assert.ok(salaryPage.includes("R$ 4.498,49"), "the R$ 5.000 row must show its net salary");
+  assert.ok(salaryPage.includes("R$ 385,10"), "the R$ 6.000 row must show its withholding");
+
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 
