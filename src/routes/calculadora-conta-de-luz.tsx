@@ -1,6 +1,6 @@
 import { buildColorMap } from "@/lib/chart-colors";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { LoaderCircle, Plus, Table as TableIcon, Trash2 } from "lucide-react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
 import { SearchableSelectField } from "@/components/calculator/SearchableSelectField";
@@ -231,15 +231,18 @@ interface ApplianceRowProps {
 }
 
 function ApplianceRow({ appliance: a, tariff, onPatch, onRemove }: ApplianceRowProps) {
+  // The appliance id carries a timestamp and differs between server and client, so the DOM id
+  // comes from useId, which both renders derive from the row's position in the tree.
+  const nameId = useId();
   return (
     <li className="space-y-3 rounded-xl border border-border bg-surface p-4">
       <div className="flex items-center justify-between gap-2">
         <div className="flex-1 space-y-1.5">
-          <Label htmlFor={`name-${a.id}`} className="text-sm font-medium">
+          <Label htmlFor={nameId} className="text-sm font-medium">
             Nome do aparelho
           </Label>
           <Input
-            id={`name-${a.id}`}
+            id={nameId}
             value={a.name}
             onChange={(e) => onPatch(a.id, { name: e.target.value })}
           />
