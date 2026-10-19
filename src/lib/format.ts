@@ -34,6 +34,13 @@ export function formatLongDate(isoDate: string): string {
   return longDateFormatter.format(new Date(`${isoDate}T00:00:00Z`));
 }
 
+const shortDateFormatter = new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" });
+
+/** "2026-10-10" as "10/10/2026", in UTC for the same reason as formatLongDate. */
+export function formatShortDate(isoDate: string): string {
+  return shortDateFormatter.format(new Date(`${isoDate.slice(0, 10)}T00:00:00Z`));
+}
+
 /**
  * Parse a string with brazilian number format (1.234,56) or plain (1234.56)
  * into a finite number. Returns 0 for invalid input.
