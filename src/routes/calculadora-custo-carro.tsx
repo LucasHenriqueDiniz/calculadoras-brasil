@@ -183,12 +183,14 @@ function fieldFromNetworkError(previous: PublicFieldState): PublicFieldState {
  * Owns the ANP fuel-price lookup for the page: the per-fuel field states, the
  * 24h localStorage cache in front of the adapter, and the reload triggered when
  * the state or the fuel type changes. The UF and the fuel type are arguments
- * because they live in the page's persisted form state; the loaded price is
- * handed back through `onPriceLoaded` rather than written here.
+ * because they live in the page's persisted form state, and nothing loads until
+ * `isRestored` says that state is the visitor's rather than the defaults; the
+ * loaded price is handed back through `onPriceLoaded` rather than written here.
  */
 function useFuelPrices(
   uf: string,
   fuelType: FuelType,
+  isRestored: boolean,
   onPriceLoaded: (key: FuelPriceKey, price: number) => void,
 ) {
   const [fuelFields, setFuelFields] = useState<FuelFields>(emptyFuelFields);
@@ -246,9 +248,11 @@ function useFuelPrices(
   }
 
   useEffect(() => {
+    // A lookup for the default UF would not be cancelled, and could land after the visitor's.
+    if (!isRestored) return;
     void loadFuelPrices(activeFuelRequests);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uf, fuelType]);
+  }, [uf, fuelType, isRestored]);
 
   function markFuelManual(key: FuelPriceKey) {
     patchField(key, (previous) => ({
@@ -367,13 +371,16 @@ function CarCostPage() {
     "calculadoras-brasil:custo-carro:input:v1",
     DEFAULTS,
   );
-  const [uf, setUf] = usePersistedState("calculadoras-brasil:custo-carro:uf:v1", "SP");
+  // Both persisted values restore in the same layout pass, so this flag covers the input too.
+  const [uf, setUf, isRestored] = usePersistedState("calculadoras-brasil:custo-carro:uf:v1", "SP");
 
   function update<K extends keyof CarCostInput>(key: K, value: CarCostInput[K]) {
     setInput((prev) => ({ ...prev, [key]: value }));
   }
 
-  const fuelPrices = useFuelPrices(uf, input.fuelType, (key, price) => update(key, price));
+  const fuelPrices = useFuelPrices(uf, input.fuelType, isRestored, (key, price) =>
+    update(key, price),
+  );
   const result = useMemo(() => calculateCarCost(input), [input]);
 
   function updateFuelManually(key: FuelPriceKey, value: string) {

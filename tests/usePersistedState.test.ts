@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { usePersistedState } from "../src/lib/usePersistedState";
+import { readPersistedValue, usePersistedState } from "../src/lib/usePersistedState";
 import type { IrpfInput } from "../src/lib/calculators/irpf";
 import type { NetSalaryInput } from "../src/lib/calculators/salarioLiquido";
 
@@ -10,7 +10,8 @@ import type { NetSalaryInput } from "../src/lib/calculators/salarioLiquido";
  * What `usePersistedState` does with a saved form when the shape it was saved in
  * no longer exists.
  *
- * ⚠️ The hook does a raw `JSON.parse` and a cast — it validates nothing. Measured
+ * ⚠️ The read (`readPersistedValue`, which the hook restores through) does a raw
+ * `JSON.parse` and a cast — it validates nothing. Measured
  * before this suite was written: it falls back to the default only when the key
  * is absent or the parse throws, so an object saved under the OLD field names is
  * handed straight back and every renamed field reads `undefined`. That is why the
@@ -116,32 +117,17 @@ const OLD_NET_SALARY_SHAPE = {
   regimeSimplificado: true,
 };
 
-/**
- * Reads the hook exactly as a route does, in a real React render.
- *
- * A static server render runs the lazy `useState` initialiser — which is the
- * whole of the read path — and skips the `useEffect` that writes back, so the
- * stored value is observed rather than overwritten.
- */
-function readThroughHook<T>(storage: Record<string, string>, key: string, defaultValue: T): T {
+/** Runs `read` with a `window.localStorage` whose `getItem` serves `storage`. */
+function withStorage<R>(
+  storage: Record<string, string>,
+  read: () => R,
+  getItem = (name: string) => (name in storage ? storage[name] : null),
+): R {
   const previousWindow = (globalThis as { window?: unknown }).window;
-  (globalThis as { window?: unknown }).window = {
-    localStorage: {
-      getItem: (name: string) => (name in storage ? storage[name] : null),
-      setItem: () => {},
-    },
-  };
-
-  let observed: T | undefined;
-
-  function Probe() {
-    const [value] = usePersistedState<T>(key, defaultValue);
-    observed = value;
-    return null;
-  }
+  (globalThis as { window?: unknown }).window = { localStorage: { getItem, setItem: () => {} } };
 
   try {
-    renderToStaticMarkup(createElement(Probe));
+    return read();
   } finally {
     if (previousWindow === undefined) {
       delete (globalThis as { window?: unknown }).window;
@@ -149,8 +135,30 @@ function readThroughHook<T>(storage: Record<string, string>, key: string, defaul
       (globalThis as { window?: unknown }).window = previousWindow;
     }
   }
+}
 
-  return observed as T;
+/** What the hook's layout effect restores: the same read, called the same way. */
+function readFromStorage<T>(storage: Record<string, string>, key: string, defaultValue: T): T {
+  return withStorage(storage, () => readPersistedValue(key, defaultValue));
+}
+
+/**
+ * The hook's first render, with `window` present the way it is in the browser.
+ *
+ * A static render runs no effects, so this is the render the server sends and
+ * the hydration render has to reproduce attribute for attribute.
+ */
+function firstRender<T>(storage: Record<string, string>, key: string, defaultValue: T) {
+  let observed: { value: T; isRestored: boolean } | undefined;
+
+  function Probe() {
+    const [value, , isRestored] = usePersistedState<T>(key, defaultValue);
+    observed = { value, isRestored };
+    return null;
+  }
+
+  withStorage(storage, () => renderToStaticMarkup(createElement(Probe)));
+  return observed!;
 }
 
 afterEach(() => {
@@ -173,7 +181,7 @@ describe("usePersistedState — the key is the only shape check there is", () =>
    */
   it("hands back a stale object unchanged when the key still matches", () => {
     const storage = { [OLD_IRPF_KEY]: JSON.stringify(OLD_IRPF_SHAPE) };
-    const restored = readThroughHook(storage, OLD_IRPF_KEY, IRPF_DEFAULTS);
+    const restored = readFromStorage(storage, OLD_IRPF_KEY, IRPF_DEFAULTS);
 
     expect(restored).toEqual(OLD_IRPF_SHAPE);
     expect((restored as Partial<IrpfInput>).grossAnnualIncome).toBeUndefined();
@@ -182,13 +190,13 @@ describe("usePersistedState — the key is the only shape check there is", () =>
   it("gives the IRPF form its defaults when only the pre-rename key is stored", () => {
     const storage = { [OLD_IRPF_KEY]: JSON.stringify(OLD_IRPF_SHAPE) };
 
-    expect(readThroughHook(storage, IRPF_KEY, IRPF_DEFAULTS)).toEqual(IRPF_DEFAULTS);
+    expect(readFromStorage(storage, IRPF_KEY, IRPF_DEFAULTS)).toEqual(IRPF_DEFAULTS);
   });
 
   it("gives the net-salary form its defaults when only the pre-rename key is stored", () => {
     const storage = { [OLD_NET_SALARY_KEY]: JSON.stringify(OLD_NET_SALARY_SHAPE) };
 
-    expect(readThroughHook(storage, NET_SALARY_KEY, NET_SALARY_DEFAULTS)).toEqual(
+    expect(readFromStorage(storage, NET_SALARY_KEY, NET_SALARY_DEFAULTS)).toEqual(
       NET_SALARY_DEFAULTS,
     );
   });
@@ -201,12 +209,41 @@ describe("usePersistedState — the key is the only shape check there is", () =>
     const saved: IrpfInput = { ...IRPF_DEFAULTS, grossAnnualIncome: 90_000, dependants: 2 };
     const storage = { [IRPF_KEY]: JSON.stringify(saved) };
 
-    expect(readThroughHook(storage, IRPF_KEY, IRPF_DEFAULTS)).toEqual(saved);
+    expect(readFromStorage(storage, IRPF_KEY, IRPF_DEFAULTS)).toEqual(saved);
   });
 
   it("falls back to the defaults when the stored value is not JSON", () => {
     const storage = { [IRPF_KEY]: "{not json" };
 
-    expect(readThroughHook(storage, IRPF_KEY, IRPF_DEFAULTS)).toEqual(IRPF_DEFAULTS);
+    expect(readFromStorage(storage, IRPF_KEY, IRPF_DEFAULTS)).toEqual(IRPF_DEFAULTS);
+  });
+});
+
+describe("usePersistedState — the first render is the one the server sent", () => {
+  /**
+   * The hydration mismatch this guards against: reading localStorage while
+   * rendering made a returning visitor's first client render differ from the
+   * server HTML, and React threw it away and rendered the page again.
+   */
+  it("renders the default even when a value is stored under the key", () => {
+    const saved: IrpfInput = { ...IRPF_DEFAULTS, grossAnnualIncome: 90_000, dependants: 2 };
+    const storage = { [IRPF_KEY]: JSON.stringify(saved) };
+
+    expect(firstRender(storage, IRPF_KEY, IRPF_DEFAULTS)).toEqual({
+      value: IRPF_DEFAULTS,
+      isRestored: false,
+    });
+  });
+
+  it("restores the default when localStorage refuses the read", () => {
+    const restored = withStorage(
+      {},
+      () => readPersistedValue(IRPF_KEY, IRPF_DEFAULTS),
+      () => {
+        throw new Error("SecurityError: localStorage is disabled");
+      },
+    );
+
+    expect(restored).toEqual(IRPF_DEFAULTS);
   });
 });

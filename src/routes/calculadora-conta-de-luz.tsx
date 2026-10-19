@@ -663,7 +663,7 @@ function ElectricityPage() {
     DEFAULT_APPLIANCES,
   );
   const [presetValue, setPresetValue] = useState<string>("");
-  const [uf, setUf] = usePersistedState("calculadoras-brasil:conta-luz:uf:v1", "SP");
+  const [uf, setUf, isUfRestored] = usePersistedState("calculadoras-brasil:conta-luz:uf:v1", "SP");
   const [distributor, setDistributor] = usePersistedState(
     "calculadoras-brasil:conta-luz:distributor:v1",
     "",
@@ -760,6 +760,8 @@ function ElectricityPage() {
   }
 
   useEffect(() => {
+    // Before the restore, uf is the default and the list would be for a state the visitor never chose.
+    if (!isUfRestored) return;
     const controller = new AbortController();
     setIsLoadingDistributors(true);
     getEnergyDistributors(uf, controller.signal)
@@ -774,7 +776,7 @@ function ElectricityPage() {
       });
 
     return () => controller.abort();
-  }, [uf]);
+  }, [uf, isUfRestored]);
 
   useEffect(() => {
     if (!distributor.trim()) return;
