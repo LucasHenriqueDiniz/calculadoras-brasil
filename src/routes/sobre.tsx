@@ -1,5 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, BookOpen, CircleSlash, Eye, Gift, Megaphone, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  CircleSlash,
+  Eye,
+  Gift,
+  Megaphone,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import { PageShell, PageHeader } from "@/components/layout/PageShell";
 import { absoluteUrl } from "@/lib/site";
 
@@ -154,6 +163,36 @@ function SobrePage() {
               >
                 GitHub
               </a>
+            </div>
+          </div>
+        </section>
+
+        {/* How the content is made. Google's guidance asks for this disclosure where readers
+            would wonder; the owner chose to make it in slice 6 of
+            docs/plans/adsense-reapplication. */}
+        <section className="mt-12 flex items-start gap-4 rounded-2xl border border-border bg-surface p-7 shadow-[var(--shadow-card)] sm:p-8">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary">
+            <Sparkles className="h-5 w-5" aria-hidden />
+          </span>
+          <div>
+            <h2 className="font-display text-xl text-foreground">Como o conteúdo é feito</h2>
+            <div className="mt-2 space-y-3 text-pretty leading-relaxed text-foreground/85">
+              <p>
+                O código das calculadoras e os textos do site são escritos com a ajuda de
+                inteligência artificial, o Claude, da Anthropic, e revisados por Lucas antes de ir
+                ao ar.
+              </p>
+              <p>
+                As regras de cada cálculo vêm de fontes oficiais ou primárias sempre que elas
+                existem, citadas na própria página: leis no Planalto, tabelas da Receita Federal,
+                dados da ANP, da ANEEL e de outros órgãos. Cada fórmula tem testes automáticos com
+                casos conferidos à mão, e as tabelas das páginas são calculadas pela própria
+                calculadora, não digitadas.
+              </p>
+              <p>
+                Quando um erro é encontrado, ele é corrigido, e a data de revisão mostrada no topo
+                de cada calculadora muda.
+              </p>
             </div>
           </div>
         </section>
