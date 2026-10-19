@@ -21,8 +21,8 @@ function net(monthlyGrossSalary: number): number {
     monthlyGrossSalary,
     dependants: 0,
     monthlyPrivatePension: 0,
-    hasMealAllowance: false,
-    hasTransportAllowance: false,
+    monthlyMealAllowance: 0,
+    monthlyTransportCost: 0,
     hasUnionDue: false,
   }).monthlyNetSalary;
 }

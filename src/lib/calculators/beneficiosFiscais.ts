@@ -19,11 +19,8 @@
  * towards the vale-transporte.
  */
 
-import { calculateNetSalary } from "./salarioLiquido";
+import { calculateNetSalary, transportEmployeeShare } from "./salarioLiquido";
 import { roundToCentavos } from "./money";
-
-/** Lei 7.418/1985, art. 4º, parágrafo único: the worker's share of the commute. */
-const TRANSPORT_EMPLOYEE_SHARE = 0.06;
 
 export interface TaxFreeBenefitsInput {
   /** The base salary, which sets the vale-transporte share and the rate a raise is taxed at. */
@@ -53,8 +50,8 @@ function netAt(monthlyGrossSalary: number): number {
     monthlyGrossSalary,
     dependants: 0,
     monthlyPrivatePension: 0,
-    hasMealAllowance: false,
-    hasTransportAllowance: false,
+    monthlyMealAllowance: 0,
+    monthlyTransportCost: 0,
     hasUnionDue: false,
   }).monthlyNetSalary;
 }
@@ -91,16 +88,14 @@ export function calculateTaxFreeBenefits(input: TaxFreeBenefitsInput): TaxFreeBe
   const meal = Math.max(input.monthlyMealAllowance, 0);
   const transportCost = Math.max(input.monthlyTransportCost, 0);
 
-  const transportEmployeeShare = roundToCentavos(
-    Math.min(transportCost, salary * TRANSPORT_EMPLOYEE_SHARE),
-  );
-  const transportEmployerShare = roundToCentavos(transportCost - transportEmployeeShare);
+  const employeeShare = transportEmployeeShare(salary, transportCost);
+  const transportEmployerShare = roundToCentavos(transportCost - employeeShare);
   const monthlyBenefitTotal = roundToCentavos(meal + transportEmployerShare);
   const equivalentGrossRaise = equivalentRaise(salary, monthlyBenefitTotal);
 
   return {
     monthlyMealAllowance: meal,
-    transportEmployeeShare,
+    transportEmployeeShare: employeeShare,
     transportEmployerShare,
     monthlyBenefitTotal,
     annualBenefitTotal: roundToCentavos(monthlyBenefitTotal * 12),

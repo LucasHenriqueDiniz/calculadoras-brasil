@@ -29,8 +29,8 @@ const DEFAULTS: NetSalaryInput = {
   monthlyGrossSalary: 5000,
   dependants: 0,
   monthlyPrivatePension: 0,
-  hasMealAllowance: false,
-  hasTransportAllowance: false,
+  monthlyMealAllowance: 0,
+  monthlyTransportCost: 0,
   hasUnionDue: false,
 };
 
@@ -38,7 +38,7 @@ const FAQ: FAQItem[] = [
   {
     question: "Qual é a diferença entre salário bruto e líquido?",
     answer:
-      "Salário bruto é o valor antes de descontos. Salário líquido é o que você realmente recebe depois de IRPF, INSS, sindicato. A diferença geralmente é 15-25% do bruto.",
+      "Salário bruto é o valor antes dos descontos. Salário líquido é o que você recebe depois do INSS, do imposto de renda e de descontos como o vale-transporte. A diferença depende do salário: a tabela desta página mostra o líquido de cada faixa.",
   },
   {
     question: "Como funciona a retenção de IRPF na folha?",
@@ -53,7 +53,7 @@ const FAQ: FAQItem[] = [
   {
     question: "Vale refeição reduz meu imposto?",
     answer:
-      "Sim. Vale refeição é um benefício não tributável, ou seja, não entra na base de cálculo do IRPF. Você recebe o benefício sem pagar imposto sobre ele.",
+      "Não reduz o imposto do salário. O que acontece é que ele mesmo não é tributado: dentro do Programa de Alimentação do Trabalhador, não entra no salário de contribuição do INSS (Lei 6.321/1976, art. 3º), e a alimentação fornecida pelo empregador é isenta de imposto de renda (Lei 7.713/1988, art. 6º, I). Para saber quanto ele vale em salário, use a calculadora de benefícios fiscais.",
   },
   {
     question: "Dependentes reduzem meu desconto de IRPF?",
@@ -107,8 +107,8 @@ const EXAMPLE = calculateNetSalary({
   monthlyGrossSalary: 6000,
   dependants: 0,
   monthlyPrivatePension: 0,
-  hasMealAllowance: false,
-  hasTransportAllowance: false,
+  monthlyMealAllowance: 0,
+  monthlyTransportCost: 0,
   hasUnionDue: false,
 });
 const AT_EXEMPTION_LIMIT = TABLE_ROWS.find((row) => row.monthlyGrossSalary === 5000);
@@ -287,7 +287,7 @@ export const Route = createFileRoute("/calculadora-salario-liquido")({
 });
 
 function SalarioLiquidoCalculator() {
-  const [input, setInput] = usePersistedState<NetSalaryInput>("salario-liquido-input-v3", DEFAULTS);
+  const [input, setInput] = usePersistedState<NetSalaryInput>("salario-liquido-input-v4", DEFAULTS);
   const result = useMemo(() => calculateNetSalary(input), [input]);
 
   const handleReset = () => setInput(DEFAULTS);
@@ -347,35 +347,27 @@ function SalarioLiquidoCalculator() {
         title="Benefícios e descontos"
         description="Vale refeição, transporte, sindicato"
       >
-        <div className="space-y-3">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={input.hasMealAllowance}
-              onChange={(e) => setInput({ ...input, hasMealAllowance: e.target.checked })}
-              className="h-4 w-4"
-            />
-            <span>Tenho vale refeição (~R$ 360/mês)</span>
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={input.hasTransportAllowance}
-              onChange={(e) => setInput({ ...input, hasTransportAllowance: e.target.checked })}
-              className="h-4 w-4"
-            />
-            <span>Tenho vale transporte (até 6% do salário)</span>
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={input.hasUnionDue}
-              onChange={(e) => setInput({ ...input, hasUnionDue: e.target.checked })}
-              className="h-4 w-4"
-            />
-            <span>Desconto de sindicato (~1 hora/mês)</span>
-          </label>
-        </div>
+        <CurrencyInput
+          label="Vale-refeição ou alimentação por mês"
+          value={input.monthlyMealAllowance}
+          onChange={(value) => setInput({ ...input, monthlyMealAllowance: value })}
+          hint="O valor creditado. Não sai do salário e não entra no imposto."
+        />
+        <CurrencyInput
+          label="Custo mensal do transporte (vale-transporte)"
+          value={input.monthlyTransportCost}
+          onChange={(value) => setInput({ ...input, monthlyTransportCost: value })}
+          hint="O desconto é de até 6% do salário, sem passar desse custo (Lei 7.418/1985). Deixe 0 se não recebe."
+        />
+        <label className="flex items-center gap-2 sm:col-span-2">
+          <input
+            type="checkbox"
+            checked={input.hasUnionDue}
+            onChange={(e) => setInput({ ...input, hasUnionDue: e.target.checked })}
+            className="h-4 w-4"
+          />
+          <span>Autorizei a contribuição sindical (um dia de salário, descontado só em março)</span>
+        </label>
       </FormSection>
 
       <ResultSummaryCard
@@ -385,7 +377,7 @@ function SalarioLiquidoCalculator() {
         secondaryValue={
           result.nonTaxableBenefits > 0
             ? formatBRL(result.totalMonthlyIncome)
-            : `${result.effectiveIrpfRate.toFixed(2)}%`
+            : `${result.effectiveIrpfRate.toFixed(2).replace(".", ",")}%`
         }
         secondaryLabel={
           result.nonTaxableBenefits > 0
@@ -422,11 +414,7 @@ function SalarioLiquidoCalculator() {
           {
             label: "Desconto IRPF (retenção)",
             value: `- ${formatBRL(result.estimatedIrpfWithheld)}`,
-            subtext: `Alíquota efetiva: ${result.effectiveIrpfRate.toFixed(1)}%`,
-          },
-          {
-            label: "Desconto sindicato",
-            value: result.unionDue > 0 ? `- ${formatBRL(result.unionDue)}` : "R$ 0",
+            subtext: `Alíquota efetiva: ${result.effectiveIrpfRate.toFixed(1).replace(".", ",")}%`,
           },
           {
             label: "Desconto vale transporte",
@@ -440,6 +428,16 @@ function SalarioLiquidoCalculator() {
             value: formatBRL(result.monthlyNetSalary),
             isFinal: true,
           },
+          ...(result.unionDueInMarch > 0
+            ? [
+                {
+                  label: "Contribuição sindical (só em março)",
+                  value: `- ${formatBRL(result.unionDueInMarch)}`,
+                  subtext:
+                    "Um dia de salário, descontado uma vez por ano da folha de março (CLT, arts. 580 e 582).",
+                },
+              ]
+            : []),
           {
             label: "Benefícios não tributáveis (vale refeição)",
             value: formatBRL(result.nonTaxableBenefits),
