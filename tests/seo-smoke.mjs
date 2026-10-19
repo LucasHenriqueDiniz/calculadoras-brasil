@@ -261,6 +261,16 @@ try {
   );
   assert.ok(inssPage.includes("R$ 700,00"), "the R$ 3.500 row must show its 20% contribution");
 
+  // The PGBL table, with the R$ 120.000 row's saving at a full 12% contribution.
+  const pensionPage = textContent(
+    await (await fetch(`${BASE_URL}/calculadora-previdencia-complementar`)).text(),
+  ).replaceAll("\u00a0", " ");
+  assert.ok(
+    pensionPage.includes("Quanto um PGBL reduz o imposto de verdade"),
+    "the PGBL table must be prerendered",
+  );
+  assert.ok(pensionPage.includes("R$ 2.369,70"), "the R$ 120.000 row must show its saving");
+
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 
