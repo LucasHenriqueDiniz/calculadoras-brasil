@@ -3,6 +3,11 @@ export interface BlogPost {
   title: string;
   description: string;
   category: "guia" | "dica" | "educacao" | "noticia" | "analise";
+  /**
+   * Slug of the calculator this post explains. The blog index groups posts by
+   * it, which is what tells a reader why the post exists.
+   */
+  calculator: string;
   imageUrl: string;
   imageAlt: string;
   author: string;
@@ -19,6 +24,7 @@ export const blogPosts: Record<string, BlogPost> = {
     description:
       "10 dicas práticas para reduzir sua conta de luz. Descubra quais aparelhos consomem mais e quanto custa cada um.",
     category: "dica",
+    calculator: "conta-de-luz",
     imageUrl: "/blog/economia-luz.jpg",
     imageAlt: "Dicas para economizar energia",
     author: "Calcule Brasil",
@@ -69,6 +75,7 @@ export const blogPosts: Record<string, BlogPost> = {
     description:
       "Guia completo de custos com pets. Ração, veterinário, higiene, vacinas e seguro. Descubra o custo anual real de adotar.",
     category: "guia",
+    calculator: "custo-pet",
     imageUrl: "/blog/custo-pet.jpg",
     imageAlt: "Custo anual de cuidar de um pet",
     author: "Calcule Brasil",
@@ -115,6 +122,7 @@ export const blogPosts: Record<string, BlogPost> = {
     description:
       "Análise de quais assinaturas oferecem melhor custo-benefício. Streaming, software, academia e mais. Quanto você realmente gasta?",
     category: "analise",
+    calculator: "assinaturas",
     imageUrl: "/blog/assinaturas.jpg",
     imageAlt: "Análise de assinaturas que valem a pena",
     author: "Calcule Brasil",
@@ -165,6 +173,7 @@ export const blogPosts: Record<string, BlogPost> = {
     description:
       "Descubra deduções IRPF que muitos brasileiros esquecem: educação, saúde, previdência, dependentes e recibos que reduzem imposto legalmente.",
     category: "guia",
+    calculator: "irpf-2026",
     imageUrl: "/blog/deducoes-irpf.jpg",
     imageAlt: "Deduções do IRPF organizadas por categoria",
     author: "Calcule Brasil",
@@ -215,6 +224,7 @@ export const blogPosts: Record<string, BlogPost> = {
     title: "Contador é Necessário para PJ?",
     description: "Quando contratar contador como PJ, custo, e como economizar.",
     category: "dica",
+    calculator: "clt-vs-pj",
     imageUrl: "/blog/contador.jpg",
     imageAlt: "Contador e documentos contábeis",
     author: "Calcule Brasil",
@@ -261,6 +271,7 @@ export const blogPosts: Record<string, BlogPost> = {
     description:
       "Descubra quais gastos um autônomo pode descontar do IRPF: equipamentos, combustível, aluguel do espaço de trabalho, internet e comprovação exigida.",
     category: "guia",
+    calculator: "inss-autonomo",
     imageUrl: "/blog/despesas-dedutiveis-autonomo.jpg",
     imageAlt: "Autônomo organizando comprovantes de despesas dedutíveis",
     author: "Calcule Brasil",
@@ -312,6 +323,7 @@ export const blogPosts: Record<string, BlogPost> = {
     description:
       "Conheça investimentos que não pagam imposto de renda no Brasil: poupança, LCI, LCA e debêntures incentivadas, além de como o Tesouro Direto é tributado.",
     category: "guia",
+    calculator: "irpf-2026",
     imageUrl: "/blog/investimentos-isentos-irpf.jpg",
     imageAlt: "Investimentos isentos de imposto de renda",
     author: "Calcule Brasil",
@@ -361,14 +373,6 @@ export const blogPosts: Record<string, BlogPost> = {
 export function getBlogPost(slug: string): BlogPost | undefined {
   return blogPosts[slug];
 }
-
-export const blogCategoryLabels: Record<BlogPost["category"], string> = {
-  guia: "Guias",
-  analise: "Análises",
-  dica: "Dicas rápidas",
-  educacao: "Fundamentos",
-  noticia: "Notícias",
-};
 
 /** Every post, newest first. Drives the blog index, which is what keeps the posts linked. */
 export function listBlogPosts(): BlogPost[] {

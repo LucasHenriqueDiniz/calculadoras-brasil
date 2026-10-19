@@ -121,8 +121,7 @@ export function comparisonStructuredData({
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Início", item: absoluteUrl("/") },
-          { "@type": "ListItem", position: 2, name: "Comparações", item: absoluteUrl("/comparar") },
-          { "@type": "ListItem", position: 3, name, item: pageUrl },
+          { "@type": "ListItem", position: 2, name, item: pageUrl },
         ],
       }),
     },

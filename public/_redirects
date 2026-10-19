@@ -22,3 +22,6 @@
 /comparar/streaming /calculadora-assinaturas 301
 /comparar/academia /calculadora-assinaturas 301
 /comparar/mudanca /calculadora-custo-mudanca 301
+# /comparar listed a single comparison after the cut above: a hub with one child
+# is not a hub. See docs/plans/adsense-reapplication/slice-02-hubs.md.
+/comparar /comparar/energia 301

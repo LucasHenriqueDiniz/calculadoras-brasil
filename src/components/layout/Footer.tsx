@@ -6,7 +6,6 @@ const EMAIL = "lucas.hdo@hotmail.com";
 
 const institucional = [
   { to: "/calculadoras", label: "Calculadoras" },
-  { to: "/comparar", label: "Comparar" },
   { to: "/blog", label: "Blog" },
   { to: "/sobre", label: "Sobre" },
   { to: "/metodologia", label: "Metodologia" },

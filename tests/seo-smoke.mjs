@@ -30,7 +30,6 @@ const PUBLIC_ROUTES = [
   "/blog/investimentos-isentos-irpf",
   "/blog/despesas-dedutiveis-autonomo",
   "/blog/contador-necessario-pj",
-  "/comparar",
   "/comparar/energia",
   "/sobre",
   "/metodologia",
