@@ -63,7 +63,7 @@ export const SEO_PAGES = [
   },
   {
     path: "/calculadora-beneficios-fiscais",
-    lastmod: "2026-09-12",
+    lastmod: "2026-10-18",
     changefreq: "monthly",
     priority: 0.8,
   },

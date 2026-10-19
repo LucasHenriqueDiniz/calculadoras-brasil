@@ -1,5 +1,5 @@
 ---
-status: doing
+status: done
 ---
 
 # Slice 3 — Salário líquido: answer the competitor, then build what only this site can
@@ -107,6 +107,7 @@ calculation before writing anything**. Here, doing so found a defect in ours tha
 auditor row would have shown. Slice 4 starts with the same defect, already found in `cltVsPj.ts`,
 and with a note on `calculateIrpf`; both are recorded in its Needs.
 
-**Still to do:** the 8 typed checks again on the deployed preview of this branch's PR, as the
-Tests section asks. ⚠️ **Owner:** "Request indexing" for `/calculadora-salario-liquido` after the
+**Deployed preview, 2026-10-19** (branch preview of #19, commit `c2286b6`): the same 8 salaries
+typed into the form on the published preview gave the table's net to the centavo, **8 of 8**, with
+no console errors. ⚠️ **Owner:** "Request indexing" for `/calculadora-salario-liquido` after the
 merge.

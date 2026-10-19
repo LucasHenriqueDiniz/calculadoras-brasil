@@ -58,7 +58,10 @@ const ROUTE_KEYS: ReadonlyArray<readonly [string, string, string]> = [
   // v3: the PJ field became company costs, which shelter no tax under the
   // Simples (decision D6); a v2 form would hand it a deductible-expense figure.
   ["src/routes/calculadora-clt-vs-pj.tsx", "clt-vs-pj-input-v3", "clt-vs-pj-input-v2"],
-  ["src/routes/calculadora-beneficios-fiscais.tsx", "beneficios-input-v2", "beneficios-input"],
+  ["src/routes/calculadora-beneficios-fiscais.tsx", "beneficios-input-v3", "beneficios-input"],
+  // v3: the salary and the commute cost replaced a typed income-tax rate; a v2
+  // form would hand the module an undefined salary.
+  ["src/routes/calculadora-beneficios-fiscais.tsx", "beneficios-input-v3", "beneficios-input-v2"],
   [
     "src/routes/calculadora-previdencia-complementar.tsx",
     "previdencia-input-v3",

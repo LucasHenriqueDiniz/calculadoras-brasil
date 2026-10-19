@@ -1,5 +1,5 @@
 ---
-status: doing
+status: done
 ---
 
 # Slice 4 — The five tax calculators, on the pattern slice 3 proved
@@ -104,6 +104,7 @@ happens in slice 7, so nothing is gained by batching here.
 | smoothness | the PJ net never falls and never rises more than the raise, from R$ 1.000 to R$ 150.000 |
 | `test:seo` | 28 routes; the break-even table and the R$ 5.000 row prerendered |
 | both ends | 5 of 5 salaries typed into the form match the table; the break-even invoice reads "Empate técnico" |
+| deployed preview, 2026-10-19 | branch preview of #21 (`57cdadc`): the same 5 of 5, and "Empate técnico" at R$ 34.948,69 |
 
 ### IRPF 2026 — 2026-10-18
 
@@ -159,4 +160,22 @@ happens in slice 7, so nothing is gained by batching here.
   - `test:seo` asserts the table.
 - The `ARCHITECTURE.md` known gap on the hidden rate is resolved.
 
-Still open for this slice: benefícios fiscais.
+### Benefícios fiscais — 2026-10-18
+
+- **Defects, against Leis 7.418, 6.321 and 7.713 on Planalto:**
+  - the cash equivalent left out INSS, dividing by one minus a typed income-tax rate;
+  - the whole vale-transporte counted, though the worker pays up to 6% of the salary.
+- **Now:** salary and commute cost are inputs, with the storage key at v3. Only the employer's
+  share of the vale-transporte counts, and the equivalent raise is solved through
+  `calculateNetSalary`.
+- **New:** a 7-row table of what R$ 800 of meal benefit is worth in raise. At R$ 5.000 it is
+  R$ 1.662,99, +108%, because of the 2026 reduction's phase-out.
+- **Checked:**
+  - 2 mutants killed;
+  - the form shows R$ 1.662,99, and 220 / 180 for the vale-transporte split;
+  - `test:seo` asserts the table.
+
+**Slice 4 is done**: all five tax calculators, each read against its statute, with a computed
+table, form-against-table checks and mutants killed. Every one of them had at least one defect in
+its arithmetic. The deployed-preview checks for #21–#25 and the owner's "Request indexing" remain,
+as in the other slices.
