@@ -104,6 +104,7 @@ happens in slice 7, so nothing is gained by batching here.
 | smoothness | the PJ net never falls and never rises more than the raise, from R$ 1.000 to R$ 150.000 |
 | `test:seo` | 28 routes; the break-even table and the R$ 5.000 row prerendered |
 | both ends | 5 of 5 salaries typed into the form match the table; the break-even invoice reads "Empate técnico" |
+| deployed preview, 2026-10-19 | branch preview of #21 (`57cdadc`): the same 5 of 5, and "Empate técnico" at R$ 34.948,69 |
 
 ### IRPF 2026 — 2026-10-18
 
