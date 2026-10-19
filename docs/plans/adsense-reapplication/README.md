@@ -15,7 +15,7 @@ them directly: re-crawling takes days to weeks, and that wait runs while slices 
 | 4 — tax calculators | the same, for IRPF, INSS autônomo, CLT vs PJ, previdência, benefícios | 5 answers written; each changed page passes slice 3's checks |
 | 5 — household calculators | the same, for carro, morar sozinho, luz, assinaturas, mudança, pet | 6 answers written; same checks |
 | 6 — close-out | owner rows, checklist, old pitch, `/metodologia`, `/sobre` | the five artefacts exist, and `/metodologia` measures without `ERR` |
-| 7 — gate and review | full inspection, full audit, D6, one review request | the AdSense API reports `GETTING_READY` |
+| 7 — gate and review | full inspection, full audit, D7, one review request | the AdSense API reports `GETTING_READY` |
 
 **Baseline, 2026-10-18** (`docs/research/2026-10-18-adsense-reapplication/measurements/`): 20 of
 51 public URLs indexed, 1 Soft 404, 7 unknown to Google, AdSense state `NEEDS_ATTENTION`.
