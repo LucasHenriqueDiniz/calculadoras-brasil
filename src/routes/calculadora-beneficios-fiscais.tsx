@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
-import { CurrencyInput, NumberInput } from "@/components/calculator/fields";
+import { CurrencyInput } from "@/components/calculator/fields";
 import { ResultSummaryCard, BreakdownTable, DisclaimerBox } from "@/components/calculator/results";
 import { FAQSection } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
@@ -9,18 +9,33 @@ import { RelatedPosts } from "@/components/calculator/RelatedPosts";
 import { relatedPostsFor } from "@/data/calculators";
 import { formatBRL } from "@/lib/format";
 import {
+  buildBenefitEquivalenceTable,
   calculateTaxFreeBenefits,
   type TaxFreeBenefitsInput,
 } from "@/lib/calculators/beneficiosFiscais";
+import { Prose } from "@/components/layout/PageShell";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
 
 const DEFAULTS: TaxFreeBenefitsInput = {
-  monthlyMealAllowance: 360,
-  monthlyTransportAllowance: 0,
-  estimatedIrpfRate: 15,
+  monthlyGrossSalary: 5000,
+  monthlyMealAllowance: 800,
+  monthlyTransportCost: 0,
 };
+
+/** The page's table: R$ 800 of meal benefit, at each salary. */
+const TABLE_BENEFIT = 800;
+const EQUIVALENCE_ROWS = buildBenefitEquivalenceTable(
+  [1621, 3000, 5000, 6500, 8000, 12_000, 20_000],
+  TABLE_BENEFIT,
+);
+
+const AT_5000 = EQUIVALENCE_ROWS.find((row) => row.monthlyGrossSalary === 5000);
+
+function percent(share: number): string {
+  return `${(share * 100).toFixed(0)}%`;
+}
 
 const DESCRIPTION =
   "Quanto valem de verdade vale-refeição, vale-alimentação e vale-transporte: veja o equivalente em salário bruto necessário para chegar ao mesmo líquido.";
@@ -73,7 +88,7 @@ export const Route = createFileRoute("/calculadora-beneficios-fiscais")({
 
 function Calculator() {
   const [input, setInput] = usePersistedState<TaxFreeBenefitsInput>(
-    "beneficios-input-v2",
+    "beneficios-input-v3",
     DEFAULTS,
   );
   const result = useMemo(() => calculateTaxFreeBenefits(input), [input]);
@@ -83,38 +98,33 @@ function Calculator() {
       title="Calculadora Benefícios Fiscais"
       description="Simule economia com vale refeição, transporte e outros benefícios"
     >
-      <FormSection title="Benefícios" description="Valores que você recebe">
+      <FormSection title="Salário e benefícios" description="Valores mensais">
         <CurrencyInput
-          label="Vale refeição mensal"
+          label="Salário bruto mensal"
+          value={input.monthlyGrossSalary}
+          onChange={(v) => setInput({ ...input, monthlyGrossSalary: v })}
+          hint="Define os 6% do vale-transporte e quanto um aumento pagaria de INSS e IR"
+        />
+        <CurrencyInput
+          label="Vale-refeição ou vale-alimentação mensal"
           value={input.monthlyMealAllowance}
           onChange={(v) => setInput({ ...input, monthlyMealAllowance: v })}
-          hint="Informe o valor que consta no seu holerite"
+          hint="O valor que a empresa credita no cartão por mês"
         />
         <CurrencyInput
-          label="Vale transporte mensal"
-          value={input.monthlyTransportAllowance}
-          onChange={(v) => setInput({ ...input, monthlyTransportAllowance: v })}
-          hint="A empresa pode descontar até 6% do salário-base a esse título"
-        />
-      </FormSection>
-
-      <FormSection title="Imposto" description="Sua alíquota IRPF estimada">
-        <NumberInput
-          label="Alíquota IRPF (%)"
-          value={input.estimatedIrpfRate}
-          onChange={(v) => setInput({ ...input, estimatedIrpfRate: v })}
-          min={0}
-          max={27.5}
-          hint="Alíquota marginal do seu IRPF"
+          label="Custo mensal do transporte público até o trabalho"
+          value={input.monthlyTransportCost}
+          onChange={(v) => setInput({ ...input, monthlyTransportCost: v })}
+          hint="O total das passagens do mês, antes do vale-transporte"
         />
       </FormSection>
 
       <ResultSummaryCard
-        title="Economia Fiscal"
-        mainValue={formatBRL(result.monthlyIrpfSaving)}
-        mainLabel="Economia IRPF mensal"
-        secondaryValue={formatBRL(result.annualIrpfSaving)}
-        secondaryLabel="Economia IRPF anual"
+        title="Quanto os benefícios valem em salário"
+        mainValue={formatBRL(result.equivalentGrossRaise)}
+        mainLabel="De aumento bruto para ter o mesmo dinheiro"
+        secondaryValue={formatBRL(result.monthlyBenefitTotal)}
+        secondaryLabel="Valor dos benefícios por mês, sem desconto"
         resultColor="positive"
       />
 
@@ -122,51 +132,111 @@ function Calculator() {
         title="Detalhes"
         items={[
           {
-            label: "Vale refeição mensal",
+            label: "Vale-refeição ou alimentação",
             value: formatBRL(result.monthlyMealAllowance),
-            subtext: "Não tributável",
+            subtext: "Sem INSS nem imposto de renda",
           },
           {
-            label: "Vale transporte mensal",
-            value: formatBRL(result.monthlyTransportAllowance),
-            subtext: "Não tributável",
+            label: "Vale-transporte: parte da empresa",
+            value: formatBRL(result.transportEmployerShare),
+            subtext: `Você paga ${formatBRL(result.transportEmployeeShare)}, até 6% do salário`,
           },
           {
-            label: "Total de benefícios",
+            label: "Total que os benefícios valem",
             value: formatBRL(result.monthlyBenefitTotal),
+            subtext: `${formatBRL(result.annualBenefitTotal)} por ano`,
           },
           {
-            label: "Economia de IRPF mensal",
-            value: formatBRL(result.monthlyIrpfSaving),
-            subtext: "Se recebesse em dinheiro, pagaria IRPF",
+            label: "INSS e IR que um aumento pagaria",
+            value: formatBRL(result.taxesOnEquivalentRaise),
+            subtext: "Na sua faixa de salário",
           },
           {
-            label: "Economia de IRPF anual",
-            value: formatBRL(result.annualIrpfSaving),
+            label: "Aumento bruto equivalente",
+            value: formatBRL(result.equivalentGrossRaise),
+            subtext: "Quanto o salário teria de subir para sobrar o mesmo",
             isFinal: true,
-          },
-          {
-            label: "Salário bruto necessário para igualar",
-            value: formatBRL(result.comparison.asCash),
-            subtext: "Quanto teria que receber a mais em salário para ter o mesmo em líquido",
           },
         ]}
       />
 
       <DisclaimerBox>
         <p>
-          A estimativa considera que os benefícios informados são concedidos nas condições que
-          afastam a incidência de INSS e IRPF. Regras específicas de convenção coletiva, benefícios
-          pagos em dinheiro e situações em que a verba é considerada de natureza salarial podem
-          mudar o resultado. Trata-se de conteúdo educativo, não de orientação tributária
-          individual.
+          A estimativa considera que os benefícios são concedidos nas condições que afastam INSS e
+          imposto de renda: o vale-refeição dentro do Programa de Alimentação do Trabalhador (Lei
+          6.321/1976) e o vale-transporte pela Lei 7.418/1985. O aumento equivalente é calculado
+          pela calculadora de salário líquido, sem dependentes. Regras específicas de convenção
+          coletiva, benefícios pagos em dinheiro e situações em que a verba é considerada de
+          natureza salarial podem mudar o resultado. Trata-se de conteúdo educativo, não de
+          orientação tributária individual.
         </p>
       </DisclaimerBox>
+
+      <EquivalenceSection />
 
       <FAQSection items={FAQ} />
 
       <RelatedCalculators excludeSlug="beneficios-fiscais" />
       <RelatedPosts slugs={relatedPostsFor("beneficios-fiscais")} />
     </CalculatorLayout>
+  );
+}
+
+function EquivalenceSection() {
+  return (
+    <Prose>
+      <h2>Quanto aumento vale um vale-refeição, em cada salário</h2>
+      <p>
+        A tabela abaixo foi calculada pela própria calculadora para {formatBRL(TABLE_BENEFIT)} por
+        mês de vale-refeição. A coluna do aumento mostra quanto o salário bruto teria de subir para
+        sobrar a mesma quantia depois do INSS e do imposto de renda.
+      </p>
+      <div className="not-prose overflow-x-auto rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]">
+        <table className="w-full min-w-[520px] text-sm">
+          <caption className="sr-only">
+            Aumento bruto equivalente a R$ 800 de vale-refeição, por salário, em 2026
+          </caption>
+          <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th scope="col" className="px-3 py-2.5">
+                Salário bruto
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Benefício
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Aumento equivalente
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                A mais que o benefício
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {EQUIVALENCE_ROWS.map((row) => (
+              <tr key={row.monthlyGrossSalary} className="border-t border-border/70">
+                <th scope="row" className="px-3 py-2 text-left font-medium text-foreground">
+                  {formatBRL(row.monthlyGrossSalary)}
+                </th>
+                <td className="px-3 py-2 text-right">{formatBRL(row.monthlyBenefitTotal)}</td>
+                <td className="px-3 py-2 text-right font-semibold text-foreground">
+                  {formatBRL(row.equivalentGrossRaise)}
+                </td>
+                <td className="px-3 py-2 text-right">{percent(row.premium)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        A diferença depende da faixa. Até cerca de R$ 5.000, a redução de 2026 isenta o salário do
+        imposto de renda, e o aumento só paga INSS. Logo acima, cada real de aumento paga INSS e
+        imposto de renda e ainda encolhe a redução de 2026, que vai sumindo até R$ 7.350. Por isso,
+        para quem ganha {formatBRL(AT_5000?.monthlyGrossSalary ?? 5000)}, {formatBRL(TABLE_BENEFIT)}
+        de vale-refeição valem {formatBRL(AT_5000?.equivalentGrossRaise ?? 0)} de aumento. Acima do
+        teto do INSS, só o imposto de renda incide. Em contrapartida, salário maior aumenta também o
+        FGTS, o 13º e as férias, o que o benefício não faz.
+      </p>
+    </Prose>
   );
 }

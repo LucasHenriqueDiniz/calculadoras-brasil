@@ -38,7 +38,8 @@ Measured against claimed is marked in every row.
 | IRPF 2026 | calculadora irpf 2026 | receita.fazenda.gov.br (official simulator) | see below | **built** (slice 4) |
 | INSS autônomo | calculadora inss autônomo | meutudo.com.br | see below | **built** (slice 4) |
 | Previdência complementar | calculadora previdência privada pgbl | portal.icatuseguros.com.br | see below | **built** (slice 4) |
-| the other 7 | — | — | — | slices 4–5 |
+| Benefícios fiscais | — (no SERP read; the defects were in the arithmetic) | — | see below | **built** (slice 4) |
+| the 6 household calculators | — | — | — | slice 5 |
 
 ## Salário líquido
 
@@ -208,6 +209,30 @@ At R$ 120.000 with R$ 1.000 a month, the page said R$ 2.700. The real saving is 
 | the saving from the visitor's income: tax on the better return without the PGBL, less with it | yes | hand case R$ 1.709,70, matched in the form; returning to contribution × rate turns 3 tests red |
 | **what a 12% PGBL returns this year, by income** | table: 0% to R$ 60.000, 6,0% at R$ 72.000, 24,2% at R$ 400.000 | built by the IRPF calculator; `test:seo` asserts the R$ 120.000 row |
 | no unsourced "historical average 8–10%" hint | removed | page |
+
+## Benefícios fiscais
+
+No competitor was read for this one: the defects were in its own arithmetic, read against three
+laws on Planalto (`fetches/planalto-beneficios.md`).
+
+- **Before:**
+  - the cash equivalent was the benefit divided by one minus an income-tax rate the visitor typed,
+    with no INSS at all, although the page's own FAQ said benefits escape both;
+  - the whole vale-transporte counted as benefit, although the worker pays up to 6% of the salary
+    towards it.
+- **Now:**
+  - the salary and the commute cost are inputs;
+  - the vale-transporte counts only the employer's share above 6%;
+  - the equivalent raise is the smallest gross raise whose extra net, by `calculateNetSalary`,
+    reaches the benefit.
+- **Found by it:** for someone earning R$ 5.000, R$ 800 of meal benefit is worth **R$ 1.662,99** of
+  raise (+108%). Just above R$ 5.000 a raise pays INSS and income tax and shrinks the 2026
+  reduction at once. Checked by hand: the net rises by exactly R$ 800,00.
+- **Verified:**
+  - two hand cases, R$ 1.103,45 at R$ 20.000 and R$ 320,77–78 at R$ 8.000;
+  - 2 mutants killed;
+  - the form matches the table;
+  - `test:seo` asserts the table.
 
 ## What this does not establish
 

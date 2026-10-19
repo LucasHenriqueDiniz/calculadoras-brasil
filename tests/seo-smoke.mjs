@@ -271,6 +271,17 @@ try {
   );
   assert.ok(pensionPage.includes("R$ 2.369,70"), "the R$ 120.000 row must show its saving");
 
+  // The benefits table: R$ 800 of meal benefit at R$ 20.000 is a R$ 1.103,45 raise
+  // (800 / 0,725), the hand case in tests/calculators/beneficios-fiscais.test.ts.
+  const benefitsPage = textContent(
+    await (await fetch(`${BASE_URL}/calculadora-beneficios-fiscais`)).text(),
+  ).replaceAll("\u00a0", " ");
+  assert.ok(
+    benefitsPage.includes("Quanto aumento vale um vale-refeição"),
+    "the benefits table must be prerendered",
+  );
+  assert.ok(benefitsPage.includes("R$ 1.103,45"), "the R$ 20.000 row must show its raise");
+
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 
