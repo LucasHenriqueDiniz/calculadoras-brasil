@@ -567,7 +567,9 @@ describe("calculateCltVsPj — the PJ side, a Simples Nacional company (D6)", ()
    * statute's 10% on the whole distribution is a cliff for any fixed pró-labore,
    * and the `dividendThreshold` strategy is what keeps it out of the net.
    */
-  it("moves smoothly across the whole range the model covers", () => {
+  // 149.000 invoices, a real apart: the sweep is the point, so it gets its own
+  // budget. It ran 5,0–5,2 s on a loaded machine and failed Vitest's default 5 s.
+  it("moves smoothly across the whole range the model covers", { timeout: 30_000 }, () => {
     expect(
       firstNonSmoothPoint((monthlyPjOffer) => compare({ monthlyPjOffer }).pjNet, 1_000, 150_000, 1),
     ).toBeUndefined();
