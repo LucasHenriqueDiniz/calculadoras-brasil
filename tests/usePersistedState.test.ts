@@ -61,8 +61,15 @@ const ROUTE_KEYS: ReadonlyArray<readonly [string, string, string]> = [
   ["src/routes/calculadora-beneficios-fiscais.tsx", "beneficios-input-v2", "beneficios-input"],
   [
     "src/routes/calculadora-previdencia-complementar.tsx",
-    "previdencia-input-v2",
+    "previdencia-input-v3",
     "previdencia-input",
+  ],
+  // v3: grossAnnualIncome replaced the fixed marginal rate; a v2 form would hand
+  // the module an undefined income.
+  [
+    "src/routes/calculadora-previdencia-complementar.tsx",
+    "previdencia-input-v3",
+    "previdencia-input-v2",
   ],
 ];
 

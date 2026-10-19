@@ -37,7 +37,8 @@ Measured against claimed is marked in every row.
 | CLT vs PJ | calculadora clt vs pj | nagringa.dev | see below | **built** (slice 4) |
 | IRPF 2026 | calculadora irpf 2026 | receita.fazenda.gov.br (official simulator) | see below | **built** (slice 4) |
 | INSS autônomo | calculadora inss autônomo | meutudo.com.br | see below | **built** (slice 4) |
-| the other 8 | — | — | — | slices 4–5 |
+| Previdência complementar | calculadora previdência privada pgbl | portal.icatuseguros.com.br | see below | **built** (slice 4) |
+| the other 7 | — | — | — | slices 4–5 |
 
 ## Salário líquido
 
@@ -181,6 +182,32 @@ gov.br's GPS page):
 | **EC 103's minimum by affiliation date: art. 18 against art. 19** | yes, a field | no | form: a man with 15 years reaches it before the reform and lacks 5 years after it; 2 mutants killed |
 | **what the 20% plan costs more, and what it pays more, across five incomes** | table built by the calculator | no | R$ 3.500 at 30 years: R$ 2.800,00 in the table and in the form |
 | 2026 values | yes | 2025 and 2024 tables | page |
+
+## Previdência complementar
+
+### What the leader does (measured, partly)
+
+Icatu Seguros' "Simulador Meu IR" ranks first; Grão, XP, Caixa, Brasilprev and BTG follow. Its
+calculator renders in JavaScript and none of its working was readable. It is an insurer's tool,
+built to sell a contribution. The tools around it ask for an income.
+
+### What ours did before today (measured)
+
+The "economia de IRPF" was the contribution times a 22,5% rate the visitor could neither see nor
+set. It ignored three things:
+- the deduction exists only in the complete return;
+- it stops at 12% of income;
+- it first has to overtake the simplified discount.
+
+At R$ 120.000 with R$ 1.000 a month, the page said R$ 2.700. The real saving is R$ 1.709,70.
+
+### What ours does now
+
+| | ours | how verified |
+|---|---|---|
+| the saving from the visitor's income: tax on the better return without the PGBL, less with it | yes | hand case R$ 1.709,70, matched in the form; returning to contribution × rate turns 3 tests red |
+| **what a 12% PGBL returns this year, by income** | table: 0% to R$ 60.000, 6,0% at R$ 72.000, 24,2% at R$ 400.000 | built by the IRPF calculator; `test:seo` asserts the R$ 120.000 row |
+| no unsourced "historical average 8–10%" hint | removed | page |
 
 ## What this does not establish
 

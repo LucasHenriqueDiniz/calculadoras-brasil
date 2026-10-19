@@ -143,4 +143,20 @@ happens in slice 7, so nothing is gained by batching here.
   - a man with 15 years reaches the minimum before the reform and lacks 5 after it;
   - `test:seo` asserts the table.
 
-Still open for this slice: previdência complementar and benefícios fiscais.
+### Previdência complementar — 2026-10-18
+
+- **Leader:** an insurer's simulator (Icatu).
+- **Defect:** the IRPF saving was the contribution times a hidden, fixed 22,5%.
+- **Fix:** `pgblTaxSaving` computes the better-return tax without and with the PGBL through
+  `compareIrpfRegimes`, which caps the deduction at 12%. The visitor gives an income, and the
+  storage key moves to v3.
+- **Hand case:** R$ 120.000 with R$ 12.000 saves R$ 1.709,70, not the R$ 2.700 the page showed.
+- **New:** a 7-row table of what a 12% PGBL returns by income (0% to 24,2%). The unsourced
+  "histórico médio 8-10%" hint is gone.
+- **Checked:**
+  - 1 mutant killed;
+  - the form shows R$ 1.709,70;
+  - `test:seo` asserts the table.
+- The `ARCHITECTURE.md` known gap on the hidden rate is resolved.
+
+Still open for this slice: benefícios fiscais.

@@ -9,9 +9,11 @@ import { RelatedPosts } from "@/components/calculator/RelatedPosts";
 import { relatedPostsFor } from "@/data/calculators";
 import { formatBRL } from "@/lib/format";
 import {
+  buildPgblSavingTable,
   calculateSupplementaryPension,
   type SupplementaryPensionInput,
 } from "@/lib/calculators/previdenciaComplementar";
+import { Prose } from "@/components/layout/PageShell";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
@@ -20,8 +22,16 @@ const DEFAULTS: SupplementaryPensionInput = {
   monthlyPgblContribution: 1000,
   annualReturnRate: 8,
   yearsToRetirement: 20,
-  currentIrpfRate: 22.5,
+  grossAnnualIncome: 120_000,
 };
+
+const SAVING_ROWS = buildPgblSavingTable([
+  60_000, 72_000, 90_000, 120_000, 180_000, 240_000, 400_000,
+]);
+
+function percent(share: number): string {
+  return `${(share * 100).toFixed(1).replace(".", ",")}%`;
+}
 
 const DESCRIPTION =
   "Simule contribuições em PGBL ou VGBL: projeção de saldo em 10, 20 e 30 anos, efeito da dedução no IRPF e diferença entre as tabelas de tributação progressiva e regressiva.";
@@ -79,7 +89,7 @@ export const Route = createFileRoute("/calculadora-previdencia-complementar")({
 
 function Calculator() {
   const [input, setInput] = usePersistedState<SupplementaryPensionInput>(
-    "previdencia-input-v2",
+    "previdencia-input-v3",
     DEFAULTS,
   );
   const result = useMemo(() => calculateSupplementaryPension(input), [input]);
@@ -96,6 +106,12 @@ function Calculator() {
           onChange={(v) => setInput({ ...input, monthlyPgblContribution: v })}
           hint="A dedução do PGBL é limitada a 12% da renda bruta anual tributável"
         />
+        <CurrencyInput
+          label="Renda bruta anual tributável"
+          value={input.grossAnnualIncome}
+          onChange={(v) => setInput({ ...input, grossAnnualIncome: v })}
+          hint="Define o limite de 12% e quanto imposto a dedução economiza"
+        />
       </FormSection>
 
       <FormSection title="Projeção" description="Taxa de retorno e tempo até aposentadoria">
@@ -105,7 +121,7 @@ function Calculator() {
           onChange={(v) => setInput({ ...input, annualReturnRate: v })}
           min={0}
           max={20}
-          hint="Histórico médio: 8-10% a.a."
+          hint="Use uma taxa líquida de taxas e realista para o seu plano"
         />
         <NumberInput
           label="Anos até aposentadoria"
@@ -122,7 +138,7 @@ function Calculator() {
         mainValue={formatBRL(result.balanceAtHorizon)}
         mainLabel={`em ${input.yearsToRetirement} anos`}
         secondaryValue={formatBRL(result.annualIrpfSaving)}
-        secondaryLabel="Economia IRPF/ano"
+        secondaryLabel="Imposto a menos no ano com o PGBL"
         resultColor="positive"
       />
 
@@ -138,9 +154,24 @@ function Calculator() {
             value: formatBRL(result.annualPgblContribution),
           },
           {
-            label: "Economia IRPF mensal",
-            value: formatBRL(result.monthlyIrpfSaving),
-            subtext: "Desconto sobre sua contribuição",
+            label: "Parte dedutível da contribuição",
+            value: formatBRL(result.deductibleAnnualContribution),
+            subtext: "Até 12% da renda, só na declaração completa",
+          },
+          {
+            label: "IRPF do ano sem o PGBL",
+            value: formatBRL(result.taxWithoutPgbl),
+            subtext: "Na declaração mais vantajosa",
+          },
+          {
+            label: "IRPF do ano com o PGBL",
+            value: formatBRL(result.taxWithPgbl),
+            subtext: `Na declaração ${result.regimeWithPgbl === "legal" ? "completa" : "simplificada"}`,
+          },
+          {
+            label: "Imposto a menos no ano",
+            value: formatBRL(result.annualIrpfSaving),
+            subtext: "Adiado para o resgate, não eliminado",
           },
           {
             label: "Saldo em 10 anos",
@@ -174,10 +205,78 @@ function Calculator() {
         </p>
       </DisclaimerBox>
 
+      <PgblSavingSection />
+
       <FAQSection items={FAQ} />
 
       <RelatedCalculators excludeSlug="previdencia-complementar" />
       <RelatedPosts slugs={relatedPostsFor("previdencia-complementar")} />
     </CalculatorLayout>
+  );
+}
+
+function PgblSavingSection() {
+  return (
+    <Prose>
+      <h2>Quanto um PGBL reduz o imposto de verdade</h2>
+      <p>
+        É comum ouvir que o PGBL devolve 27,5% do que você aplica. Isso só vale para rendas altas, e
+        só depois de a declaração completa passar o desconto simplificado. A tabela abaixo foi
+        calculada pela calculadora de IRPF do próprio site, com um aporte no limite de 12% da renda,
+        sem dependentes nem outras deduções.
+      </p>
+      <div className="not-prose overflow-x-auto rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]">
+        <table className="w-full min-w-[640px] text-sm">
+          <caption className="sr-only">
+            Economia de IRPF com um PGBL de 12% da renda, por renda anual, em 2026
+          </caption>
+          <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th scope="col" className="px-3 py-2.5">
+                Renda anual
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Aporte de 12%
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                IR sem PGBL
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                IR com PGBL
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Imposto a menos
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Volta do aporte
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {SAVING_ROWS.map((row) => (
+              <tr key={row.grossAnnualIncome} className="border-t border-border/70">
+                <th scope="row" className="px-3 py-2 text-left font-medium text-foreground">
+                  {formatBRL(row.grossAnnualIncome)}
+                </th>
+                <td className="px-3 py-2 text-right">{formatBRL(row.annualContribution)}</td>
+                <td className="px-3 py-2 text-right">{formatBRL(row.taxWithout)}</td>
+                <td className="px-3 py-2 text-right">{formatBRL(row.taxWith)}</td>
+                <td className="px-3 py-2 text-right font-semibold text-foreground">
+                  {formatBRL(row.saving)}
+                </td>
+                <td className="px-3 py-2 text-right">{percent(row.savingShare)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        A coluna "Volta do aporte" é o imposto a menos dividido pelo aporte. Ela fica abaixo de
+        27,5% porque, sem o PGBL, a declaração simplificada já desconta até R$ 17.640 da renda: o
+        PGBL só reduz imposto na parte em que leva as deduções da completa além desse valor. Até R$
+        60 mil por ano, a redução da Lei 15.270/2025 já zera o imposto e o PGBL não economiza nada.
+        O valor deduzido volta a ser tributado no resgate: é imposto adiado, não eliminado.
+      </p>
+    </Prose>
   );
 }

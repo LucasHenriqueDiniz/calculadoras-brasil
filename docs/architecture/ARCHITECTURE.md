@@ -420,7 +420,9 @@ The violations that exist right now.
       2026-10-18: the CLT vs PJ details, the dependants input and the salary breakdown are now
       rendered, and `regimeSimplificado` is gone, because the law picks the route and the module
       now does too.
-- [ ] **`previdenciaComplementar` headlines a saving from a rate the visitor cannot set.**
+- [x] **`previdenciaComplementar` headlines a saving from a rate the visitor cannot set.** ✅ Resolved
+      2026-10-18: the visitor gives an income, and the saving is the IRPF calculator's own tax
+      without the PGBL less the tax with it, on the better return each time.
       `aliquotaIrpfAtual` is hardcoded at 22,5% with no control, yet "Economia IRPF/ano" is shown
       as though it were the visitor's own figure.
 - [ ] **`nextId()` draws ids from `Date.now()` at module scope**, in

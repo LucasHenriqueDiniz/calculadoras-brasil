@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildPgblSavingTable,
   calculateSupplementaryPension,
   type SupplementaryPensionInput,
   type SupplementaryPensionResult,
@@ -16,7 +17,7 @@ const BASELINE: SupplementaryPensionInput = {
   monthlyPgblContribution: 1_000,
   annualReturnRate: 8,
   yearsToRetirement: 10,
-  currentIrpfRate: 27.5,
+  grossAnnualIncome: 120_000,
 };
 
 function project(overrides: Partial<SupplementaryPensionInput> = {}): SupplementaryPensionResult {
@@ -258,39 +259,76 @@ describe("calculateSupplementaryPension — the year-by-year projection", () => 
   });
 });
 
-describe("calculateSupplementaryPension — the IRPF deduction", () => {
-  it("deducts nothing in the exempt band", () => {
-    expect(project({ currentIrpfRate: 0 }).monthlyIrpfSaving).toBe(0);
-    expect(project({ currentIrpfRate: 0 }).annualIrpfSaving).toBe(0);
+describe("calculateSupplementaryPension — the IRPF deduction, from the visitor's income", () => {
+  /** Up to R$ 60.000 the 2026 reduction already zeroes the tax: there is nothing to defer. */
+  it("saves nothing where the tax is already zero", () => {
+    const result = project({ grossAnnualIncome: 60_000 });
+
+    expect(result.taxWithoutPgbl).toBe(0);
+    expect(result.annualIrpfSaving).toBe(0);
   });
 
   /**
-   * Hand-worked from the top marginal rate: R$ 1.000 deducted at 27,5% defers
-   * R$ 275 of IRPF a month, R$ 3.300 a year.
+   * By hand, R$ 120.000 with R$ 12.000 of PGBL: without it, the simplified return
+   * wins (R$ 17.640 against R$ 11.857,10 of INSS) and owes 102.360 × 27,5% −
+   * 10.904,66 = 17.244,34. With it, the complete return deducts 11.857,10 +
+   * 12.000 and owes 96.142,90 × 27,5% − 10.904,66 = 15.534,64. The saving is
+   * R$ 1.709,70 — the PGBL only pays where it takes the deductions past the
+   * simplified discount, so it is NOT 12.000 × 27,5% = R$ 3.300.
    */
-  it("defers the marginal rate on the contribution", () => {
-    const result = project({ currentIrpfRate: 27.5 });
+  it("saves the difference between the better returns, not contribution × rate", () => {
+    const result = project({ grossAnnualIncome: 120_000, monthlyPgblContribution: 1_000 });
 
-    expect(result.monthlyIrpfSaving).toBeCloseTo(275, 2);
-    expect(result.annualIrpfSaving).toBeCloseTo(3_300, 2);
+    expect(result.taxWithoutPgbl).toBeCloseTo(17244.34, 2);
+    expect(result.taxWithPgbl).toBeCloseTo(15534.64, 2);
+    expect(result.regimeWithPgbl).toBe("legal");
+    expect(result.annualIrpfSaving).toBeCloseTo(1709.7, 2);
+    expect(result.monthlyIrpfSaving).toBeCloseTo(result.annualIrpfSaving / 12, 10);
   });
 
-  it.each([0, 7.5, 15, 22.5, 27.5])(
-    "never defers more tax than the contribution itself at %i%%",
-    (currentIrpfRate) => {
-      const result = project({ currentIrpfRate });
+  it("deducts at most 12% of income", () => {
+    const result = project({ grossAnnualIncome: 100_000, monthlyPgblContribution: 2_000 });
 
-      expect(result.monthlyIrpfSaving).toBeGreaterThanOrEqual(0);
-      expect(result.monthlyIrpfSaving).toBeLessThanOrEqual(result.monthlyPgblContribution);
-      expect(result.annualIrpfSaving).toBeCloseTo(result.monthlyIrpfSaving * 12, 6);
+    expect(result.deductibleAnnualContribution).toBeCloseTo(12_000, 6);
+  });
+
+  it.each([30_000, 90_000, 150_000, 400_000])(
+    "never saves more than 27,5%% of the deductible part at %i",
+    (grossAnnualIncome) => {
+      const result = project({ grossAnnualIncome, monthlyPgblContribution: 3_000 });
+
+      expect(result.annualIrpfSaving).toBeGreaterThanOrEqual(0);
+      expect(result.annualIrpfSaving).toBeLessThanOrEqual(
+        result.deductibleAnnualContribution * 0.275 + 1e-6,
+      );
     },
   );
 
   it("leaves the projected balance untouched — the deduction is a separate pot", () => {
-    const exempt = project({ currentIrpfRate: 0 });
-    const topRate = project({ currentIrpfRate: 27.5 });
+    const low = project({ grossAnnualIncome: 40_000 });
+    const high = project({ grossAnnualIncome: 300_000 });
 
-    expect(topRate.balanceAtHorizon).toBe(exempt.balanceAtHorizon);
+    expect(high.balanceAtHorizon).toBe(low.balanceAtHorizon);
+  });
+});
+
+describe("buildPgblSavingTable — a PGBL at the full 12%", () => {
+  it("is the form's own saving on every row", () => {
+    for (const row of buildPgblSavingTable([90_000, 120_000, 240_000])) {
+      const form = project({
+        grossAnnualIncome: row.grossAnnualIncome,
+        monthlyPgblContribution: row.annualContribution / 12,
+      });
+      expect(row.saving).toBeCloseTo(form.annualIrpfSaving, 6);
+    }
+  });
+
+  /** Far above the simplified cap, the whole 12% sits in the top bracket: 27,5% of it. */
+  it("returns 27,5% of the contribution at a high income", () => {
+    const [row] = buildPgblSavingTable([400_000]);
+
+    expect(row.savingShare).toBeGreaterThan(0.2);
+    expect(row.savingShare).toBeLessThanOrEqual(0.275 + 1e-9);
   });
 });
 

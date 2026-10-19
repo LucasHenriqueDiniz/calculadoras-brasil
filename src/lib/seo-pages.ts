@@ -57,7 +57,7 @@ export const SEO_PAGES = [
   { path: "/calculadora-clt-vs-pj", lastmod: "2026-10-18", changefreq: "monthly", priority: 0.9 },
   {
     path: "/calculadora-previdencia-complementar",
-    lastmod: "2026-09-12",
+    lastmod: "2026-10-18",
     changefreq: "monthly",
     priority: 0.85,
   },
