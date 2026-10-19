@@ -140,6 +140,19 @@ try {
       `${path} must have an absolute canonical`,
     );
 
+    // adsbygoogle.js run from the server HTML can append its <ins> inside the page markup before
+    // React hydrates it, and hydration fails; the root route adds it after hydration instead.
+    // What Google's crawler reads in the HTML is the account meta tag.
+    assert.ok(
+      !/<script\b[^>]*src=["'][^"']*adsbygoogle\.js/i.test(html),
+      `${path} must not load adsbygoogle.js from the server HTML`,
+    );
+    assert.equal(
+      readAttribute(html, /<meta\b[^>]*name=["']google-adsense-account["'][^>]*>/i, "content"),
+      "ca-pub-2600827684802809",
+      `${path} must declare the AdSense account in the server HTML`,
+    );
+
     internalLinks.set(
       path,
       new Set(
