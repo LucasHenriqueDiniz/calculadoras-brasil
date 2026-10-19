@@ -362,6 +362,20 @@ try {
     "500 km on two axles must show R$ 2.488,74",
   );
 
+  // The feeding table: eight pets, the 10 kg adult dog at 177 g a day.
+  const petHtml = await (await fetch(`${BASE_URL}/calculadora-custo-pet`)).text();
+  const feedingTable = petHtml.slice(
+    petHtml.indexOf("Quanto ração um cão ou um gato come por mês"),
+  );
+  const feedingRows = feedingTable
+    .slice(0, feedingTable.indexOf("</table>"))
+    .match(/<th scope="row"/g);
+  assert.equal(feedingRows?.length, 8, "the feeding table must have its eight pets");
+  assert.ok(
+    textContent(petHtml).replaceAll("\u00a0", " ").includes("177 g"),
+    "the 10 kg adult dog must eat 177 g a day",
+  );
+
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 
