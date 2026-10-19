@@ -18,6 +18,22 @@ export function formatNumber(value: number, digits = 2): string {
   });
 }
 
+const longDateFormatter = new Intl.DateTimeFormat("pt-BR", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+/**
+ * An ISO calendar date ("2026-10-18") as a visitor reads it ("18 de outubro de
+ * 2026"). Read and formatted in UTC: at midnight UTC the date is already the
+ * previous day in Brasília, and a page revised on the 18th would say the 17th.
+ */
+export function formatLongDate(isoDate: string): string {
+  return longDateFormatter.format(new Date(`${isoDate}T00:00:00Z`));
+}
+
 /**
  * Parse a string with brazilian number format (1.234,56) or plain (1234.56)
  * into a finite number. Returns 0 for invalid input.
