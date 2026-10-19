@@ -1,15 +1,16 @@
 export const SITE_REVIEW_DATE = "2026-06-23";
-export const SITE_REVIEW_DATE_LABEL = "23 de junho de 2026";
 export const EDITORIAL_RESPONSIBLE = "Calcule Brasil";
 
 /**
  * `lastmod` is the date that page's own content last changed — not the
- * site-wide editorial review date above. A sitemap that stamps every URL with
+ * site-wide editorial review date above, which is only the fallback for a path
+ * missing from this list. A sitemap that stamps every URL with
  * the same date tells Google nothing, and Google answers by not re-crawling:
  * dating each page apart is what makes the signal usable.
  *
  * It is maintained by hand, so it has to move in the same commit that changes a
- * page. `lastmodFor` also feeds `dateModified` in the JSON-LD, and the SEO smoke
+ * page. `lastmodFor` also feeds `dateModified` in the JSON-LD and the "Revisado
+ * em" a calculator shows its visitors, and the SEO smoke
  * test fails when the two disagree — which is what catches a date left behind.
  */
 export const SEO_PAGES = [
@@ -29,7 +30,7 @@ export const SEO_PAGES = [
   },
   {
     path: "/calculadora-conta-de-luz",
-    lastmod: "2026-09-12",
+    lastmod: "2026-10-18",
     changefreq: "monthly",
     priority: 0.9,
   },

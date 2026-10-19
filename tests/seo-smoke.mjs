@@ -168,14 +168,25 @@ try {
       assert.ok(types.has("WebApplication"), `${path} must declare WebApplication`);
       assert.ok(types.has("BreadcrumbList"), `${path} must declare BreadcrumbList`);
       assert.ok(types.has("FAQPage"), `${path} must declare FAQPage`);
-      assert.match(html, /<time\b[^>]*datetime=["']2026-06-23["']/i);
+    }
+
+    // The "Revisado em" a calculator shows is its own lastmod, held to the
+    // sitemap with dateModified below.
+    const reviewedAt = [...html.matchAll(/<time\b[^>]*datetime=["']([^"']+)["']/gi)].map(
+      (m) => m[1],
+    );
+    if (CALCULATOR_ROUTES.has(path)) {
+      assert.ok(reviewedAt.length >= 1, `${path} must show when it was reviewed`);
     }
 
     // Collected for every route, not only the calculators: a page whose JSON-LD
     // contradicts its own sitemap entry is what teaches Google to ignore
     // `lastmod` altogether.
     dateModifiedByPath.set(path, [
-      ...new Set([...decodeHtml(html).matchAll(/"dateModified":"([^"]+)"/g)].map((m) => m[1])),
+      ...new Set([
+        ...[...decodeHtml(html).matchAll(/"dateModified":"([^"]+)"/g)].map((m) => m[1]),
+        ...reviewedAt,
+      ]),
     ]);
   }
 
@@ -192,7 +203,7 @@ try {
       assert.equal(
         dateModified,
         lastmodByUrl.get(`${CANONICAL_ORIGIN}${path}`),
-        `${path} must publish the same dateModified as its sitemap lastmod`,
+        `${path} must publish the same dateModified and "Revisado em" as its sitemap lastmod`,
       );
     }
   }
@@ -281,6 +292,16 @@ try {
     "the benefits table must be prerendered",
   );
   assert.ok(benefitsPage.includes("R$ 1.103,45"), "the R$ 20.000 row must show its raise");
+
+  // The appliance table, with the two-door refrigerator at Eletrobrás's 56,9 kWh.
+  const electricityPage = textContent(
+    await (await fetch(`${BASE_URL}/calculadora-conta-de-luz`)).text(),
+  ).replaceAll("\u00a0", " ");
+  assert.ok(
+    electricityPage.includes("Quanto cada aparelho gasta por mês"),
+    "the appliance table must be prerendered",
+  );
+  assert.ok(electricityPage.includes("56,9 kWh"), "the refrigerator row must show 56,9 kWh");
 
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");

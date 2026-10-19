@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
+import { useLocation } from "@tanstack/react-router";
 import { PageShell, PageHeader } from "@/components/layout/PageShell";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
-import { SITE_REVIEW_DATE, SITE_REVIEW_DATE_LABEL } from "@/lib/seo-pages";
+import { formatLongDate } from "@/lib/format";
+import { lastmodFor } from "@/lib/seo-pages";
 
 interface CalculatorLayoutProps {
   eyebrow?: string;
@@ -23,13 +25,18 @@ export function CalculatorLayout({
   result,
   children,
 }: CalculatorLayoutProps) {
+  // The page's own lastmod, the date its JSON-LD publishes as dateModified: one
+  // site-wide date here told visitors a page revised in October was last
+  // looked at in June.
+  const reviewedAt = lastmodFor(useLocation().pathname);
+
   return (
     <PageShell>
       <div className="border-b border-border bg-surface">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
           <Breadcrumbs items={[{ label: breadcrumbLabel ?? title }]} />
           <p className="text-xs text-muted-foreground">
-            Revisado em <time dateTime={SITE_REVIEW_DATE}>{SITE_REVIEW_DATE_LABEL}</time>
+            Revisado em <time dateTime={reviewedAt}>{formatLongDate(reviewedAt)}</time>
           </p>
         </div>
       </div>

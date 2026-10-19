@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { calculateCarCost } from "../src/lib/calculators/carCost";
 import { calculateLivingAloneCost } from "../src/lib/calculators/livingAlone";
-import { calculateElectricityBill } from "../src/lib/calculators/electricityBill";
+import {
+  APPLIANCE_PRESETS,
+  calculateApplianceConsumption,
+  calculateElectricityBill,
+} from "../src/lib/calculators/electricityBill";
 import { calculateSubscriptions } from "../src/lib/calculators/subscriptions";
 import { calculateMovingCost } from "../src/lib/calculators/movingCost";
 import { calculatePetCost } from "../src/lib/calculators/petCost";
@@ -164,6 +168,25 @@ describe("core calculators", () => {
     expect(result.monthlyFoodKg).toBe(6);
     expect(result.foodPackageDurationDays).toBe(50);
     expect(result.monthlyTotal).toBe(70);
+  });
+});
+
+describe("electricity presets — refrigerators at their average draw", () => {
+  /**
+   * Eletrobrás's monthly consumption for continuous use, as IDEC publishes it:
+   * 56,88 kWh (two-door frost-free), 39,6 kWh (one-door frost-free), 47,55 kWh
+   * (freezer). The presets must reproduce them within a tenth of a kWh; the
+   * compressor rating × 24 h they replaced gave 93,6 and 108.
+   */
+  it.each([
+    ["Geladeira duplex frost free", 56.88],
+    ["Geladeira 1 porta frost free", 39.6],
+    ["Freezer", 47.55],
+  ] as const)("puts the %s at Eletrobrás's %s kWh a month", (name, kwh) => {
+    const preset = APPLIANCE_PRESETS.find((p) => p.name === name);
+    expect(preset).toBeDefined();
+    const { kwhPerMonth } = calculateApplianceConsumption({ id: "x", quantity: 1, ...preset! });
+    expect(Math.abs(kwhPerMonth - kwh)).toBeLessThan(0.1);
   });
 });
 
