@@ -1,0 +1,62 @@
+Content depth (min 300 words)
+=============================
+
+[note] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/
+         - 445 words: borderline (300-449 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadoras
+         - 767 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-custo-carro
+         - 2195 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-morar-sozinho
+         - 2040 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-conta-de-luz
+         - 2170 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-assinaturas
+         - 1081 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-custo-mudanca
+         - 1348 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-custo-pet
+         - 1306 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-irpf-2026
+         - 1691 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-salario-liquido
+         - 1599 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-inss-autonomo
+         - 1352 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-clt-vs-pj
+         - 2066 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-previdencia-complementar
+         - 1116 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/calculadora-beneficios-fiscais
+         - 969 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog
+         - 486 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/como-economizar-conta-de-luz
+         - 456 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/custo-pet-anual
+         - 1029 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/assinaturas-que-valem-a-pena
+         - 479 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/deducoes-irpf-esqueca
+         - 604 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/investimentos-isentos-irpf
+         - 627 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/despesas-dedutiveis-autonomo
+         - 579 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/blog/contador-necessario-pj
+         - 604 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/comparar/energia
+         - 1282 words: at or above the configured bar (>= 450 words)
+[note] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/sobre
+         - 363 words: borderline (300-449 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/metodologia
+         - 1678 words: at or above the configured bar (>= 450 words)
+[PASS] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/privacidade
+         - 1096 words: at or above the configured bar (>= 450 words)
+[WARN] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/termos
+         - 180 words: below the configured threshold (300 words)
+[WARN] ADS-CONTENT-03 https://feat-adsense-closeout-calcule-brasil.lucas-hdo.workers.dev/contato
+         - 123 words: below the configured threshold (300 words)
+
+28 checks: PASS=24, note=2, WARN=2
+Verdict: worst status is WARNING. Not ready.

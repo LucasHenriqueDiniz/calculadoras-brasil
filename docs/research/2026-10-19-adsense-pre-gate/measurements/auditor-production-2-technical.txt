@@ -1,0 +1,17 @@
+Technical checks — https://calculebrasil.com
+============================================
+
+[PASS] ADS-CRAWL-01 reachable
+         - HTTP 200 in 33ms
+[note] ADS-CRAWL-06 availability
+         - TLS: served over HTTPS
+         - DNS: host calculebrasil.com resolved
+         - response time: 33ms for the whole chain
+         - uptime: not observed — one request cannot establish reliability over time. This quarter of ADS-CRAWL-06 needs monitoring, not an audit run
+[PASS] ADS-CRAWL-02 robots.txt
+         - Mediapartners-Google, Googlebot and AdsBot are all allowed at /
+[PASS] ADS-CRAWL-07 sitemap
+         - 5 of 5 sampled URL(s) answered 200
+
+4 checks: PASS=3, note=1
+Verdict: nothing failed, and some observations were recorded without being decided — see the note lines.
