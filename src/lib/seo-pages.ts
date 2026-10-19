@@ -18,7 +18,7 @@ export const SEO_PAGES = [
   { path: "/calculadoras", lastmod: "2026-10-18", changefreq: "monthly", priority: 0.8 },
   {
     path: "/calculadora-custo-carro",
-    lastmod: "2026-09-12",
+    lastmod: "2026-10-18",
     changefreq: "monthly",
     priority: 0.9,
   },

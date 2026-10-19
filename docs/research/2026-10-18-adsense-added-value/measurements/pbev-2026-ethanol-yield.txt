@@ -1,0 +1,7 @@
+flex rows parsed: 261
+cidade: median 0.6984 mean 0.6995 min 0.660 max 0.744  p10 0.686 p90 0.716
+estrada: median 0.7007 mean 0.7028 min 0.671 max 0.753  p10 0.689 p90 0.719
+combinado: median 0.7000 mean 0.7003 min 0.664 max 0.726  p10 0.690 p90 0.710
+share of rows with combined ratio <= 0.70: 125 / 261
+share with ratio in [0.68, 0.74]: 255
+distinct consumption tuples: 114 median combined over distinct: 0.7

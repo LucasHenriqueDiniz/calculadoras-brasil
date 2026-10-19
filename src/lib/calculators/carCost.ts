@@ -1,9 +1,22 @@
 export type FuelType = "gasoline" | "ethanol" | "diesel" | "flex";
 
+/**
+ * How far a litre of hydrated ethanol takes a flex car, as a percentage of a
+ * litre of gasoline. Measured on Inmetro's PBE Veicular 2026 table (update of
+ * 14/08/2026): across its 261 combustion flex rows, ethanol's combined km/l is
+ * a median 70,0% of gasoline's, from 66,4% to 72,6%
+ * (docs/research/2026-10-18-adsense-added-value/fetches/inmetro-pbev-2026.md).
+ * It is the "regra dos 70%", measured rather than repeated.
+ */
+export const ETHANOL_YIELD_PERCENT = 70;
+
 export interface CarCostInput {
   monthlyKm: number;
+  /** km/l on the fuel the car uses; under flex, on gasoline. */
   cityConsumptionKmL: number;
   highwayConsumptionKmL: number;
+  /** Under flex, ethanol's km/l as a percentage of gasoline's. */
+  ethanolYieldPercent: number;
   cityUsePercent: number;
   gasolinePrice: number;
   ethanolPrice: number;
@@ -86,6 +99,12 @@ function fuelCostFor(
   return { monthly, averageConsumption, liters };
 }
 
+/** The yield typed, or the PBE median when it is missing or out of (0, 100]. */
+function ethanolYieldOf(input: CarCostInput): number {
+  const typed = safe(input.ethanolYieldPercent);
+  return typed > 0 && typed <= 100 ? typed : ETHANOL_YIELD_PERCENT;
+}
+
 interface FuelChoice {
   monthlyFuelCost: number;
   selectedFuelLabel: string;
@@ -96,14 +115,19 @@ interface FuelChoice {
 /**
  * Picks the fuel the driver actually pays for, and — under flex — the cheaper of
  * the two, which is the only branch that produces a comparison.
+ *
+ * Under flex the consumption is gasoline's, and ethanol's is that times its
+ * yield. Both used to run on the same km/l, which made a litre of ethanol go as
+ * far as a litre of gasoline: at R$ 6,00 and R$ 4,20, exactly the 70% where
+ * the two cost the same, the page called ethanol R$ 137 a month cheaper.
  */
 function chooseFuel(input: CarCostInput, monthlyKm: number): FuelChoice {
-  const costOf = (pricePerLiter: number) =>
+  const costOf = (pricePerLiter: number, yieldFactor = 1) =>
     fuelCostFor(
       pricePerLiter,
       monthlyKm,
-      input.cityConsumptionKmL,
-      input.highwayConsumptionKmL,
+      input.cityConsumptionKmL * yieldFactor,
+      input.highwayConsumptionKmL * yieldFactor,
       input.cityUsePercent,
     ).monthly;
 
@@ -117,8 +141,9 @@ function chooseFuel(input: CarCostInput, monthlyKm: number): FuelChoice {
     return { monthlyFuelCost: costOf(input.dieselPrice), selectedFuelLabel: FUEL_LABEL.diesel };
   }
 
+  const ethanolYield = ethanolYieldOf(input) / 100;
   const gasolineMonthly = costOf(input.gasolinePrice);
-  const ethanolMonthly = costOf(input.ethanolPrice);
+  const ethanolMonthly = costOf(input.ethanolPrice, ethanolYield);
   const cheaper: FuelComparison["cheaper"] =
     Math.abs(gasolineMonthly - ethanolMonthly) < 0.01
       ? "tie"
@@ -249,6 +274,11 @@ function collectWarnings(input: CarCostInput, monthlyKm: number): string[] {
   if (safe(input.cityConsumptionKmL) === 0 || safe(input.highwayConsumptionKmL) === 0) {
     warnings.push("Consumo informado inválido; ajuste os valores de km/l.");
   }
+  if (input.fuelType === "flex" && ethanolYieldOf(input) !== input.ethanolYieldPercent) {
+    warnings.push(
+      `Rendimento do etanol inválido; usamos ${ETHANOL_YIELD_PERCENT}% do consumo com gasolina.`,
+    );
+  }
   warnings.push(
     "Valores padrão são apenas exemplos. Use seus custos reais para uma estimativa melhor.",
   );
@@ -295,4 +325,68 @@ export function calculateCarCost(input: CarCostInput): CarCostResult {
     ),
     warnings: collectWarnings(input, monthlyKm),
   };
+}
+
+/** One state's line in the page's table: the same car, on each fuel, at that week's prices. */
+export interface FuelByStateRow {
+  uf: string;
+  gasolinePrice: number;
+  ethanolPrice: number | null;
+  /** Ethanol's price over gasoline's: 0,70 is the default yield's break-even. */
+  priceRatio: number | null;
+  gasolineMonthly: number;
+  ethanolMonthly: number | null;
+  /** Null when the survey had no ethanol price for the state that week. */
+  cheaper: FuelComparison["cheaper"] | null;
+  /** What the cheaper fuel saves a month; zero on a tie. */
+  monthlySaving: number;
+}
+
+/**
+ * The page's table, built by the calculator: `car` under flex at each state's
+ * average prices, so every row is what the form shows for those prices.
+ */
+export function buildFuelByStateTable(
+  states: readonly { uf: string; gasoline: number | null; ethanol: number | null }[],
+  car: CarCostInput,
+): FuelByStateRow[] {
+  return states.flatMap(({ uf, gasoline, ethanol }): FuelByStateRow[] => {
+    if (gasoline === null) return [];
+
+    const result = calculateCarCost({
+      ...car,
+      fuelType: "flex",
+      gasolinePrice: gasoline,
+      ethanolPrice: ethanol ?? 0,
+    });
+    const comparison = result.fuelComparison!;
+
+    if (ethanol === null) {
+      return [
+        {
+          uf,
+          gasolinePrice: gasoline,
+          ethanolPrice: null,
+          priceRatio: null,
+          gasolineMonthly: comparison.gasolineMonthly,
+          ethanolMonthly: null,
+          cheaper: null,
+          monthlySaving: 0,
+        },
+      ];
+    }
+
+    return [
+      {
+        uf,
+        gasolinePrice: gasoline,
+        ethanolPrice: ethanol,
+        priceRatio: ethanol / gasoline,
+        gasolineMonthly: comparison.gasolineMonthly,
+        ethanolMonthly: comparison.ethanolMonthly,
+        cheaper: comparison.cheaper,
+        monthlySaving: comparison.cheaper === "tie" ? 0 : comparison.differenceMonthly,
+      },
+    ];
+  });
 }

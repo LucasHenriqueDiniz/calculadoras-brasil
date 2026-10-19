@@ -22,9 +22,12 @@ import { CopyResultButton, ResetButton, ShareResultButton } from "@/components/c
 import { Prose } from "@/components/layout/PageShell";
 import { PublicDataField } from "@/components/public-data/PublicDataField";
 import { Button } from "@/components/ui/button";
+import { ANP_WEEKLY_SNAPSHOT } from "@/data/anp-weekly-snapshot";
 import { getCalculator, relatedPostsFor } from "@/data/calculators";
-import { formatBRL, parseBRNumber } from "@/lib/format";
+import { formatBRL, formatLongDate, parseBRNumber } from "@/lib/format";
 import {
+  ETHANOL_YIELD_PERCENT,
+  buildFuelByStateTable,
   calculateCarCost,
   type CarCostInput,
   type CarCostResult,
@@ -46,6 +49,7 @@ const DEFAULTS: CarCostInput = {
   monthlyKm: 800,
   cityConsumptionKmL: 10,
   highwayConsumptionKmL: 13,
+  ethanolYieldPercent: ETHANOL_YIELD_PERCENT,
   cityUsePercent: 80,
   gasolinePrice: 6.0,
   ethanolPrice: 4.2,
@@ -63,6 +67,50 @@ const DEFAULTS: CarCostInput = {
   finesAndOthersMonthly: 0,
   depreciationAnnualPercent: 8,
 };
+
+// Every figure the FAQ and the article quote comes from the calculator itself.
+const DEFAULT_RESULT = calculateCarCost(DEFAULTS);
+const FUEL_NAME: Record<FuelType, string> = {
+  gasoline: "gasolina",
+  flex: "gasolina",
+  ethanol: "etanol",
+  diesel: "diesel",
+};
+const DEFAULT_LITERS =
+  (DEFAULTS.monthlyKm * DEFAULTS.cityUsePercent) / 100 / DEFAULTS.cityConsumptionKmL +
+  (DEFAULTS.monthlyKm * (100 - DEFAULTS.cityUsePercent)) / 100 / DEFAULTS.highwayConsumptionKmL;
+const DEFAULT_DEPRECIATION_SHARE = DEFAULT_RESULT.monthlyDepreciation / DEFAULT_RESULT.monthlyTotal;
+const DEFAULT_DEPRECIATION_RANK =
+  [...DEFAULT_RESULT.breakdown]
+    .sort((a, b) => b.monthly - a.monthly)
+    .findIndex((row) => row.key === "depreciation") + 1;
+
+const STATE_NAME = new Map<string, string>(
+  BRAZILIAN_STATES.map(({ value, label }) => [value, label]),
+);
+const FUEL_BY_STATE = buildFuelByStateTable(ANP_WEEKLY_SNAPSHOT.states, DEFAULTS).sort(
+  (a, b) => (a.priceRatio ?? Infinity) - (b.priceRatio ?? Infinity),
+);
+const ETHANOL_STATES = FUEL_BY_STATE.filter((row) => row.cheaper === "ethanol");
+
+/** "4 a 10 de outubro de 2026", or both dates in full across a month. */
+function surveyWeek(start: string, end: string): string {
+  return start.slice(0, 7) === end.slice(0, 7)
+    ? `${Number(start.slice(8))} a ${formatLongDate(end)}`
+    : `${formatLongDate(start)} a ${formatLongDate(end)}`;
+}
+const SURVEY_WEEK = surveyWeek(ANP_WEEKLY_SNAPSHOT.periodStart, ANP_WEEKLY_SNAPSHOT.periodEnd);
+
+function percent(value: number, digits = 1): string {
+  return `${(value * 100).toLocaleString("pt-BR", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  })}%`;
+}
+
+function liters(value: number): string {
+  return `${value.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} litros`;
+}
 
 type FuelPriceKey = "gasolinePrice" | "ethanolPrice" | "dieselPrice";
 
@@ -275,68 +323,51 @@ function useFuelPrices(
 const FAQ: FAQItem[] = [
   {
     question: "Quanto custa manter um carro por mês?",
-    answer:
-      "Depende do carro, do uso e da cidade. Em média, um carro popular custa entre R$ 1.200-1.500/mês. Carros intermediários custam R$ 1.800-2.500/mês. Carros premium podem ultrapassar R$ 3.000/mês. Use a calculadora com seus números para estimativa personalizada.",
-  },
-  {
-    question: "Qual é o custo anual total de ter um carro?",
-    answer:
-      "Um carro popular custa R$ 14.400-18.000/ano. Um carro intermediário custa R$ 21.600-30.000/ano. Carros premium custam R$ 36.000+/ano. O carro mais barato não é o mais econômico. Considere custo total, não só preço.",
+    answer: `Depende do carro, do uso e da cidade, por isso a calculadora pede os seus números. No exemplo dela, um carro de ${formatBRL(DEFAULTS.carValue)} que roda ${DEFAULTS.monthlyKm} km por mês custa ${formatBRL(DEFAULT_RESULT.monthlyTotal)} por mês, ${formatBRL(DEFAULT_RESULT.annualTotal)} por ano, somando combustível, IPVA, seguro, licenciamento, manutenção, pneus, lavagem e depreciação.`,
   },
   {
     question: "Como calcular o custo por km de um carro?",
-    answer:
-      "Divida o custo mensal total pelos quilômetros rodados no mês. Exemplo: se gasta R$ 2.000/mês e roda 1.000 km, o custo é R$ 2,00 por km. Carros populares custam R$ 1,50-2,50/km. Carros premium custam R$ 3,00-4,00+/km.",
+    answer: `Divida o custo mensal total pelos quilômetros rodados no mês. No exemplo da calculadora, ${formatBRL(DEFAULT_RESULT.monthlyTotal)} por ${DEFAULTS.monthlyKm} km dão ${formatBRL(DEFAULT_RESULT.costPerKm ?? 0)} por km. Como IPVA, seguro e depreciação não mudam com a quilometragem, o custo por km cai quando o carro roda mais.`,
   },
   {
     question: "A calculadora considera IPVA?",
-    answer:
-      "Sim. O IPVA varia por estado (2-4%) e valor do carro. Uma calculadora divide o valor anual por 12 para distribuir mensalmente. Exemplo: carro de R$ 50.000 com alíquota de 3% = R$ 1.500/ano = R$ 125/mês.",
+    answer: `Sim, como valor anual dividido por 12. O IPVA é um imposto estadual sobre o valor venal do carro, e cada estado define a sua alíquota: confira a do seu no site da Secretaria da Fazenda. No exemplo, ${formatBRL(DEFAULTS.ipvaAnnual)} por ano dão ${formatBRL(DEFAULTS.ipvaAnnual / 12)} por mês.`,
   },
   {
     question: "A calculadora considera depreciação?",
-    answer:
-      "Sim. Depreciação é a perda de valor do veículo (mesmo parado na garagem). Um carro novo perde 15-20% no primeiro ano. Isso é custo real que muitos ignoram. A depreciação representa 30-40% do custo total.",
+    answer: `Sim. Depreciação é a perda de valor do carro, mesmo parado na garagem. A calculadora aplica o percentual anual que você informar sobre o valor do carro: no exemplo, ${DEFAULTS.depreciationAnnualPercent}% de ${formatBRL(DEFAULTS.carValue)} são ${formatBRL(DEFAULT_RESULT.monthlyDepreciation)} por mês, ${percent(DEFAULT_DEPRECIATION_SHARE, 0)} do custo total. Para estimar a do seu carro, compare o preço dele na Tabela Fipe com o de um ano antes.`,
   },
   {
     question: "Gasolina ou etanol: qual vale mais a pena?",
-    answer:
-      "Regra dos 70%: etanol vale a pena se custar até 70% do preço da gasolina. Mas depende do consumo específico do seu carro. Carros flex modernos costumam rodar mais com gasolina.",
+    answer: `Depende de quanto o etanol rende no seu carro. Na tabela de consumo do Inmetro de 2026, o etanol rende em mediana ${ETHANOL_YIELD_PERCENT}% da gasolina nos 261 carros flex a combustão, entre 66% e 73%. Daí a regra dos 70%: o etanol compensa quando custa menos de 70% do preço da gasolina. Na média de cada estado no levantamento da ANP de ${SURVEY_WEEK}, isso acontecia em ${ETHANOL_STATES.length} das ${FUEL_BY_STATE.filter((row) => row.ethanolPrice !== null).length} unidades da federação com preço dos dois combustíveis.`,
   },
   {
     question: "Quanto custa o seguro de um carro?",
     answer:
-      "DPVAT (obrigatório) custa R$ 150-200/ano. Seguro completo varia bastante: carros populares custam R$ 80-150/mês. Carros intermediários custam R$ 120-250/mês. Preço depende de idade, perfil, histórico e região.",
+      "Depende do perfil do motorista, do modelo, da região e da cobertura, por isso a calculadora pede o valor anual da sua apólice ou cotação. Não há mais seguro obrigatório a pagar: o DPVAT foi extinto pela Lei Complementar 207/2024, e o SPVAT, que o substituiria, foi revogado pela Lei Complementar 211/2024.",
   },
   {
     question: "Quanto gasto com combustível por mês?",
-    answer:
-      "Depende de 3 fatores: quilometragem mensal, consumo do carro (km/l) e preço do combustível. Exemplo: 800 km/mês, carro que faz 10 km/l, gasolina a R$ 6,00 = 80 litros × R$ 6 = R$ 480/mês.",
+    answer: `Some os litros da cidade e da estrada: quilômetros na cidade ÷ consumo na cidade + quilômetros na estrada ÷ consumo na estrada. Com ${DEFAULTS.monthlyKm} km por mês, ${DEFAULTS.cityUsePercent}% na cidade, num carro que faz ${DEFAULTS.cityConsumptionKmL} km/l na cidade e ${DEFAULTS.highwayConsumptionKmL} km/l na estrada, são ${liters(DEFAULT_LITERS)}. A ${formatBRL(DEFAULTS.gasolinePrice)} o litro, ${formatBRL(DEFAULT_RESULT.monthlyFuelCost)} por mês.`,
   },
   {
     question: "Qual é o custo de manutenção de um carro?",
-    answer:
-      "Carros novos (até 3 anos) custam R$ 100-200/mês em manutenção preventiva. Carros com 5-7 anos custam R$ 150-300/mês. Carros com 10+ anos custam R$ 300-500+/mês. Manutenção preventiva é mais barata que reparos de emergência.",
-  },
-  {
-    question: "Quanto custa estacionamento de carro?",
-    answer:
-      "Em grandes cidades (SP, RJ, BH) estacionamento custa R$ 50-300/mês. Em cidades menores, pode ser zero. Se usar metrô/ônibus, economiza R$ 50-150/mês apenas em estacionamento. Considere essa despesa na sua decisão.",
+    answer: `Varia com a idade do carro, a quilometragem e o plano de revisões do fabricante. O jeito mais fiel é somar o que você gastou no último ano com revisões, óleo, filtros, freios e reparos e dividir por 12. O exemplo da calculadora usa ${formatBRL(DEFAULTS.maintenanceMonthly)} por mês.`,
   },
   {
     question: "Vale a pena comprar carro à vista ou financiar?",
     answer:
-      "Depende do juros e da sua situação financeira. Com juros altos (12%+/ano), financiar fica caro. À vista você economiza em juros, mas imobiliza capital. Use a calculadora com diferentes cenários para ver o impacto real.",
+      "A calculadora não simula financiamento. Financiado, o carro custa também os juros, que o Custo Efetivo Total (CET) do contrato resume. À vista, o custo é o rendimento que o dinheiro deixa de ter. Compare o CET com o que o dinheiro renderia aplicado.",
   },
   {
-    question: "Como reduzir o custo de manutenção do carro?",
+    question: "Como reduzir o custo do carro?",
     answer:
-      "1) Respeite prazos de revisão. 2) Use óleo de qualidade. 3) Mantenha pneus calibrados (reduz consumo 3-5%). 4) Dirija de forma suave (menos desgaste). 5) Evite multas (são custo real). Um carro bem mantido custa 30-40% menos.",
+      "Veja no resultado quais itens pesam mais e comece por eles. Em geral ajuda: fazer as revisões no prazo, manter os pneus calibrados, cotar o seguro todo ano, abastecer com o combustível mais barato por quilômetro, e não só por litro, e rodar menos quando houver alternativa.",
   },
   {
     question: "O resultado da calculadora é garantido?",
     answer:
-      "Não. Esta é uma estimativa educativa baseada em médias nacionais e valores que você informa. Custos reais variam por cidade, marca, modelo, seguradora, oficina e seus hábitos. Use como ponto de partida, não como orçamento oficial.",
+      "Não. É uma estimativa educativa feita com os valores que você informa. Custos reais variam por cidade, marca, modelo, seguradora, oficina e hábitos. Use como ponto de partida, não como orçamento oficial.",
   },
 ];
 
@@ -364,7 +395,7 @@ export const Route = createFileRoute("/calculadora-custo-carro")({
 
 function CarCostPage() {
   const [input, setInput] = usePersistedState<CarCostInput>(
-    "calculadoras-brasil:custo-carro:input:v1",
+    "calculadoras-brasil:custo-carro:input:v2",
     DEFAULTS,
   );
   const [uf, setUf] = usePersistedState("calculadoras-brasil:custo-carro:uf:v1", "SP");
@@ -416,6 +447,8 @@ function CarCostPage() {
           <BreakdownTable rows={result.breakdown} caption="Breakdown de custos mensais e anuais" />
         </div>
       </section>
+
+      <FuelByStateSection />
 
       <CarCostArticle />
 
@@ -505,14 +538,14 @@ function UsageSection({ input, onUpdate }: SectionProps) {
         hint="O restante é considerado uso em estrada."
       />
       <NumberInput
-        label="Consumo na cidade (km/l)"
+        label={`Consumo na cidade com ${FUEL_NAME[input.fuelType]} (km/l)`}
         value={input.cityConsumptionKmL}
         onChange={(v) => onUpdate("cityConsumptionKmL", v)}
         step={0.1}
         suffix="km/l"
       />
       <NumberInput
-        label="Consumo na estrada (km/l)"
+        label={`Consumo na estrada com ${FUEL_NAME[input.fuelType]} (km/l)`}
         value={input.highwayConsumptionKmL}
         onChange={(v) => onUpdate("highwayConsumptionKmL", v)}
         step={0.1}
@@ -568,6 +601,14 @@ function FuelSection({
           { value: "flex", label: "Flex automático (compara gasolina x etanol)" },
         ]}
       />
+      {input.fuelType === "flex" ? (
+        <PercentageInput
+          label="Rendimento do etanol"
+          value={input.ethanolYieldPercent}
+          onChange={(v) => onUpdate("ethanolYieldPercent", v)}
+          hint={`Quanto o etanol rende, em % do consumo com gasolina. A mediana dos carros flex na tabela do Inmetro de 2026 é ${ETHANOL_YIELD_PERCENT}%; a etiqueta do seu carro traz os dois consumos.`}
+        />
+      ) : null}
       <div className="sm:col-span-2">
         <Button
           type="button"
@@ -712,6 +753,95 @@ function CarCostResults({ result, shareText }: { result: CarCostResult; shareTex
   );
 }
 
+function FuelByStateSection() {
+  const noEthanol = FUEL_BY_STATE.filter((row) => row.ethanolPrice === null);
+
+  return (
+    <Prose>
+      <h2>Etanol ou gasolina em cada estado</h2>
+      <p>
+        A tabela foi calculada pela própria calculadora no modo Flex, para o carro do exemplo:{" "}
+        {DEFAULTS.monthlyKm} km por mês, {DEFAULTS.cityConsumptionKmL} km/l na cidade e{" "}
+        {DEFAULTS.highwayConsumptionKmL} km/l na estrada com gasolina, e o etanol rendendo{" "}
+        {ETHANOL_YIELD_PERCENT}% disso. Os preços são a média de cada estado no levantamento semanal
+        da ANP de {SURVEY_WEEK}. O etanol saía mais barato em {ETHANOL_STATES.length} estados, os
+        primeiros da lista.
+      </p>
+      <div className="not-prose overflow-x-auto rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]">
+        <table className="w-full min-w-[640px] text-sm">
+          <caption className="sr-only">
+            Preço médio da gasolina e do etanol por estado e qual sai mais barato por mês
+          </caption>
+          <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th scope="col" className="px-3 py-2.5">
+                Estado
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Gasolina
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Etanol
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Etanol ÷ gasolina
+              </th>
+              <th scope="col" className="px-3 py-2.5">
+                Mais barato
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Economia por mês
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {FUEL_BY_STATE.map((row) => (
+              <tr key={row.uf} className="border-t border-border/70">
+                <th scope="row" className="px-3 py-2 text-left font-medium text-foreground">
+                  {STATE_NAME.get(row.uf) ?? row.uf}
+                </th>
+                <td className="px-3 py-2 text-right">{formatBRL(row.gasolinePrice)}</td>
+                <td className="px-3 py-2 text-right">
+                  {row.ethanolPrice === null ? "—" : formatBRL(row.ethanolPrice)}
+                </td>
+                <td className="px-3 py-2 text-right">
+                  {row.priceRatio === null ? "—" : percent(row.priceRatio)}
+                </td>
+                <td className="px-3 py-2">
+                  {row.cheaper === null
+                    ? "sem preço de etanol"
+                    : row.cheaper === "ethanol"
+                      ? "Etanol"
+                      : row.cheaper === "gasoline"
+                        ? "Gasolina"
+                        : "Empate"}
+                </td>
+                <td className="px-3 py-2 text-right font-semibold text-foreground">
+                  {row.cheaper === null ? "—" : formatBRL(row.monthlySaving)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Fonte:{" "}
+        <a href={ANP_WEEKLY_SNAPSHOT.sourceUrl} target="_blank" rel="noreferrer">
+          planilha do levantamento semanal da ANP
+        </a>
+        , semana de {SURVEY_WEEK}.
+        {noEthanol.length > 0
+          ? ` A ANP não publicou preço de etanol naquela semana em: ${noEthanol
+              .map((row) => STATE_NAME.get(row.uf) ?? row.uf)
+              .join(", ")}.`
+          : null}{" "}
+        Os preços mudam toda semana e de posto para posto: para o seu caso, escolha o estado no
+        formulário, que consulta o levantamento mais recente, ou informe o preço que você paga.
+      </p>
+    </Prose>
+  );
+}
+
 function CarCostArticle() {
   return (
     <Prose collapsibleTitle="Saiba mais sobre o custo de um carro">
@@ -727,7 +857,8 @@ function CarCostArticle() {
           (cidade x estrada).
         </li>
         <li>
-          <strong>IPVA:</strong> imposto estadual anual, em geral 2% a 4% do valor venal do veículo.
+          <strong>IPVA:</strong> imposto estadual anual sobre o valor venal do veículo, com alíquota
+          definida por cada estado.
         </li>
         <li>
           <strong>Seguro:</strong> depende do perfil do motorista, da região e do modelo.
@@ -739,7 +870,7 @@ function CarCostArticle() {
           <strong>Manutenção:</strong> revisões, troca de óleo, filtros, pastilhas, alinhamento.
         </li>
         <li>
-          <strong>Pneus:</strong> troca a cada 40–60 mil km, dependendo do uso.
+          <strong>Pneus:</strong> troca conforme o desgaste e a indicação do fabricante.
         </li>
         <li>
           <strong>Estacionamento:</strong> mensalidade fixa ou avulsos no trabalho e em viagens.
@@ -754,36 +885,48 @@ function CarCostArticle() {
 
       <h2>Como calcular o custo por km?</h2>
       <p>
-        A conta é simples: divida o custo mensal total pelo número de quilômetros rodados no mês.
-        Por exemplo, se o carro custa R$ 1.600 por mês e roda 800 km, o custo por km é R$ 2,00. Esse
-        número ajuda a comparar usar o carro com alternativas como aplicativos, transporte público
-        ou aluguel por viagem.
+        A conta é simples: divida o custo mensal total pelo número de quilômetros rodados no mês. No
+        exemplo da calculadora, {formatBRL(DEFAULT_RESULT.monthlyTotal)} por mês e{" "}
+        {DEFAULTS.monthlyKm} km dão {formatBRL(DEFAULT_RESULT.costPerKm ?? 0)} por km. Esse número
+        ajuda a comparar usar o carro com alternativas como aplicativos, transporte público ou
+        aluguel por viagem.
       </p>
 
       <h2>Gasolina ou etanol: como comparar?</h2>
       <p>
-        A famosa regra dos 70% diz que o etanol vale a pena quando custa até 70% do preço da
-        gasolina. É uma referência útil, mas imprecisa: o consumo do seu carro com cada combustível
-        pode ser diferente da média. O ideal é abastecer com cada um, anotar o consumo real (km/l) e
-        usar esses valores na calculadora. No modo Flex, simulamos os dois cenários e mostramos qual
-        sai mais barato com os preços e o consumo que você informou.
+        A regra dos 70% diz que o etanol vale a pena quando custa menos de 70% do preço da gasolina,
+        porque um litro de etanol leva o carro menos longe. Na tabela de consumo do Inmetro de 2026,
+        o etanol rende em mediana {ETHANOL_YIELD_PERCENT}% da gasolina nos 261 carros flex a
+        combustão, de 66% no que rende menos a 73% no que rende mais. A regra vale na média, e o seu
+        carro pode ficar alguns pontos acima ou abaixo: a etiqueta do Inmetro, ou o consumo que você
+        anota abastecendo com cada um, dá o número dele. No modo Flex, a calculadora aplica esse
+        rendimento ao consumo com gasolina e mostra qual combustível sai mais barato por mês.
       </p>
 
       <h2>Por que considerar depreciação?</h2>
       <p>
-        A depreciação não sai do seu bolso todo mês — mas é o custo mais alto e silencioso de ter um
-        carro. Um veículo de R$ 50.000 que perde 8% ao ano vale cerca de R$ 4.000 a menos depois de
-        12 meses, mesmo sem rodar muito. Ignorar isso dá a falsa sensação de que o carro é mais
-        barato do que realmente é, principalmente em carros novos.
+        A depreciação não sai do seu bolso todo mês, mas é custo: um veículo de{" "}
+        {formatBRL(DEFAULTS.carValue)} que perde {DEFAULTS.depreciationAnnualPercent}% ao ano vale{" "}
+        {formatBRL((DEFAULTS.carValue * DEFAULTS.depreciationAnnualPercent) / 100)} a menos depois
+        de 12 meses, mesmo sem rodar muito. No exemplo da calculadora, ela é o{" "}
+        {DEFAULT_DEPRECIATION_RANK}º maior custo do mês. Ignorá-la dá a falsa sensação de que o
+        carro é mais barato do que realmente é.
       </p>
 
       <h2>Exemplo prático</h2>
       <p>
-        Imagine um motorista que roda 800 km por mês (80% na cidade), em um carro popular que faz 10
-        km/l na cidade e 13 km/l na estrada, abastecendo com gasolina a R$ 6,00 o litro. Só de
-        combustível, ele gasta cerca de R$ 460 por mês. Somando IPVA, seguro, licenciamento,
-        manutenção, pneus, lavagem e depreciação de um carro de R$ 50.000 a 8% ao ano, o custo
-        mensal real fica próximo de R$ 1.500 — quase o triplo do que ele paga só na bomba.
+        Imagine um motorista que roda {DEFAULTS.monthlyKm} km por mês ({DEFAULTS.cityUsePercent}% na
+        cidade), em um carro que faz {DEFAULTS.cityConsumptionKmL} km/l na cidade e{" "}
+        {DEFAULTS.highwayConsumptionKmL} km/l na estrada, abastecendo com gasolina a{" "}
+        {formatBRL(DEFAULTS.gasolinePrice)} o litro. Só de combustível, ele gasta{" "}
+        {formatBRL(DEFAULT_RESULT.monthlyFuelCost)} por mês. Somando IPVA, seguro, licenciamento,
+        manutenção, pneus, lavagem e depreciação de um carro de {formatBRL(DEFAULTS.carValue)} a{" "}
+        {DEFAULTS.depreciationAnnualPercent}% ao ano, o custo mensal fica em{" "}
+        {formatBRL(DEFAULT_RESULT.monthlyTotal)}:{" "}
+        {(DEFAULT_RESULT.monthlyTotal / DEFAULT_RESULT.monthlyFuelCost).toLocaleString("pt-BR", {
+          maximumFractionDigits: 1,
+        })}{" "}
+        vezes o que ele paga só na bomba.
       </p>
 
       <h2>Fonte dos preços de combustível</h2>
