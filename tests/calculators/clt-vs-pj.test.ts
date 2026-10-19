@@ -5,6 +5,7 @@ import {
   type CltVsPjResult,
 } from "../../src/lib/calculators/cltVsPj";
 import { INSS_CEILING, calculateEmployeeInss } from "../../src/lib/calculators/inss-constants";
+import { calculateNetSalary } from "../../src/lib/calculators/salarioLiquido";
 
 const BASELINE: CltVsPjInput = {
   cltGrossSalary: 8_000,
@@ -195,18 +196,58 @@ describe("calculateCltVsPj — the CLT side", () => {
   });
 
   /**
-   * R$ 4.000 a month. INSS takes R$ 368,60, so the base is R$ 3.631,40, and the
-   * 15% row of the monthly table charges 3.631,40 × 0,15 − 394,16 = R$ 150,55.
-   * The Lei 15.270/2025 reduction covers up to R$ 312,89 at this income, so the
-   * withholding is nil and the net is the gross less INSS.
+   * R$ 4.000 a month. INSS takes R$ 368,60, less than the R$ 607,20 desconto
+   * simplificado, so Lei 9.250, art. 4º, § 2º takes the simplified route: the base
+   * is 4.000 − 607,20 = R$ 3.392,80, and the 15% row charges
+   * 3.392,80 × 0,15 − 394,16 = R$ 114,76. The Lei 15.270/2025 reduction covers up
+   * to R$ 312,89 at this income, so the withholding is nil and the net is the
+   * gross less INSS. (The legal route would have taxed R$ 150,55 from the table,
+   * also reduced to nil, which is why this case alone could not catch the
+   * missing route.)
    */
   it("leaves a R$ 4.000 salary untaxed, which is what Lei 15.270/2025 is for", () => {
     const { cltDetail, cltNet } = compare({ cltGrossSalary: 4_000 });
 
-    expect(cltDetail.taxFromTable).toBe(150.55);
-    expect(cltDetail.reductionLei15270).toBe(150.55);
+    expect(cltDetail.assessableBase).toBeCloseTo(3392.8, 2);
+    expect(cltDetail.taxFromTable).toBe(114.76);
+    expect(cltDetail.reductionLei15270).toBe(114.76);
     expect(cltDetail.irpfWithheld).toBe(0);
     expect(cltNet).toBe(3631.4);
+  });
+
+  /**
+   * R$ 5.000 a month, no dependants: the case that could. On the legal route the
+   * base is 5.000 − 501,51 = R$ 4.498,49 and the table charges R$ 336,67, which the
+   * R$ 312,89 reduction leaves at R$ 23,78. On the simplified route the base is
+   * R$ 4.392,80, the table charges exactly R$ 312,89 and nothing is withheld. The
+   * statute picks the second; the copy of the CLT rules this module used to carry
+   * picked the first.
+   */
+  it("withholds nothing at R$ 5.000, taking the more beneficial route", () => {
+    const { cltDetail, cltNet } = compare({ cltGrossSalary: 5_000 });
+
+    expect(cltDetail.assessableBase).toBeCloseTo(4392.8, 2);
+    expect(cltDetail.irpfWithheld).toBe(0);
+    expect(cltNet).toBe(4498.49);
+  });
+
+  it("nets exactly what the net-salary calculator nets, at every CLT salary", () => {
+    for (let cltGrossSalary = 0; cltGrossSalary <= 12_000; cltGrossSalary += 7) {
+      for (const dependants of [0, 2]) {
+        const net = calculateNetSalary({
+          monthlyGrossSalary: cltGrossSalary,
+          dependants,
+          monthlyPrivatePension: 0,
+          hasMealAllowance: false,
+          hasTransportAllowance: false,
+          hasUnionDue: false,
+        });
+
+        expect(compare({ cltGrossSalary, dependants }).cltNet, `R$ ${cltGrossSalary}`).toBe(
+          Math.round(net.monthlyNetSalary * 100) / 100,
+        );
+      }
+    }
   });
 
   /**

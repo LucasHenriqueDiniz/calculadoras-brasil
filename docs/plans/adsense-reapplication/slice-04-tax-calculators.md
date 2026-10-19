@@ -1,5 +1,5 @@
 ---
-status: todo
+status: doing
 ---
 
 # Slice 4 — The five tax calculators, on the pattern slice 3 proved

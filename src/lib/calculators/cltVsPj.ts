@@ -18,13 +18,9 @@
  * review.
  */
 
-import { calculateEmployeeInss } from "./inss-constants";
-import {
-  DEDUCTION_PER_DEPENDENT_MONTHLY,
-  findMonthlyTaxBracket,
-  monthlyReductionLei15270,
-} from "./irpf-constants";
+import { findMonthlyTaxBracket, monthlyReductionLei15270 } from "./irpf-constants";
 import { roundToCentavos } from "./money";
+import { calculateNetSalary } from "./salarioLiquido";
 
 export interface CltVsPjInput {
   cltGrossSalary: number;
@@ -114,17 +110,29 @@ export function calculateCltVsPj(input: CltVsPjInput): CltVsPjResult {
   const pjDeductibleExpenses = Math.max(input.pjDeductibleExpenses, 0);
 
   // ---- CLT side ----------------------------------------------------------
-  // INSS is progressive and capped at the RGPS ceiling, the same contribution
-  // the net-salary calculator withholds for this salary. A flat percentage
-  // would put the two calculators on different answers for the same input.
-  const cltInssWithheld = calculateEmployeeInss(cltGrossSalary);
-  const dependantAllowance = Math.max(input.dependants, 0) * DEDUCTION_PER_DEPENDENT_MONTHLY;
-  const cltTax = computeMonthlyIrpf(
-    cltGrossSalary,
-    cltGrossSalary - cltInssWithheld - dependantAllowance,
-  );
+  // The net-salary calculator's own answer for this salary, not a second copy
+  // of it. The copy this replaced took the legal route every time and missed
+  // the desconto simplificado mensal that Lei 9.250, art. 4º, § 2º applies when
+  // it is more beneficial — overstating the CLT withholding by up to R$ 23,78
+  // between R$ 4.878 and R$ 5.754 of gross, exactly where CLT and PJ are close.
+  // One call is what makes the two pages agree by construction.
+  const clt = calculateNetSalary({
+    monthlyGrossSalary: cltGrossSalary,
+    dependants: input.dependants,
+    monthlyPrivatePension: 0,
+    hasMealAllowance: false,
+    hasTransportAllowance: false,
+    hasUnionDue: false,
+  });
+  const cltInssWithheld = clt.inssWithheld;
+  const cltTax: MonthlyIrpfDetail = {
+    assessableBase: clt.monthlyAssessableBase,
+    taxFromTable: clt.taxFromTable,
+    reductionLei15270: clt.reductionLei15270,
+    irpfWithheld: clt.estimatedIrpfWithheld,
+  };
 
-  const cltNet = roundToCentavos(cltGrossSalary - cltInssWithheld - cltTax.irpfWithheld);
+  const cltNet = roundToCentavos(clt.monthlyNetSalary);
   const cltBenefits = cltGrossSalary * CLT_BENEFITS_RATE;
   const cltWithBenefits = roundToCentavos(cltNet + cltBenefits);
 
