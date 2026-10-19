@@ -1,5 +1,5 @@
 ---
-status: doing
+status: done
 ---
 
 # Slice 5 — The six household calculators
@@ -53,7 +53,7 @@ Same as slice 4: one PR per calculator.
 
 ---
 
-## What actually happened — 2026-10-18 (conta de luz; the other five are still to do)
+## What actually happened — 2026-10-18
 
 ### Conta de luz — 2026-10-18
 
@@ -207,3 +207,41 @@ Same as slice 4: one PR per calculator.
 | hand cases | 500 × 5,2177 + 541,86 = R$ 3.150,71; 1.000 × 4,0738 + 451,84 = R$ 4.525,64; reserve 10% × 6.350 = R$ 635 |
 | `test:seo` | 28 routes; 6 distance rows and R$ 2.488,74 prerendered |
 | both ends | 2 of 2 trips typed into the form match the table: 500 km × 2 axles R$ 2.488,74; 3.000 km × 3 axles R$ 16.194,96 |
+
+### Custo de pet — 2026-10-18
+
+- **Leader:** calculadorabrasil.com.br. A breed list, food as a price range by size, and age and
+  regional multipliers with no source.
+- **Defects:**
+  - food counted on a 30-day month, so the year had 360 days of food. A unit test pinned it;
+  - every FAQ answer gave ranges with no source;
+  - a "taxa" for pets in a lease that Lei 8.245 does not provide (art. 43, I);
+  - a typo.
+- **New:**
+  - FEDIAF's energy needs in the module (dogs by age at kg^0,75, cats at kg^0,67);
+  - a portion helper in the form that copies its suggestion into the calculation;
+  - an 8-row table at an example food of 3.500 kcal/kg and R$ 10/kg.
+- **Caught in the browser:** the table priced 176,7 g while it showed "177 g", 8 centavos off
+  what the form gave for 177. The table now prices the whole grams it shows.
+
+| check | result |
+|---|---|
+| unit | 384 green. Mutants killed: the 30-day month and the dog's exponent for the cat (3 red) |
+| hand cases | 110 × 10^0,75 = 618,6 kcal → 177 g → R$ 53,8375 a month; 75 × 4^0,67 = 189,9 kcal |
+| `test:seo` | 28 routes; 8 pet rows and "177 g" prerendered |
+| both ends | 2 of 2 suggestions copied into the form match the table: 10 kg dog R$ 53,84, 4 kg cat R$ 16,43 |
+
+**Slice 5 is done.** All six household calculators were read against their leader. Each had at
+least one defect in its arithmetic or a false statement:
+
+| calculator | arithmetic or factual defect |
+|---|---|
+| conta de luz | refrigerator at its compressor rating |
+| custo de carro | flex fuel on gasoline's km/l; DPVAT |
+| morar sozinho | FAQ against the calculator; agency fee against the law |
+| assinaturas | "Netflix permite compartilhamento" |
+| custo de mudança | reserve on the lease; deposit as a cost |
+| custo de pet | 30-day month |
+
+Each gained a computed table checked against the form, and every FAQ figure now comes from the
+calculator or a dated source. The owner's "Request indexing" remains, as in the other slices.

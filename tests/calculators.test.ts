@@ -171,10 +171,12 @@ describe("core calculators", () => {
       emergencyReserveMonthly: 0,
       quantity: 1,
     });
-    expect(result.calculatedFoodMonthly).toBe(60);
-    expect(result.monthlyFoodKg).toBe(6);
+    // 200 g a day for 365 days is 73 kg a year, R$ 730 at R$ 10/kg. On a
+    // 30-day month the year came to R$ 720: five days of food short.
+    expect(result.calculatedFoodMonthly * 12).toBeCloseTo(730, 10);
+    expect(result.monthlyFoodKg).toBeCloseTo(73 / 12, 10);
     expect(result.foodPackageDurationDays).toBe(50);
-    expect(result.monthlyTotal).toBe(70);
+    expect(result.monthlyTotal).toBeCloseTo(730 / 12 + 10, 10);
   });
 });
 

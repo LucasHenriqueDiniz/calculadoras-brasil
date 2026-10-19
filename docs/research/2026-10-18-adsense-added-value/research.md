@@ -6,7 +6,7 @@ decided:
 
 # What does each calculator do that the page ranking first for its query does not?
 
-> Salário líquido, the pilot: nothing, until today. The top result applied the 2026 law correctly and ours did not. Fixed, it now does what the leader does, plus a table across 16 salaries, the simplified-discount crossover explained, a private pension field, and the 2026 reduction written out line by line. The other 11 calculators are slices 4 and 5.
+> Salário líquido, the pilot: nothing, until today. The top result applied the 2026 law correctly and ours did not. Fixed, it now does what the leader does, plus a table across 16 salaries, the simplified-discount crossover explained, a private pension field, and the 2026 reduction written out line by line. The other 11 followed in slices 4 and 5, and every one of the 12 had at least one defect in its arithmetic or a false statement. Each now has a table its own calculator computes, checked against the form, with every figure from the calculator or a dated source.
 
 ## What was blocking
 
@@ -44,7 +44,7 @@ Measured against claimed is marked in every row.
 | Morar sozinho | calculadora morar sozinho | customorarsozinho.com.br | see below | **built** (slice 5) |
 | Assinaturas | calculadora de assinaturas | nucleo.jor.br (Calculadora de Streaming) | see below | **built** (slice 5) |
 | Custo de mudança | calculadora custo de mudança | translidermudancas.com.br (blog) | see below | **built** (slice 5) |
-| Custo de pet | — | — | — | slice 5 |
+| Custo de pet | calculadora custo pet | calculadorabrasil.com.br | see below | **built** (slice 5) |
 
 ## Salário líquido
 
@@ -470,6 +470,44 @@ R$ 15,00 por quilômetro" as if from the ANTT table. The ANTT has no such catego
   - the form matches the table at 500 km on 2 axles and 3.000 km on 3 axles;
   - `test:seo` asserts 6 rows and R$ 2.488,74.
 
+## Custo de pet
+
+### What the leader does (measured)
+
+calculadorabrasil.com.br (`fetches/calculadorabrasil-custo-pet.md`): a breed list, food as a price
+range by size, and multipliers for age and for Brasília. It claims "95% de acurácia" and does not
+say how that was measured.
+
+### What ours did before today (measured)
+
+- **A month of food was 30 days**, so the year came to 360: five days of food short on the
+  largest item. An existing unit test pinned R$ 60 for 200 g at R$ 10/kg; the year is R$ 730, not
+  R$ 720.
+- **Every FAQ answer gave ranges with no source.**
+- **"Muitos proprietários cobram taxa (R$ 100-300/mês extra)"** for a pet in a lease. The Lei do
+  Inquilinato provides no such charge, and art. 43, I, makes demanding sums beyond rent and
+  permitted charges a contravenção.
+- **A typo,** "hapcedem".
+
+### What ours does now that the leader does not
+
+- **The ration from the animal's weight.** The FEDIAF Nutritional Guidelines (September 2025,
+  the same as July 2024) set an adult dog at 130, 110 or 95 kcal per kg^0,75 by age, and a cat at
+  75 or 100 kcal per kg^0,67 (`fetches/fediaf-energy-requirements.md`). The form turns weight,
+  profile and the energy on the bag into grams a day, and can copy them into the calculation.
+- **A table of 8 pets** at an example food of 3.500 kcal/kg and R$ 10/kg. A 10 kg adult dog eats
+  177 g a day, R$ 53,84 a month; a 40 kg dog, 500 g; a 4 kg indoor cat, 54 g, R$ 16,43.
+- **Compare by the day, not by the kilo.** A denser food needs a smaller portion, and the page
+  says so with the formula behind it.
+
+- **Verified:**
+  - hand cases: 110 × 10^0,75 = 618,6 kcal, 75 × 4^0,67 = 189,9 kcal, and 177 g over 365/12 days
+    = R$ 53,8375;
+  - 2 mutants killed, the 30-day month and the dog's exponent for the cat (3 red);
+  - the form's suggestion, copied into the calculation, matches the table for the 10 kg dog and
+    the 4 kg cat;
+  - `test:seo` asserts 8 rows and 177 g.
+
 ## What this does not establish
 
 - **That Google will judge it added value.** It is the kind of thing Google's own text names, as
@@ -489,6 +527,8 @@ R$ 15,00 por quilômetro" as if from the ANTT table. The ANTT has no such catego
 - **The streaming prices after 2026-10-18.** They are one day's reading of three pages.
 - **That the freight floor is current after a diesel move.** The coefficients are those of
   Portaria SUROC 22/2026; the ANTT must replace them whenever diesel moves more than 5%.
+- **That 3.500 kcal/kg is a typical Brazilian dry food.** It is the table's example; the form
+  takes the figure on the visitor's bag.
 - **Eletrobrás's figures for a 2026 refrigerator.** They are 2013 averages, quoted by IDEC; the
   primary table was not found.
 
@@ -517,4 +557,7 @@ R$ 15,00 por quilômetro" as if from the ANTT table. The ANTT has no such catego
 - [Google Brasil SERP](https://www.google.com.br/search?q=calculadora+custo+de+mudan%C3%A7a&hl=pt-BR&gl=br&num=10) — `fetches/serp-calculadora-custo-de-mudanca.md` — the 9 organic results
 - [Translider, simulador de frete](https://translidermudancas.com.br) — `fetches/translider-simulador-frete.md` — position 1
 - [Portaria SUROC 22/2026](https://anttlegis.antt.gov.br/action/UrlPublicasAction.php?acao=abrirAtoPublico&num_ato=00000022&sgl_tipo=POR&sgl_orgao=SUROC/ANTT/MT&vlr_ano=2026&seq_ato=000&cod_modulo=623&cod_menu=9230), [Resolução ANTT 5.867/2020](https://anttlegis.antt.gov.br/action/UrlPublicasAction.php?acao=abrirAtoPublico&sgl_tipo=RES&num_ato=00005867&seq_ato=000&vlr_ano=2020&sgl_orgao=DG/ANTT/MI&cod_modulo=161&cod_menu=5408), [Lei 13.703/2018](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13703.htm) — `fetches/antt-piso-minimo-frete-2026-09.md` — the freight floor and its coefficients
+- [Google Brasil SERP](https://www.google.com.br/search?q=calculadora+custo+pet&hl=pt-BR&gl=br&num=10) — `fetches/serp-calculadora-custo-pet.md` — the 9 organic results
+- [Calculadora Brasil, custo de pet](https://calculadorabrasil.com.br) — `fetches/calculadorabrasil-custo-pet.md` — position 1
+- [FEDIAF, Nutritional Guidelines](https://europeanpetfood.org/self-regulation/nutritional-guidelines/) — `fetches/fediaf-energy-requirements.md` — energy needs of adult dogs and cats
 - Secondary, search results only and not fetched: BP Money, Contabilidade.com and others saying payroll applies the more beneficial route. They agree with the statute; nothing rests on them.
