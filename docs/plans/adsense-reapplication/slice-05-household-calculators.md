@@ -149,3 +149,31 @@ Same as slice 4: one PR per calculator.
 | hand cases | São Paulo 65,78 × 40 + 922,51 = R$ 3.553,71; Teresina 32,59 × 40 + 698,55 = R$ 2.002,15 |
 | `test:seo` | 28 routes; 22 capital rows and São Paulo's R$ 3.553,71 prerendered |
 | both ends | 2 of 2 capitals typed into the form match the table: SP R$ 3.553,71 (219,2% of R$ 1.621), Teresina R$ 2.002,15 |
+
+### Assinaturas — 2026-10-18
+
+- **Leader:** Núcleo's Calculadora de Streaming. It lists about 70 services at monthly prices
+  with no date, and mentions annual discounts only as a caveat.
+- **Defects:**
+  - "Netflix, Disney+, Prime permitem compartilhamento" was false: Netflix's Help Center says
+    the account cannot be shared outside the household;
+  - streaming prices and averages had no source;
+  - an invented "regra dos 70%";
+  - Truebill, a US app;
+  - a typo.
+- **New:**
+  - `compareAnnualPlan` and `buildAnnualPlanTable`;
+  - a 6-row table of the plans Amazon Prime, Disney+ and HBO Max sell both ways, priced from
+    their pages on 2026-10-18. The annual plan pays off from 8,2 months for Disney+ Padrão to
+    9,6 for HBO Max Platinum;
+  - the article gained the section it lacked.
+- **Found on the way:** the CLT vs PJ smoothness test (slice 4) sweeps 149.000 invoices and ran
+  5,0–5,2 s on a loaded machine. It failed Vitest's default 5 s timeout in 3 of 6 runs; with
+  its own 30 s budget, it passed 6 of 6. The flake was in the timeout, not in the arithmetic.
+
+| check | result |
+|---|---|
+| unit | 366 green, 6 runs in a row. Mutant killed: break-even on the monthly equivalent (3 red) |
+| hand case | Prime: 12 × 19,90 − 166,80 = R$ 72,00; 166,80 / 19,90 = 8,38 months |
+| `test:seo` | 28 routes; 6 plan rows and Prime's "8,4 meses" prerendered |
+| both ends | 2 of 2 plans typed into the form match the table: Prime R$ 72,00, HBO Max Platinum R$ 132,00 |
