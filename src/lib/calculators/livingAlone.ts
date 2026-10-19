@@ -57,6 +57,14 @@ export const FINANCIAL_STATUS_LABEL: Record<FinancialStatus, string> = {
   unknown: "Renda não informada",
 };
 
+/**
+ * The share of net income, in percent, up to which each status applies; above
+ * the last, "critical". The calculator's own bands, not an official rule. The
+ * page's FAQ quotes them from here: it once called 50–70% "apertado", the band
+ * the calculator labels "atenção".
+ */
+export const FINANCIAL_STATUS_BANDS = { comfortable: 50, attention: 70, tight: 90 } as const;
+
 function safe(n: number): number {
   return Number.isFinite(n) && n > 0 ? n : 0;
 }
@@ -122,9 +130,9 @@ export function calculateLivingAloneCost(input: LivingAloneInput): LivingAloneRe
   } else if (remainingIncome !== null && remainingIncome < 0) {
     financialStatus = "critical";
   } else if (incomePercentage !== null) {
-    if (incomePercentage <= 50) financialStatus = "comfortable";
-    else if (incomePercentage <= 70) financialStatus = "attention";
-    else if (incomePercentage <= 90) financialStatus = "tight";
+    if (incomePercentage <= FINANCIAL_STATUS_BANDS.comfortable) financialStatus = "comfortable";
+    else if (incomePercentage <= FINANCIAL_STATUS_BANDS.attention) financialStatus = "attention";
+    else if (incomePercentage <= FINANCIAL_STATUS_BANDS.tight) financialStatus = "tight";
     else financialStatus = "critical";
   }
 
@@ -222,4 +230,74 @@ export function calculateLivingAloneCost(input: LivingAloneInput): LivingAloneRe
     highlights,
     warnings,
   };
+}
+
+const NO_COSTS: LivingAloneInput = {
+  rent: 0,
+  condoFee: 0,
+  iptuMonthly: 0,
+  electricity: 0,
+  water: 0,
+  gas: 0,
+  internet: 0,
+  phone: 0,
+  groceries: 0,
+  deliveryAndRestaurants: 0,
+  transportation: 0,
+  cleaningAndHygiene: 0,
+  laundry: 0,
+  furnitureInstallments: 0,
+  subscriptions: 0,
+  healthAndMedicine: 0,
+  leisure: 0,
+  emergencyReserve: 0,
+  otherCosts: 0,
+  netIncome: 0,
+};
+
+/** One capital's line in the page's table: a roof and food, before anything else. */
+export interface CapitalCostRow {
+  city: string;
+  uf: string;
+  rent: number;
+  basicBasket: number;
+  /** Rent plus the basket, as the calculator adds them. */
+  monthlyTotal: number;
+  /** The total in minimum wages, the share of income it would take at one. */
+  minimumWages: number;
+}
+
+/**
+ * The page's table, built by the calculator: in each capital, a flat of
+ * `areaSquareMetres` at the average rent per m² plus the cesta básica, and
+ * nothing else. Sorted from the dearest.
+ */
+export function buildCapitalCostTable(
+  capitals: readonly {
+    city: string;
+    uf: string;
+    rentPerSquareMetre: number;
+    basicBasket: number;
+  }[],
+  areaSquareMetres: number,
+  minimumWage: number,
+): CapitalCostRow[] {
+  return capitals
+    .map(({ city, uf, rentPerSquareMetre, basicBasket }) => {
+      const rent = Math.round(rentPerSquareMetre * areaSquareMetres * 100) / 100;
+      const { monthlyTotal } = calculateLivingAloneCost({
+        ...NO_COSTS,
+        rent,
+        groceries: basicBasket,
+      });
+      return {
+        city,
+        uf,
+        rent,
+        basicBasket,
+        monthlyTotal,
+        minimumWages: monthlyTotal / minimumWage,
+      };
+    })
+    .sort((a, b) => b.monthlyTotal - a.monthlyTotal);
 }

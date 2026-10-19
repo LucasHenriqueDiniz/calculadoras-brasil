@@ -14,9 +14,13 @@ import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { RelatedPosts } from "@/components/calculator/RelatedPosts";
 import { CopyResultButton, ResetButton, ShareResultButton } from "@/components/calculator/actions";
 import { Prose } from "@/components/layout/PageShell";
+import { CAPITAL_LIVING_COSTS } from "@/data/capital-living-costs";
 import { getCalculator, relatedPostsFor } from "@/data/calculators";
 import { formatBRL } from "@/lib/format";
+import { MINIMUM_WAGE } from "@/lib/calculators/inss-constants";
 import {
+  FINANCIAL_STATUS_BANDS,
+  buildCapitalCostTable,
   calculateLivingAloneCost,
   type LivingAloneInput,
   type LivingAloneResult,
@@ -53,66 +57,102 @@ const DEFAULTS: LivingAloneInput = {
   netIncome: 3500,
 };
 
+// Every figure the FAQ and the table quote comes from the calculator or a cited report.
+const DEFAULT_RESULT = calculateLivingAloneCost(DEFAULTS);
+
+/** The flat the capitals table prices: the page's scenario, not a source's figure. */
+const RENT_AREA_M2 = 40;
+const CAPITAL_TABLE = buildCapitalCostTable(
+  CAPITAL_LIVING_COSTS.capitals,
+  RENT_AREA_M2,
+  MINIMUM_WAGE,
+);
+const DEAREST = CAPITAL_TABLE[0];
+const CHEAPEST = CAPITAL_TABLE[CAPITAL_TABLE.length - 1];
+
+function capital(city: string) {
+  const row = CAPITAL_TABLE.find((candidate) => candidate.city === city);
+  const source = CAPITAL_LIVING_COSTS.capitals.find((candidate) => candidate.city === city);
+  if (!row || !source) throw new Error(`No capital row for ${city}`);
+  return { ...row, rentPerSquareMetre: source.rentPerSquareMetre };
+}
+const SAO_PAULO = capital("São Paulo");
+const RIO = capital("Rio de Janeiro");
+const BELO_HORIZONTE = capital("Belo Horizonte");
+
+/**
+ * FipeZAP, informe de setembro de 2026, across its 36 cities: one-bedroom flats
+ * asked R$ 72,68/m² against R$ 54,77/m² for all sizes. Only the national split
+ * is published, so the table uses each city's average and says so.
+ */
+const ONE_BEDROOM_RENT_PER_M2 = 72.68;
+const ALL_SIZES_RENT_PER_M2 = 54.77;
+
+/** FipeZAP, same report: rent a year as a share of the sale price, on average. */
+const RENTAL_YIELD_PERCENT = 6.13;
+
+function perSquareMetre(value: number): string {
+  return `${formatBRL(value)}/m²`;
+}
+
+function minimumWages(value: number): string {
+  return value.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+}
+
 const FAQ: FAQItem[] = [
   {
     question: "Quanto custa morar sozinho no Brasil?",
-    answer:
-      "Depende muito da cidade e do estilo de vida. Em capitais como SP/RJ, o custo é R$ 2.500-5.000/mês. Em cidades do interior, R$ 1.500-2.500/mês. Fatores: aluguel, condomínio, contas, alimentação, transporte, lazer.",
+    answer: `Depende da cidade e do padrão de vida. Só o aluguel de um apartamento de ${RENT_AREA_M2} m² e a cesta básica custavam, em setembro de 2026, de ${formatBRL(CHEAPEST.monthlyTotal)} em ${CHEAPEST.city} a ${formatBRL(DEAREST.monthlyTotal)} em ${DEAREST.city}, como mostra a tabela por capital. Condomínio, contas, transporte e o resto vêm por cima: no exemplo da calculadora, o total chega a ${formatBRL(DEFAULT_RESULT.monthlyTotal)} por mês.`,
   },
   {
     question: "O que entra no orçamento de morar sozinho?",
     answer:
-      "Custos fixos: aluguel, condomínio, IPTU, luz, água, gás, internet. Variáveis: mercado, delivery, transporte, limpeza, lazer, assinaturas, saúde, emergências. Não esqueça reserva para imprevistos.",
+      "Custos fixos: aluguel, condomínio, IPTU, luz, água, gás e internet. Variáveis: mercado, delivery, transporte, limpeza, lazer, assinaturas, saúde e emergências. Não esqueça uma reserva para imprevistos.",
   },
   {
-    question: "Quanto custa aluguel em SP, RJ, MG?",
-    answer:
-      "Estúdio em SP: R$ 800-1.500. 1 quarto em SP: R$ 1.200-2.000. Rio de Janeiro: 10-15% a mais. Belo Horizonte: 20-30% a menos. Preço varia conforme bairro e proximidade do trabalho.",
+    question: "Quanto custa o aluguel em São Paulo, no Rio e em Belo Horizonte?",
+    answer: `No Índice FipeZAP de setembro de 2026, o preço médio pedido nos anúncios de aluguel era de ${perSquareMetre(SAO_PAULO.rentPerSquareMetre)} em São Paulo, ${perSquareMetre(RIO.rentPerSquareMetre)} no Rio de Janeiro e ${perSquareMetre(BELO_HORIZONTE.rentPerSquareMetre)} em Belo Horizonte: ${formatBRL(SAO_PAULO.rent)}, ${formatBRL(RIO.rent)} e ${formatBRL(BELO_HORIZONTE.rent)} por um apartamento de ${RENT_AREA_M2} m². É a média de apartamentos de todos os tamanhos e bairros; os de um dormitório custam mais por m².`,
   },
   {
     question: "Como saber se consigo morar sozinho?",
-    answer:
-      "Calcule: gastos mensais ÷ renda líquida. Se resultar em menos de 50% da renda, está seguro. 50-70% é apertado. Acima de 70%, espere ganhar mais ou gastar menos. Deixe 30% para emergências e lazer.",
+    answer: `Divida o custo mensal pela renda líquida. A calculadora chama de confortável um custo de até ${FINANCIAL_STATUS_BANDS.comfortable}% da renda, de atenção até ${FINANCIAL_STATUS_BANDS.attention}%, de apertado até ${FINANCIAL_STATUS_BANDS.tight}% e de muito apertado acima disso ou quando a conta não fecha. São faixas da calculadora, não uma regra oficial: o que importa é sobrar o bastante para imprevistos.`,
   },
   {
-    question: "Quanto guardar antes de sair de casa?",
+    question: "Quais são os custos para sair de casa e alugar?",
     answer:
-      "Idealmente: 3 meses de custos fixos + gastos iniciais (caução, frete, móveis, utensílios). Exemplo: R$ 2.000/mês em custos fixos = R$ 6.000 + R$ 5.000 (móveis) = R$ 11.000 como piso mínimo.",
+      "Além de móveis, eletrodomésticos e mudança, o contrato pode pedir uma garantia: caução, fiador, seguro-fiança ou cessão de cotas de fundo, e só uma delas (Lei 8.245/1991, art. 37). A caução em dinheiro não pode passar de três aluguéis (art. 38). O aluguel antecipado só pode ser cobrado quando não há garantia ou na locação para temporada (arts. 20 e 42). As taxas de intermediação e de administração da imobiliária são do proprietário, não do inquilino (art. 22, VII), e cobrar valores além do aluguel e dos encargos permitidos é contravenção penal (art. 43).",
   },
   {
     question: "Qual é o melhor bairro para morar sozinho?",
     answer:
-      "Critérios: proximidade do trabalho (reduz transporte), segurança, comércio, transportes. Às vezes um bairro mais barato mas distante custa mais em transporte. Use a calculadora para testar diferentes cenários.",
+      "Pese a distância do trabalho, a segurança, o comércio e o transporte. Um bairro mais barato e distante pode sair mais caro somando o transporte. Use a calculadora para comparar os cenários.",
   },
   {
-    question: "Quanto custa condomínio + IPTU?",
+    question: "Quem paga o condomínio e o IPTU?",
     answer:
-      "Condomínio varia R$ 150-500/mês (mais em áreas nobres). IPTU varia R$ 50-200/mês conforme valor do imóvel. Juntos podem ser R$ 200-700/mês. Negocie esses valores com o proprietário.",
+      "Pela Lei do Inquilinato, o inquilino paga as despesas ordinárias de condomínio (Lei 8.245/1991, art. 23, XII), e o proprietário as extraordinárias, como obras, pintura da fachada e fundo de reserva (art. 22, X). O IPTU é do proprietário, salvo se o contrato passar a obrigação ao inquilino (art. 22, VIII): confira o contrato antes de assinar.",
   },
   {
     question: "Como economizar morando sozinho?",
     answer:
-      "1) Aluguel é 40-50% do orçamento — escolha bem. 2) Compartilhe (reduz aluguel em 50%). 3) Cozinhe em casa (comida caseira é 60% mais barata). 4) Transporte público vs uber/carro. 5) Corte assinaturas desnecessárias.",
+      "Comece pela maior categoria do resultado. Comparar o aluguel com o preço por m² da sua cidade, dividir o imóvel, cozinhar em casa, trocar viagens de aplicativo por transporte público e cortar assinaturas que você não usa são os ajustes que mais mexem no total.",
   },
   {
     question: "Vale a pena alugar ou comprar?",
-    answer:
-      "Aluguel: flexibilidade, sem compromisso. Compra: construir patrimônio, mas exige capital inicial. Com juros altos, alugar é mais barato. Com juros baixos, compra pode ser melhor a longo prazo (10+ anos).",
+    answer: `Depende do preço do imóvel, dos juros e de quanto tempo você vai ficar. Uma referência: em setembro de 2026, o FipeZAP estimou o aluguel residencial, em média, em ${RENTAL_YIELD_PERCENT.toLocaleString("pt-BR")}% ao ano do preço de venda. Se o dinheiro da compra rende mais do que isso aplicado, alugar tende a sair mais barato, sem contar a valorização do imóvel; financiar acrescenta os juros do contrato.`,
   },
   {
-    question: "Quanto gasto com energia elétrica sozinho?",
+    question: "Quanto gasto com energia elétrica morando sozinho?",
     answer:
-      "Média: R$ 100-200/mês em apartamento. Varia conforme clima, eletrodomésticos, hábitos (ar-condicionado é o vilão). Use nossa calculadora de conta de luz para ver por aparelho.",
+      "Depende dos aparelhos que você usa e da tarifa da sua distribuidora. A calculadora de conta de luz calcula aparelho por aparelho, com a tarifa da ANEEL para o seu estado.",
   },
   {
     question: "A calculadora funciona para qualquer cidade?",
-    answer:
-      "Sim. Ajuste os valores de aluguel, contas, alimentação conforme sua realidade. A estrutura funciona igual — muda só os números. Para cidades maiores, aumente; para menores, reduza.",
+    answer: `Sim: ajuste aluguel, contas e alimentação à sua realidade. A tabela por capital cobre as ${CAPITAL_TABLE.length} capitais que o Índice FipeZAP acompanha.`,
   },
   {
-    question: "Quanto guardar por mês como emergência?",
-    answer:
-      "Recomendação: 5-10% da renda ou R$ 200-500/mês. Emergências acontecem (geladeira quebra, dente dói, carro precisa conserto). Ter reserva evita dívida desnecessária.",
+    question: "Quanto guardar por mês como reserva de emergência?",
+    answer: `Não há percentual oficial. O exemplo da calculadora guarda ${formatBRL(DEFAULTS.emergencyReserve)} por mês; o que importa é o total guardado cobrir alguns meses de custos fixos se a renda parar.`,
   },
 ];
 
@@ -329,6 +369,81 @@ function LivingAloneResults({
 }
 
 /** The editorial section under the calculator. Static, so it takes no props. */
+function CapitalCostSection() {
+  return (
+    <Prose>
+      <h2>Quanto custa morar sozinho em cada capital</h2>
+      <p>
+        A tabela foi calculada pela própria calculadora com só dois custos: o aluguel de um
+        apartamento de {RENT_AREA_M2} m² ao preço médio por m² da cidade no Índice FipeZAP de
+        setembro de 2026, e a cesta básica do DIEESE no mesmo mês, a quantidade de alimentos que a
+        lei define para um adulto por mês. Condomínio, contas e transporte ficam de fora, por isso é
+        um piso, não o custo total.
+      </p>
+      <div className="not-prose overflow-x-auto rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]">
+        <table className="w-full min-w-[600px] text-sm">
+          <caption className="sr-only">
+            Aluguel de {RENT_AREA_M2} m² e cesta básica por capital, setembro de 2026
+          </caption>
+          <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th scope="col" className="px-3 py-2.5">
+                Capital
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Aluguel de {RENT_AREA_M2} m²
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Cesta básica
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Aluguel + cesta
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Em salários mínimos
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {CAPITAL_TABLE.map((row) => (
+              <tr key={row.city} className="border-t border-border/70">
+                <th scope="row" className="px-3 py-2 text-left font-medium text-foreground">
+                  {row.city} ({row.uf})
+                </th>
+                <td className="px-3 py-2 text-right">{formatBRL(row.rent)}</td>
+                <td className="px-3 py-2 text-right">{formatBRL(row.basicBasket)}</td>
+                <td className="px-3 py-2 text-right font-semibold text-foreground">
+                  {formatBRL(row.monthlyTotal)}
+                </td>
+                <td className="px-3 py-2 text-right">{minimumWages(row.minimumWages)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        O FipeZAP mede o preço pedido em anúncios de novos aluguéis de apartamentos de todos os
+        tamanhos. Os de um dormitório custam mais por m²: no país,{" "}
+        {perSquareMetre(ONE_BEDROOM_RENT_PER_M2)} contra {perSquareMetre(ALL_SIZES_RENT_PER_M2)} da
+        média. Boa Vista, Macapá, Palmas, Porto Velho e Rio Branco têm cesta básica, mas não têm
+        índice de aluguel, e ficaram de fora. O salário mínimo usado é o de 2026,{" "}
+        {formatBRL(MINIMUM_WAGE)}.
+      </p>
+      <p>
+        Fontes:{" "}
+        <a href={CAPITAL_LIVING_COSTS.rentSourceUrl} target="_blank" rel="noreferrer">
+          {CAPITAL_LIVING_COSTS.rentSource}
+        </a>{" "}
+        e{" "}
+        <a href={CAPITAL_LIVING_COSTS.basketSourceUrl} target="_blank" rel="noreferrer">
+          {CAPITAL_LIVING_COSTS.basketSource}
+        </a>
+        .
+      </p>
+    </Prose>
+  );
+}
+
 function LivingAloneArticle() {
   return (
     <Prose collapsibleTitle="Saiba mais sobre morar sozinho">
@@ -345,7 +460,8 @@ function LivingAloneArticle() {
           <strong>Condomínio:</strong> obrigatório em apartamentos, varia muito por prédio.
         </li>
         <li>
-          <strong>IPTU:</strong> imposto municipal, geralmente anual mas pode ser parcelado.
+          <strong>IPTU:</strong> imposto municipal, anual ou parcelado. No aluguel, é do
+          proprietário, salvo se o contrato disser o contrário (Lei 8.245/1991, art. 22, VIII).
         </li>
         <li>
           <strong>Luz:</strong> depende do consumo e da tarifa local.
@@ -391,7 +507,10 @@ function LivingAloneArticle() {
       <h2>Custos iniciais que muita gente esquece</h2>
       <p>Além dos gastos mensais, mudar sozinho exige um valor inicial. Os principais são:</p>
       <ul>
-        <li>Caução, depósito ou seguro-fiança</li>
+        <li>
+          A garantia do contrato: caução de até três aluguéis, fiador ou seguro-fiança, só uma delas
+          (Lei 8.245/1991, arts. 37 e 38)
+        </li>
         <li>Frete da mudança</li>
         <li>Móveis essenciais (cama, mesa, sofá, armários)</li>
         <li>Eletrodomésticos (geladeira, fogão, micro-ondas, máquina de lavar)</li>
@@ -475,6 +594,8 @@ function LivingAlonePage() {
           />
         </div>
       </section>
+
+      <CapitalCostSection />
 
       <LivingAloneArticle />
 
