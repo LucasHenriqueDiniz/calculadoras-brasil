@@ -89,6 +89,18 @@ The row at R$ 4.500 reproduces the Receita's own worked example to the centavo: 
 table R$ 200,39, reduced to zero. That is the cross-check that the table is the law and not only
 the module's opinion of it.
 
+### Found later, in slice 6 (2026-10-19)
+
+Writing `/metodologia` exposed three figures this note did not read:
+
+- the vale-transporte as min(6%, R$ 250), where Lei 7.418/1985 caps the worker's share at the
+  commute's cost, with no R$ 250;
+- a fixed R$ 360 meal allowance;
+- a monthly 0,33% union due, where CLT, arts. 580, I, and 582, take one day's pay in March.
+
+The FAQ also said the meal allowance "reduz o imposto". All four are fixed in `80eb069`, with a
+red test for each mutant.
+
 ### Verdict for this page
 
 The added value is **correctness made visible**: the same rule the leader applies, explained where

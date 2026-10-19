@@ -1,9 +1,14 @@
 ---
-status: active
+status: done
 epic: adsense
 ---
 
 # Google rejected the site for low-value content, and our own checklist had signed off
+
+> ⚠️ **Closed 2026-10-19.** Superseded by [[adsense-reapplication]], whose plan
+> (`docs/plans/adsense-reapplication/`) carried every open item below. Each box is ticked with the
+> measurement that closed it (✅), or points at the slice that owns it (⏭). The rest of the text is
+> kept as written: it is the record of what was believed in September.
 
 ## The problem
 
@@ -147,7 +152,7 @@ supposed to know about it.
       The bands are calibrated for copied text. **This measurement was never able to
       see what Google objected to**, which is why the item below is now the blocking
       one rather than a follow-up.
-- [ ] **⚠️ Re-review the three judgement rows against competitors, not against
+- [x] **⚠️ Re-review the three judgement rows against competitors, not against
       structure** — `ADS-CONTENT-01`, `ADS-CONTENT-ORIGINAL`,
       `ADS-CONTENT-ADDED-VALUE`. **Now the blocking item**, promoted by the research
       above. For each of the 12 calculators: what does this page do that the top
@@ -168,35 +173,45 @@ supposed to know about it.
       the site, and is the worst of the four. `custo-pet` was picked as the control
       — the least contested query — and it failed the same way, which argues the
       shape of the pages is the problem rather than the competition.
-- [ ] **`ADS-PRIV-04` — ship a consent path.** Either enable Funding Choices on
+      ✅ **Done 2026-10-18, slices 3–5 of [[adsense-reapplication]].** All 12 calculators were read against the first Google result for their query (`docs/research/2026-10-18-adsense-added-value/research.md`). Every one had at least one defect in its arithmetic or a false statement. Each gained a table its own calculator computes, checked against the form. Whether that is enough is for slice 7's audit and for Google to say.
+- [x] **`ADS-PRIV-04` — ship a consent path.** Either enable Funding Choices on
       the account, or gate the `adsbygoogle.js` tag in `__root.tsx` behind a
       certified CMP. Today the tag fires for every visitor including EEA/UK ones,
       and `__tcfapi` is undefined.
-- [ ] **`ADS-CONTENT-03` — raise `blog/quanto-custa-morar-sozinho`** from 286
+      ✅ **Measured 2026-10-18:** `window.__tcfapi` is a function and Funding Choices serves, with the `__tcfapiLocator` iframe present (`docs/pitches/adsense-reapplication.md`).
+- [x] **`ADS-CONTENT-03` — raise `blog/quanto-custa-morar-sozinho`** from 286
       words, and decide what to do about the four pages in the 300–449 band
       (home 315, `/comparar/` 342, `blog/como-economizar-conta-de-luz` 300,
       `blog/assinaturas-que-valem-a-pena` 318).
-- [ ] **`ADS-COMPLETE-02` — get a third blog article past 1200 words.** Two make
+      ✅ **Closed by slice 1.** The article reached 1619 words, then went to `/calculadora-morar-sozinho` with a 301, as Google had declined it. Of the four pages in the 300–449 band, `/comparar` redirects to `/comparar/energia`, and the home page was rewritten in slice 2. Measured 2026-10-19, locally: home 445 words, `/calculadoras` 767, `blog/como-economizar-conta-de-luz` 456, `blog/assinaturas-que-valem-a-pena` 479. [[adsense-reapplication]] dropped word count as a criterion after research found Google declined the two longest articles.
+- [x] **`ADS-COMPLETE-02` — get a third blog article past 1200 words.** Two make
       it today: `guia-irpf-2026` (1494) and `calculadora-irpf-2026` (1952). The
       row can be argued closed by counting calculator bodies instead, and the
       point of doing the work is to stop arguing.
-- [ ] **`ADS-CRAWL-05` — make the canonical URL be a URL that answers 200.**
+      ✅ **Measured 2026-10-18: 4 articles at 1200+.** Superseded as a criterion for the same reason as the item above.
+- [x] **`ADS-CRAWL-05` — make the canonical URL be a URL that answers 200.**
       Affects the 24 pages that declare a canonical.
-- [ ] **`ADS-CRAWL-04` — 301/308 instead of 307** for trailing-slash
+      ✅ **Measured 2026-10-18:** the canonical answers 200 (`curl`, D4).
+- [x] **`ADS-CRAWL-04` — 301/308 instead of 307** for trailing-slash
       normalisation, on the 22 pages that redirect.
-- [ ] **`ADS-CRAWL-07` — add `/calculadoras`** to `src/lib/seo-pages.ts`, and
+      ✅ **Measured 2026-10-18:** only the slash form still answers 307, and nothing links to it (D4).
+- [x] **`ADS-CRAWL-07` — add `/calculadoras`** to `src/lib/seo-pages.ts`, and
       therefore to `sitemap.xml`, and to `tests/seo-smoke.mjs`.
-- [ ] **Install the auditor skill** so it is invocable as
+      ✅ **Done:** `/calculadoras` is in `seo-pages.ts` and `seo-smoke.mjs` (2026-10-18), and slice 2 gave it editorial content after Google classed it a Soft 404.
+- [x] **Install the auditor skill** so it is invocable as
       `/adsense-site-auditor` rather than read by hand:
       `ln -s ~/dev/pessoal/adsense-site-auditor ~/.claude/skills/adsense-site-auditor`
-- [ ] **Answer the 12 `owner` rows in writing** — `ADS-ELIG-01/02`,
+      ✅ **Done 2026-09-10:** `~/.claude/skills/adsense-site-auditor` is a symlink to the repo.
+- [x] **Answer the 12 `owner` rows in writing** — `ADS-ELIG-01/02`,
       `ADS-OWN-01/02`, `ADS-SITE-01/02`, `ADS-PROG-01/04/07`, `ADS-PRIV-08/09/10`.
       Eight came back `Unknown` on 2026-09-10 because nobody had been asked.
       An attestation that is written down is a different artefact from one that
       is assumed, and the reference insists on the distinction.
-- [ ] **Retire `ADSENSE-CHECKLIST.md`** in its current form. Whatever replaces it
+      ✅ **Answered 2026-10-19** by the account holder: `docs/adsense/owner-attestations.md`.
+- [x] **Retire `ADSENSE-CHECKLIST.md`** in its current form. Whatever replaces it
       must not be able to grade itself: the verdict comes from a skill run whose
       `Unknown` rows survive into the report.
+      ✅ **Deleted 2026-10-19** in slice 6.
 
 ### Out of scope
 
@@ -233,24 +248,29 @@ supposed to know about it.
       out nothing else. `WebSearch` was unavailable, so all 20 SERP positions were
       resolved by hand in a browser; the note records that and the two competitor
       pages whose extracted text was too thin for their 0% to carry weight.
-- [ ] **Does Google publish anything operational behind "Conteúdo de baixo
+- [x] **Does Google publish anything operational behind "Conteúdo de baixo
       valor"?** Section J of the reference already records that the rejection-rate
       figures it used to carry had no source and were removed. Assume the same
       applies to any threshold found in a blog post, and cite only Google.
-- [ ] **Does enabling Funding Choices satisfy `ADS-PRIV-04` without a code
+      ✅ **Answered 2026-10-18** ([[2026-10-18-adsense-reapplication]], finding 7): no thresholds anywhere. The repeated test is original information or analysis that adds substantial value against what already ranks.
+- [x] **Does enabling Funding Choices satisfy `ADS-PRIV-04` without a code
       change, and can it be configured while the site is in "Requer atenção"?**
       If yes, the cheapest fix for a High risk is a dashboard toggle.
-- [ ] **Is there a cooldown before reapplying, and does a resubmission re-review
+      ✅ **Answered by measurement 2026-10-18:** Funding Choices serves `__tcfapi` on the live site.
+- [x] **Is there a cooldown before reapplying, and does a resubmission re-review
       the whole site or only what changed?** This decides whether the fixes ship
       as one batch or can go out incrementally.
-- [ ] **Which of the 49 pages did the review actually look at?** Probably not
+      ✅ **Answered 2026-10-18** (finding 6): the review covers the whole site, and no cooldown is documented for readiness reviews. Ship as one batch and request review once.
+- [x] **Which of the 49 pages did the review actually look at?** Probably not
       knowable. If it is not, say so in the research note rather than leaving the
       question open — an unanswerable question closed as unanswerable is worth
       more than one that looks pending forever.
-- [ ] **Does the `/comparar/` section read as thin aggregation?** Its four pages
+      ✅ **Closed as unknowable 2026-10-18.** What is knowable: Google indexes 20 of 51 pages (finding 2).
+- [x] **Does the `/comparar/` section read as thin aggregation?** Its four pages
       measure 1016–1278 words, which is healthy, but a comparison page is the
       shape most likely to be read as curation without added value, and the
       audit passed it on structure like the rest.
+      ✅ **Closed by slice 1:** Google had not indexed 3 of the 4 comparisons. They redirect to the calculators, and `/comparar` to `/comparar/energia`.
 
 ## Testing strategy
 
@@ -273,23 +293,32 @@ none of it is a pure formula.
 
 ## Success criteria
 
-- [ ] `docs/research/<date>-adsense-content-overlap/research.md` holds an overlap
+- [x] `docs/research/<date>-adsense-content-overlap/research.md` holds an overlap
       percentage per main page, with every competitor page fetched and committed.
+      ✅ Done 2026-09-10.
 - [ ] A fresh `/adsense-site-auditor` run against the live site reports **zero
       `Fail` rows among the 35 `auto` requirements**, and every `Unknown` that
       remains says what access it needs.
-- [ ] The 12 `owner` rows are answered, in writing, by the account holder.
-- [ ] `window.__tcfapi` is defined on the live site, or the account's Funding
+      ⏭ → **slice 7** of [[adsense-reapplication]].
+- [x] The 12 `owner` rows are answered, in writing, by the account holder.
+      ✅ Answered 2026-10-19.
+- [x] `window.__tcfapi` is defined on the live site, or the account's Funding
       Choices setting is recorded as the reason it does not need to be.
-- [ ] No page reachable from `src/lib/seo-pages.ts` measures below 450 words.
+      ✅ Defined on the live site, measured 2026-10-18.
+- [x] No page reachable from `src/lib/seo-pages.ts` measures below 450 words.
+      ✅ Dropped as a criterion by [[adsense-reapplication]]: Google declined the two longest articles. The home page measures 445 (2026-10-19).
 - [ ] `pnpm run check` and `pnpm run test:seo` are green.
-- [ ] `/adsense-site-auditor` is invocable as a skill, not read by hand from
+      ⏭ → **slice 7**. `test:seo` is green. `check` stops at `pnpm audit` on findings that predate this work (2026-10-18).
+- [x] `/adsense-site-auditor` is invocable as a skill, not read by hand from
       another repo.
-- [ ] `ADSENSE-CHECKLIST.md` is gone or rewritten so that it cannot report a
+      ✅ Done 2026-09-10.
+- [x] `ADSENSE-CHECKLIST.md` is gone or rewritten so that it cannot report a
       score it did not measure.
+      ✅ Gone 2026-10-19.
 - [ ] The decision — reapply, or hold and change the content strategy — is an
       entry in the `## Decisions` section of
       `docs/architecture/ARCHITECTURE.md`, dated, with the overlap number in it.
+      ⏭ → **slice 7**, as D7.
 
 ## Appetite
 

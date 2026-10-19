@@ -466,7 +466,10 @@ The violations that exist right now.
           the head, not its cause. The lesson for the next reader: a hydration error in `pnpm run dev`
           is not evidence of one in production, and the deployed preview is the cheap way to tell.
 
-- [ ] **`ADSENSE-CHECKLIST.md` sits at the repo root**, dated 2026-06-26 with 3 of 7 fixes still
+- [x] **`ADSENSE-CHECKLIST.md` sits at the repo root**, dated 2026-06-26 with 3 of 7 fixes still
       open. It is a roadmap document living outside `docs/`, and it has not moved in two months.
+      ✅ Resolved 2026-10-19: deleted in slice 6 of [[adsense-reapplication]]. It graded itself 63/63
+      before a rejection; the owner's 12 answers now live in `docs/adsense/owner-attestations.md`, and
+      the verdict comes from the auditor's report in slice 7, whose `Unknown` rows survive into it.
 - [ ] **No test covers the two adapters.** `aneel.ts` and `anp.ts` parse third-party formats — an
       upstream column rename is caught today only by a visitor seeing the fallback message.

@@ -1,5 +1,5 @@
 ---
-status: todo
+status: done
 ---
 
 # Slice 6 — Close out what the first round left open
@@ -50,3 +50,55 @@ prints `OK`.
 
 If the owner has not answered the 12 rows, this slice stays open, and slice 7 does not start.
 Unanswered owner rows are exactly what the 26 June checklist assumed.
+
+---
+
+## What actually happened — 2026-10-19
+
+1. **The 12 owner rows.** Each requirement was put to the account holder as a statement, and the
+   owner confirmed all 12 in writing. `docs/adsense/owner-attestations.md` has one dated line per
+   row. Where the repository or the AdSense panel also shows something, the line says what. Where
+   the evidence was weaker than it first read, the line says that too: Search Console cannot rule
+   out non-search traffic, and serving a domain does not show who registered it.
+2. **`/sobre`.** The page already named the author with LinkedIn and GitHub. The owner chose to
+   disclose how the content is made. A new section, "Como o conteúdo é feito", says that the
+   code and texts are written with AI (Claude, from Anthropic) and reviewed by the author before
+   publishing, that the rules come from official or primary sources, and that the tables are
+   computed and the formulas tested.
+3. **`ADSENSE-CHECKLIST.md`** is deleted, and the ARCHITECTURE.md known gap is marked resolved.
+4. **The old pitch** is `status: done`. Each item is ticked with the measurement that closed it.
+   The three success criteria that need the final audit point at slice 7.
+5. **`/metodologia` was wrong, not just unmeasurable.** It covered 6 of 12 calculators. It
+   described a freight estimate "from distance and volume" that no calculator ever made, and a
+   "35% of income" rule the calculator did not use. It said personal taxes were not covered,
+   while six calculators computed them. It listed Inmetro's efficiency data as used by the car
+   calculator, which used none. It now has a section per calculator, describing what the code
+   does and reading its figures from the modules, so the page cannot drift.
+   - **The `ERR` was fixed by the content, not the markup.** The extractor erred only because the
+     22 words of the table of contents put the page on either side of the 450-word band, 449 or
+     471. At 1678 words that cannot happen: with the document wrapped in `<div>` instead of
+     `<article>`, the check still passes. The `<article>` stays because it is the right
+     element, but nothing claims it fixed anything.
+6. **Found while writing it: three invented figures in the net-salary calculator** (`80eb069`).
+   - The vale-transporte took min(6%, R$ 250); the law has no R$ 250 cap.
+   - The meal allowance was a fixed R$ 360.
+   - The union due was 0,33% a month. CLT, art. 582, has it as one day's pay, once a year, in
+     March.
+   The FAQ also answered "Sim" to "Vale refeição reduz meu imposto?". Each is fixed from the
+   statute, with a test that turns red when it is put back.
+
+| check | result |
+|---|---|
+| owner rows | `grep -c '^| ADS-' docs/adsense/owner-attestations.md` = 12 |
+| checklist | `test ! -e ADSENSE-CHECKLIST.md` |
+| old pitch | `status: done` |
+| `/metodologia` text depth | PASS, 1678 words, against the local server. Run against production after the merge |
+| `/sobre` text depth | 363 words, a note in the 300–449 band, not a failure |
+| unit | 386 green. Mutants killed: the R$ 250 cap and the monthly union due (1 red each) |
+| `test:seo` | 28 routes; all 12 calculator sections on `/metodologia`, no "35% da renda", and the disclosure on `/sobre` |
+| browser | R$ 6.000 with a R$ 400 commute: vale-transporte R$ 360,00, net R$ 4.613,39, union R$ 200,00 in March only |
+| `pnpm run check` | stops at `pnpm audit`, on findings that predate this work; a separate task |
+
+**Not done here, and worth a look before slice 7:** the 7 blog articles slice 1 kept were not
+re-read against sources. They carry figures like "o chuveiro pode representar 20-30% da conta"
+in their FAQs, and the calculators no longer stand behind figures like that.
