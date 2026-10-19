@@ -25,10 +25,7 @@ export const Route = createFileRoute("/api/energy-tariffs")({
               const distributors = await fetchAneelDistributors(uf);
               return json(
                 { available: true, source: "ANEEL", distributors },
-                {
-                  cacheControl:
-                    "public, max-age=0, s-maxage=604800, stale-while-revalidate=2592000",
-                },
+                { cacheControl: "public, max-age=0, s-maxage=604800" },
               );
             }
 
@@ -43,7 +40,7 @@ export const Route = createFileRoute("/api/energy-tariffs")({
             return json(
               { available: true, ...result },
               {
-                cacheControl: "public, max-age=0, s-maxage=604800, stale-while-revalidate=2592000",
+                cacheControl: "public, max-age=0, s-maxage=604800",
               },
             );
           } catch (error) {

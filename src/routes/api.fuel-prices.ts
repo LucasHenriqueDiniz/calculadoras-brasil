@@ -34,7 +34,7 @@ export const Route = createFileRoute("/api/fuel-prices")({
             return json(
               { available: true, ...result },
               {
-                cacheControl: "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800",
+                cacheControl: "public, max-age=0, s-maxage=86400",
               },
             );
           } catch (error) {

@@ -115,7 +115,7 @@ Four properties the CLAUDE.md requires, and where each one lives:
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | timeout             | `bounded-fetch.ts`, `DEFAULT_TIMEOUT_MS = 15_000`                                                                                                                         |
 | response-size limit | `bounded-fetch.ts`, `maxBytes` — checked on `content-length` **and** while streaming                                                                                      |
-| cache               | `edge-cache.ts` (Cloudflare Cache API) + `s-maxage=300, stale-while-revalidate=3600` in `responses.ts`                                                                    |
+| cache               | `edge-cache.ts` (Cloudflare Cache API) + `s-maxage=300` in `responses.ts`, no `stale-while-revalidate` (the Cache API ignores it; a browser would not)                    |
 | manual fallback     | `unavailable()` in `responses.ts` returns **HTTP 200** with `available: false`; the page then renders `PUBLIC_DATA_FALLBACK_MESSAGE` and lets the visitor type the number |
 
 ⚠️ **The fallback answers 200, not an error status, on purpose.** An upstream outage is a normal
