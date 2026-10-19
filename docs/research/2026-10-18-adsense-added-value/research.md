@@ -36,7 +36,8 @@ Measured against claimed is marked in every row.
 | salário líquido | calculadora salário líquido 2026 | buk.com.br | see below | **built** (slice 3) |
 | CLT vs PJ | calculadora clt vs pj | nagringa.dev | see below | **built** (slice 4) |
 | IRPF 2026 | calculadora irpf 2026 | receita.fazenda.gov.br (official simulator) | see below | **built** (slice 4) |
-| the other 9 | — | — | — | slices 4–5 |
+| INSS autônomo | calculadora inss autônomo | meutudo.com.br | see below | **built** (slice 4) |
+| the other 8 | — | — | — | slices 4–5 |
 
 ## Salário líquido
 
@@ -154,6 +155,32 @@ Its annual tab is **exercício 2026**, the return filed in 2026 on 2025 income.
 | **how much more than INSS the complete return needs, per income** | 9-row table built by the calculator | no | limiar R$ 5.782,90 at R$ 120.000: one real above picks complete, one below picks simplified, in the form |
 | deductions itemised (dependants, health, education per person, PGBL at 12%) | yes | one total | tests, 4 mutants killed |
 | says which tax year, and points the 2026 filer to the Receita's own simulator | yes | "Exercício 2026" only | page |
+
+## INSS autônomo
+
+### What the leader does (measured)
+
+meutudo.com.br (Google Brasil, 2026-10-18; other results include ecalculos, the Receita's SAL and
+gov.br's GPS page):
+- 3.214 words, and one input: a salary. It is an **employee** INSS calculator.
+- Self-employed, MEI and facultativo contributions are covered only in text.
+- Its tables are headed **2025 and 2024**.
+
+### What ours did before today (measured)
+
+- It applied art. 19's 20 years to every man, so a man contributing since before the reform, who
+  can retire with 15 under art. 18, was told he had not reached the minimum.
+- Its sex selector said "Masculino (mínimo de 20 anos)".
+- Its disclaimer said transition rules were not considered.
+
+### What ours does now that the leader does not
+
+| | ours | meutudo | how verified |
+|---|---|---|---|
+| the two self-employed plans, 20% and 11%, with their cost | yes | text only | form |
+| **EC 103's minimum by affiliation date: art. 18 against art. 19** | yes, a field | no | form: a man with 15 years reaches it before the reform and lacks 5 years after it; 2 mutants killed |
+| **what the 20% plan costs more, and what it pays more, across five incomes** | table built by the calculator | no | R$ 3.500 at 30 years: R$ 2.800,00 in the table and in the form |
+| 2026 values | yes | 2025 and 2024 tables | page |
 
 ## What this does not establish
 

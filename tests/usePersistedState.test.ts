@@ -50,7 +50,10 @@ const ROUTE_KEYS: ReadonlyArray<readonly [string, string, string]> = [
   // Slices 3 and 4 of docs/plans/english-domain-identifiers/ bumped three more
   // keys for the same reason. Without a row here, a revert to an unbumped key
   // would pass the suite and hand a returning visitor a form of undefineds.
-  ["src/routes/calculadora-inss-autonomo.tsx", "inss-autonomo-input-v2", "inss-autonomo-input"],
+  ["src/routes/calculadora-inss-autonomo.tsx", "inss-autonomo-input-v3", "inss-autonomo-input"],
+  // v3: affiliatedBeforeReform joined the input; a v2 form would read undefined
+  // and apply art. 19's 20 years to every man.
+  ["src/routes/calculadora-inss-autonomo.tsx", "inss-autonomo-input-v3", "inss-autonomo-input-v2"],
   ["src/routes/calculadora-clt-vs-pj.tsx", "clt-vs-pj-input-v3", "clt-vs-pj-input"],
   // v3: the PJ field became company costs, which shelter no tax under the
   // Simples (decision D6); a v2 form would hand it a deductible-expense figure.

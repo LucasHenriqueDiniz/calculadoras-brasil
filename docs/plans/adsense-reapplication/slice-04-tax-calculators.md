@@ -127,4 +127,20 @@ happens in slice 7, so nothing is gained by batching here.
   - the R$ 120.000 threshold flips between one real above and one real below;
   - `test:seo` asserts the table and the tax-year notice.
 
-Still open for this slice: INSS autônomo, previdência complementar and benefícios fiscais.
+### INSS autônomo — 2026-10-18
+
+- **Leader:** meutudo.com.br, an employee INSS calculator with 2025 tables.
+- **Defect, against EC 103/2019 on Planalto:** the module applied art. 19's 20 years to every man.
+  Art. 18 gives 15 to anyone affiliated before 13/11/2019. The 2-point increment still starts at
+  20 for men (art. 26 § 2º), a threshold the module had conflated with the minimum.
+- **Fixed:**
+  - an affiliation field, with the storage key moved to v3;
+  - the minimum age reported;
+  - a 5-row plan table built by the calculator.
+- **Checked:**
+  - 2 mutants killed;
+  - in the form, R$ 3.500 at 30 years gives R$ 2.800,00, as in the table;
+  - a man with 15 years reaches the minimum before the reform and lacks 5 after it;
+  - `test:seo` asserts the table.
+
+Still open for this slice: previdência complementar and benefícios fiscais.

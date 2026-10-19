@@ -5,7 +5,10 @@ import { calculateElectricityBill } from "../src/lib/calculators/electricityBill
 import { calculateSubscriptions } from "../src/lib/calculators/subscriptions";
 import { calculateMovingCost } from "../src/lib/calculators/movingCost";
 import { calculatePetCost } from "../src/lib/calculators/petCost";
-import { calculateInssAutonomo } from "../src/lib/calculators/inssAutonomo";
+import {
+  buildPlanComparisonTable,
+  calculateInssAutonomo,
+} from "../src/lib/calculators/inssAutonomo";
 import {
   calculateEmployeeInss,
   MINIMUM_WAGE,
@@ -202,6 +205,7 @@ describe("self-employed INSS", () => {
       grossMonthlyIncome: 3000,
       contributedMonths: 0,
       contributorSex: "masculino",
+      affiliatedBeforeReform: false,
     });
 
     expect(result.contributionBase).toBe(3000);
@@ -216,6 +220,7 @@ describe("self-employed INSS", () => {
       grossMonthlyIncome: 30_000,
       contributedMonths: 0,
       contributorSex: "masculino",
+      affiliatedBeforeReform: false,
     });
     expect(aboveCeiling.contributionBase).toBe(INSS_CEILING);
     expect(aboveCeiling.cappedByCeiling).toBe(true);
@@ -224,6 +229,7 @@ describe("self-employed INSS", () => {
       grossMonthlyIncome: 800,
       contributedMonths: 0,
       contributorSex: "masculino",
+      affiliatedBeforeReform: false,
     });
     expect(belowFloor.contributionBase).toBe(MINIMUM_WAGE);
     expect(belowFloor.raisedToFloor).toBe(true);
@@ -234,6 +240,7 @@ describe("self-employed INSS", () => {
       grossMonthlyIncome: 5000,
       contributedMonths: 10 * 12,
       contributorSex: "masculino",
+      affiliatedBeforeReform: false,
     });
     expect(result.minimumTimeReached).toBe(false);
     expect(result.standardPlanBenefitEstimate).toBe(0);
@@ -244,6 +251,7 @@ describe("self-employed INSS", () => {
       grossMonthlyIncome: 5000,
       contributedMonths: 25 * 12,
       contributorSex: "masculino",
+      affiliatedBeforeReform: false,
     });
     // 20 years of requirement + 5 extra years = 60% + 10% = 70%
     expect(result.minimumTimeReached).toBe(true);
@@ -256,6 +264,7 @@ describe("self-employed INSS", () => {
       grossMonthlyIncome: 5000,
       contributedMonths: 15 * 12,
       contributorSex: "feminino",
+      affiliatedBeforeReform: false,
     });
     expect(result.minimumContributionYears).toBe(15);
     expect(result.minimumTimeReached).toBe(true);
@@ -267,6 +276,7 @@ describe("self-employed INSS", () => {
       grossMonthlyIncome: 30_000,
       contributedMonths: 40 * 12,
       contributorSex: "masculino",
+      affiliatedBeforeReform: false,
     });
     expect(alto.standardPlanBenefitEstimate).toBeLessThanOrEqual(INSS_CEILING);
 
@@ -274,8 +284,83 @@ describe("self-employed INSS", () => {
       grossMonthlyIncome: MINIMUM_WAGE,
       contributedMonths: 20 * 12,
       contributorSex: "masculino",
+      affiliatedBeforeReform: false,
     });
     expect(baixo.standardPlanBenefitEstimate).toBeGreaterThanOrEqual(MINIMUM_WAGE);
+  });
+});
+
+describe("self-employed INSS — EC 103/2019, arts. 18, 19 and 26", () => {
+  const at = (years: number, sex: "masculino" | "feminino", affiliatedBeforeReform: boolean) =>
+    calculateInssAutonomo({
+      grossMonthlyIncome: 5000,
+      contributedMonths: years * 12,
+      contributorSex: sex,
+      affiliatedBeforeReform,
+    });
+
+  /** Art. 18: "15 (quinze) anos de contribuição, para ambos os sexos". */
+  it("lets a man affiliated before the reform retire with 15 years", () => {
+    expect(at(15, "masculino", true).minimumContributionYears).toBe(15);
+    expect(at(15, "masculino", true).minimumTimeReached).toBe(true);
+    expect(at(14, "masculino", true).minimumTimeReached).toBe(false);
+  });
+
+  /** Art. 19: 20 years for a man who joined after 13/11/2019. */
+  it("asks 20 years of a man affiliated after it", () => {
+    expect(at(15, "masculino", false).minimumTimeReached).toBe(false);
+    expect(at(20, "masculino", false).minimumTimeReached).toBe(true);
+  });
+
+  /**
+   * Art. 26 § 2º: the 2 points start past 20 years for men, whatever article set
+   * the minimum. So 15 to 20 years under art. 18 all pay 60%.
+   */
+  it("starts the 2-point increment at 20 years for men, not at the minimum", () => {
+    expect(at(15, "masculino", true).appliedAveragePercentage).toBe(60);
+    expect(at(19, "masculino", true).appliedAveragePercentage).toBe(60);
+    expect(at(21, "masculino", true).appliedAveragePercentage).toBe(62);
+    expect(at(15, "masculino", true).standardPlanBenefitEstimate).toBeCloseTo(3000, 2);
+  });
+
+  /** Art. 26 § 5º: for women the increment starts past 15 years. */
+  it("starts it at 15 years for women", () => {
+    expect(at(16, "feminino", true).appliedAveragePercentage).toBe(62);
+    expect(at(16, "feminino", false).appliedAveragePercentage).toBe(62);
+  });
+
+  it("reports the minimum age, 65 for men and 62 for women", () => {
+    expect(at(20, "masculino", true).minimumRetirementAge).toBe(65);
+    expect(at(20, "feminino", true).minimumRetirementAge).toBe(62);
+  });
+});
+
+describe("buildPlanComparisonTable", () => {
+  it("is the form's own answer on every row", () => {
+    const rows = buildPlanComparisonTable([MINIMUM_WAGE, 3000, 8000], 30, "masculino", true);
+    for (const row of rows) {
+      const form = calculateInssAutonomo({
+        grossMonthlyIncome: row.grossMonthlyIncome,
+        contributedMonths: 360,
+        contributorSex: "masculino",
+        affiliatedBeforeReform: true,
+      });
+      expect(row.standardMonthly).toBe(form.standardPlan.monthlyContribution);
+      expect(row.standardBenefit).toBe(form.standardPlanBenefitEstimate);
+    }
+  });
+
+  /**
+   * By hand: R$ 3.000 pays 20%, R$ 600, against 11% of R$ 1.621, R$ 178,31, so
+   * R$ 421,69 more a month. Thirty years for a man is 10 past 20, so 80% of
+   * 3.000, R$ 2.400, against the simplified plan's one minimum wage.
+   */
+  it("matches the hand computation at R$ 3.000 and 30 years", () => {
+    const [row] = buildPlanComparisonTable([3000], 30, "masculino", true);
+
+    expect(row.extraMonthlyCost).toBeCloseTo(421.69, 2);
+    expect(row.standardBenefit).toBeCloseTo(2400, 2);
+    expect(row.simplifiedBenefit).toBe(MINIMUM_WAGE);
   });
 });
 
@@ -283,7 +368,7 @@ describe("calculateInssAutonomo — the literal values are stored data", () => {
   /**
    * `contributorSex` and `InssPlan` are the only fields in this feature whose
    * *values* — not just their names — are persisted. The route serialises the
-   * whole input into `localStorage` under `inss-autonomo-input-v2`, so a
+   * whole input into `localStorage` under `inss-autonomo-input-v3`, so a
    * returning visitor hands the module a literal written by an older build.
    *
    * Slice 3 of docs/plans/english-domain-identifiers/ renamed the type and the
@@ -294,21 +379,26 @@ describe("calculateInssAutonomo — the literal values are stored data", () => {
   it.each([
     ["masculino", 20],
     ["feminino", 15],
-  ] as const)("accepts the stored contributorSex %s and requires %i years", (stored, years) => {
-    const result = calculateInssAutonomo({
-      grossMonthlyIncome: 3000,
-      contributedMonths: 120,
-      contributorSex: stored,
-    });
+  ] as const)(
+    "accepts the stored contributorSex %s and requires %i years after the reform",
+    (stored, years) => {
+      const result = calculateInssAutonomo({
+        grossMonthlyIncome: 3000,
+        contributedMonths: 120,
+        contributorSex: stored,
+        affiliatedBeforeReform: false,
+      });
 
-    expect(result.minimumContributionYears).toBe(years);
-  });
+      expect(result.minimumContributionYears).toBe(years);
+    },
+  );
 
   it("keeps both plan detail shapes reachable, whichever plan a stored value names", () => {
     const result = calculateInssAutonomo({
       grossMonthlyIncome: 3000,
       contributedMonths: 120,
       contributorSex: "masculino",
+      affiliatedBeforeReform: false,
     });
 
     // "normal" and "simplificado" are the InssPlan literals a stored input may carry.

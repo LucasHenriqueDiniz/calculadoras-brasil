@@ -50,7 +50,7 @@ export const SEO_PAGES = [
   },
   {
     path: "/calculadora-inss-autonomo",
-    lastmod: "2026-09-12",
+    lastmod: "2026-10-18",
     changefreq: "monthly",
     priority: 0.9,
   },
