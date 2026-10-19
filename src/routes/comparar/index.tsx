@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Dumbbell, Scale, Sun, Tv, Truck } from "lucide-react";
+import { ArrowRight, Scale, Sun } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { PageShell } from "@/components/layout/PageShell";
 import { absoluteUrl } from "@/lib/site";
 
 interface Comparison {
   slug: string;
-  to: "/comparar/streaming" | "/comparar/academia" | "/comparar/mudanca" | "/comparar/energia";
+  to: "/comparar/energia";
   title: string;
   description: string;
   icon: LucideIcon;
@@ -18,36 +18,6 @@ interface Comparison {
 }
 
 const comparisons: Comparison[] = [
-  {
-    slug: "streaming",
-    to: "/comparar/streaming",
-    title: "Netflix vs Disney+ vs Prime vs HBO Max",
-    description: "Preço, catálogo e qualidade lado a lado para achar o melhor custo-benefício.",
-    icon: Tv,
-    options: ["Netflix", "Disney+", "Prime Video", "HBO Max"],
-    highlight: "R$ 15 – 55/mês",
-    highlightLabel: "Faixa de preço",
-  },
-  {
-    slug: "academia",
-    to: "/comparar/academia",
-    title: "Academia vs Treino em Casa vs Online",
-    description: "Quanto custa cada modalidade e qual entrega mais resultado pelo que você paga.",
-    icon: Dumbbell,
-    options: ["Academia", "Em casa", "Online"],
-    highlight: "3 modalidades",
-    highlightLabel: "Comparadas",
-  },
-  {
-    slug: "mudanca",
-    to: "/comparar/mudanca",
-    title: "Mudança profissional vs por conta própria",
-    description: "Contratar transportadora ou fazer você mesmo? Veja custo, tempo e risco.",
-    icon: Truck,
-    options: ["Transportadora", "Por conta própria"],
-    highlight: "Custo + tempo",
-    highlightLabel: "Critérios",
-  },
   {
     slug: "energia",
     to: "/comparar/energia",
@@ -67,13 +37,13 @@ export const Route = createFileRoute("/comparar/")({
       {
         name: "description",
         content:
-          "Compare custos: streaming, academia, mudança, energia solar. Veja qual opção compensa mais para você.",
+          "Energia tradicional ou solar: investimento inicial, economia mensal e em quanto tempo o painel se paga.",
       },
       { property: "og:title", content: "Comparador de Custos | Calcule Brasil" },
       {
         property: "og:description",
         content:
-          "Decisões comuns comparadas lado a lado. Netflix vs Disney+, academia vs home gym, e mais.",
+          "Energia tradicional vs energia solar, lado a lado: quanto custa, quanto economiza e quando se paga.",
       },
       { property: "og:url", content: absoluteUrl("/comparar") },
     ],

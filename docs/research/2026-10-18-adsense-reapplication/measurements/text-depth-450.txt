@@ -1,0 +1,108 @@
+Content depth (min 450 words)
+=============================
+
+[WARN] ADS-CONTENT-03 https://calculebrasil.com/
+         - 315 words: below the configured threshold (450 words)
+[WARN] ADS-CONTENT-03 https://calculebrasil.com/calculadoras
+         - 339 words: below the configured threshold (450 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/calculadora-custo-carro
+         - 1749 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/calculadora-morar-sozinho
+         - 1402 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/calculadora-conta-de-luz
+         - 1648 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/calculadora-assinaturas
+         - 736 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/calculadora-custo-mudanca
+         - 739 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/calculadora-custo-pet
+         - 834 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/calculadora-irpf-2026
+         - 1369 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/calculadora-salario-liquido
+         - 813 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/calculadora-inss-autonomo
+         - 1020 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/calculadora-clt-vs-pj
+         - 2272 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/calculadora-previdencia-complementar
+         - 857 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/calculadora-beneficios-fiscais
+         - 747 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog
+         - 1000 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/quanto-custa-ter-carro
+         - 1276 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/quanto-custa-morar-sozinho
+         - 1619 words: at or above the configured bar (>= 675 words)
+[note] ADS-CONTENT-03 https://calculebrasil.com/blog/como-economizar-conta-de-luz
+         - 494 words: borderline (450-674 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/custo-pet-anual
+         - 1067 words: at or above the configured bar (>= 675 words)
+[note] ADS-CONTENT-03 https://calculebrasil.com/blog/assinaturas-que-valem-a-pena
+         - 547 words: borderline (450-674 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/calculadora-irpf-2026
+         - 2037 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/guia-irpf-2026
+         - 1579 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/salario-liquido-entenda
+         - 756 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/quanto-custa-ser-autonomo
+         - 687 words: at or above the configured bar (>= 675 words)
+[note] ADS-CONTENT-03 https://calculebrasil.com/blog/deducoes-irpf-esqueca
+         - 661 words: borderline (450-674 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/dependentes-irpf-economia
+         - 723 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/recibo-rpa-autonomo
+         - 735 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/negociar-salario-melhor
+         - 728 words: at or above the configured bar (>= 675 words)
+[note] ADS-CONTENT-03 https://calculebrasil.com/blog/planejamento-tributario
+         - 674 words: borderline (450-674 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/clt-vs-pj-comparacao
+         - 759 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/salario-por-setor-2026
+         - 854 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/mei-vs-pj-custo
+         - 698 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/investimentos-isentos-irpf
+         - 722 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/quando-virar-pj
+         - 777 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/aposentadoria-early-retirement
+         - 742 words: at or above the configured bar (>= 675 words)
+[note] ADS-CONTENT-03 https://calculebrasil.com/blog/despesas-dedutiveis-autonomo
+         - 661 words: borderline (450-674 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/contador-necessario-pj
+         - 730 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/tabela-irpf-2026-completa
+         - 1097 words: at or above the configured bar (>= 675 words)
+[note] ADS-CONTENT-03 https://calculebrasil.com/blog/formal-vs-informal
+         - 663 words: borderline (450-674 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/como-calcular-salario-pj
+         - 815 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/blog/simplificado-vs-completo
+         - 797 words: at or above the configured bar (>= 675 words)
+[WARN] ADS-CONTENT-03 https://calculebrasil.com/comparar
+         - 342 words: below the configured threshold (450 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/comparar/streaming
+         - 1016 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/comparar/academia
+         - 1095 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/comparar/mudanca
+         - 1137 words: at or above the configured bar (>= 675 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/comparar/energia
+         - 1278 words: at or above the configured bar (>= 675 words)
+[WARN] ADS-CONTENT-03 https://calculebrasil.com/sobre
+         - 251 words: below the configured threshold (450 words)
+[ERR ] ADS-CONTENT-03 https://calculebrasil.com/metodologia
+         - main content not separated from page furniture: the container measured still holds 22 words of <nav>/<header>/<footer>/<aside>, and without them this page is 449 words: below the configured threshold (450 words); 471 words: borderline (450-674 words)
+[PASS] ADS-CONTENT-03 https://calculebrasil.com/privacidade
+         - 1096 words: at or above the configured bar (>= 675 words)
+[WARN] ADS-CONTENT-03 https://calculebrasil.com/termos
+         - 180 words: below the configured threshold (450 words)
+[WARN] ADS-CONTENT-03 https://calculebrasil.com/contato
+         - 123 words: below the configured threshold (450 words)
+
+51 checks: PASS=38, note=6, WARN=6, ERR=1
+Verdict: worst status is ERROR. Not ready.

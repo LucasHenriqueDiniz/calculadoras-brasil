@@ -1,0 +1,24 @@
+# Pages Google declined to index on 2026-10-18, redirected to the page that
+# covers the same topic. See docs/plans/adsense-reapplication/slice-01-declined-pages.md.
+# Workers static assets do not support 410; removed pages without a natural
+# target are simply gone and answer 404.
+/blog/quanto-custa-ter-carro /calculadora-custo-carro 301
+/blog/quanto-custa-morar-sozinho /calculadora-morar-sozinho 301
+/blog/calculadora-irpf-2026 /calculadora-irpf-2026 301
+/blog/guia-irpf-2026 /calculadora-irpf-2026 301
+/blog/tabela-irpf-2026-completa /calculadora-irpf-2026 301
+/blog/simplificado-vs-completo /calculadora-irpf-2026 301
+/blog/dependentes-irpf-economia /blog/deducoes-irpf-esqueca 301
+/blog/planejamento-tributario /blog/deducoes-irpf-esqueca 301
+/blog/salario-liquido-entenda /calculadora-salario-liquido 301
+/blog/salario-por-setor-2026 /calculadora-salario-liquido 301
+/blog/clt-vs-pj-comparacao /calculadora-clt-vs-pj 301
+/blog/quando-virar-pj /calculadora-clt-vs-pj 301
+/blog/como-calcular-salario-pj /calculadora-clt-vs-pj 301
+/blog/quanto-custa-ser-autonomo /calculadora-inss-autonomo 301
+/blog/recibo-rpa-autonomo /calculadora-inss-autonomo 301
+/blog/formal-vs-informal /calculadora-inss-autonomo 301
+/blog/aposentadoria-early-retirement /calculadora-previdencia-complementar 301
+/comparar/streaming /calculadora-assinaturas 301
+/comparar/academia /calculadora-assinaturas 301
+/comparar/mudanca /calculadora-custo-mudanca 301

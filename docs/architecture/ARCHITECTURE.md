@@ -139,6 +139,43 @@ port contract here: both adapters return it, the client consumes it, and the dis
 
 _Context, decision, and what it rules out. Newest first. A superseded entry stays, marked._
 
+### D5 — Cut what Google declined, and measure by what Google keeps, not by word count
+
+**Context.** AdSense rejected the site for "Conteúdo de baixo valor" on 2026-09-07. That was at
+least the second rejection: commit `efed25d` records an earlier one before 2026-07-27. The first
+response, #2 and #13, expanded articles until they cleared word-count bars, and closed every
+mechanical row of the 2026-09-10 audit. On 2026-10-18, Google's own APIs showed what that bought
+(`docs/research/2026-10-18-adsense-reapplication/research.md`):
+- Google indexes 20 of the 51 public pages, and 7 of the 26 articles.
+- Google crawled and declined the two longest articles, 1619 and 1579 words, and indexes
+  articles of 494 and 547.
+- Google classifies `/calculadoras` as a Soft 404.
+- Search impressions fell from 24.2 a day to 0.21 on 2026-07-25.
+- An AdSense review covers the whole site.
+
+**Decision.**
+1. The 22 pages Google declined (19 articles, 3 comparisons) are merged into an indexed sibling
+   behind a 301, or removed with a 410. A page is kept only with a written reason.
+2. Hubs and calculators are judged by Google's coverage state from URL Inspection, and the
+   calculators also by a written answer to what each does that its top competitor does not.
+3. Added value on a calculator comes from the site's own engine, as tables and worked examples,
+   and not from more prose.
+4. Review is requested once, after all of it ships, recorded as D6.
+
+Decided 2026-10-18. Pitch: `docs/pitches/adsense-reapplication.md`.
+
+**Rules out.**
+- Expanding articles to a word count. It was tried twice and Google declined the result.
+- Requesting review after each slice. A whole-site review of a half-done site risks a third
+  rejection, and the Policy center documents a lockout after "several" recent ones.
+- New articles or calculators until the review. The site already has more pages than Google
+  keeps.
+
+**What it does not settle.**
+- Whether Search indexing and the AdSense review judge by the same standard. They are separate
+  systems, and the link is inferred from Google using the same vocabulary for both.
+- Dropping a calculator that Google indexed. That stays a separate decision per page.
+
 ### D4 — The canonical URL is the no-slash form, and the asset server serves it
 
 **Context.** Prerendering writes `dist/client/<route>/index.html`. `wrangler.jsonc` declared no
@@ -162,6 +199,12 @@ sitemaps and no canonical declares.
 `html_handling` status code is not configurable, so `ADS-CRAWL-04` is closed in substance and not
 in letter. Changing it would mean putting a redirect layer in front of the asset server, which
 buys a status code on a URL nobody publishes.
+
+⚠️ **Note, 2026-10-18.** `vite preview` now runs the Workers asset server: with
+`@cloudflare/vite-plugin` 1.54.2 it answered `/calculadora-irpf-2026/` with a 307 to the no-slash
+form, and applied `public/_redirects`. Whether the claim above held in September was not
+re-checked; it does not hold now. The decision itself is unaffected. See
+`docs/plans/adsense-reapplication/slice-01-declined-pages.md`.
 
 ### D3 — IRPF 2026 is the official Receita table **plus** the Lei 15.270/2025 redutor
 

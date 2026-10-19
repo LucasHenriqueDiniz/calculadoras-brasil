@@ -1,0 +1,30 @@
+== IRPF cluster
+Duplicate content
+=================
+
+[PASS] ADS-CONTENT-02 (part) 8 URLs
+         - no near-duplicate groups
+           analyzed: 8
+           groups: 0
+           unanalyzable: 0
+[MISS] ADS-CONTENT-OVERLAP compared against the web
+         - not measured: ADS-CONTENT-OVERLAP asks for similarity against the top 5 search results and this script performs no search
+
+2 checks: PASS=1, MISS=1
+Verdict: nothing failed, but something could not be observed. Not a pass — see the MISS lines.
+== PJ cluster
+Duplicate content
+=================
+
+[PASS] ADS-CONTENT-02 (part) 9 URLs
+         - no near-duplicate groups
+           analyzed: 9
+           groups: 0
+           unanalyzable: 0
+[MISS] ADS-CONTENT-OVERLAP compared against the web
+         - not measured: ADS-CONTENT-OVERLAP asks for similarity against the top 5 search results and this script performs no search
+
+2 checks: PASS=1, MISS=1
+Verdict: nothing failed, but something could not be observed. Not a pass — see the MISS lines.
+
+[exited with code 0]

@@ -1,0 +1,8 @@
+{
+ "name": "accounts/pub-2600827684802809/sites/calculebrasil.com",
+ "reportingDimensionId": "ca-pub-2600827684802809:calculebrasil.com",
+ "domain": "calculebrasil.com",
+ "state": "NEEDS_ATTENTION",
+ "autoAdsEnabled": true
+}
+policyIssues total: 0
