@@ -251,6 +251,16 @@ try {
     "the IRPF page must say which tax year it models",
   );
 
+  // The INSS plan table, with the R$ 3.500 row's 20% contribution (R$ 700,00).
+  const inssPage = textContent(
+    await (await fetch(`${BASE_URL}/calculadora-inss-autonomo`)).text(),
+  ).replaceAll("\u00a0", " ");
+  assert.ok(
+    inssPage.includes("Quanto custa a mais o plano de 20%"),
+    "the INSS plan table must be prerendered",
+  );
+  assert.ok(inssPage.includes("R$ 700,00"), "the R$ 3.500 row must show its 20% contribution");
+
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 

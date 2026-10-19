@@ -33,6 +33,12 @@ export interface InssAutonomoInput {
   contributedMonths: number;
   /** Sex sets the minimum length-of-contribution requirement (EC 103/2019). */
   contributorSex: "masculino" | "feminino";
+  /**
+   * Already affiliated to the RGPS when EC 103/2019 came into force (13/11/2019).
+   * Decides which article sets the minimum time: art. 18 (15 years for both
+   * sexes) or art. 19 (15 for women, 20 for men).
+   */
+  affiliatedBeforeReform: boolean;
 }
 
 export interface InssAutonomoResult {
@@ -55,6 +61,8 @@ export interface InssAutonomoResult {
   contributedYears: number;
   /** Applicable length-of-contribution requirement, in years. */
   minimumContributionYears: number;
+  /** Minimum retirement age under either article: 62 for women, 65 for men. */
+  minimumRetirementAge: number;
   /** Benefit estimate for the standard plan, under the EC 103/2019 rule. */
   standardPlanBenefitEstimate: number;
   /** The simplified plan's benefit is always one minimum wage. */
@@ -77,10 +85,34 @@ export interface PlanDetail {
 const STANDARD_PLAN_RATE = 0.2;
 const SIMPLIFIED_PLAN_RATE = 0.11;
 
-/** EC 103/2019: 20 years for men, 15 for women, for a self-employed contributor. */
-const MINIMUM_CONTRIBUTION_YEARS = { masculino: 20, feminino: 15 } as const;
+/**
+ * EC 103/2019, read on Planalto
+ * (docs/research/2026-10-18-adsense-added-value/fetches/planalto-ec-103-2019.md):
+ * - art. 18, affiliated before the reform: 15 years of contribution "para ambos
+ *   os sexos", at 65 (men) and 62 (women, reached in 2023 by § 1º's steps);
+ * - art. 19, affiliated after it: 15 years for women, 20 for men, same ages.
+ *
+ * This used to apply art. 19's 20 years to every man, so a man who had been
+ * contributing since before 2019 was told he had not reached the minimum at 15
+ * to 19 years — when the transition rule lets him retire from 15.
+ */
+function minimumContributionYearsFor(
+  sex: InssAutonomoInput["contributorSex"],
+  affiliatedBeforeReform: boolean,
+): number {
+  if (sex === "feminino") return 15;
+  return affiliatedBeforeReform ? 15 : 20;
+}
 
-/** EC 103/2019: 60% of the average + 2% per year beyond the minimum time. */
+const MINIMUM_RETIREMENT_AGE = { masculino: 65, feminino: 62 } as const;
+
+/**
+ * EC 103/2019, art. 26: 60% of the average, plus 2 points for each year beyond
+ * 20 years of contribution (§ 2º) — beyond 15 for women (§ 5º). The threshold is
+ * NOT the minimum time: a man retiring under art. 18 with 15 years gets 60%, and
+ * the 2 points start only past 20.
+ */
+const INCREMENT_THRESHOLD_YEARS = { masculino: 20, feminino: 15 } as const;
 const BASE_PERCENTAGE = 60;
 const PERCENTAGE_PER_EXTRA_YEAR = 2;
 
@@ -111,12 +143,18 @@ export function calculateInssAutonomo(input: InssAutonomoInput): InssAutonomoRes
 
   const contributedMonths = Math.max(input.contributedMonths, 0);
   const contributedYears = contributedMonths / 12;
-  const minimumContributionYears = MINIMUM_CONTRIBUTION_YEARS[input.contributorSex];
+  const minimumContributionYears = minimumContributionYearsFor(
+    input.contributorSex,
+    input.affiliatedBeforeReform,
+  );
   const minimumTimeReached = contributedYears >= minimumContributionYears;
 
-  const yearsBeyondMinimum = Math.max(contributedYears - minimumContributionYears, 0);
+  const yearsBeyondThreshold = Math.max(
+    contributedYears - INCREMENT_THRESHOLD_YEARS[input.contributorSex],
+    0,
+  );
   const appliedAveragePercentage = Math.min(
-    BASE_PERCENTAGE + Math.floor(yearsBeyondMinimum) * PERCENTAGE_PER_EXTRA_YEAR,
+    BASE_PERCENTAGE + Math.floor(yearsBeyondThreshold) * PERCENTAGE_PER_EXTRA_YEAR,
     100,
   );
 
@@ -139,9 +177,53 @@ export function calculateInssAutonomo(input: InssAutonomoInput): InssAutonomoRes
     contributedMonths,
     contributedYears,
     minimumContributionYears,
+    minimumRetirementAge: MINIMUM_RETIREMENT_AGE[input.contributorSex],
     standardPlanBenefitEstimate,
     simplifiedPlanBenefitEstimate: MINIMUM_WAGE,
     appliedAveragePercentage,
     minimumTimeReached,
   };
+}
+
+/** One line of the page's plan table: what the standard plan costs more, and what it pays more. */
+export interface PlanComparisonRow {
+  grossMonthlyIncome: number;
+  standardMonthly: number;
+  simplifiedMonthly: number;
+  extraMonthlyCost: number;
+  /** Standard-plan benefit after `years` of contribution, by the same estimate as the form. */
+  standardBenefit: number;
+  /** Always one minimum wage. */
+  simplifiedBenefit: number;
+}
+
+/**
+ * The page's plan table, from the calculator itself: every row is
+ * `calculateInssAutonomo` at that income, for a contributor with `years` of
+ * contribution under `sex` and the reform rule given.
+ */
+export function buildPlanComparisonTable(
+  incomes: readonly number[],
+  years: number,
+  sex: InssAutonomoInput["contributorSex"],
+  affiliatedBeforeReform: boolean,
+): PlanComparisonRow[] {
+  return incomes.map((grossMonthlyIncome) => {
+    const result = calculateInssAutonomo({
+      grossMonthlyIncome,
+      contributedMonths: years * 12,
+      contributorSex: sex,
+      affiliatedBeforeReform,
+    });
+
+    return {
+      grossMonthlyIncome: result.grossMonthlyIncome,
+      standardMonthly: result.standardPlan.monthlyContribution,
+      simplifiedMonthly: result.simplifiedPlan.monthlyContribution,
+      extraMonthlyCost:
+        result.standardPlan.monthlyContribution - result.simplifiedPlan.monthlyContribution,
+      standardBenefit: result.standardPlanBenefitEstimate,
+      simplifiedBenefit: result.simplifiedPlanBenefitEstimate,
+    };
+  });
 }
