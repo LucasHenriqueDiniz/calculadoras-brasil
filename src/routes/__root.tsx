@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   HeadContent,
@@ -12,7 +12,8 @@ import {
 import appCss from "@/styles.css?url";
 import { SITE_URL } from "@/lib/site";
 
-const ADSENSE_PUBLISHER_ID = "pub-2600827684802809";
+const ADSENSE_CLIENT = "ca-pub-2600827684802809";
+const ADSENSE_SCRIPT_SRC = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
 
 const siteSchema = {
   "@context": "https://schema.org",
@@ -113,6 +114,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:alt", content: "Calcule Brasil — decisões do dia a dia" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: `${SITE_URL}/og-image.png` },
+      // The crawler-visible proof of the AdSense account, since the script itself is only added
+      // after hydration (see useAdSenseScript).
+      { name: "google-adsense-account", content: ADSENSE_CLIENT },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -122,11 +126,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "manifest", href: "/site.webmanifest" },
     ],
     scripts: [
-      {
-        src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-${ADSENSE_PUBLISHER_ID}`,
-        async: true,
-        crossOrigin: "anonymous",
-      },
       {
         type: "application/ld+json",
         children: JSON.stringify(siteSchema),
@@ -155,7 +154,25 @@ function RootComponent() {
   );
 }
 
+// adsbygoogle.js appends an <ins> to <body> as soon as it runs. Loaded from the server HTML, it can
+// run while the parser is still inside the page markup, so the <ins> lands inside the route's
+// Suspense boundary before React hydrates it, and hydration fails. Added from an effect, it runs
+// after hydration started, which is after the parser inserted the client entry at the end of
+// <body>: whatever it appends then goes after every node React rendered.
+function useAdSenseScript() {
+  useEffect(() => {
+    if (document.querySelector(`script[src="${ADSENSE_SCRIPT_SRC}"]`)) return;
+    const script = document.createElement("script");
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.src = ADSENSE_SCRIPT_SRC;
+    document.head.appendChild(script);
+  }, []);
+}
+
 function RootDocument({ children }: { children: ReactNode }) {
+  useAdSenseScript();
+
   return (
     <html lang="pt-BR">
       <head>
