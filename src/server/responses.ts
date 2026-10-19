@@ -11,10 +11,9 @@ export function json(data: unknown, init: ResponseInit & { cacheControl?: string
     if (!headers.has(name)) headers.set(name, value);
   }
 
-  headers.set(
-    "cache-control",
-    init.cacheControl ?? "public, max-age=0, s-maxage=300, stale-while-revalidate=3600",
-  );
+  // s-maxage is the edge TTL. Never add stale-while-revalidate: the Workers Cache API ignores it,
+  // so only the browser would apply it, answering from its stale copy and refetching behind it.
+  headers.set("cache-control", init.cacheControl ?? "public, max-age=0, s-maxage=300");
 
   return new Response(JSON.stringify(data), {
     ...init,
