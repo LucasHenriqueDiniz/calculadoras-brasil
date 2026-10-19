@@ -35,7 +35,8 @@ Measured against claimed is marked in every row.
 |---|---|---|---|---|
 | salário líquido | calculadora salário líquido 2026 | buk.com.br | see below | **built** (slice 3) |
 | CLT vs PJ | calculadora clt vs pj | nagringa.dev | see below | **built** (slice 4) |
-| the other 10 | — | — | — | slices 4–5 |
+| IRPF 2026 | calculadora irpf 2026 | receita.fazenda.gov.br (official simulator) | see below | **built** (slice 4) |
+| the other 9 | — | — | — | slices 4–5 |
 
 ## Salário líquido
 
@@ -126,6 +127,33 @@ Two defects turned up while building, both found by tests and fixed:
   was put in Anexo V, losing R$ 648.
 - **The break-even rounded to the nearest centavo.** It could land one centavo short of the
   package.
+
+## IRPF 2026
+
+### What the leader does (measured)
+
+The Receita Federal's own simulator (`fetches/receita-simulador-irpf.md`): 132 words, two tabs,
+one "Deduções" field, and tax and effective rate as the result. It is authoritative and bare.
+Its annual tab is **exercício 2026**, the return filed in 2026 on 2025 income.
+
+### What ours did before today (measured)
+
+- It capped health at an invented R$ 2.666,67. Lei 9.250, art. 8º, II, "a" sets no limit.
+- It capped education once per family. "b" says "limite anual individual".
+- It did not cap private pension at the 12% the Receita's FAQ gives.
+- It asked the visitor to pick a regime blind.
+- Its FAQ called uniforms, school transport and pharmacy medicines deductible. None is.
+- It said "IRPF 2026" without saying which year: the query covers the 2026 return, on 2025
+  income, and this page models ano-calendário 2026.
+
+### What ours does now that the leader does not
+
+| | ours | Receita simulator | how verified |
+|---|---|---|---|
+| both regimes, side by side, with the better one named | yes | one field, no regimes | hand case R$ 100.000 + R$ 20.000 health: 7.900,34 complete against 11.744,34 simplified, matched in the form |
+| **how much more than INSS the complete return needs, per income** | 9-row table built by the calculator | no | limiar R$ 5.782,90 at R$ 120.000: one real above picks complete, one below picks simplified, in the form |
+| deductions itemised (dependants, health, education per person, PGBL at 12%) | yes | one total | tests, 4 mutants killed |
+| says which tax year, and points the 2026 filer to the Receita's own simulator | yes | "Exercício 2026" only | page |
 
 ## What this does not establish
 

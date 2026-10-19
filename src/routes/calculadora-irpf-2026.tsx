@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
-import { CurrencyInput, NumberInput, SelectField } from "@/components/calculator/fields";
+import { CurrencyInput, NumberInput } from "@/components/calculator/fields";
 import {
   DisclaimerBox,
   ResultSummaryCard,
@@ -15,7 +15,11 @@ import { RelatedPosts } from "@/components/calculator/RelatedPosts";
 import { relatedPostsFor } from "@/data/calculators";
 import { Prose } from "@/components/layout/PageShell";
 import { formatBRL } from "@/lib/format";
-import { calculateIrpf, type IrpfInput } from "@/lib/calculators/irpf";
+import {
+  buildRegimeThresholdTable,
+  compareIrpfRegimes,
+  type IrpfInput,
+} from "@/lib/calculators/irpf";
 import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
@@ -24,18 +28,25 @@ const meta = {
   slug: "irpf-2026",
   path: "/calculadora-irpf-2026",
 };
-const PAGE_TITLE = "Calculadora IRPF 2026 - Simule seu Imposto de Renda";
+const PAGE_TITLE = "Calculadora IRPF 2026 - Declaração completa ou simplificada";
 const PAGE_DESCRIPTION =
-  "Calcule seu IRPF 2026 de forma fácil. Inclua dependentes, deduções com educação e saúde, e veja o efeito da redução que isenta quem recebe até R$ 5.000 por mês.";
+  "Simule o imposto de renda do ano-calendário 2026 nos dois regimes, completo e simplificado, com dependentes, saúde, educação e previdência, e a redução que isenta quem recebe até R$ 5.000 por mês.";
 
-const DEFAULTS: IrpfInput = {
+/** The form no longer picks a regime: both are computed, so the stored flag is ignored. */
+type IrpfFormInput = Omit<IrpfInput, "simplifiedRegime">;
+
+const DEFAULTS: IrpfFormInput = {
   grossAnnualIncome: 48000,
   dependants: 0,
   educationDeduction: 0,
   healthDeduction: 0,
   supplementaryPensionDeduction: 0,
-  simplifiedRegime: false,
 };
+
+const THRESHOLD_INCOMES = [
+  36_000, 48_000, 60_000, 72_000, 90_000, 120_000, 180_000, 240_000, 360_000,
+];
+const THRESHOLD_ROWS = buildRegimeThresholdTable(THRESHOLD_INCOMES);
 
 const FAQ: FAQItem[] = [
   {
@@ -56,17 +67,17 @@ const FAQ: FAQItem[] = [
   {
     question: "Educação é dedutível no IRPF?",
     answer:
-      "Sim. Gastos com educação (pública, privada, uniforme, transporte escolar) são dedutíveis até o limite de R$ 3.561,50/ano em 2026. Inclua sua educação e de dependentes.",
+      "Sim, as mensalidades pagas a estabelecimentos de ensino: educação infantil, ensino fundamental e médio, graduação, pós-graduação e cursos técnicos. O limite é de R$ 3.561,50 por ano para cada pessoa, você e cada dependente (Lei 9.250/1995, art. 8º). Uniforme, material escolar, transporte e cursos livres, como idiomas, não entram.",
   },
   {
     question: "Saúde é dedutível no IRPF?",
     answer:
-      "Sim, completamente. Sem limite legal: consultas, exames, medicamentos, hospitais, plano de saúde, dentista — tudo entra. Mantenha comprovantes de todas as despesas.",
+      "Sim, sem limite de valor: consultas com médicos, dentistas, psicólogos, fisioterapeutas e fonoaudiólogos, hospitais, exames, plano de saúde e próteses. Medicamentos comprados em farmácia não entram, a não ser que estejam na conta do hospital. Guarde os comprovantes de todas as despesas.",
   },
   {
     question: "Vale a pena usar o regime simplificado?",
     answer:
-      "Depende. O regime simplificado desconta 20% da renda bruta, até o limite de R$ 17.640,00 por ano, e substitui todas as outras deduções — inclusive dependentes. O regime completo usa as deduções reais (educação, saúde, previdência). Se você tem muitos gastos dedutíveis, o completo tende a valer mais. Simule os dois: a calculadora mostra o resultado do regime que você escolher, não escolhe por você.",
+      "Depende das suas deduções. O simplificado desconta 20% da renda bruta, até R$ 17.640,00 por ano, no lugar de todas as outras deduções, inclusive INSS e dependentes. O completo soma INSS, dependentes, saúde, educação e previdência. Esta calculadora faz as duas contas e mostra qual paga menos, e a tabela da página mostra, para cada renda, quanto de deduções é preciso para o completo compensar.",
   },
   {
     question: "Quando devo declarar IRPF?",
@@ -111,7 +122,7 @@ const FAQ: FAQItem[] = [
   {
     question: "Onde obtenho meus comprovantes de dedução?",
     answer:
-      "Educação: recibos da escola, universidade, livros. Saúde: recibos de médico, farmácia, hospital, plano de saúde. Previdência: extrato do fundo/PGBL. Guarde tudo por 5 anos para possível fiscalização.",
+      "Educação: recibos e declarações da escola ou universidade. Saúde: recibos de médicos e outros profissionais com CPF ou CNPJ, notas do hospital e o informe do plano de saúde. Previdência: o informe do PGBL. Guarde tudo por 5 anos para uma possível fiscalização.",
   },
 ];
 
@@ -138,16 +149,33 @@ export const Route = createFileRoute("/calculadora-irpf-2026")({
 });
 
 function IrpfCalculator() {
-  const [input, setInput] = usePersistedState<IrpfInput>("irpf-2026-input-v2", DEFAULTS);
-  const result = useMemo(() => calculateIrpf(input), [input]);
+  const [input, setInput] = usePersistedState<IrpfFormInput>("irpf-2026-input-v2", DEFAULTS);
+  const comparison = useMemo(() => compareIrpfRegimes(input), [input]);
+  const isSimplified = comparison.better === "simplified";
+  const result = comparison[comparison.better];
+  const other = isSimplified ? comparison.legal : comparison.simplified;
 
   const handleReset = () => setInput(DEFAULTS);
 
   return (
     <CalculatorLayout
       title="Calculadora IRPF 2026"
-      description="Simule seu imposto de renda pessoa física conforme as alíquotas progressivas de 2026"
+      description="Imposto de renda do ano-calendário 2026, nos regimes completo e simplificado"
     >
+      <p className="rounded-xl border border-border bg-surface px-4 py-3 text-sm leading-relaxed text-muted-foreground">
+        Esta calculadora usa as regras do <strong>ano-calendário 2026</strong>: a renda recebida em
+        2026, declarada em 2027. Se você está fazendo a declaração entregue em 2026, sobre a renda
+        de 2025, as tabelas são outras. Para ela, use o{" "}
+        <a
+          href="https://www27.receita.fazenda.gov.br/simulador-irpf/"
+          className="text-primary underline-offset-2 hover:underline"
+          rel="noopener noreferrer"
+        >
+          simulador da Receita Federal
+        </a>
+        .
+      </p>
+
       <FormSection
         title="Dados pessoais e renda"
         description="Informe sua renda bruta anual e situação familiar"
@@ -170,71 +198,84 @@ function IrpfCalculator() {
         />
       </FormSection>
 
-      <FormSection title="Deduções permitidas" description="Gastos que reduzem sua base de cálculo">
+      <FormSection
+        title="Deduções da declaração completa"
+        description="Usadas no regime completo; o simplificado substitui todas por um desconto fixo"
+      >
         <CurrencyInput
           label="Gastos com educação (anual)"
-          placeholder="Escola, universidade, material"
+          placeholder="Mensalidades escolares e de faculdade"
           value={input.educationDeduction}
           onChange={(value) => setInput({ ...input, educationDeduction: value })}
-          hint={`Até ${formatBRL(3561.5)}/ano. Inclua sua educação e de dependentes.`}
+          hint={`Até ${formatBRL(3561.5)} por pessoa: você e cada dependente.`}
         />
         <CurrencyInput
           label="Gastos com saúde (anual)"
-          placeholder="Consultas, exames, medicamentos, plano"
+          placeholder="Consultas, exames, hospital, plano"
           value={input.healthDeduction}
           onChange={(value) => setInput({ ...input, healthDeduction: value })}
-          hint="Sem limite legal. Mantenha comprovantes."
+          hint="Sem limite de valor. Remédio de farmácia não entra."
         />
         <CurrencyInput
           label="Contribuição previdência complementar (anual)"
-          placeholder="PGBL, VGBL, fundo de pensão"
+          placeholder="PGBL"
           value={input.supplementaryPensionDeduction}
           onChange={(value) => setInput({ ...input, supplementaryPensionDeduction: value })}
           hint="Até 12% do rendimento tributável do ano. Só o PGBL é dedutível; o VGBL não."
         />
       </FormSection>
 
-      <FormSection
-        title="Regime tributário"
-        description="Escolha o que gera menor imposto para seu perfil"
-      >
-        <SelectField
-          label="Regime de tributação"
-          value={input.simplifiedRegime ? "simplificado" : "completo"}
-          onChange={(value) => setInput({ ...input, simplifiedRegime: value === "simplificado" })}
-          options={[
-            {
-              label: "Regime Completo (deduções reais)",
-              value: "completo",
-            },
-            {
-              label: "Regime Simplificado (20% dedução fixa)",
-              value: "simplificado",
-            },
-          ]}
-          hint="Regime completo é melhor se tem muitas deduções. Simplifcado é mais fácil se tem poucas."
-        />
-      </FormSection>
-
       <ResultSummaryCard
-        title="Seu IRPF 2026"
+        title={`Seu IRPF 2026, na declaração ${isSimplified ? "simplificada" : "completa"}`}
         mainValue={formatBRL(result.calculatedTax)}
         mainLabel={result.calculatedTax > 0 ? "Você deve pagar" : "Nada a pagar"}
-        secondaryValue={`Alíquota efetiva: ${result.effectiveRate.toFixed(2)}%`}
-        secondaryLabel="Do seu rendimento total"
+        secondaryValue={
+          comparison.saving > 0
+            ? `${formatBRL(comparison.saving)} a menos`
+            : `Alíquota efetiva: ${result.effectiveRate.toFixed(2).replace(".", ",")}%`
+        }
+        secondaryLabel={
+          comparison.saving > 0
+            ? `que na declaração ${isSimplified ? "completa" : "simplificada"}`
+            : "Os dois regimes dão o mesmo resultado"
+        }
         resultColor={result.calculatedTax > 0 ? "negative" : "positive"}
+      />
+
+      <BreakdownTable
+        title="Completa ou simplificada"
+        items={[
+          {
+            label: "Declaração completa",
+            value: formatBRL(comparison.legal.calculatedTax),
+            subtext: "INSS, dependentes, saúde, educação e previdência",
+          },
+          {
+            label: "Declaração simplificada",
+            value: formatBRL(comparison.simplified.calculatedTax),
+            subtext: `Desconto de ${formatBRL(
+              comparison.simplified.grossAnnualIncome -
+                comparison.simplified.simplifiedCalculationBase,
+            )}: 20% da renda, até R$ 17.640,00`,
+          },
+          {
+            label: "Mais vantajosa",
+            value: isSimplified ? "Simplificada" : "Completa",
+            isFinal: true,
+          },
+        ]}
       />
 
       <WarningList
         items={[
           `Alíquota marginal: ${result.marginalRate}`,
-          `Renda bruta anual: ${formatBRL(result.grossAnnualIncome)}`,
+          `Alíquota efetiva: ${result.effectiveRate.toFixed(2).replace(".", ",")}%`,
           `Desconto INSS (aprox.): ${formatBRL(result.inssWithheld)}`,
         ]}
       />
 
       <BreakdownTable
-        title="Detalhamento do cálculo"
+        title={`Detalhamento da declaração ${isSimplified ? "simplificada" : "completa"}`}
         items={[
           {
             label: "Renda bruta anual",
@@ -243,12 +284,12 @@ function IrpfCalculator() {
           // The simplified regime replaces every other deduction — INSS, dependants
           // and the itemised three. Listing them under it would show a chain that
           // does not produce the tax printed below it.
-          ...(input.simplifiedRegime
+          ...(isSimplified
             ? [
                 {
                   label: "Desconto simplificado",
                   value: `- ${formatBRL(result.grossAnnualIncome - result.simplifiedCalculationBase)}`,
-                  subtext: "20% da renda bruta, até R$ 17.640,00 — no lugar de todas as deduções",
+                  subtext: "20% da renda bruta, até R$ 17.640,00, no lugar de todas as deduções",
                 },
                 {
                   label: "Base de cálculo",
@@ -310,15 +351,14 @@ function IrpfCalculator() {
       <DisclaimerBox>
         <Prose>
           <p>
-            Esta calculadora segue as alíquotas e valores do IRPF vigentes em 2026. O resultado é
-            uma estimativa educativa. Seu imposto real pode variar se você tiver:
+            Esta calculadora segue as alíquotas e valores do IRPF do ano-calendário 2026. O
+            resultado é uma estimativa educativa. Seu imposto real pode variar se você tiver:
           </p>
           <ul>
             <li>Ganho de capital (venda de ações, imóveis)</li>
             <li>Atividade profissional autônoma ou PJ</li>
             <li>Bens e direitos no exterior</li>
-            <li>Contribuições que excedem os limites oficiais</li>
-            <li>Isenções específicas (ex: aposentado com renda baixa)</li>
+            <li>Isenções específicas (ex: aposentado com 65 anos ou mais)</li>
           </ul>
           <p>
             Esta página faz a <strong>conta anual</strong> — a do ajuste da declaração. A{" "}
@@ -328,8 +368,9 @@ function IrpfCalculator() {
             acerta.
           </p>
           <p>
-            Use esta ferramenta como referência. Para uma declaração oficial, consulte a Receita
-            Federal ou um contador.
+            A comparação entre {formatBRL(comparison.legal.calculatedTax)} na completa e{" "}
+            {formatBRL(comparison.simplified.calculatedTax)} na simplificada usa as mesmas regras do
+            programa da Receita. A declaração oficial é sempre a do programa.
           </p>
         </Prose>
       </DisclaimerBox>
@@ -340,15 +381,81 @@ function IrpfCalculator() {
           title="Meu IRPF 2026"
           text={`Calculei meu IRPF 2026 em ${formatBRL(
             result.calculatedTax,
-          )} (alíquota efetiva: ${result.effectiveRate.toFixed(2)}%)`}
+          )} na declaração ${isSimplified ? "simplificada" : "completa"} (alíquota efetiva: ${result.effectiveRate.toFixed(2).replace(".", ",")}%)`}
         />
         <ResetButton onClick={handleReset} />
       </div>
+
+      <RegimeThresholdSection />
 
       <FAQSection items={FAQ} />
 
       <RelatedCalculators excludeSlug="irpf-2026" />
       <RelatedPosts slugs={relatedPostsFor("irpf-2026")} />
     </CalculatorLayout>
+  );
+}
+
+function RegimeThresholdSection() {
+  return (
+    <Prose>
+      <h2>Quando a declaração completa compensa</h2>
+      <p>
+        A declaração completa paga menos imposto quando as suas deduções somadas passam do desconto
+        simplificado. O INSS já entra nessa soma, então a pergunta prática é: quanto de deduções{" "}
+        <em>além do INSS</em> você precisa ter? A tabela abaixo foi calculada pela própria
+        calculadora, com as regras do ano-calendário 2026.
+      </p>
+      <div className="not-prose overflow-x-auto rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]">
+        <table className="w-full min-w-[640px] text-sm">
+          <caption className="sr-only">
+            Deduções necessárias para a declaração completa compensar, por renda anual, em 2026
+          </caption>
+          <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th scope="col" className="px-3 py-2.5">
+                Renda anual
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                INSS no ano
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Desconto simplificado
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Deduções além do INSS para a completa compensar
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                IR na simplificada
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {THRESHOLD_ROWS.map((row) => (
+              <tr key={row.grossAnnualIncome} className="border-t border-border/70">
+                <th scope="row" className="px-3 py-2 text-left font-medium text-foreground">
+                  {formatBRL(row.grossAnnualIncome)}
+                </th>
+                <td className="px-3 py-2 text-right">{formatBRL(row.inssWithheld)}</td>
+                <td className="px-3 py-2 text-right">{formatBRL(row.simplifiedDiscount)}</td>
+                <td className="px-3 py-2 text-right font-semibold text-foreground">
+                  {row.deductionsToBeatSimplified === null
+                    ? "A simplificada já não paga imposto"
+                    : `mais de ${formatBRL(row.deductionsToBeatSimplified)}`}
+                </td>
+                <td className="px-3 py-2 text-right">{formatBRL(row.taxSimplified)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Para chegar a esse valor, some o que você pode deduzir: R$ 2.275,08 por dependente, as
+        despesas de saúde (sem limite), a educação (até R$ 3.561,50 por pessoa) e o PGBL (até 12% da
+        renda). Até R$ 60 mil por ano, a declaração simplificada já não paga imposto, por causa da
+        redução da Lei 15.270/2025, e não há o que a completa possa ganhar. Acima disso, cada real
+        de dedução além do valor da tabela vira imposto a menos, na alíquota da sua faixa.
+      </p>
+    </Prose>
   );
 }

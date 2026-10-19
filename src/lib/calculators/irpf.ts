@@ -52,16 +52,8 @@ export interface IrpfResult {
   marginalRate: string;
 }
 
-/**
- * Cap on health deductions.
- *
- * ⚠️ Stays here rather than joining the published figures in `irpf-constants.ts`,
- * and that is the point: no official ceiling on despesas médicas was found in
- * any source read for the research note. This is an invented reference figure,
- * and the net-salary calculator deliberately applies no health cap at all.
- * Moving it in beside the sourced constants would launder it into one of them.
- */
-const MAX_DEDUCTION_HEALTH = 2666.67;
+/** PGBL contributions deduct up to this share of taxable income. */
+const MAX_PENSION_SHARE_OF_INCOME = 0.12;
 
 /**
  * Computes personal income tax.
@@ -91,10 +83,25 @@ export function calculateIrpf(input: IrpfInput): IrpfResult {
   // 2. taxable base after INSS
   const baseAfterInss = grossAnnualIncome - inssWithheld;
 
-  // 3. determine the allowed deductions
-  const educationDeduction = Math.min(input.educationDeduction, MAX_DEDUCTION_EDUCATION_ANNUAL);
-  const healthDeduction = Math.min(input.healthDeduction, MAX_DEDUCTION_HEALTH);
-  const supplementaryPensionDeduction = Math.max(input.supplementaryPensionDeduction, 0);
+  // 3. determine the allowed deductions (Lei 9.250/1995, art. 8º, II).
+  //    Education, "b": "até o limite anual individual" — per person, so the
+  //    taxpayer and each dependant carry their own. With one total on the form,
+  //    the most it can hold is that limit times the people it may cover.
+  //    Health, "a": no limit at all. The R$ 2.666,67 cap this used to apply was
+  //    invented, and its own comment said so.
+  //    See docs/research/2026-10-18-adsense-added-value/fetches/planalto-lei-9250-1995-art-8.md.
+  const educationDeduction = Math.min(
+    Math.max(input.educationDeduction, 0),
+    MAX_DEDUCTION_EDUCATION_ANNUAL * (1 + input.dependants),
+  );
+  const healthDeduction = Math.max(input.healthDeduction, 0);
+  // Private pension (PGBL): "até o limite de 12% do rendimento tributável", per the
+  // Receita's own FAQ (docs/research/2026-09-05-filing-and-pension-limits/). The
+  // page already said so; the module took any amount.
+  const supplementaryPensionDeduction = Math.min(
+    Math.max(input.supplementaryPensionDeduction, 0),
+    MAX_PENSION_SHARE_OF_INCOME * grossAnnualIncome,
+  );
 
   const totalDeductions = educationDeduction + healthDeduction + supplementaryPensionDeduction;
 
@@ -128,13 +135,13 @@ export function calculateIrpf(input: IrpfInput): IrpfResult {
 
     const { rate, deduction } = findAnnualTaxBracket(simplifiedCalculationBase);
     calculatedTax = Math.max(simplifiedCalculationBase * rate - deduction, 0);
-    marginalRate = rate > 0 ? `${(rate * 100).toFixed(1)}%` : "Isento";
+    marginalRate = rate > 0 ? `${(rate * 100).toFixed(1).replace(".", ",")}%` : "Isento";
   } else {
     // full regime: itemised deductions
     simplifiedCalculationBase = fullCalculationBase;
     const { rate, deduction } = findAnnualTaxBracket(assessableBase);
     calculatedTax = Math.max(assessableBase * rate - deduction, 0);
-    marginalRate = rate > 0 ? `${(rate * 100).toFixed(1)}%` : "Isento";
+    marginalRate = rate > 0 ? `${(rate * 100).toFixed(1).replace(".", ",")}%` : "Isento";
   }
 
   // 8. Lei 15.270/2025 reduction, applied to the tax the table produced.
@@ -166,4 +173,80 @@ export function calculateIrpf(input: IrpfInput): IrpfResult {
     taxDue,
     marginalRate,
   };
+}
+
+/** The two ways to file, side by side, and which one owes less. */
+export interface IrpfRegimeComparison {
+  /** Declaração completa: the legal deductions. */
+  legal: IrpfResult;
+  /** Desconto simplificado: 20% of income, capped, in place of every deduction. */
+  simplified: IrpfResult;
+  better: "legal" | "simplified";
+  /** How much less the better one owes. Zero when they tie. */
+  saving: number;
+}
+
+/**
+ * Both regimes for the same income, as the declaration program shows them: the
+ * taxpayer chooses, so the page shows what each choice costs instead of asking
+ * the visitor to guess. A tie goes to the simplified one, which needs no receipts.
+ */
+export function compareIrpfRegimes(
+  input: Omit<IrpfInput, "simplifiedRegime">,
+): IrpfRegimeComparison {
+  const legal = calculateIrpf({ ...input, simplifiedRegime: false });
+  const simplified = calculateIrpf({ ...input, simplifiedRegime: true });
+  const better = legal.taxDue < simplified.taxDue ? "legal" : "simplified";
+
+  return {
+    legal,
+    simplified,
+    better,
+    saving: Math.abs(legal.taxDue - simplified.taxDue),
+  };
+}
+
+/** One line of the page's regime table: what tips a given income from simplified to complete. */
+export interface RegimeThresholdRow {
+  grossAnnualIncome: number;
+  inssWithheld: number;
+  simplifiedDiscount: number;
+  /**
+   * Further deductions — dependants, health, education, private pension — the
+   * declaração completa needs before it owes less than the simplified one.
+   * Zero once INSS alone already exceeds the simplified discount; null when the
+   * simplified return owes nothing, so there is nothing to beat.
+   */
+  deductionsToBeatSimplified: number | null;
+  taxSimplified: number;
+}
+
+/**
+ * The page's regime table, from the calculator itself. Both regimes are taxed by
+ * the same table and the same reduction on the same gross, so the complete one
+ * owes less exactly when its deductions pass the simplified discount.
+ */
+export function buildRegimeThresholdTable(incomes: readonly number[]): RegimeThresholdRow[] {
+  return incomes.map((grossAnnualIncome) => {
+    const none = {
+      dependants: 0,
+      educationDeduction: 0,
+      healthDeduction: 0,
+      supplementaryPensionDeduction: 0,
+    };
+    const simplified = calculateIrpf({ ...none, grossAnnualIncome, simplifiedRegime: true });
+    const simplifiedDiscount = grossAnnualIncome - simplified.simplifiedCalculationBase;
+
+    return {
+      grossAnnualIncome,
+      inssWithheld: simplified.inssWithheld,
+      simplifiedDiscount,
+      // Both regimes share the table and the reduction, which depends on the gross
+      // alone; so once the simplified return owes something, any lower base owes
+      // strictly less, and below that point both owe nothing.
+      deductionsToBeatSimplified:
+        simplified.taxDue > 0 ? Math.max(simplifiedDiscount - simplified.inssWithheld, 0) : null,
+      taxSimplified: simplified.taxDue,
+    };
+  });
 }
