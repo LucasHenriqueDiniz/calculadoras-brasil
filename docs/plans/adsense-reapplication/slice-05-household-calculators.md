@@ -1,5 +1,5 @@
 ---
-status: todo
+status: doing
 ---
 
 # Slice 5 — The six household calculators
@@ -50,3 +50,40 @@ that gained a table.
 ## If stuck
 
 Same as slice 4: one PR per calculator.
+
+---
+
+## What actually happened — 2026-10-18 (conta de luz; the other five are still to do)
+
+### Conta de luz — 2026-10-18
+
+- **Leader:** portal.elfsm.com.br, a distributor's simulator. One appliance at a time, kWh only,
+  and a reference list with the refrigerator at 130 W.
+- **Defects:**
+  - our refrigerator was at its compressor rating too: 130 W × 24 h is 93,6 kWh a month, against
+    the 56,88 kWh Eletrobrás gives for a two-door frost-free one (IDEC, 2013). The freezer was
+    108 kWh against 47,55;
+  - an FAQ priced a 500 W refrigerator at 4 hours a day, which contradicted the form;
+  - percentages had no source;
+  - the share column printed `16.4%`.
+- **Fixed:**
+  - refrigerator and freezer presets at Eletrobrás's average draw: 79, 55 and 66 W;
+  - the default list moves to the duplex and its storage key to v2;
+  - the FAQ and the worked example are computed by the calculator;
+  - watts and percentages are in Brazilian format.
+- **New:** a 20-row table of each appliance at a typical use and the example tariff. On the
+  default house the 9.000 BTU air conditioner is 62,3% of the bill.
+- **Not built: the plan's per-distributor table.** ANEEL's tariff leaves out the taxes and the
+  bandeira, so it would print a bill lower than anyone pays. It would also be live data at
+  prerender. With one example tariff, the table takes no public data, and the
+  `PublicDataUnavailable` test has nothing to exercise.
+- **Found on the way, every calculator:** the "Revisado em" every calculator shows was one
+  site-wide date, 23/06, even on the pages revised today, while their JSON-LD said 2026-10-18.
+  The layout now shows the page's own `lastmod`. `test:seo` holds it to the sitemap: with the
+  fixed date put back, it fails on `/calculadora-custo-carro`.
+
+| check | result |
+|---|---|
+| unit | 338 green. Mutants killed: the duplex back at 130 W (1 red); the date without UTC (2 red, "17 de outubro") |
+| `test:seo` | 28 routes; the table and the 56,9 kWh row prerendered; "Revisado em" equal to lastmod on every route |
+| both ends | 6 of 6 rows shared by the default form and the table match in kWh and R$ (AC R$ 205,20, duplex R$ 54,04) |

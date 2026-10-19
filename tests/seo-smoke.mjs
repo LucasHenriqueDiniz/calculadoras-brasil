@@ -293,6 +293,16 @@ try {
   );
   assert.ok(benefitsPage.includes("R$ 1.103,45"), "the R$ 20.000 row must show its raise");
 
+  // The appliance table, with the two-door refrigerator at Eletrobrás's 56,9 kWh.
+  const electricityPage = textContent(
+    await (await fetch(`${BASE_URL}/calculadora-conta-de-luz`)).text(),
+  ).replaceAll("\u00a0", " ");
+  assert.ok(
+    electricityPage.includes("Quanto cada aparelho gasta por mês"),
+    "the appliance table must be prerendered",
+  );
+  assert.ok(electricityPage.includes("56,9 kWh"), "the refrigerator row must show 56,9 kWh");
+
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 

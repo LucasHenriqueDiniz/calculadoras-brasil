@@ -39,7 +39,8 @@ Measured against claimed is marked in every row.
 | INSS autônomo | calculadora inss autônomo | meutudo.com.br | see below | **built** (slice 4) |
 | Previdência complementar | calculadora previdência privada pgbl | portal.icatuseguros.com.br | see below | **built** (slice 4) |
 | Benefícios fiscais | — (no SERP read; the defects were in the arithmetic) | — | see below | **built** (slice 4) |
-| the 6 household calculators | — | — | — | slice 5 |
+| Conta de luz | calculadora conta de luz por aparelho | portal.elfsm.com.br | see below | **built** (slice 5) |
+| the other 5 household calculators | — | — | — | slice 5 |
 
 ## Salário líquido
 
@@ -234,6 +235,55 @@ laws on Planalto (`fetches/planalto-beneficios.md`).
   - the form matches the table;
   - `test:seo` asserts the table.
 
+## Conta de luz
+
+### What the leader does (measured)
+
+portal.elfsm.com.br, the page of a distributor in Espírito Santo
+(`fetches/elfsm-simulacao-de-consumo.md`):
+
+- one appliance at a time, by power × hours × days, the same formula as ours;
+- the result in kWh only, with no tariff and no reais;
+- a list of 25 powers with no hours of use and no source, among them "Geladeira: 130W".
+
+### What ours did before today (measured)
+
+- **The refrigerator at its compressor rating.** The default list and the preset put it at 130 W
+  for 24 h, 93,6 kWh a month. Eletrobrás puts a two-door frost-free one at 56,88 kWh
+  (`fetches/idec-eletrobras-consumo.md`). The compressor cycles, so the page overstated the
+  appliance every household has by 65%. The freezer, at 150 W, came out at 108 kWh against 47,55.
+  The leader makes the same mistake.
+- **An FAQ that contradicted the form.** It priced "uma geladeira média (500W)" at 4 hours a day,
+  with a washing machine at 2.000 W against the preset's 500 W.
+- **Percentages with no source:** standby "5%", a lukewarm shower "50%", cold water "30%".
+- **The share column** printed with a decimal point, `16.4%`.
+
+### What ours does now that the leader does not
+
+- **Refrigerators at Eletrobrás's averages:** duplex frost-free 79 W, one-door frost-free 55 W,
+  freezer 66 W, which is 56,88, 39,6 and 47,55 kWh over 720 hours.
+- **Cost in reais** at the visitor's own tariff, or the distributor's from ANEEL, for the whole
+  house at once.
+- **A table of 20 appliances**, computed by the calculator at a typical use and the example
+  tariff of R$ 0,95/kWh, in order of consumption.
+- **An FAQ whose every figure comes from the same calculation**, with the unsourced percentages
+  removed.
+- **Found by it:** on the page's default house, a 9.000 BTU air conditioner on for 8 hours is
+  62,3% of the bill, R$ 205,20 of R$ 329,37. The refrigerator is R$ 54,04 of it, where the old
+  figure said R$ 88,92.
+
+**The plan's candidate was a cost per appliance at each distributor's tariff. It was not built.**
+ANEEL's TE + TUSD leave out ICMS, PIS/Cofins and the bandeira, as the page itself warns, so a
+table per distributor would print a bill lower than any visitor pays. It would also be live data
+at prerender time. The table uses one example tariff instead and takes no public data, so slice
+5's `PublicDataUnavailable` test does not apply to it. The form keeps the per-distributor lookup.
+
+- **Verified:**
+  - 3 preset tests against Eletrobrás, within 0,1 kWh;
+  - 1 mutant killed (the duplex back at 130 W);
+  - the form matches the table on 6/6 shared rows;
+  - `test:seo` asserts the table and the 56,9 kWh row.
+
 ## What this does not establish
 
 - **That Google will judge it added value.** It is the kind of thing Google's own text names, as
@@ -244,6 +294,10 @@ laws on Planalto (`fetches/planalto-beneficios.md`).
 - **Buk's rendered output.** Its form was not submitted. The comparison rests on its script, which
   could differ from what it renders.
 - **That the SERP is the reviewer's.** One snapshot, from one machine, signed-in state unknown.
+- **The example tariff of R$ 0,95/kWh.** It predates this note and was not sourced. Every figure in
+  the conta de luz table scales with it.
+- **Eletrobrás's figures for a 2026 refrigerator.** They are 2013 averages, quoted by IDEC; the
+  primary table was not found.
 
 ## Sources
 
@@ -251,4 +305,7 @@ laws on Planalto (`fetches/planalto-beneficios.md`).
 - [Buk, calculadora de salário líquido](https://www.buk.com.br/recursos/calculadoras/calculadora-salario-liquido) — `fetches/buk-calculadora-salario-liquido.md` — position 1, its form and its calculation
 - [Lei 14.663/2023](https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/lei/l14663.htm) — `fetches/planalto-lei-14663-2023.md` — the simplified discount "caso seja mais benéfico"
 - [Lei 9.250/1995](https://www.planalto.gov.br/ccivil_03/leis/l9250.htm) — `fetches/planalto-lei-9250-1995-art-4.md` — what the monthly base may deduct
+- [Google Brasil SERP](https://www.google.com.br/search?q=calculadora+conta+de+luz+por+aparelho&hl=pt-BR&gl=br&num=10) — `fetches/serp-calculadora-conta-de-luz-por-aparelho.md` — the 10 organic results
+- [ELFSM, simulação de consumo](https://portal.elfsm.com.br/consumo/simulacao-de-consumo/) — `fetches/elfsm-simulacao-de-consumo.md` — position 1, its form and its reference powers
+- [IDEC, dicas de como economizar na conta de luz](https://idec.org.br/o-idec/sala-de-imprensa/release/idec-da-dicas-de-como-economizar-na-conta-de-luz) — `fetches/idec-eletrobras-consumo.md` — Eletrobrás's monthly consumption for refrigerators and freezer
 - Secondary, search results only and not fetched: BP Money, Contabilidade.com and others saying payroll applies the more beneficial route. They agree with the statute; nothing rests on them.

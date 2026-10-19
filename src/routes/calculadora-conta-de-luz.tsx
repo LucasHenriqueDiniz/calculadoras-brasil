@@ -25,6 +25,7 @@ import { getCalculator, relatedPostsFor } from "@/data/calculators";
 import { formatBRL, formatNumber, parseBRNumber } from "@/lib/format";
 import {
   APPLIANCE_PRESETS,
+  calculateApplianceConsumption,
   calculateElectricityBill,
   type ApplianceInput,
   type ElectricityResult,
@@ -50,7 +51,14 @@ function newAppliance(source: Omit<ApplianceInput, "id" | "quantity">): Applianc
 }
 
 const DEFAULT_APPLIANCES: ApplianceInput[] = [
-  { id: nextId(), name: "Geladeira", watts: 130, hoursPerDay: 24, daysPerMonth: 30, quantity: 1 },
+  {
+    id: nextId(),
+    name: "Geladeira duplex frost free",
+    watts: 79,
+    hoursPerDay: 24,
+    daysPerMonth: 30,
+    quantity: 1,
+  },
   {
     id: nextId(),
     name: "Chuveiro elétrico",
@@ -74,6 +82,27 @@ const DEFAULT_APPLIANCES: ApplianceInput[] = [
 
 const DEFAULT_TARIFF = 0.95;
 
+/** Monthly kWh and cost of a catalogue appliance at its typical use, for the copy and the table. */
+function presetUse(name: string) {
+  const preset = APPLIANCE_PRESETS.find((p) => p.name === name);
+  if (!preset) throw new Error(`no appliance preset named ${name}`);
+  const { kwhPerMonth } = calculateApplianceConsumption({ id: name, quantity: 1, ...preset });
+  return { ...preset, kwhPerMonth, cost: kwhPerMonth * DEFAULT_TARIFF };
+}
+
+const kwh = (value: number) => `${value.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} kWh`;
+
+const FRIDGE = presetUse("Geladeira duplex frost free");
+const FRIDGE_ONE_DOOR = presetUse("Geladeira 1 porta frost free");
+const SHOWER = presetUse("Chuveiro elétrico");
+const AC_9000 = presetUse("Ar-condicionado 9.000 BTUs");
+const AC_12000 = presetUse("Ar-condicionado 12.000 BTUs");
+const WASHER = presetUse("Máquina de lavar");
+
+const PRESET_TABLE = APPLIANCE_PRESETS.map((preset) => presetUse(preset.name)).sort(
+  (a, b) => b.kwhPerMonth - a.kwhPerMonth,
+);
+
 interface PublicFieldState {
   isLoading: boolean;
   isManual: boolean;
@@ -86,64 +115,54 @@ interface PublicFieldState {
 
 const FAQ: FAQItem[] = [
   {
-    question: "Qual é a tarifa média de energia no Brasil?",
+    question: "Qual é a tarifa de energia da minha região?",
     answer:
-      "Varia bastante por estado: SP/RJ ~R$ 0,80-1,00/kWh. São mais caras: AM (R$ 0,90+), mais baratas: MA (R$ 0,60-0,70). Consulte sua fatura de luz para a tarifa exata.",
+      "Varia por distribuidora. A calculadora sugere a tarifa residencial B1 da sua distribuidora a partir dos dados abertos da ANEEL, mas esse valor não inclui impostos nem bandeira tarifária, então a tarifa final da sua conta costuma ser maior. Para a estimativa mais fiel, use o valor por kWh que aparece na sua fatura.",
   },
   {
-    question: "Como sei a tarifa de energia da minha região?",
+    question: "Como sei a tarifa da minha conta?",
     answer:
-      "Aparece na sua conta de luz, normalmente em R$/kWh. Já inclui impostos (ICMS, PIS, Cofins). Bandeira tarifária pode somar 15-50% (amarela/vermelha). Use o valor total da fatura para estimativas realistas.",
+      "Ela aparece na fatura, em R$/kWh, já com ICMS, PIS e Cofins. Nos meses de bandeira amarela ou vermelha, há também um adicional por kWh. Uma forma simples de chegar à tarifa total é dividir o valor da conta pelo consumo do mês em kWh.",
   },
   {
     question: "Qual aparelho consome mais energia?",
-    answer:
-      "Ar-condicionado (3.000-5.000W), chuveiro elétrico (5.500W), máquina de lavar (2.000W), geladeira (500W 24h). Ar-condicionado é o maior vilão se ligado muito. Chuveiro elétrico é segundo porque usa muita potência rápido.",
+    answer: `Com os usos típicos desta calculadora, o ar-condicionado lidera: um de 9.000 BTUs ligado 8 horas por dia consome ${kwh(AC_9000.kwhPerMonth)} por mês. Depois vêm a geladeira duplex frost free (${kwh(FRIDGE.kwhPerMonth)}) e o chuveiro elétrico (${kwh(SHOWER.kwhPerMonth)} com 15 minutos de banho por dia). O que pesa é potência vezes tempo de uso: o chuveiro tem a maior potência, mas fica pouco tempo ligado.`,
   },
   {
-    question: "Quanto custa ligar ar-condicionado 8 horas/dia?",
-    answer:
-      "Ar de 3.000W × 8h × 30 dias = 720 kWh. Preço: 720 kWh × R$ 0,80/kWh = R$ 576/mês (aprox). Ar de 5.000W pode custar R$ 1.000+/mês. É realmente o maior custo.",
+    question: "Quanto custa ligar o ar-condicionado 8 horas por dia?",
+    answer: `Um aparelho de 9.000 BTUs (cerca de ${AC_9000.watts.toLocaleString("pt-BR")} W) consome ${kwh(AC_9000.kwhPerMonth)} por mês nesse uso, o que dá ${formatBRL(AC_9000.cost)} na tarifa de exemplo de ${formatBRL(DEFAULT_TARIFF)} por kWh. Um de 12.000 BTUs (cerca de ${AC_12000.watts.toLocaleString("pt-BR")} W) consome ${kwh(AC_12000.kwhPerMonth)}, ou ${formatBRL(AC_12000.cost)}. Modelos inverter costumam gastar menos depois que o ambiente atinge a temperatura.`,
   },
   {
     question: "Por que o chuveiro elétrico consome tanto?",
-    answer:
-      "Potência altíssima: 5.500W normalmente. Mesmo 5-10 minutos = 450-900Wh por banho. 2 banhos/dia × 30 dias = 27-54 kWh/mês (R$ 20-40). Chuveiro morno (40°C) consome metade.",
-  },
-  {
-    question: "Como economizar na conta de luz?",
-    answer:
-      "1) Trocar lâmpadas por LED (80% economia). 2) Ar-condicionado: 24°C em vez de 18°C = 30% economia. 3) Desligar da tomada (reduz standby em 5%). 4) Banho morno (economia 50% do chuveiro). 5) Máquina com água fria.",
+    answer: `Porque a potência é muito alta, em torno de ${SHOWER.watts.toLocaleString("pt-BR")} W. Com 15 minutos de uso por dia, são ${kwh(SHOWER.kwhPerMonth)} por mês. Banhos mais curtos e a chave na posição verão, que usa menos potência, reduzem o consumo na mesma proporção.`,
   },
   {
     question: "Geladeira consome muito?",
-    answer:
-      "Consome 24/7, mas menos que ar-condicionado. Uma geladeira média (500W) funciona ~4 horas/dia = 60 kWh/mês = R$ 48. Geladeiras velhas consomem 2-3x mais. Manutenção regular reduz consumo.",
+    answer: `Menos do que parece. O compressor liga e desliga, então a geladeira não consome a potência da etiqueta durante 24 horas. Pelos valores de consumo contínuo publicados pela Eletrobrás, uma geladeira de 1 porta frost free gasta cerca de ${kwh(FRIDGE_ONE_DOOR.kwhPerMonth)} por mês, e uma duplex frost free, cerca de ${kwh(FRIDGE.kwhPerMonth)}. Modelos antigos e com vedação gasta consomem mais.`,
   },
   {
-    question: "Quanto custa manter máquina de lavar ligada?",
-    answer:
-      "Máquina de 2.000W por 1 hora = 2 kWh. Lavar 3x/semana = ~24 kWh/mês = R$ 19/mês. Água fria em vez de quente reduz em 30% (a maior parte do consumo é para aquecer água).",
+    question: "Quanto gasta a máquina de lavar?",
+    answer: `Uma máquina de cerca de ${WASHER.watts} W usada uma hora por ciclo, ${WASHER.daysPerMonth} vezes por mês, consome ${kwh(WASHER.kwhPerMonth)}. Máquinas que aquecem a água gastam bem mais, porque aquecer é o que mais consome energia.`,
   },
   {
     question: "Onde encontro a potência (W) de um aparelho?",
     answer:
-      "Na etiqueta de trás ou embaixo. Manual do aparelho também. Às vezes tem VA (volt-ampere) — use como aproximação. Se não encontrar, busque o modelo online.",
+      "Na etiqueta de trás ou embaixo, ou no manual. Às vezes aparece em VA (volt-ampere), que pode ser usado como aproximação. Para geladeira e freezer, a etiqueta do Inmetro informa o consumo em kWh por mês, que é melhor que a potência para essa conta.",
   },
   {
     question: "A bandeira tarifária afeta meu cálculo?",
     answer:
-      "Sim. Bandeira verde = tarifa normal. Amarela = +7,5%. Vermelha = +15% ou +25%. Se você informar a tarifa total com bandeira, o resultado já está incluído. Bandeiras mudam mensalmente.",
+      "Sim. Nas bandeiras amarela e vermelha, a Aneel acrescenta um valor a cada kWh consumido, definido mês a mês. Se você usar a tarifa total da conta de um mês com bandeira, o adicional já está incluído.",
   },
   {
     question: "Como reduzir a conta de luz sem perder conforto?",
     answer:
-      "LED em tudo (economia 80%). Ar-condicionado a 24-26°C (economia 30%). Banho morno (economia 50%). Desligar da tomada (economia 5%). Máquina com água fria (economia 30%). Juntas: redução 20-40%.",
+      "Trocar lâmpadas antigas por LED, regular o ar-condicionado entre 23 °C e 24 °C, encurtar os banhos e usar a posição verão do chuveiro, juntar roupa para a máquina de lavar e desligar aparelhos em standby. A tabela desta página mostra onde está o maior consumo: é por ali que a economia rende mais.",
   },
   {
     question: "O resultado funciona para qualquer cidade?",
     answer:
-      "Sim, basta ajustar tarifa em R$/kWh conforme sua distribuidora. Cálculo de kWh não muda. Só muda o preço final. Bandeira tarifária também varia por região.",
+      "Sim. O consumo em kWh não muda de cidade para cidade: muda a tarifa. Escolha sua distribuidora ou informe a tarifa da sua conta.",
   },
 ];
 
@@ -348,7 +367,7 @@ function ApplianceSection({
           { value: "", label: "Escolher da lista..." },
           ...APPLIANCE_PRESETS.map((p) => ({
             value: p.name,
-            label: `${p.name} (${p.watts} W)`,
+            label: `${p.name} (${p.watts.toLocaleString("pt-BR")} W)`,
           })),
         ]}
         hint="Adiciona uma linha com potência e uso típicos. Edite depois."
@@ -485,7 +504,7 @@ function ConsumptionTable({ result, rows, colorOf }: ConsumptionTableProps) {
                           />
                         </span>
                         <span className="w-12 text-right tabular-nums text-muted-foreground">
-                          {a.sharePercent.toFixed(1)}%
+                          {a.sharePercent.toFixed(1).replace(".", ",")}%
                         </span>
                       </span>
                     </td>
@@ -522,9 +541,16 @@ function ElectricityArticle() {
       </p>
       <p>
         O custo mensal é o consumo em kWh multiplicado pela tarifa da sua distribuidora, informada
-        em R$/kWh. Por exemplo, uma geladeira de 130 W ligada 24 horas por dia consome
-        aproximadamente 93,6 kWh por mês. Com uma tarifa de R$ 0,95/kWh, isso dá cerca de R$ 89 por
-        mês só com a geladeira.
+        em R$/kWh. Por exemplo, um ar-condicionado de 9.000 BTUs (
+        {AC_9000.watts.toLocaleString("pt-BR")} W) ligado 8 horas por dia consome{" "}
+        {kwh(AC_9000.kwhPerMonth)} por mês. Com uma tarifa de {formatBRL(DEFAULT_TARIFF)}/kWh, isso
+        dá {formatBRL(AC_9000.cost)} por mês.
+      </p>
+      <p>
+        Geladeira e freezer são a exceção à fórmula: o compressor liga e desliga ao longo do dia,
+        então a potência da etiqueta vezes 24 horas superestima o consumo duas a quatro vezes. Por
+        isso a calculadora usa para eles a potência média que reproduz os valores de consumo da
+        Eletrobrás: {kwh(FRIDGE.kwhPerMonth)} por mês para uma geladeira duplex frost free.
       </p>
 
       <h2>Os campeões da conta de luz</h2>
@@ -633,7 +659,7 @@ function ElectricityPage() {
     DEFAULT_TARIFF,
   );
   const [appliances, setAppliances] = usePersistedState<ApplianceInput[]>(
-    "calculadoras-brasil:conta-luz:appliances:v1",
+    "calculadoras-brasil:conta-luz:appliances:v2",
     DEFAULT_APPLIANCES,
   );
   const [presetValue, setPresetValue] = useState<string>("");
@@ -813,6 +839,8 @@ function ElectricityPage() {
     >
       <ConsumptionTable result={result} rows={chartRows} colorOf={applianceColor} />
 
+      <ApplianceTableSection />
+
       <ElectricityArticle />
 
       <div className="mx-auto max-w-6xl space-y-10 px-4 pb-16 sm:px-6">
@@ -823,5 +851,64 @@ function ElectricityPage() {
         <RelatedPosts slugs={relatedPostsFor("conta-de-luz")} />
       </div>
     </CalculatorLayout>
+  );
+}
+
+function ApplianceTableSection() {
+  return (
+    <Prose>
+      <h2>Quanto cada aparelho gasta por mês</h2>
+      <p>
+        A tabela abaixo foi calculada pela própria calculadora, com o uso típico de cada aparelho e
+        a tarifa de exemplo de {formatBRL(DEFAULT_TARIFF)} por kWh. Ela está em ordem de consumo: os
+        primeiros da lista são onde a economia rende mais.
+      </p>
+      <div className="not-prose overflow-x-auto rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]">
+        <table className="w-full min-w-[560px] text-sm">
+          <caption className="sr-only">Consumo e custo mensal por aparelho, uso típico</caption>
+          <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th scope="col" className="px-3 py-2.5">
+                Aparelho
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Potência
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Uso típico
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Consumo por mês
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Custo por mês
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {PRESET_TABLE.map((row) => (
+              <tr key={row.name} className="border-t border-border/70">
+                <th scope="row" className="px-3 py-2 text-left font-medium text-foreground">
+                  {row.name}
+                </th>
+                <td className="px-3 py-2 text-right">{row.watts.toLocaleString("pt-BR")} W</td>
+                <td className="px-3 py-2 text-right">
+                  {row.hoursPerDay.toLocaleString("pt-BR")} h × {row.daysPerMonth} dias
+                </td>
+                <td className="px-3 py-2 text-right">{kwh(row.kwhPerMonth)}</td>
+                <td className="px-3 py-2 text-right font-semibold text-foreground">
+                  {formatBRL(row.cost)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Geladeiras e freezer aparecem com a potência média, não a da etiqueta, porque o compressor
+        não fica ligado o tempo todo. Os demais usam a potência típica do aparelho. Para o seu caso,
+        adicione os aparelhos no formulário acima com a potência e o tempo de uso reais.
+      </p>
+    </Prose>
   );
 }

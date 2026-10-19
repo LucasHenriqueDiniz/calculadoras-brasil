@@ -117,15 +117,27 @@ export function calculateElectricityBill(input: ElectricityInput): ElectricityRe
   };
 }
 
-/** Catalogue of common appliances with their average power draw in watts. */
+/**
+ * Catalogue of common appliances with their average power draw in watts.
+ *
+ * Refrigerators and freezers are listed at their AVERAGE draw over the day, not
+ * the compressor's rating: the compressor cycles on and off, so rating × 24 h
+ * overstates the month two to four times. The figures reproduce Eletrobrás's
+ * monthly consumption for continuous use, as published by IDEC
+ * (docs/research/2026-10-18-adsense-added-value/fetches/idec-eletrobras-consumo.md):
+ * 56,88 kWh for a two-door frost-free refrigerator, 39,6 kWh for a one-door
+ * frost-free one, 47,55 kWh for a freezer. 130 W × 24 h × 30 d, which stood
+ * here, is 93,6 kWh.
+ */
 export const APPLIANCE_PRESETS: {
   name: string;
   watts: number;
   hoursPerDay: number;
   daysPerMonth: number;
 }[] = [
-  { name: "Geladeira", watts: 130, hoursPerDay: 24, daysPerMonth: 30 },
-  { name: "Freezer", watts: 150, hoursPerDay: 24, daysPerMonth: 30 },
+  { name: "Geladeira duplex frost free", watts: 79, hoursPerDay: 24, daysPerMonth: 30 },
+  { name: "Geladeira 1 porta frost free", watts: 55, hoursPerDay: 24, daysPerMonth: 30 },
+  { name: "Freezer", watts: 66, hoursPerDay: 24, daysPerMonth: 30 },
   { name: "Chuveiro elétrico", watts: 5500, hoursPerDay: 0.25, daysPerMonth: 30 },
   { name: "Ar-condicionado 9.000 BTUs", watts: 900, hoursPerDay: 8, daysPerMonth: 30 },
   { name: "Ar-condicionado 12.000 BTUs", watts: 1200, hoursPerDay: 8, daysPerMonth: 30 },
