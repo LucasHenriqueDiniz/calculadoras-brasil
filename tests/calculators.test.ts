@@ -128,7 +128,7 @@ describe("core calculators", () => {
     expect(result.monthlySavings).toBe(30);
   });
 
-  it("adds up the move and its contingency", () => {
+  it("adds up the move, and its contingency on what the lease does not fix", () => {
     const result = calculateMovingCost({
       truckAndLabor: 1200,
       packingMaterials: 200,
@@ -143,10 +143,15 @@ describe("core calculators", () => {
       appliances: 0,
       other: 0,
       contingencyPercent: 10,
+      distanceKm: 0,
+      truckAxles: 2,
     });
     expect(result.subtotal).toBe(5300);
-    expect(result.contingency).toBe(530);
-    expect(result.total).toBe(5830);
+    // 10% of 5.300 − 2.000 of deposit: the reserve once took R$ 530, R$ 200 of
+    // it on a deposit the lease fixes and the tenant gets back.
+    expect(result.contingency).toBe(330);
+    expect(result.total).toBe(5630);
+    expect(result.nonRefundableTotal).toBe(3630);
   });
 
   it("computes food per bag and spreads the pet's yearly costs", () => {

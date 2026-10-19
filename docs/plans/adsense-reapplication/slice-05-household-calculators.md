@@ -177,3 +177,33 @@ Same as slice 4: one PR per calculator.
 | hand case | Prime: 12 × 19,90 − 166,80 = R$ 72,00; 166,80 / 19,90 = 8,38 months |
 | `test:seo` | 28 routes; 6 plan rows and Prime's "8,4 meses" prerendered |
 | both ends | 2 of 2 plans typed into the form match the table: Prime R$ 72,00, HBO Max Platinum R$ 132,00 |
+
+### Custo de mudança — 2026-10-18
+
+- **Leader:** a removal company's blog. It quotes the ANTT, then gives a "mudanças" range per km
+  that the ANTT tables do not have.
+- **Defects:**
+  - the reserve for the unforeseen applied to the deposit and the first rent, R$ 450 of the
+    default R$ 1.085, against the page's own description of what the reserve is for. A unit test
+    pinned it;
+  - the deposit counted as a cost, though Lei 8.245, art. 38, § 2º, returns it with its yield;
+  - every FAQ answer gave ranges with no source, among them a "cartório" fee;
+  - "mudançadora".
+- **Fixed:**
+  - the reserve applies to logistics, set-up and purchases;
+  - the result shows "caução que volta" and "custo que fica";
+  - the old test now expects the corrected R$ 330 and says why.
+- **New:**
+  - `antt-freight-floor.ts`, the binding floor of Lei 13.703: distance × CCD + CC, carga geral,
+    Portaria SUROC 22/2026;
+  - an optional distance and truck size in the form;
+  - a 6-row table on 2 and 3 axles. 500 km on 2 axles is at least R$ 2.488,74.
+- **Read on the way:** Lei 15.485/2026 revoked the twice-yearly publication of § 1º. The page
+  says only what § 3º still requires, a new table when diesel moves more than 5%.
+
+| check | result |
+|---|---|
+| unit | 376 green. Mutant killed: the reserve back on the contract amounts (3 red) |
+| hand cases | 500 × 5,2177 + 541,86 = R$ 3.150,71; 1.000 × 4,0738 + 451,84 = R$ 4.525,64; reserve 10% × 6.350 = R$ 635 |
+| `test:seo` | 28 routes; 6 distance rows and R$ 2.488,74 prerendered |
+| both ends | 2 of 2 trips typed into the form match the table: 500 km × 2 axles R$ 2.488,74; 3.000 km × 3 axles R$ 16.194,96 |

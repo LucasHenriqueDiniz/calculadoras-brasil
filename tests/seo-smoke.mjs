@@ -348,6 +348,20 @@ try {
     "Amazon Prime's row must show 8,4 meses",
   );
 
+  // The ANTT freight-floor table: six distances, 500 km on two axles at R$ 2.488,74.
+  const movingHtml = await (await fetch(`${BASE_URL}/calculadora-custo-mudanca`)).text();
+  const freightTable = movingHtml.slice(
+    movingHtml.indexOf("Piso mínimo de frete da ANTT por distância"),
+  );
+  const freightRows = freightTable
+    .slice(0, freightTable.indexOf("</table>"))
+    .match(/<th scope="row"/g);
+  assert.equal(freightRows?.length, 6, "the freight-floor table must have its six distances");
+  assert.ok(
+    textContent(movingHtml).replaceAll("\u00a0", " ").includes("R$ 2.488,74"),
+    "500 km on two axles must show R$ 2.488,74",
+  );
+
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 
