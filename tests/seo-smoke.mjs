@@ -336,6 +336,18 @@ try {
     "São Paulo's row must show R$ 3.553,71",
   );
 
+  // The annual-plan table: six plans, each with the month the annual one pays off.
+  const subscriptionsHtml = await (await fetch(`${BASE_URL}/calculadora-assinaturas`)).text();
+  const plansTable = subscriptionsHtml.slice(
+    subscriptionsHtml.indexOf("a partir de quantos meses o anual compensa"),
+  );
+  const planRows = plansTable.slice(0, plansTable.indexOf("</table>")).match(/<th scope="row"/g);
+  assert.equal(planRows?.length, 6, "the annual-plan table must have its six plans");
+  assert.ok(
+    textContent(subscriptionsHtml).replaceAll("\u00a0", " ").includes("8,4 meses"),
+    "Amazon Prime's row must show 8,4 meses",
+  );
+
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
 

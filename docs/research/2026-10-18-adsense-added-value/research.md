@@ -42,7 +42,8 @@ Measured against claimed is marked in every row.
 | Conta de luz | calculadora conta de luz por aparelho | portal.elfsm.com.br | see below | **built** (slice 5) |
 | Custo de carro | calculadora custo de carro | calculadoras.rioclaro.com.br | see below | **built** (slice 5) |
 | Morar sozinho | calculadora morar sozinho | customorarsozinho.com.br | see below | **built** (slice 5) |
-| the other 3 household calculators | — | — | — | slice 5 |
+| Assinaturas | calculadora de assinaturas | nucleo.jor.br (Calculadora de Streaming) | see below | **built** (slice 5) |
+| the other 2 household calculators | — | — | — | slice 5 |
 
 ## Salário líquido
 
@@ -392,6 +393,45 @@ extracted by script and agree with the report's own summary paragraph, all 22 of
   - the form matches the table for SP and Teresina;
   - `test:seo` asserts 22 capital rows and São Paulo's total.
 
+## Assinaturas
+
+### What the leader does (measured)
+
+Núcleo Jornalismo's Calculadora de Streaming (`fetches/nucleo-calculadora-de-streaming.md`):
+
+- about 70 services, each with a preloaded monthly price and no collection date;
+- "descontos de planos anuais" named only as a reason the total may differ.
+
+### What ours did before today (measured)
+
+- **A false claim:** "Netflix, Disney+, Prime permitem compartilhamento (é nos termos de
+  serviço)". Netflix's Help Center for Brazil says "Não é possível compartilhar a conta Netflix
+  fora da residência" (`fetches/streaming-annual-plans-2026-10-18.md`).
+- **Prices and averages with no source or date:**
+  - streaming prices by service;
+  - "Usuário médio: R$ 500-800/mês";
+  - Microsoft 365 and Adobe prices;
+  - "compartilhe (reduz 50%)".
+- **An invented rule:** "A regra dos 70%: se usa menos de 70% do tempo disponível, cancela".
+- **A US app suggested to Brazilian visitors**, Truebill, and a typo, "servicosé".
+
+### What ours does now that the leader does not
+
+- **When an annual plan pays off.** The table covers the 6 plans that Amazon Prime, Disney+ and
+  HBO Max sell both monthly and yearly, priced from their own pages on 2026-10-18. The
+  calculator works out the yearly saving and how many monthly payments the annual price buys.
+  That runs from 8,2 months for Disney+ Padrão to 9,6 for HBO Max Platinum. Keep the service at
+  least that long and the annual plan is cheaper; fewer months, and paying monthly then
+  cancelling costs less.
+- **Every FAQ figure from the calculator or a dated official page.** The sharing answer now
+  comes from Netflix's own terms.
+
+- **Verified:**
+  - hand case: Prime, 12 × 19,90 − 166,80 = R$ 72,00, or 8,38 monthly payments;
+  - 1 mutant killed (the break-even taken on the monthly equivalent, 3 red);
+  - the form matches the table for Prime (R$ 72,00) and HBO Max Platinum (R$ 132,00);
+  - `test:seo` asserts the 6 plan rows and Prime's 8,4 months.
+
 ## What this does not establish
 
 - **That Google will judge it added value.** It is the kind of thing Google's own text names, as
@@ -408,6 +448,7 @@ extracted by script and agree with the report's own summary paragraph, all 22 of
   snapshot script is run again.
 - **That a 40 m² flat at the city's average rent per m² is what a person living alone pays.** It is
   the table's scenario. FipeZAP publishes rent by size only nationally.
+- **The streaming prices after 2026-10-18.** They are one day's reading of three pages.
 - **Eletrobrás's figures for a 2026 refrigerator.** They are 2013 averages, quoted by IDEC; the
   primary table was not found.
 
@@ -430,4 +471,7 @@ extracted by script and agree with the report's own summary paragraph, all 22 of
 - [FipeZAP Locação, setembro de 2026](https://downloads.fipe.org.br/indices/fipezap/fipezap-202609-residencial-locacao.pdf) — `fetches/fipezap-locacao-2026-09.md`, `measurements/fipezap-2026-09-city-prices.*` — rent per m² in 22 capitals
 - [DIEESE, cesta básica de setembro de 2026](https://www.dieese.org.br/analisecestabasica/2026/202609cestabasica.html) — `fetches/dieese-cesta-basica-2026-09.md` — the basket in 27 capitals
 - [Lei 8.245/1991](https://www.planalto.gov.br/ccivil_03/leis/l8245.htm) — `fetches/planalto-lei-8245-1991.md` — who pays what in a lease
+- [Google Brasil SERP](https://www.google.com.br/search?q=calculadora+de+assinaturas&hl=pt-BR&gl=br&num=10) — `fetches/serp-calculadora-de-assinaturas.md` — the 9 organic results
+- [Núcleo, Calculadora de Streaming](https://nucleo.jor.br/calculadora-de-streaming/) — `fetches/nucleo-calculadora-de-streaming.md` — the leading tool
+- [Amazon Prime](https://www.amazon.com.br/prime), [Disney+](https://www.disneyplus.com/pt-br), [HBO Max](https://www.hbomax.com/br/pt), [Netflix, compartilhamento](https://help.netflix.com/pt/node/123277) — `fetches/streaming-annual-plans-2026-10-18.md` — monthly and annual prices; Netflix's household rule
 - Secondary, search results only and not fetched: BP Money, Contabilidade.com and others saying payroll applies the more beneficial route. They agree with the statute; nothing rests on them.

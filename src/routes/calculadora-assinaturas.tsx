@@ -14,12 +14,14 @@ import { FAQSection, type FAQItem } from "@/components/calculator/FAQSection";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { RelatedPosts } from "@/components/calculator/RelatedPosts";
 import { relatedPostsFor } from "@/data/calculators";
+import { STREAMING_ANNUAL_PLANS } from "@/data/streaming-annual-plans";
 import { Prose } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { formatBRL } from "@/lib/format";
+import { formatBRL, formatLongDate } from "@/lib/format";
 import {
+  buildAnnualPlanTable,
   calculateSubscriptions,
   type BillingCycle,
   type SubscriptionInput,
@@ -51,66 +53,108 @@ const defaults = (): SubscriptionInput[] => [
     keep: true,
   },
 ];
+// Every figure the FAQ and the table quote comes from the calculator or a service's own page.
+const DEFAULT_RESULT = calculateSubscriptions(defaults());
+const PLAN_TABLE = buildAnnualPlanTable(STREAMING_ANNUAL_PLANS.plans);
+const PRICES_CHECKED = formatLongDate(STREAMING_ANNUAL_PLANS.checkedAt);
+
+function plan(service: string, name: string) {
+  const row = PLAN_TABLE.find(
+    (candidate) => candidate.service === service && candidate.plan === name,
+  );
+  if (!row) throw new Error(`No plan ${service} ${name}`);
+  return row;
+}
+const PRIME = plan("Amazon Prime", "");
+const DISNEY_STANDARD = plan("Disney+", "Padrão");
+const DISNEY_PREMIUM = plan("Disney+", "Premium");
+const MAX_BASIC = plan("HBO Max", "Básico com anúncios");
+const MAX_PLATINUM = plan("HBO Max", "Platinum");
+const TRIO = [PRIME, DISNEY_STANDARD, MAX_BASIC];
+const TRIO_MONTHLY = calculateSubscriptions(
+  TRIO.map((row, index) => ({
+    id: `trio-monthly-${index}`,
+    name: row.service,
+    category: "Streaming",
+    value: row.monthly,
+    cycle: "monthly" as const,
+    keep: true,
+  })),
+);
+const TRIO_ANNUAL = calculateSubscriptions(
+  TRIO.map((row, index) => ({
+    id: `trio-annual-${index}`,
+    name: row.service,
+    category: "Streaming",
+    value: row.annual,
+    cycle: "annual" as const,
+    keep: true,
+  })),
+);
+
+function months(value: number): string {
+  return value.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+}
+
+function percent(share: number): string {
+  return `${Math.round(share * 100)}%`;
+}
+
 const FAQ: FAQItem[] = [
   {
     question: "Quanto custa ter streaming em casa?",
-    answer:
-      "Netflix (R$ 55-165/mês), Disney+ (R$ 33-55), Prime Video (R$ 15-45), Max (R$ 40), Apple TV+ (R$ 10). Se assina 3-4 = R$ 200-350/mês = R$ 2.400-4.200/ano. Compartilhar reduz custos.",
+    answer: `Nas páginas oficiais, em ${PRICES_CHECKED}, o Amazon Prime custava ${formatBRL(PRIME.monthly)} por mês, o Disney+ de ${formatBRL(DISNEY_STANDARD.monthly)} (Padrão) a ${formatBRL(DISNEY_PREMIUM.monthly)} (Premium) e o HBO Max de ${formatBRL(MAX_BASIC.monthly)} (Básico com anúncios) a ${formatBRL(MAX_PLATINUM.monthly)} (Platinum). Prime, Disney+ Padrão e HBO Max Básico juntos dão ${formatBRL(TRIO_MONTHLY.monthlyTotal)} por mês, ${formatBRL(TRIO_MONTHLY.annualTotal)} no ano; nos planos anuais, ${formatBRL(TRIO_ANNUAL.annualTotal)}.`,
   },
   {
     question: "Como registrar assinatura anual?",
     answer:
-      "Escolha frequência 'Anual' e informe o valor total. A calculadora divide por 12 para média mensal. Exemplo: R$ 1.200/ano = R$ 100/mês.",
+      "Escolha a frequência 'Anual' e informe o valor total do ano. A calculadora divide por 12 para a média mensal: R$ 1.200 por ano viram R$ 100 por mês.",
   },
   {
     question: "Como simular cortes de assinaturas?",
     answer:
-      "Desmarque 'Manter' na assinatura que quer cortar. O resultado recalcula automaticamente e mostra a economia.",
+      "Desmarque 'Manter' na assinatura que quer cortar. O resultado recalcula na hora e mostra a economia.",
   },
   {
-    question: "Vale a pena assinar tudo de uma vez?",
-    answer:
-      "Não. Assine por 3 meses, teste, cancele se não usar. A regra dos 70%: se usa menos de 70% do tempo disponível, cancela.",
+    question: "Plano anual ou mensal: qual vale mais a pena?",
+    answer: `Depende de quantos meses você vai usar. O preço do plano anual equivale a um certo número de mensalidades: no Amazon Prime, ${months(PRIME.breakEvenMonths)}; no HBO Max Platinum, ${months(MAX_PLATINUM.breakEvenMonths)}. Se você vai manter o serviço pelo menos esse tempo, o anual sai mais barato; se pretende assinar só alguns meses e cancelar, o mensal custa menos. A tabela mostra o número de cada plano.`,
   },
   {
-    question: "Qual é o custo anual médio de assinaturas?",
-    answer:
-      "Usuário médio: R$ 500-800/mês = R$ 6.000-9.600/ano. Alguns chegam a R$ 1.500+/mês. Muitos servicosé esquecido e consome dinheiro.",
+    question: "Quanto se gasta por ano com assinaturas?",
+    answer: `Não há um número oficial: depende de quantas você tem. O exemplo da calculadora, com um streaming de R$ 39,90, uma academia de R$ 99,90 e um software de R$ 240 por ano, soma ${formatBRL(DEFAULT_RESULT.monthlyTotal)} por mês, ${formatBRL(DEFAULT_RESULT.annualTotal)} por ano e ${formatBRL(DEFAULT_RESULT.fiveYearTotal)} em cinco anos.`,
   },
   {
-    question: "Como saber qual assinatura estou usando?",
+    question: "Como saber quais assinaturas estou pagando?",
     answer:
-      "Revise suas contas bancárias dos últimos 3 meses. Procure por recorrências. Use aplicativos como Truebill ou Gastos para rastrear assinaturas automáticas.",
+      "Revise a fatura do cartão e o extrato dos últimos meses e procure cobranças que se repetem. As assinaturas feitas pelo celular também aparecem na área de assinaturas da Google Play ou da App Store.",
   },
   {
-    question: "É possível compartilhar assinatura legalmente?",
-    answer:
-      "Netflix, Disney+, Prime permitem compartilhamento (é nos termos de serviço). Spotify, Apple Music, iCloud + são para pessoa. Divide custos legalmente quando permitido.",
+    question: "É possível compartilhar uma assinatura?",
+    answer: `Depende dos termos de cada serviço. A Netflix, por exemplo, diz que não é possível compartilhar a conta fora da residência: quem mora em outro lugar precisa de conta própria ou ser incluído como assinante extra, pago à parte (Central de Ajuda da Netflix, consultada em ${PRICES_CHECKED}). Planos família ou duo, quando existem, são a forma prevista de dividir.`,
   },
   {
     question: "Como economizar em assinaturas?",
     answer:
-      "1) Compartilhe (reduz 50%). 2) Cancele as que não usa. 3) Teste período grátis antes. 4) Alguns pacotes (telefone + TV + Netflix) são mais baratos. 5) Pague anual se oferece desconto.",
+      "Cancele as que não usa, assine por temporada os serviços que você só usa em alguns meses, prefira o plano anual só para os que você usa o ano inteiro, e veja se há plano família, duo ou combo que substitua duas assinaturas.",
   },
   {
-    question: "Assinatura de software realmente vale a pena?",
+    question: "Assinatura de software vale a pena?",
     answer:
-      "Microsoft 365 (R$ 40/mês): vale se usa Word/Excel/PowerPoint profissionalmente. Adobe Creative Cloud (R$ 80-110/mês): vale se designer/editor. Grátis (Canva, Google Docs) se uso casual.",
+      "Vale quando o uso paga a mensalidade, como num programa que você usa para trabalhar. Para uso eventual, alternativas gratuitas costumam bastar.",
   },
   {
-    question: "Qual é o custo real de assinaturas em 5 anos?",
+    question: "Qual é o custo de uma assinatura em cinco anos?",
     answer:
-      "Se gasta R$ 500/mês hoje: 500 × 12 × 5 = R$ 30.000 em 5 anos. Se conseguir reduzir para R$ 200/mês: economiza R$ 18.000. Impressionante quando ve o valor acumulado.",
+      "O valor mensal vezes 60. R$ 500 por mês viram R$ 30.000 em cinco anos; reduzir para R$ 200 economiza R$ 18.000 no período. A calculadora mostra essa projeção para a sua lista.",
   },
   {
     question: "Os preços são atualizados automaticamente?",
-    answer:
-      "Não. Você informa o valor. Preços mudam frequentemente, então use o último que você pagou. Atualize a calculadora periodicamente.",
+    answer: `Não. Você informa o valor que paga. Os preços da tabela de planos anuais foram consultados nas páginas oficiais em ${PRICES_CHECKED} e podem ter mudado.`,
   },
   {
-    question: "Devo cancelar tudo e economizar?",
+    question: "Devo cancelar tudo para economizar?",
     answer:
-      "Não, mas seja inteligente. Cancele as que não usa. Mantenha as que trazem valor. Se Netflix = lazer diário, mantém. Se usa 1x/mês, cancela. Qualidade de vida importa.",
+      "Não necessariamente. Cancele o que você não usa e mantenha o que traz valor: um serviço usado todo dia vale mais que um usado uma vez por mês.",
   },
 ];
 
@@ -288,11 +332,85 @@ function SubscriptionsPage() {
           valores atuais da sua fatura ou cartão.
         </p>
       </Prose>
+      <AnnualPlanSection />
       <div className="mx-auto max-w-6xl space-y-10 px-4 pb-16 sm:px-6">
         <FAQSection items={FAQ} />
         <RelatedCalculators slugs={["morar-sozinho", "conta-de-luz", "custo-pet"]} />
         <RelatedPosts slugs={relatedPostsFor("assinaturas")} />
       </div>
     </CalculatorLayout>
+  );
+}
+
+function AnnualPlanSection() {
+  return (
+    <Prose>
+      <h2>Plano anual ou mensal: a partir de quantos meses o anual compensa</h2>
+      <p>
+        Alguns serviços vendem o mesmo plano por mês ou por ano. O preço do anual equivale a um
+        certo número de mensalidades: se você vai manter a assinatura pelo menos esse tempo, o anual
+        sai mais barato; se pretende assinar só alguns meses e cancelar, o mensal custa menos. A
+        tabela foi calculada pela própria calculadora com os preços das páginas oficiais em{" "}
+        {PRICES_CHECKED}.
+      </p>
+      <div className="not-prose overflow-x-auto rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]">
+        <table className="w-full min-w-[620px] text-sm">
+          <caption className="sr-only">
+            Plano mensal e anual de serviços de streaming e a partir de quantos meses o anual
+            compensa
+          </caption>
+          <thead className="bg-muted/60 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th scope="col" className="px-3 py-2.5">
+                Serviço e plano
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Mensal
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Anual
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Economia no ano
+              </th>
+              <th scope="col" className="px-3 py-2.5 text-right">
+                Anual compensa a partir de
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {PLAN_TABLE.map((row) => (
+              <tr key={`${row.service}-${row.plan}`} className="border-t border-border/70">
+                <th scope="row" className="px-3 py-2 text-left font-medium text-foreground">
+                  {row.plan ? `${row.service} ${row.plan}` : row.service}
+                </th>
+                <td className="px-3 py-2 text-right">{formatBRL(row.monthly)}</td>
+                <td className="px-3 py-2 text-right">{formatBRL(row.annual)}</td>
+                <td className="px-3 py-2 text-right">
+                  {formatBRL(row.yearlySaving)} ({percent(row.savingShare)})
+                </td>
+                <td className="px-3 py-2 text-right font-semibold text-foreground">
+                  {months(row.breakEvenMonths)} meses
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        No Disney+, o plano anual é cobrado em 12 parcelas e a página avisa: "pagamento antecipado
+        obrigatório". Os preços mudam; confira a página de cada serviço:{" "}
+        {[...new Map(PLAN_TABLE.map((row) => [row.service, row.sourceUrl])).entries()].map(
+          ([service, url], index, all) => (
+            <span key={service}>
+              <a href={url} target="_blank" rel="noreferrer">
+                {service}
+              </a>
+              {index < all.length - 1 ? ", " : "."}
+            </span>
+          ),
+        )}
+      </p>
+    </Prose>
   );
 }
