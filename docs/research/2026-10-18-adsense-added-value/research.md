@@ -43,7 +43,8 @@ Measured against claimed is marked in every row.
 | Custo de carro | calculadora custo de carro | calculadoras.rioclaro.com.br | see below | **built** (slice 5) |
 | Morar sozinho | calculadora morar sozinho | customorarsozinho.com.br | see below | **built** (slice 5) |
 | Assinaturas | calculadora de assinaturas | nucleo.jor.br (Calculadora de Streaming) | see below | **built** (slice 5) |
-| the other 2 household calculators | — | — | — | slice 5 |
+| Custo de mudança | calculadora custo de mudança | translidermudancas.com.br (blog) | see below | **built** (slice 5) |
+| Custo de pet | — | — | — | slice 5 |
 
 ## Salário líquido
 
@@ -432,6 +433,43 @@ Núcleo Jornalismo's Calculadora de Streaming (`fetches/nucleo-calculadora-de-st
   - the form matches the table for Prime (R$ 72,00) and HBO Max Platinum (R$ 132,00);
   - `test:seo` asserts the 6 plan rows and Prime's 8,4 months.
 
+## Custo de mudança
+
+### What the leader does (measured)
+
+translidermudancas.com.br, a removal company's blog post (`fetches/translider-simulador-frete.md`).
+It points to the ANTT's calculator, then gives "Mudanças residenciais/comerciais: R$ 8,00 a
+R$ 15,00 por quilômetro" as if from the ANTT table. The ANTT has no such category.
+
+### What ours did before today (measured)
+
+- **The reserve for the unforeseen fell on the lease too.** 10% of the deposit and the first rent
+  added R$ 450 of the default R$ 1.085 reserve. The page's own text says the reserve covers
+  materials, repairs and installations. An existing unit test pinned the inflated figure.
+- **The deposit counted as a cost.** Lei 8.245/1991, art. 38, § 2º, sends a cash deposit to a
+  savings account and back to the tenant with its yield.
+- **Every FAQ answer gave ranges with no source.** "Cartório: R$ 300-600" is not a cost of a
+  lease. The word "mudançadora" appeared three times.
+
+### What ours does now that the leader does not
+
+- **The ANTT's binding floor for the truck.** It is computed from the coefficients in force: carga
+  geral, Tabela A of Portaria SUROC 22/2026, from 30/09/2026
+  (`fetches/antt-piso-minimo-frete-2026-09.md`). The page shows a table of 6 distances on 2 and 3
+  axles, and the form computes it for the visitor's trip. 500 km on 2 axles is at least
+  R$ 2.488,74. Per km it falls from R$ 8,59 at 100 km to R$ 4,22 at 3.000 km, because loading is
+  paid once.
+- **The reserve on what the lease does not fix**, and the deposit shown as money that comes back:
+  R$ 11.485 needed at the defaults, R$ 8.485 that stays spent.
+- **FAQ answers from the statute and the calculator.** The agency fee is the landlord's, the
+  deposit is capped at three rents and returns with its yield, and there is one guarantee.
+
+- **Verified:**
+  - hand cases: 500 × 5,2177 + 541,86 = R$ 3.150,71, and the reserve at R$ 635;
+  - 1 mutant killed (the reserve back on the contract, 3 red);
+  - the form matches the table at 500 km on 2 axles and 3.000 km on 3 axles;
+  - `test:seo` asserts 6 rows and R$ 2.488,74.
+
 ## What this does not establish
 
 - **That Google will judge it added value.** It is the kind of thing Google's own text names, as
@@ -449,6 +487,8 @@ Núcleo Jornalismo's Calculadora de Streaming (`fetches/nucleo-calculadora-de-st
 - **That a 40 m² flat at the city's average rent per m² is what a person living alone pays.** It is
   the table's scenario. FipeZAP publishes rent by size only nationally.
 - **The streaming prices after 2026-10-18.** They are one day's reading of three pages.
+- **That the freight floor is current after a diesel move.** The coefficients are those of
+  Portaria SUROC 22/2026; the ANTT must replace them whenever diesel moves more than 5%.
 - **Eletrobrás's figures for a 2026 refrigerator.** They are 2013 averages, quoted by IDEC; the
   primary table was not found.
 
@@ -474,4 +514,7 @@ Núcleo Jornalismo's Calculadora de Streaming (`fetches/nucleo-calculadora-de-st
 - [Google Brasil SERP](https://www.google.com.br/search?q=calculadora+de+assinaturas&hl=pt-BR&gl=br&num=10) — `fetches/serp-calculadora-de-assinaturas.md` — the 9 organic results
 - [Núcleo, Calculadora de Streaming](https://nucleo.jor.br/calculadora-de-streaming/) — `fetches/nucleo-calculadora-de-streaming.md` — the leading tool
 - [Amazon Prime](https://www.amazon.com.br/prime), [Disney+](https://www.disneyplus.com/pt-br), [HBO Max](https://www.hbomax.com/br/pt), [Netflix, compartilhamento](https://help.netflix.com/pt/node/123277) — `fetches/streaming-annual-plans-2026-10-18.md` — monthly and annual prices; Netflix's household rule
+- [Google Brasil SERP](https://www.google.com.br/search?q=calculadora+custo+de+mudan%C3%A7a&hl=pt-BR&gl=br&num=10) — `fetches/serp-calculadora-custo-de-mudanca.md` — the 9 organic results
+- [Translider, simulador de frete](https://translidermudancas.com.br) — `fetches/translider-simulador-frete.md` — position 1
+- [Portaria SUROC 22/2026](https://anttlegis.antt.gov.br/action/UrlPublicasAction.php?acao=abrirAtoPublico&num_ato=00000022&sgl_tipo=POR&sgl_orgao=SUROC/ANTT/MT&vlr_ano=2026&seq_ato=000&cod_modulo=623&cod_menu=9230), [Resolução ANTT 5.867/2020](https://anttlegis.antt.gov.br/action/UrlPublicasAction.php?acao=abrirAtoPublico&sgl_tipo=RES&num_ato=00005867&seq_ato=000&vlr_ano=2020&sgl_orgao=DG/ANTT/MI&cod_modulo=161&cod_menu=5408), [Lei 13.703/2018](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13703.htm) — `fetches/antt-piso-minimo-frete-2026-09.md` — the freight floor and its coefficients
 - Secondary, search results only and not fetched: BP Money, Contabilidade.com and others saying payroll applies the more beneficial route. They agree with the statute; nothing rests on them.
