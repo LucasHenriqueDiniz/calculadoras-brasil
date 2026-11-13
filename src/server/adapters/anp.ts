@@ -101,20 +101,33 @@ function excelDateToIso(serial: string): string {
   return new Date(milliseconds).toISOString().slice(0, 10);
 }
 
+// ANP has named the weekly workbook three ways, and the page still links all of them:
+//   resumo-semanal-lpc-2022-08-07-2022-08-13.xlsx
+//   resumo_semanal_lpc_2026-10-04_2026-10-10.xlsx
+//   resumo_semanal_lpc_2026_11_01-2026_11_07.xlsx   (from the week of 2026-10-11)
+// Only the dates are read, each part separated by either "-" or "_".
+const WEEKLY_WORKBOOK_LINK =
+  /href=["']([^"']*resumo[-_]semanal[-_]lpc[-_]\d{4}[-_]\d{2}[-_]\d{2}[-_](\d{4})[-_](\d{2})[-_](\d{2})\.xlsx)["']/gi;
+
+/** The href of the weekly workbook whose week ends last, or undefined when none is linked. */
+export function findLatestWorkbookHref(html: string): string | undefined {
+  const links = [...html.replace(/&amp;/g, "&").matchAll(WEEKLY_WORKBOOK_LINK)].map((match) => ({
+    href: match[1],
+    endDate: `${match[2]}-${match[3]}-${match[4]}`,
+  }));
+  links.sort((a, b) => b.endDate.localeCompare(a.endDate));
+  return links[0]?.href;
+}
+
 async function findLatestWorkbookUrl(): Promise<string> {
   const { bytes } = await fetchBounded(ANP_PAGE, {
     maxBytes: 1_500_000,
     headers: { accept: "text/html", "user-agent": "CalculadorasBrasil/1.0" },
   });
-  const html = decodeUtf8(bytes).replace(/&amp;/g, "&");
-  const links = [
-    ...html.matchAll(
-      /href=["']([^"']*resumo_semanal_lpc_(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})\.xlsx)["']/gi,
-    ),
-  ].sort((a, b) => b[3].localeCompare(a[3]));
-  if (!links[0]) throw new Error("ANP has not published a recognisable weekly spreadsheet.");
+  const href = findLatestWorkbookHref(decodeUtf8(bytes));
+  if (!href) throw new Error("ANP has not published a recognisable weekly spreadsheet.");
 
-  const url = new URL(links[0][1], ANP_PAGE);
+  const url = new URL(href, ANP_PAGE);
   if (url.hostname !== "www.gov.br" || !url.pathname.startsWith("/anp/")) {
     throw new Error("The spreadsheet found does not belong to the official ANP domain.");
   }
