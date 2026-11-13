@@ -1,9 +1,14 @@
+import { env } from "cloudflare:workers";
+import { edgeCacheKey } from "@/server/edge-cache-key";
+
 export async function respondWithEdgeCache(
   request: Request,
   producer: () => Promise<Response>,
 ): Promise<Response> {
   const cache = await caches.open("public-data");
-  const cacheKey = new Request(request.url, { method: "GET" });
+  const cacheKey = new Request(edgeCacheKey(request.url, env.CF_VERSION_METADATA.id), {
+    method: "GET",
+  });
   const cached = await cache.match(cacheKey);
   if (cached) return cached;
 
