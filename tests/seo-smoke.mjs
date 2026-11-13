@@ -284,6 +284,16 @@ try {
     "the INSS plan table must be prerendered",
   );
   assert.ok(inssPage.includes("R$ 700,00"), "the R$ 3.500 row must show its 20% contribution");
+  // The first render is what Googlebot sees. Opened on 0 months it said the estimate "aparece
+  // zerada", and Google classed the page as a Soft 404 on 2026-11-05.
+  assert.ok(
+    !inssPage.includes("aparece zerada"),
+    "the INSS page must not open on a zeroed benefit estimate",
+  );
+  assert.ok(
+    inssPage.includes("Estimativa de benefício no plano normal R$ 2.400,00"),
+    "the INSS page must open on an estimate: R$ 3.000 over 30 years is 80% of the average",
+  );
 
   // The PGBL table, with the R$ 120.000 row's saving at a full 12% contribution.
   const pensionPage = textContent(

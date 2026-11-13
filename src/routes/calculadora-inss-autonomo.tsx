@@ -24,15 +24,18 @@ import { absoluteUrl } from "@/lib/site";
 import { calculatorStructuredData } from "@/lib/structured-data";
 import { usePersistedState } from "@/lib/usePersistedState";
 
+/** The plan table: a man affiliated before the reform, with 30 years of contribution. */
+const TABLE_YEARS = 30;
+
+// The page opens on the table's own case, so its first render is an estimate. It used to open
+// on 0 months, which renders "a estimativa de benefício aparece zerada" to every visitor with
+// nothing saved, Googlebot included, and Google classed the page as a Soft 404 on 2026-11-05.
 const DEFAULTS: InssAutonomoInput = {
   grossMonthlyIncome: 3000,
-  contributedMonths: 0,
+  contributedMonths: TABLE_YEARS * 12,
   contributorSex: "masculino",
   affiliatedBeforeReform: true,
 };
-
-/** The plan table: a man affiliated before the reform, with 30 years of contribution. */
-const TABLE_YEARS = 30;
 const PLAN_ROWS = buildPlanComparisonTable(
   [MINIMUM_WAGE, 2500, 3500, 5000, INSS_CEILING],
   TABLE_YEARS,
