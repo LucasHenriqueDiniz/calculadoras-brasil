@@ -4,3 +4,10 @@
 allowBuilds:
   esbuild: true
   workerd: true
+
+# GHSA-g3hv-75wg-m249 is fixed only in minimatch 11, and typescript-estree still
+# asks for ^10. Its one call is minimatch(path, pattern, { dot: true }) for
+# allowDefaultProject, which 11 keeps and this repo's ESLint config never reaches
+# (no projectService). Drop this once typescript-estree depends on ^11 itself.
+overrides:
+  "@typescript-eslint/typescript-estree>minimatch": ^11.0.1
