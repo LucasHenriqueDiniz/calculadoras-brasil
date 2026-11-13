@@ -65,16 +65,52 @@ function baseFilters() {
   };
 }
 
+type ValidityRecord = Pick<AneelRecord, "SigAgente" | "DatInicioVigencia" | "DatFimVigencia">;
+
+// The list needs three fields of the rows in force today. Asking for every field of every row
+// grew with each year of tariffs ANEEL publishes, and on 2026-11-13 it was 2,214,387 bytes for
+// 3,824 rows: over the cap, so every list request failed. Sorted by end of validity, the rows in
+// force come first, and the response size is set by this row count instead of by the dataset's
+// history: 1,000 rows were 89,307 bytes, holding the 203 that had not ended yet.
+const DISTRIBUTOR_ROWS = 1000;
+
+/**
+ * The distributors with a tariff in force on `today`, from rows sorted by end of validity,
+ * latest first. Throws when every row returned is still in force, because the rows beyond the
+ * limit could hold more distributors, and a short list would read as complete.
+ */
+export function distributorsInForce(
+  records: readonly ValidityRecord[],
+  today: string,
+  requestedRows: number,
+): string[] {
+  const oldestEnd = records[records.length - 1]?.DatFimVigencia;
+  if (records.length >= requestedRows && oldestEnd !== undefined && oldestEnd >= today) {
+    throw new Error(
+      "Every ANEEL row returned is still in force, so the distributor list may be cut short.",
+    );
+  }
+
+  const names = new Set<string>();
+  for (const record of records) {
+    if (record.DatInicioVigencia <= today && record.DatFimVigencia >= today) {
+      names.add(record.SigAgente);
+    }
+  }
+  return [...names].sort((a, b) => a.localeCompare(b, "pt-BR"));
+}
+
 export async function fetchAneelDistributors(uf: string): Promise<EnergyDistributorOption[]> {
   const filters = JSON.stringify(baseFilters());
   const url = new URL(API_URL);
   url.searchParams.set("resource_id", RESOURCE_ID);
-  url.searchParams.set("limit", "5000");
+  url.searchParams.set("limit", String(DISTRIBUTOR_ROWS));
   url.searchParams.set("filters", filters);
-  url.searchParams.set("sort", "SigAgente asc");
+  url.searchParams.set("fields", "SigAgente,DatInicioVigencia,DatFimVigencia");
+  url.searchParams.set("sort", "DatFimVigencia desc");
 
   const { bytes } = await fetchBounded(url, {
-    maxBytes: 2_000_000,
+    maxBytes: 500_000,
     headers: { accept: "application/json", "user-agent": "CalculadorasBrasil/1.0" },
   });
   const payload = JSON.parse(decodeUtf8(bytes)) as AneelResponse;
@@ -83,22 +119,14 @@ export async function fetchAneelDistributors(uf: string): Promise<EnergyDistribu
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const names = new Set<string>();
-
-  for (const record of payload.result.records) {
-    if (record.DatInicioVigencia <= today && record.DatFimVigencia >= today) {
-      names.add(record.SigAgente);
-    }
-  }
-
-  return [...names]
-    .sort((a, b) => a.localeCompare(b, "pt-BR"))
-    .map((distributor) => ({
+  return distributorsInForce(payload.result.records, today, DISTRIBUTOR_ROWS).map(
+    (distributor) => ({
       uf,
       distributor,
       source: "ANEEL",
       sourceUrl: url.toString(),
-    }));
+    }),
+  );
 }
 
 export async function fetchAneelTariff(
