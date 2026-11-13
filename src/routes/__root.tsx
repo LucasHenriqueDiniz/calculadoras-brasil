@@ -10,7 +10,7 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import appCss from "@/styles.css?url";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, isProductionHost } from "@/lib/site";
 
 const ADSENSE_CLIENT = "ca-pub-2600827684802809";
 const ADSENSE_SCRIPT_SRC = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
@@ -159,8 +159,13 @@ function RootComponent() {
 // Suspense boundary before React hydrates it, and hydration fails. Added from an effect, it runs
 // after hydration started, which is after the parser inserted the client entry at the end of
 // <body>: whatever it appends then goes after every node React rendered.
+//
+// Only on the production domain. Loaded on the dev server and on every PR preview, it reported
+// their page views to the AdSense account as domains of their own: in the 90 days to 2026-11-11
+// the report had a row for each preview host (feat-adsense-*, fix-*) and one for 127.0.0.1.
 function useAdSenseScript() {
   useEffect(() => {
+    if (!isProductionHost(window.location.hostname)) return;
     if (document.querySelector(`script[src="${ADSENSE_SCRIPT_SRC}"]`)) return;
     const script = document.createElement("script");
     script.async = true;
