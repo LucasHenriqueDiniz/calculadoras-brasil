@@ -1,5 +1,5 @@
 ---
-status: todo
+status: doing
 ---
 
 # Slice 3 — The ANEEL snapshot, and `/tarifa-de-energia` ranking 103 distributors
@@ -80,3 +80,53 @@ node scripts/verify-aneel-pages.mjs https://calculebrasil.com/tarifa-de-energia
 
 If ANEEL's API is slow or truncates (the adapter already met a 2,000,000-byte cap), page through it
 with `offset` as the research script did: 1,927 records in two calls on 2026-11-14.
+
+---
+
+## What actually happened — 2026-11-14
+
+**States: not ANEEL's ranking export.** `RankingB1.xlsx` sits behind a Cloudflare challenge. Two
+sources instead, each recorded per distributor as `stateSource`:
+
+| source | covers | how |
+|---|---|---|
+| ANEEL "Indicadores de Qualidade do Atendimento Telefônico" (`153c0076…`, `SigUF` + `NumCNPJ`) | 40 concessionaires | joined to the tariff rows by CNPJ |
+| CNPJ register (BrasilAPI), city name from IBGE by municipality code | 62 cooperatives | head office; a cooperative serves the area around it. Looked up once, carried over on later refreshes |
+
+0 distributors without a state. Searched and rejected on the way: SAMP (legal names and market data,
+no state), the DEC/FEC sets (no state), the distributed-generation set (zip/parquet only), the Tarifa
+Social CSV (redirects to itself).
+
+**What ANEEL's data needed.**
+- Grouped by CNPJ **and** agent name: "CPFL Santa Cruz" today carries CPFL Jaguari's former CNPJ, and
+  RGE absorbed RGE Sul. Keyed by one of them alone, two concession areas splice into one line.
+- Consecutive rows with the same REH and values merged (COPEL-DIS: 19 rows, 18 periods).
+- `SigAgente` "Não Informado" has a row in force and is not a distributor: excluded, and out of the
+  API list too.
+- 102 distributors in force on 2026-11-14 (the "103" in the research counted "Não Informado"),
+  1,670 periods.
+
+**Bundle.** The first build put the 1,670-period history in `index-*.js`, every page's JavaScript
+(631 KB): route `head()`s are not code-split, and the head's figures came from the snapshot. Now the
+script also writes `aneel-tariff-summary.ts` (the figures the head and prose state, from
+`summarizeRanking`), and `TariffRankingTable` is the only importer of the history. After:
+`index-*.js` 471 KB with no history in it; `tarifa-de-energia-*.js` 166 KB, 31.8 KB gzip.
+
+**Measured locally** (`vite preview` of the build, load average ~100):
+
+| check | result |
+|---|---|
+| `node scripts/verify-aneel-pages.mjs http://127.0.0.1:4174/tarifa-de-energia` against live ANEEL | **102/102** rows, R$/kWh to 5 decimals and change to 0.1 pp |
+| same, page with COPEL-DIS's cell edited to 0,76812 | **101/102**, names COPEL-DIS, exit 1 |
+| `/api/energy-tariffs?uf=…` | PR 5 (COPEL-DIS in, Âmbar Amazonas out), SP 19, MG 3, RJ 5, AC 1 |
+| domain tests (recorded ANEEL fixture) | 12/12; merge disabled → 1 red; key by CNPJ only → 1 red |
+| snapshot tests (states, no overlap, in force, summary = ranking, `lastmod` = snapshot date) | 9/9 |
+| `test:seo` | 27 routes; the ranking has ≥ 100 rows, no repeat, no placeholder, COPEL-DIS at R$ 0,76802 |
+| `cf:types:check`, `typecheck`, `lint`, `build`, `worker:dry-run`, `audit` | exit 0 |
+
+The figures the page states on 2026-11-14: 102 distributors; most expensive CERES (Resende, RJ)
+R$ 1,56923/kWh; cheapest CERSAD (Doutor Pedrinho, SC) R$ 0,40502, −38.7% in a year; median
+R$ 0,80713; median 12-month change +9.2%; 47 rose 10% or more, 12 fell; biggest rise COOPERCOCAL
+(Cocal do Sul, SC) +39.7%.
+
+Production, and ⚠️ the owner's "Request indexing": after the merge.

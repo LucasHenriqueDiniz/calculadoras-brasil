@@ -1,5 +1,5 @@
 import { buildColorMap } from "@/lib/chart-colors";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useId, useMemo, useState } from "react";
 import { LoaderCircle, Plus, Table as TableIcon, Trash2 } from "lucide-react";
 import { CalculatorLayout, FormSection } from "@/components/calculator/CalculatorLayout";
@@ -621,6 +621,11 @@ function ElectricityArticle() {
         valor público combina TUSD e TE, mas não inclui impostos, bandeiras tarifárias, iluminação
         pública nem regras específicas da sua fatura. O cache é atualizado semanalmente e o valor
         continua editável.
+      </p>
+      <p>
+        Para comparar a sua distribuidora com as outras, o{" "}
+        <Link to="/tarifa-de-energia">ranking das tarifas de energia por distribuidora</Link> mostra
+        a tarifa residencial em vigor de cada uma e quanto ela mudou em 12 meses.
       </p>
 
       <h2>Limitações</h2>

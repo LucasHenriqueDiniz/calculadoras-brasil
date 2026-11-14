@@ -29,6 +29,7 @@ const PUBLIC_ROUTES = [
   "/blog/investimentos-isentos-irpf",
   "/blog/despesas-dedutiveis-autonomo",
   "/blog/contador-necessario-pj",
+  "/tarifa-de-energia",
   "/sobre",
   "/metodologia",
   "/privacidade",
@@ -430,6 +431,29 @@ try {
   assert.ok(
     aboutHtml.includes('href="https://lucashdo.com/"'),
     "/sobre must link the author's portfolio at lucashdo.com",
+  );
+
+  // The tariff ranking is the snapshot rendered: one row per distributor, the values ANEEL
+  // published, in the HTML a crawler reads rather than only after hydration.
+  const tariffHtml = await (await fetch(`${BASE_URL}/tarifa-de-energia`)).text();
+  const tariffRows = [...tariffHtml.matchAll(/<tr\b[^>]*data-agent="([^"]+)"/g)].map((m) => m[1]);
+  assert.ok(
+    tariffRows.length >= 100,
+    `/tarifa-de-energia must list every distributor, got ${tariffRows.length}`,
+  );
+  assert.equal(
+    new Set(tariffRows).size,
+    tariffRows.length,
+    "/tarifa-de-energia must not repeat a row",
+  );
+  assert.ok(
+    !tariffRows.includes("Não Informado"),
+    "/tarifa-de-energia must not list ANEEL's placeholder agent",
+  );
+  const copelRow = tariffHtml.match(/<tr\b[^>]*data-agent="COPEL-DIS"[\s\S]*?<\/tr>/)?.[0] ?? "";
+  assert.ok(
+    textContent(copelRow).includes("R$ 0,76802"),
+    "/tarifa-de-energia must show COPEL-DIS at the tariff ANEEL set",
   );
 
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });

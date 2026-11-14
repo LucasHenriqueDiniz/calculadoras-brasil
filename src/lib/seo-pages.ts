@@ -100,6 +100,8 @@ export const SEO_PAGES = [
     changefreq: "monthly",
     priority: 0.75,
   },
+  // Moves with ANEEL_TARIFF_SNAPSHOT.referenceDate; tests/aneel-snapshot.test.ts holds the two together.
+  { path: "/tarifa-de-energia", lastmod: "2026-11-14", changefreq: "monthly", priority: 0.85 },
   { path: "/sobre", lastmod: "2026-10-19", changefreq: "yearly", priority: 0.5 },
   { path: "/metodologia", lastmod: "2026-10-19", changefreq: "monthly", priority: 0.7 },
   { path: "/privacidade", lastmod: "2026-08-06", changefreq: "yearly", priority: 0.3 },
