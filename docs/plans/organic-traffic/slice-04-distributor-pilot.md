@@ -1,5 +1,5 @@
 ---
-status: todo
+status: doing
 ---
 
 # Slice 4 — Ten distributor pages: history, rank and the bill, from ANEEL
@@ -73,3 +73,59 @@ node scripts/verify-aneel-pages.mjs https://calculebrasil.com/tarifa-de-energia/
 
 If the history chart needs a library, use none: an inline SVG drawn from the table's numbers is
 enough, and it keeps the page as light as the others.
+
+---
+
+## What actually happened — 2026-11-14
+
+**The ten, by size.** ANEEL's SAMP had residential consumer counts ("Número de consumidores", class
+Residencial). September 2026 listed only 21 distributors that day; August listed all 103. The ten
+largest (`docs/research/2026-11-14-public-data-pages/measurements/samp-residential-consumers-2026-08.tsv`)
+replace the judgement list above: **ENEL CE in, ENEL RJ out**.
+
+| slug | `SigAgente` | residential consumers | name checked at |
+|---|---|---|---|
+| cemig | CEMIG-D | 8,536,384 | cemig.com.br (title "Cemig") |
+| enel-sao-paulo | ELETROPAULO | 7,619,153 | enel.com.br/pt-saopaulo ("Enel São Paulo" ×9) |
+| neoenergia-coelba | COELBA | 6,282,407 | neoenergia.com/web/bahia ("Neoenergia Coelba" ×27) |
+| cpfl-paulista | CPFL-PAULISTA | 4,650,887 | cpfl.com.br/institucional ("CPFL Paulista" ×4) |
+| copel | COPEL-DIS | 4,505,635 | copel.com (title "Copel") |
+| neoenergia-pernambuco | Neoenergia PE | 3,849,786 | neoenergia.com/web/pernambuco ("Neoenergia Pernambuco" ×14) |
+| light | LIGHT SESA | 3,799,152 | light.com.br (title "Light") |
+| enel-ceara | ENEL CE | 3,507,540 | enel.com.br/pt-ceara (title "Enel Ceará") |
+| equatorial-goias | EQUATORIAL GO | 3,185,346 | **press only** (Jornal Opção): the group's pages render the name in JavaScript |
+| celesc | CELESC | 2,840,717 | celesc.com.br (title "A Celesc") |
+
+The GD ("Sistema de Compensação") market rows are in the count; whether they overlap "Regular" is not
+stated, so the page says "cerca de".
+
+**The pages.** `/tarifa-de-energia/<slug>` (`src/routes/tarifa-de-energia_.$slug.tsx`, not nested
+under the hub). Each carries today's tariff and resolution, every period with its change and the
+gaps ANEEL left (shown, never filled), a step chart drawn from the same numbers, the neighbours in
+the national ranking, the bill for 50–500 kWh, and an FAQ whose answers are numbers. The prose
+branches on the distributor's own facts: third of the national table it falls in, above or below the
+median change, its place in its state, how many reductions, off-cycle revisions, gaps. Two examples
+from the build: Light is "uma das tarifas mais altas do país" and "a mais barata das 5 distribuidoras
+do Rio de Janeiro"; Copel rose "mais que a mediana", Enel São Paulo "menos que a mediana".
+
+The head reads `aneel-distributor-summaries.ts` (generated), so the history stays out of `index-*.js`
+(410 KB, no history in it); the snapshot sits in one chunk the tariff pages share (162 KB, 30 KB
+gzip). The hub's table now links each pilot row to its page.
+
+**Measured locally** (`vite preview` of the build):
+
+| check | result |
+|---|---|
+| `verify-aneel-pages.mjs` on each of the 10 pages vs live ANEEL | **10/10**: every period (18–19 per page, from 19–20 ANEEL rows), every gap (1–4), bill rows 8/8, rank |
+| same, Copel copy with the 100 kWh cell and the 2014 period edited | periods 17/18, bill rows 7/8, both rows named |
+| hub, same build | 102/102 |
+| `test:seo` | 37 routes, none orphaned; each page ≥ 8 periods and 8 bill rows; **the 10 narratives differ pairwise** with numbers, names, acronyms, UFs and state names masked |
+| unit tests (history, gaps, bill, facts, head summaries, lastmod) | 45/45 across the six related files |
+| `cf:types:check`, `typecheck`, `lint`, `build`, `worker:dry-run`, `audit` | exit 0 |
+
+One defect found and fixed on the way: a string replace meant for the comparison pages' breadcrumb
+also hit `calculatorStructuredData`, where `parent` would have resolved to `window.parent`. The
+typecheck caught it before any commit.
+
+Production and ⚠️ the owner's "Request indexing" for the ten URLs: after the merge. Slice 6's clock
+starts on the deploy date.

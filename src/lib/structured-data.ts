@@ -84,6 +84,8 @@ interface ComparisonStructuredDataOptions {
   description: string;
   path: string;
   faq: StructuredFaq[];
+  /** A page between the home page and this one in the breadcrumb trail. */
+  parent?: { name: string; path: string };
 }
 
 /**
@@ -95,6 +97,7 @@ export function comparisonStructuredData({
   description,
   path,
   faq,
+  parent,
 }: ComparisonStructuredDataOptions) {
   const pageUrl = absoluteUrl(path);
 
@@ -121,7 +124,17 @@ export function comparisonStructuredData({
         "@type": "BreadcrumbList",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Início", item: absoluteUrl("/") },
-          { "@type": "ListItem", position: 2, name, item: pageUrl },
+          ...(parent
+            ? [
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: parent.name,
+                  item: absoluteUrl(parent.path),
+                },
+              ]
+            : []),
+          { "@type": "ListItem", position: parent ? 3 : 2, name, item: pageUrl },
         ],
       }),
     },

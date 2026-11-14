@@ -1,3 +1,5 @@
+import { DISTRIBUTOR_PAGES } from "../data/distributor-pages";
+
 export const SITE_REVIEW_DATE = "2026-06-23";
 export const EDITORIAL_RESPONSIBLE = "Calcule Brasil";
 
@@ -102,6 +104,13 @@ export const SEO_PAGES = [
   },
   // Moves with ANEEL_TARIFF_SNAPSHOT.referenceDate; tests/aneel-snapshot.test.ts holds the two together.
   { path: "/tarifa-de-energia", lastmod: "2026-11-14", changefreq: "monthly", priority: 0.85 },
+  // One per distributor page, dated by the same snapshot (tests/aneel-snapshot.test.ts).
+  ...DISTRIBUTOR_PAGES.map((page) => ({
+    path: `/tarifa-de-energia/${page.slug}`,
+    lastmod: "2026-11-14",
+    changefreq: "monthly" as const,
+    priority: 0.8,
+  })),
   { path: "/sobre", lastmod: "2026-10-19", changefreq: "yearly", priority: 0.5 },
   { path: "/metodologia", lastmod: "2026-10-19", changefreq: "monthly", priority: 0.7 },
   { path: "/privacidade", lastmod: "2026-08-06", changefreq: "yearly", priority: 0.3 },

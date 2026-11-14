@@ -1,4 +1,6 @@
+import { Link } from "@tanstack/react-router";
 import { ANEEL_TARIFF_SNAPSHOT } from "@/data/aneel-tariff-snapshot";
+import { distributorPageByAgent } from "@/data/distributor-pages";
 import { distributorName, DISTRIBUTOR_NAMES } from "@/data/distributor-names";
 import { rankByTariff } from "@/lib/calculators/energy-tariffs";
 import { formatLongDate, formatNumber, formatShortDate } from "@/lib/format";
@@ -54,7 +56,17 @@ export function TariffRankingTable() {
                   {row.rank}
                 </td>
                 <th scope="row" className="px-3 py-2 text-left font-medium text-foreground">
-                  {distributorName(row.agent)}
+                  {distributorPageByAgent(row.agent) ? (
+                    <Link
+                      to="/tarifa-de-energia/$slug"
+                      params={{ slug: distributorPageByAgent(row.agent)?.slug ?? "" }}
+                      className="text-primary underline underline-offset-2"
+                    >
+                      {distributorName(row.agent)}
+                    </Link>
+                  ) : (
+                    distributorName(row.agent)
+                  )}
                   {DISTRIBUTOR_NAMES[row.agent] ? (
                     <span className="block text-xs font-normal text-muted-foreground">
                       {row.agent}
