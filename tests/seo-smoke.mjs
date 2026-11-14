@@ -425,8 +425,14 @@ try {
   assert.ok(!methodology.includes("35% da renda"), "/metodologia must not carry the old 35% rule");
 
   // /sobre says how the content is produced, as the owner decided in slice 6.
-  const aboutPage = textContent(await (await fetch(`${BASE_URL}/sobre`)).text());
+  const aboutHtml = await (await fetch(`${BASE_URL}/sobre`)).text();
+  const aboutPage = textContent(aboutHtml);
   assert.ok(aboutPage.includes("Como o conteúdo é feito"), "/sobre must say how content is made");
+  // The author block names the publisher behind the site and links his portfolio.
+  assert.ok(
+    aboutHtml.includes('href="https://lucashdo.com/"'),
+    "/sobre must link the author's portfolio at lucashdo.com",
+  );
 
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");
