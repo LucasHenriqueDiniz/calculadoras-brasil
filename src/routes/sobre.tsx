@@ -146,6 +146,18 @@ function SobrePage() {
               interesse em finanças pessoais e educação financeira. Criou o Calcule Brasil para
               ajudar brasileiros a tomar decisões informadas sobre custos do dia a dia.
             </p>
+            <p className="mt-2 text-pretty leading-relaxed text-foreground/85">
+              Outros projetos do autor e formas de contato estão no portfólio em{" "}
+              <a
+                href="https://lucashdo.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-primary underline-offset-4 hover:underline"
+              >
+                lucashdo.com
+              </a>
+              .
+            </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <a
                 href="https://www.linkedin.com/in/lucas-diniz-ostroski/"
