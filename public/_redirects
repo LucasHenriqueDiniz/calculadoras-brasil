@@ -23,5 +23,11 @@
 /comparar/academia /calculadora-assinaturas 301
 /comparar/mudanca /calculadora-custo-mudanca 301
 # /comparar listed a single comparison after the cut above: a hub with one child
-# is not a hub. See docs/plans/adsense-reapplication/slice-02-hubs.md.
-/comparar /comparar/energia 301
+# is not a hub. See docs/plans/adsense-reapplication/slice-02-hubs.md. Its last
+# child went the same way on 2026-11-14 (below), so /comparar goes straight to
+# the calculator rather than through a second redirect.
+/comparar /calculadora-conta-de-luz 301
+# Still "Crawled - currently not indexed" on 2026-11-14, merged into the
+# calculator they served. See docs/plans/organic-traffic/slice-02-declined-pages.md.
+/blog/assinaturas-que-valem-a-pena /calculadora-assinaturas 301
+/comparar/energia /calculadora-conta-de-luz 301

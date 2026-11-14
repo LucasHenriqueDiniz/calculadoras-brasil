@@ -14,18 +14,11 @@ export interface GuideStep {
   why: string;
 }
 
-export interface GuideExtraLink {
-  to: "/comparar/energia";
-  title: string;
-  why: string;
-}
-
 export interface GuideSituation {
   id: string;
   title: string;
   intro: string;
   steps: GuideStep[];
-  extra?: GuideExtraLink;
 }
 
 export const calculatorGuide: GuideSituation[] = [
@@ -136,10 +129,5 @@ export const calculatorGuide: GuideSituation[] = [
         why: "Mostra quais aparelhos pesam mais na conta, que é por onde a economia começa.",
       },
     ],
-    extra: {
-      to: "/comparar/energia",
-      title: "Energia solar vs rede da concessionária",
-      why: "Se a conta de luz é alta e estável, compara quanto custa um sistema solar, quanto ele economiza e em quantos anos se paga.",
-    },
   },
 ];

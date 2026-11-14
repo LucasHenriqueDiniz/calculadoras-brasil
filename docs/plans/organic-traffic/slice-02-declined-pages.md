@@ -1,5 +1,5 @@
 ---
-status: todo
+status: doing
 ---
 
 # Slice 2 — The two pages Google declined, merged behind a 301
@@ -61,3 +61,31 @@ grep -rn -e 'assinaturas-que-valem-a-pena' -e 'comparar/energia' src public --in
 
 If `/calculadoras` loses its only "energia" entry and reads thin, point that guide entry at
 `/calculadora-conta-de-luz` now and at `/tarifa-de-energia` once slice 3 ships.
+
+---
+
+## What actually happened — 2026-11-14
+
+**Gate.** `sitestats inspect` the same day: both still `Crawled - currently not indexed` (last crawls
+2026-10-14 and 2026-09-20), both targets `Submitted and indexed`. Both moved.
+
+| removed | 301 to | why nothing moved into the target |
+|---|---|---|
+| `/blog/assinaturas-que-valem-a-pena` | `/calculadora-assinaturas` | Its "teste dos 70%" cites no source, and its tip "Netflix/Disney+ permitem compartilhamento" contradicts the calculator's FAQ, which quotes Netflix's help centre. The calculator's 12 FAQs already cover cutting, annual plans and totals. |
+| `/comparar/energia` | `/calculadora-conta-de-luz` | Generic solar payback; the idea is in `docs/IDEAS.md` on real tariffs. |
+| `/comparar` (already a 301 to `/comparar/energia`) | `/calculadora-conta-de-luz` | Pointed straight at the final page, so it is one hop, not two. |
+
+Code: the two route files and `src/routes/comparar.tsx` (a layout with no child left) deleted; the
+post out of `src/lib/blog.ts`; both paths out of `seo-pages.ts` and `PUBLIC_ROUTES`;
+`relatedPosts` repointed (custo-carro now lists none, since the only other post is about electricity);
+the guide's `extra` link, its type and its rendering removed, since no situation uses it any more.
+No `lastmod` moved: dropping a related link is not a change to a page's content.
+
+**Local, before the PR** (load average ~100 on this machine):
+- `test:seo`: passed for **26 routes**, and it walks every rule in `_redirects`: 301, target public,
+  source not public;
+- `cf:types:check`, `typecheck` (after the build regenerated `routeTree.gen.ts`, −74 lines), `lint`,
+  `build`, `worker:dry-run`: exit 0;
+- `vitest` on blog, guide, calculators and site tests: 43/43. The full suite runs in CI.
+
+Production after the merge is recorded on the PR (#46 or the number GitHub gives it); Google's half, both targets still indexed after their next crawl, is read in slice 6.
