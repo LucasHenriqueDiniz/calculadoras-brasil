@@ -139,6 +139,51 @@ port contract here: both adapters return it, the client consumes it, and the dis
 
 _Context, decision, and what it rules out. Newest first. A superseded entry stays, marked._
 
+### D8 — Traffic comes from pages built on the site's own public data, piloted before they scale
+
+**Status: proposed 2026-11-14.** Binding when the owner merges the PR that adds it, with
+`docs/plans/organic-traffic/`. D7 stays reserved for the AdSense review, which waits for traffic.
+
+**Context.** On 2026-11-14 the site had 0 clicks and 8 impressions in 28 days, with 26 of its 28
+sitemap URLs indexed. `docs/research/2026-11-14-search-cliff-2026-07-25/research.md` traced the loss
+to one day, 2026-07-25, every page and every position at once. It ruled out the deploy pipeline, a
+zone change, a removal request and a current manual action, and left the cause unknown, most
+consistent with a site-wide judgement on Google's side. July's impressions came from long-tail
+questions ("39 kwh em reais") at positions 6–8. Head terms never left positions 85–96.
+`docs/research/2026-11-14-public-data-pages/research.md` found that ANEEL's open data gives 103
+distributors' tariffs with a series back to 2010 for 88 of them, and that the pages already ranking for
+"valor do kwh <distribuidora>" show the current tariff but not the history or the rank.
+
+**Decision.**
+1. New traffic is sought with pages whose numbers come from the public datasets the site already
+   reads (ANEEL tariffs first, ANP fuel prices second), each carrying history or comparison that no
+   other page on the site carries.
+2. They ship as a pilot (one hub and ten distributor pages), and Google's own numbers 28 and 42 days
+   later decide whether to scale, hold or stop. That decision is D9.
+3. At most ten new pages per deploy, at least seven days apart.
+4. No more work targets the head terms "calculadora salário líquido" and "clt vs pj". The two pages
+   stay as they are.
+5. The two URLs still "Crawled - currently not indexed" on 2026-11-14 are handled by D5's rule, not
+   reopened here.
+
+**Amends D5.** D5 ruled out "new articles or calculators until the review". That assumed the existing
+pages could earn traffic once fixed. They are fixed and indexed and earn none, and the review now waits
+for traffic. Data pages are allowed before the review. New articles stay ruled out.
+
+**Rules out.**
+- A page per kWh value, per city, per query wording, or any page that would read the same as another
+  with the names swapped. That is the scaled-content pattern Google's spam policy names, and the site
+  published 52 pages in four days in June.
+- Publishing the 103 distributors at once.
+- Head-term work, unless Search Console shows one of those pages back inside the top 20 for its head
+  term, which would reopen it.
+- Expecting an infrastructure fix to restore July. The research found nothing broken.
+
+**What it does not settle.**
+- Why the site dropped on 2026-07-25.
+- Whether a site-wide demotion exists. The pilot is the test; D9 records the answer.
+- Search volume in absolute numbers. The research has Trends ratios and July's impressions, not counts.
+
 ### D6 — The PJ side is a one-person service company in the Simples Nacional
 
 **Context.** `/calculadora-clt-vs-pj` charged the PJ 20% INSS, uncapped, on the whole invoice, and

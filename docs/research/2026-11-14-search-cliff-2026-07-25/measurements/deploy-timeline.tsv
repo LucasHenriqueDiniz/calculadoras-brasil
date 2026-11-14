@@ -1,0 +1,103 @@
+# GitHub Actions runs, 2026-06-20 .. 2026-08-29 (gh api actions/runs, fetched 2026-11-14)
+
+created_at (UTC)	workflow	event	branch	conclusion	sha
+2026-06-23T14:33:02Z	CI	push	main	success	f3c5c32
+2026-06-23T14:56:03Z	CI	push	main	success	230b4d9
+2026-06-23T16:03:15Z	CI	push	codex/tanstack-start-seo	success	2b31cbf
+2026-06-24T11:39:25Z	CI	push	codex/tanstack-start-seo	success	afcc3f9
+2026-06-24T11:54:37Z	CI	push	codex/tanstack-start-seo	success	fc63f54
+2026-06-24T12:47:07Z	CI	push	codex/tanstack-start-seo	success	b3eee22
+2026-06-24T12:50:46Z	CI	push	main	success	93e292b
+2026-06-24T14:40:37Z	CI	push	import/v0-layout-breadcrumbs	failure	282e9eb
+2026-06-24T14:53:56Z	CI	push	import/v0-layout-breadcrumbs	success	7902b79
+2026-06-24T14:56:53Z	CI	push	import/v0-layout-breadcrumbs	success	681f925
+2026-06-24T15:13:09Z	CI	pull_request	import/v0-layout-breadcrumbs	success	681f925
+2026-06-24T15:13:23Z	CI	push	import/v0-layout-breadcrumbs	success	ff8f86a
+2026-06-24T15:13:27Z	CI	pull_request	import/v0-layout-breadcrumbs	success	ff8f86a
+2026-06-24T15:14:16Z	CI	push	main	success	cf0ae9e
+2026-06-25T11:53:20Z	CI	push	main	failure	9a5e625
+2026-06-25T11:58:36Z	CI	push	v0/lucashenriquediniz-a34d1903	failure	9a5e625
+2026-06-25T11:59:09Z	CI	push	v0/lucashenriquediniz-e4ad9f77	failure	9a5e625
+2026-06-25T12:02:09Z	CI	push	v0/lucashenriquediniz-d5a06c65	failure	9a5e625
+2026-06-25T12:49:24Z	CI	push	main	failure	bbe53d5
+2026-06-25T12:53:29Z	CI	push	main	failure	84ef15a
+2026-06-25T12:59:55Z	CI	push	main	failure	2891310
+2026-06-25T13:24:05Z	CI	push	main	failure	d2b96e2
+2026-06-25T13:37:08Z	CI	push	main	failure	c2000b5
+2026-06-25T13:37:08Z	Deploy Cloudflare	push	main	failure	c2000b5
+2026-06-25T13:43:35Z	CI	push	main	failure	1fc9722
+2026-06-25T13:43:35Z	Deploy Cloudflare	push	main	success	1fc9722
+2026-06-25T13:44:26Z	CI	push	main	failure	e897f0d
+2026-06-25T13:44:26Z	Deploy Cloudflare	push	main	failure	e897f0d
+2026-06-25T13:45:44Z	CI	push	main	failure	6e2c4ff
+2026-06-25T13:45:44Z	Deploy Cloudflare	push	main	success	6e2c4ff
+2026-06-25T14:06:53Z	CI	push	main	failure	dc7ee15
+2026-06-25T14:06:54Z	Deploy Cloudflare	push	main	success	dc7ee15
+2026-06-25T14:13:31Z	CI	push	main	failure	d3d937b
+2026-06-25T14:13:32Z	Deploy Cloudflare	push	main	success	d3d937b
+2026-06-25T14:14:39Z	CI	push	main	failure	ab7d385
+2026-06-25T14:14:39Z	Deploy Cloudflare	push	main	success	ab7d385
+2026-06-25T14:22:32Z	CI	push	main	failure	1445d1b
+2026-06-25T14:22:32Z	Deploy Cloudflare	push	main	success	1445d1b
+2026-06-25T14:32:02Z	CI	push	main	failure	5e1738c
+2026-06-25T14:32:04Z	Deploy Cloudflare	push	main	success	5e1738c
+2026-06-25T14:40:38Z	CI	push	main	failure	d11829c
+2026-06-25T14:40:38Z	Deploy Cloudflare	push	main	success	d11829c
+2026-06-26T11:47:17Z	CI	push	main	failure	56539a2
+2026-06-26T11:47:17Z	Deploy Cloudflare	push	main	failure	56539a2
+2026-06-26T12:05:14Z	CI	push	main	failure	92f27a9
+2026-06-26T12:05:14Z	Deploy Cloudflare	push	main	success	92f27a9
+2026-06-26T12:07:17Z	CI	push	main	failure	84b6f5b
+2026-06-26T12:07:17Z	Deploy Cloudflare	push	main	success	84b6f5b
+2026-06-26T12:14:08Z	CI	push	main	success	2be4f42
+2026-06-26T12:14:08Z	Deploy Cloudflare	push	main	success	2be4f42
+2026-06-26T12:27:34Z	CI	push	main	success	40d8db8
+2026-06-26T12:27:34Z	Deploy Cloudflare	push	main	success	40d8db8
+2026-06-26T12:54:15Z	CI	push	main	success	849621e
+2026-06-26T12:54:15Z	Deploy Cloudflare	push	main	success	849621e
+2026-06-26T13:38:12Z	CI	push	main	failure	7f22d13
+2026-06-26T13:38:12Z	Deploy Cloudflare	push	main	success	7f22d13
+2026-06-26T14:05:54Z	CI	push	main	success	59386d8
+2026-06-26T14:05:54Z	Deploy Cloudflare	push	main	success	59386d8
+2026-06-26T15:06:15Z	.github/workflows/build.yml	push	main	failure	79a2e3b
+2026-06-26T15:06:15Z	.github/workflows/deploy.yml	push	main	failure	79a2e3b
+2026-06-26T15:06:16Z	CI	push	main	failure	79a2e3b
+2026-07-27T00:01:52Z	.github/workflows/build.yml	push	claude/calculebrasil-low-value-content-o18953	failure	856faac
+2026-07-27T00:01:53Z	.github/workflows/deploy.yml	push	claude/calculebrasil-low-value-content-o18953	failure	856faac
+2026-07-27T09:28:47Z	CI	pull_request	claude/calculebrasil-low-value-content-o18953	failure	856faac
+2026-07-27T09:30:44Z	.github/workflows/deploy.yml	push	claude/calculebrasil-low-value-content-o18953	failure	adb3b71
+2026-07-27T09:30:45Z	.github/workflows/build.yml	push	claude/calculebrasil-low-value-content-o18953	failure	adb3b71
+2026-07-27T09:30:49Z	CI	pull_request	claude/calculebrasil-low-value-content-o18953	success	adb3b71
+2026-07-27T09:48:24Z	CI	pull_request	claude/calculebrasil-low-value-content-o18953	success	e4b28ff
+2026-07-27T11:32:31Z	CI	pull_request	claude/calculebrasil-low-value-content-o18953	success	8312966
+2026-07-27T11:47:18Z	CI	push	main	success	efed25d
+2026-07-27T11:47:18Z	Deploy to Cloudflare Pages	push	main	failure	efed25d
+2026-07-27T11:53:33Z	CI	pull_request	claude/calculebrasil-low-value-content-o18953	success	10ccbf0
+2026-07-27T11:56:13Z	CI	push	main	success	bbe7431
+2026-07-27T11:56:13Z	Deploy to Cloudflare Workers	push	main	success	bbe7431
+2026-08-06T13:19:17Z	CI	pull_request	claude/calcule-brasil-adsense-audit-elv26r	success	c0bede2
+2026-08-06T13:35:54Z	CI	pull_request	claude/calcule-brasil-adsense-audit-elv26r	success	952bf74
+2026-08-06T13:37:27Z	CI	pull_request	claude/calcule-brasil-adsense-audit-elv26r	success	4ee0394
+2026-08-06T13:41:08Z	CI	push	main	success	446d5ce
+2026-08-18T16:02:47Z	CI	push	main	success	4783347
+2026-08-18T16:02:48Z	CI	push	main	success	29e8e7b
+
+# Check runs on main commits after the switch to Workers Builds
+446d5ce	Workers Builds: calcule-brasil	success	2026-08-06T13:42:14Z
+29e8e7b	Workers Builds: calcule-brasil	success	2026-08-18T16:04:46Z
+ae2866a	Workers Builds: calcule-brasil	success	2026-09-01T00:53:41Z
+87589fd	Workers Builds: calcule-brasil	success	2026-09-01T16:21:54Z
+
+# Deploy workflow per commit
+## 59386d8
+file: .github/workflows/deploy-cloudflare.yml
+1:name: Deploy Cloudflare
+39:          command: deploy
+## 79a2e3b
+file: .github/workflows/deploy.yml
+1:name: Deploy to Cloudflare Pages
+34:          command: pages deploy dist --project-name=brasil-calculadoras
+## bbe7431
+file: .github/workflows/deploy.yml
+1:name: Deploy to Cloudflare Workers
+29:          command: deploy
