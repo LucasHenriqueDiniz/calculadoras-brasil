@@ -116,57 +116,6 @@ export const blogPosts: Record<string, BlogPost> = {
     ],
   },
 
-  "assinaturas-que-valem-a-pena": {
-    slug: "assinaturas-que-valem-a-pena",
-    title: "Assinaturas que realmente valem a pena",
-    description:
-      "Análise de quais assinaturas oferecem melhor custo-benefício. Streaming, software, academia e mais. Quanto você realmente gasta?",
-    category: "analise",
-    calculator: "assinaturas",
-    imageUrl: "/blog/assinaturas.jpg",
-    imageAlt: "Análise de assinaturas que valem a pena",
-    author: "Calcule Brasil",
-    publishedAt: "2026-06-25",
-    readingTime: 8,
-    keywords: [
-      "assinaturas que valem a pena",
-      "Netflix vs Disney",
-      "quanto custa todas assinaturas",
-    ],
-    faqs: [
-      {
-        question: "Quanto os brasileiros gastam em média com assinaturas por mês?",
-        answer:
-          "Um lar com streaming de vídeo, música e um ou dois serviços extras (nuvem, academia, software) costuma somar entre R$ 150 e R$ 400 por mês. Muita gente não percebe esse total porque os valores são cobrados separadamente.",
-      },
-      {
-        question: "Vale a pena assinar vários streamings de vídeo ao mesmo tempo?",
-        answer:
-          "Só compensa se você realmente assiste ao catálogo de cada um. Uma alternativa comum é revezar assinaturas mês a mês, mantendo apenas 1-2 ativas por vez e cancelando as demais.",
-      },
-      {
-        question: "Como saber se uma assinatura vale o preço?",
-        answer:
-          "Divida o valor mensal pela quantidade de vezes que você realmente usa o serviço no mês. Se o custo por uso ficar alto comparado a uma alternativa avulsa, provavelmente não vale a pena manter.",
-      },
-      {
-        question: "Planos anuais são sempre mais baratos que mensais?",
-        answer:
-          "Na maioria dos serviços sim, com desconto de 15% a 30% frente ao plano mensal. Mas só vale a pena se você tiver certeza de que vai usar o serviço por pelo menos a maior parte do ano.",
-      },
-      {
-        question: "Assinatura compartilhada em família compensa?",
-        answer:
-          "Compensa bastante quando o serviço permite múltiplos perfis ou usuários, dividindo o custo por pessoa. Verifique sempre os termos de uso, já que muitos serviços restringem o compartilhamento entre endereços diferentes.",
-      },
-      {
-        question: "Como organizar e controlar todas as minhas assinaturas?",
-        answer:
-          "Liste todas em uma planilha com valor, data de cobrança e frequência de uso real. Revise a cada 3 meses e cancele o que não estiver gerando valor proporcional ao custo.",
-      },
-    ],
-  },
-
   "deducoes-irpf-esqueca": {
     slug: "deducoes-irpf-esqueca",
     title: "Deduções IRPF que Você Esquece de Descontar",

@@ -77,12 +77,6 @@ export const SEO_PAGES = [
   },
   { path: "/blog/custo-pet-anual", lastmod: "2026-09-12", changefreq: "monthly", priority: 0.8 },
   {
-    path: "/blog/assinaturas-que-valem-a-pena",
-    lastmod: "2026-09-12",
-    changefreq: "monthly",
-    priority: 0.8,
-  },
-  {
     path: "/blog/deducoes-irpf-esqueca",
     lastmod: "2026-09-12",
     changefreq: "monthly",
@@ -106,7 +100,6 @@ export const SEO_PAGES = [
     changefreq: "monthly",
     priority: 0.75,
   },
-  { path: "/comparar/energia", lastmod: "2026-10-18", changefreq: "monthly", priority: 0.7 },
   { path: "/sobre", lastmod: "2026-10-19", changefreq: "yearly", priority: 0.5 },
   { path: "/metodologia", lastmod: "2026-10-19", changefreq: "monthly", priority: 0.7 },
   { path: "/privacidade", lastmod: "2026-08-06", changefreq: "yearly", priority: 0.3 },

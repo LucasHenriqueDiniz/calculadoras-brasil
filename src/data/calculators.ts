@@ -106,7 +106,7 @@ export const calculators: CalculatorMeta[] = [
       "Valor anual de IPVA, seguro e licenciamento",
       "Tempo planejado de uso do veículo",
     ],
-    relatedPosts: ["assinaturas-que-valem-a-pena"],
+    relatedPosts: [],
   },
   {
     slug: "morar-sozinho",
@@ -133,7 +133,7 @@ export const calculators: CalculatorMeta[] = [
       "Hábito alimentar (em casa, delivery, refeições fora)",
       "Renda líquida mensal",
     ],
-    relatedPosts: ["como-economizar-conta-de-luz", "assinaturas-que-valem-a-pena"],
+    relatedPosts: ["como-economizar-conta-de-luz"],
   },
   {
     slug: "conta-de-luz",
@@ -159,7 +159,7 @@ export const calculators: CalculatorMeta[] = [
       "Dias de uso por mês",
       "Tarifa de energia (R$/kWh) da sua conta",
     ],
-    relatedPosts: ["como-economizar-conta-de-luz", "assinaturas-que-valem-a-pena"],
+    relatedPosts: ["como-economizar-conta-de-luz"],
   },
   {
     slug: "assinaturas",
@@ -184,7 +184,7 @@ export const calculators: CalculatorMeta[] = [
       "Frequência (mensal ou anual)",
       "Categoria (streaming, software, academia, etc.)",
     ],
-    relatedPosts: ["assinaturas-que-valem-a-pena", "como-economizar-conta-de-luz"],
+    relatedPosts: ["como-economizar-conta-de-luz"],
   },
   {
     slug: "custo-mudanca",
@@ -236,7 +236,7 @@ export const calculators: CalculatorMeta[] = [
       "Frequência de banho/tosa",
       "Plano de saúde pet (sim/não)",
     ],
-    relatedPosts: ["custo-pet-anual", "assinaturas-que-valem-a-pena"],
+    relatedPosts: ["custo-pet-anual"],
   },
   {
     slug: "irpf-2026",

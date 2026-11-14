@@ -24,7 +24,6 @@ import { Route as CalculadoraMorarSozinhoRouteImport } from './routes/calculador
 import { Route as CalculadoraPrevidenciaComplementarRouteImport } from './routes/calculadora-previdencia-complementar'
 import { Route as CalculadoraSalarioLiquidoRouteImport } from './routes/calculadora-salario-liquido'
 import { Route as CalculadorasRouteImport } from './routes/calculadoras'
-import { Route as CompararRouteImport } from './routes/comparar'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as MetodologiaRouteImport } from './routes/metodologia'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
@@ -35,14 +34,12 @@ import { Route as ApiFuelPricesRouteImport } from './routes/api.fuel-prices'
 import { Route as ApiHealthRouteImport } from './routes/api.health'
 import { Route as ApiVehicleEfficiencyRouteImport } from './routes/api.vehicle-efficiency'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
-import { Route as BlogAssinaturasQueValemAPenaRouteImport } from './routes/blog/assinaturas-que-valem-a-pena'
 import { Route as BlogComoEconomizarContaDeLuzRouteImport } from './routes/blog/como-economizar-conta-de-luz'
 import { Route as BlogContadorNecessarioPjRouteImport } from './routes/blog/contador-necessario-pj'
 import { Route as BlogCustoPetAnualRouteImport } from './routes/blog/custo-pet-anual'
 import { Route as BlogDeducoesIrpfEsquecaRouteImport } from './routes/blog/deducoes-irpf-esqueca'
 import { Route as BlogDespesasDedutiveisAutonomoRouteImport } from './routes/blog/despesas-dedutiveis-autonomo'
 import { Route as BlogInvestimentosIsentosIrpfRouteImport } from './routes/blog/investimentos-isentos-irpf'
-import { Route as CompararEnergiaRouteImport } from './routes/comparar/energia'
 import { Route as ApiLocationsCitiesRouteImport } from './routes/api.locations.cities'
 import { Route as ApiLocationsStatesRouteImport } from './routes/api.locations.states'
 import { Route as ApiPublicDataSourcesRouteImport } from './routes/api.public-data.sources'
@@ -125,11 +122,6 @@ const CalculadorasRoute = CalculadorasRouteImport.update({
   path: '/calculadoras',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CompararRoute = CompararRouteImport.update({
-  id: '/comparar',
-  path: '/comparar',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ContatoRoute = ContatoRouteImport.update({
   id: '/contato',
   path: '/contato',
@@ -180,12 +172,6 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/',
   getParentRoute: () => BlogRoute,
 } as any)
-const BlogAssinaturasQueValemAPenaRoute =
-  BlogAssinaturasQueValemAPenaRouteImport.update({
-    id: '/assinaturas-que-valem-a-pena',
-    path: '/assinaturas-que-valem-a-pena',
-    getParentRoute: () => BlogRoute,
-  } as any)
 const BlogComoEconomizarContaDeLuzRoute =
   BlogComoEconomizarContaDeLuzRouteImport.update({
     id: '/como-economizar-conta-de-luz',
@@ -220,11 +206,6 @@ const BlogInvestimentosIsentosIrpfRoute =
     path: '/investimentos-isentos-irpf',
     getParentRoute: () => BlogRoute,
   } as any)
-const CompararEnergiaRoute = CompararEnergiaRouteImport.update({
-  id: '/energia',
-  path: '/energia',
-  getParentRoute: () => CompararRoute,
-} as any)
 const ApiLocationsCitiesRoute = ApiLocationsCitiesRouteImport.update({
   id: '/api/locations/cities',
   path: '/api/locations/cities',
@@ -257,7 +238,6 @@ export interface FileRoutesByFullPath {
   '/calculadora-previdencia-complementar': typeof CalculadoraPrevidenciaComplementarRoute
   '/calculadora-salario-liquido': typeof CalculadoraSalarioLiquidoRoute
   '/calculadoras': typeof CalculadorasRoute
-  '/comparar': typeof CompararRouteWithChildren
   '/contato': typeof ContatoRoute
   '/metodologia': typeof MetodologiaRoute
   '/privacidade': typeof PrivacidadeRoute
@@ -267,14 +247,12 @@ export interface FileRoutesByFullPath {
   '/api/fuel-prices': typeof ApiFuelPricesRoute
   '/api/health': typeof ApiHealthRoute
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
-  '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
   '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
   '/blog/contador-necessario-pj': typeof BlogContadorNecessarioPjRoute
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
   '/blog/deducoes-irpf-esqueca': typeof BlogDeducoesIrpfEsquecaRoute
   '/blog/despesas-dedutiveis-autonomo': typeof BlogDespesasDedutiveisAutonomoRoute
   '/blog/investimentos-isentos-irpf': typeof BlogInvestimentosIsentosIrpfRoute
-  '/comparar/energia': typeof CompararEnergiaRoute
   '/blog/': typeof BlogIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
@@ -295,7 +273,6 @@ export interface FileRoutesByTo {
   '/calculadora-previdencia-complementar': typeof CalculadoraPrevidenciaComplementarRoute
   '/calculadora-salario-liquido': typeof CalculadoraSalarioLiquidoRoute
   '/calculadoras': typeof CalculadorasRoute
-  '/comparar': typeof CompararRouteWithChildren
   '/contato': typeof ContatoRoute
   '/metodologia': typeof MetodologiaRoute
   '/privacidade': typeof PrivacidadeRoute
@@ -305,14 +282,12 @@ export interface FileRoutesByTo {
   '/api/fuel-prices': typeof ApiFuelPricesRoute
   '/api/health': typeof ApiHealthRoute
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
-  '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
   '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
   '/blog/contador-necessario-pj': typeof BlogContadorNecessarioPjRoute
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
   '/blog/deducoes-irpf-esqueca': typeof BlogDeducoesIrpfEsquecaRoute
   '/blog/despesas-dedutiveis-autonomo': typeof BlogDespesasDedutiveisAutonomoRoute
   '/blog/investimentos-isentos-irpf': typeof BlogInvestimentosIsentosIrpfRoute
-  '/comparar/energia': typeof CompararEnergiaRoute
   '/blog': typeof BlogIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
@@ -335,7 +310,6 @@ export interface FileRoutesById {
   '/calculadora-previdencia-complementar': typeof CalculadoraPrevidenciaComplementarRoute
   '/calculadora-salario-liquido': typeof CalculadoraSalarioLiquidoRoute
   '/calculadoras': typeof CalculadorasRoute
-  '/comparar': typeof CompararRouteWithChildren
   '/contato': typeof ContatoRoute
   '/metodologia': typeof MetodologiaRoute
   '/privacidade': typeof PrivacidadeRoute
@@ -345,14 +319,12 @@ export interface FileRoutesById {
   '/api/fuel-prices': typeof ApiFuelPricesRoute
   '/api/health': typeof ApiHealthRoute
   '/api/vehicle-efficiency': typeof ApiVehicleEfficiencyRoute
-  '/blog/assinaturas-que-valem-a-pena': typeof BlogAssinaturasQueValemAPenaRoute
   '/blog/como-economizar-conta-de-luz': typeof BlogComoEconomizarContaDeLuzRoute
   '/blog/contador-necessario-pj': typeof BlogContadorNecessarioPjRoute
   '/blog/custo-pet-anual': typeof BlogCustoPetAnualRoute
   '/blog/deducoes-irpf-esqueca': typeof BlogDeducoesIrpfEsquecaRoute
   '/blog/despesas-dedutiveis-autonomo': typeof BlogDespesasDedutiveisAutonomoRoute
   '/blog/investimentos-isentos-irpf': typeof BlogInvestimentosIsentosIrpfRoute
-  '/comparar/energia': typeof CompararEnergiaRoute
   '/blog/': typeof BlogIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
@@ -376,7 +348,6 @@ export interface FileRouteTypes {
     | '/calculadora-previdencia-complementar'
     | '/calculadora-salario-liquido'
     | '/calculadoras'
-    | '/comparar'
     | '/contato'
     | '/metodologia'
     | '/privacidade'
@@ -386,14 +357,12 @@ export interface FileRouteTypes {
     | '/api/fuel-prices'
     | '/api/health'
     | '/api/vehicle-efficiency'
-    | '/blog/assinaturas-que-valem-a-pena'
     | '/blog/como-economizar-conta-de-luz'
     | '/blog/contador-necessario-pj'
     | '/blog/custo-pet-anual'
     | '/blog/deducoes-irpf-esqueca'
     | '/blog/despesas-dedutiveis-autonomo'
     | '/blog/investimentos-isentos-irpf'
-    | '/comparar/energia'
     | '/blog/'
     | '/api/locations/cities'
     | '/api/locations/states'
@@ -414,7 +383,6 @@ export interface FileRouteTypes {
     | '/calculadora-previdencia-complementar'
     | '/calculadora-salario-liquido'
     | '/calculadoras'
-    | '/comparar'
     | '/contato'
     | '/metodologia'
     | '/privacidade'
@@ -424,14 +392,12 @@ export interface FileRouteTypes {
     | '/api/fuel-prices'
     | '/api/health'
     | '/api/vehicle-efficiency'
-    | '/blog/assinaturas-que-valem-a-pena'
     | '/blog/como-economizar-conta-de-luz'
     | '/blog/contador-necessario-pj'
     | '/blog/custo-pet-anual'
     | '/blog/deducoes-irpf-esqueca'
     | '/blog/despesas-dedutiveis-autonomo'
     | '/blog/investimentos-isentos-irpf'
-    | '/comparar/energia'
     | '/blog'
     | '/api/locations/cities'
     | '/api/locations/states'
@@ -453,7 +419,6 @@ export interface FileRouteTypes {
     | '/calculadora-previdencia-complementar'
     | '/calculadora-salario-liquido'
     | '/calculadoras'
-    | '/comparar'
     | '/contato'
     | '/metodologia'
     | '/privacidade'
@@ -463,14 +428,12 @@ export interface FileRouteTypes {
     | '/api/fuel-prices'
     | '/api/health'
     | '/api/vehicle-efficiency'
-    | '/blog/assinaturas-que-valem-a-pena'
     | '/blog/como-economizar-conta-de-luz'
     | '/blog/contador-necessario-pj'
     | '/blog/custo-pet-anual'
     | '/blog/deducoes-irpf-esqueca'
     | '/blog/despesas-dedutiveis-autonomo'
     | '/blog/investimentos-isentos-irpf'
-    | '/comparar/energia'
     | '/blog/'
     | '/api/locations/cities'
     | '/api/locations/states'
@@ -493,7 +456,6 @@ export interface RootRouteChildren {
   CalculadoraPrevidenciaComplementarRoute: typeof CalculadoraPrevidenciaComplementarRoute
   CalculadoraSalarioLiquidoRoute: typeof CalculadoraSalarioLiquidoRoute
   CalculadorasRoute: typeof CalculadorasRoute
-  CompararRoute: typeof CompararRouteWithChildren
   ContatoRoute: typeof ContatoRoute
   MetodologiaRoute: typeof MetodologiaRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
@@ -615,13 +577,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CalculadorasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/comparar': {
-      id: '/comparar'
-      path: '/comparar'
-      fullPath: '/comparar'
-      preLoaderRoute: typeof CompararRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/contato': {
       id: '/contato'
       path: '/contato'
@@ -692,13 +647,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof BlogRoute
     }
-    '/blog/assinaturas-que-valem-a-pena': {
-      id: '/blog/assinaturas-que-valem-a-pena'
-      path: '/assinaturas-que-valem-a-pena'
-      fullPath: '/blog/assinaturas-que-valem-a-pena'
-      preLoaderRoute: typeof BlogAssinaturasQueValemAPenaRouteImport
-      parentRoute: typeof BlogRoute
-    }
     '/blog/como-economizar-conta-de-luz': {
       id: '/blog/como-economizar-conta-de-luz'
       path: '/como-economizar-conta-de-luz'
@@ -741,13 +689,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogInvestimentosIsentosIrpfRouteImport
       parentRoute: typeof BlogRoute
     }
-    '/comparar/energia': {
-      id: '/comparar/energia'
-      path: '/energia'
-      fullPath: '/comparar/energia'
-      preLoaderRoute: typeof CompararEnergiaRouteImport
-      parentRoute: typeof CompararRoute
-    }
     '/api/locations/cities': {
       id: '/api/locations/cities'
       path: '/api/locations/cities'
@@ -773,7 +714,6 @@ declare module '@tanstack/react-router' {
 }
 
 interface BlogRouteChildren {
-  BlogAssinaturasQueValemAPenaRoute: typeof BlogAssinaturasQueValemAPenaRoute
   BlogComoEconomizarContaDeLuzRoute: typeof BlogComoEconomizarContaDeLuzRoute
   BlogContadorNecessarioPjRoute: typeof BlogContadorNecessarioPjRoute
   BlogCustoPetAnualRoute: typeof BlogCustoPetAnualRoute
@@ -784,7 +724,6 @@ interface BlogRouteChildren {
 }
 
 const BlogRouteChildren: BlogRouteChildren = {
-  BlogAssinaturasQueValemAPenaRoute: BlogAssinaturasQueValemAPenaRoute,
   BlogComoEconomizarContaDeLuzRoute: BlogComoEconomizarContaDeLuzRoute,
   BlogContadorNecessarioPjRoute: BlogContadorNecessarioPjRoute,
   BlogCustoPetAnualRoute: BlogCustoPetAnualRoute,
@@ -795,18 +734,6 @@ const BlogRouteChildren: BlogRouteChildren = {
 }
 
 const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
-
-interface CompararRouteChildren {
-  CompararEnergiaRoute: typeof CompararEnergiaRoute
-}
-
-const CompararRouteChildren: CompararRouteChildren = {
-  CompararEnergiaRoute: CompararEnergiaRoute,
-}
-
-const CompararRouteWithChildren = CompararRoute._addFileChildren(
-  CompararRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -825,7 +752,6 @@ const rootRouteChildren: RootRouteChildren = {
     CalculadoraPrevidenciaComplementarRoute,
   CalculadoraSalarioLiquidoRoute: CalculadoraSalarioLiquidoRoute,
   CalculadorasRoute: CalculadorasRoute,
-  CompararRoute: CompararRouteWithChildren,
   ContatoRoute: ContatoRoute,
   MetodologiaRoute: MetodologiaRoute,
   PrivacidadeRoute: PrivacidadeRoute,

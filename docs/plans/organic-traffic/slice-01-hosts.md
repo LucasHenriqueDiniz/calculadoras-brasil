@@ -1,5 +1,5 @@
 ---
-status: todo
+status: done
 ---
 
 # Slice 1 — `www` and `workers.dev` answer with a 301 to the apex
@@ -74,3 +74,41 @@ Google's half, read in slice 6 and not blocking this slice: Search Console crawl
 If the redirect rule template is not offered on the zone's plan, a Bulk Redirect list with one entry
 (`www.calculebrasil.com` → `https://calculebrasil.com`, subpath matching, preserve path and query) does
 the same thing.
+
+---
+
+## What actually happened — 2026-11-14
+
+**`workers.dev`: off.** #45 set `"workers_dev": false` and `"preview_urls": true`. Wrangler 4.160.0
+sends `previews_enabled` undefined when the key is absent, and its own deploy warning says previews then
+go off with workers.dev, so the explicit `true` is what keeps them.
+
+**`www`: dashboard, by the owner's approval in this session.** The rule went first, so `www` never
+answered 522:
+1. Redirect Rule "Redirect from WWW to root [Template]", edited to request URL
+   `http*://www.calculebrasil.com/*`, target `https://calculebrasil.com/${2}`, `301`, preserve query
+   string. The dashboard warned that no proxied record existed yet; deployed anyway, record next.
+2. DNS: `AAAA www 100::`, proxied. The apex turned out to be a Worker Custom Domain
+   (`calculebrasil.com → Worker calcule-brasil, Proxied`), not a route.
+
+`docs/deploy.md` records all three hosts.
+
+**Measured on production**, the loop above plus the `http://` form, after the record and after #45's
+Workers Builds deploy finished (2026-11-14 22:40 UTC):
+
+| check | before | after |
+|---|---|---|
+| `https://www.…<path>?x=1` → `301 https://calculebrasil.com<path>?x=1` | 0/28 (NXDOMAIN) | **28/28** |
+| `http://www.…<path>` → `301 https://calculebrasil.com<path>` | — | **28/28** |
+| apex `200` | 28/28 | **28/28** |
+| hops from `http://www.…/calculadora-conta-de-luz?a=1&b=2` | — | **1**, ends at the apex with the query, `200` |
+| `calcule-brasil.lucas-hdo.workers.dev/` and `/calculadora-conta-de-luz` | `200` | **`404`** |
+| `www` from `elsa.ns.cloudflare.com`, `1.1.1.1` and the local resolver | NXDOMAIN | Cloudflare anycast A and AAAA |
+| #45's own PR preview (`3a7ab6e4-calcule-brasil…`) | — | `200`, `x-robots-tag: noindex` |
+
+**Not done, said plainly.** The revert check (disable the rule for a minute, see `0/28`) was not run:
+it would take `www` down in production to prove what the `0/28` taken before the change already shows.
+The preview URL above came from `versions upload`, which does not apply subdomain settings; the first PR
+opened after #45's deploy is the real test that previews survived, and slice 2's PR is that PR.
+
+Google's half (crawl stats showing 301s for the `www` host) is read in slice 6.
