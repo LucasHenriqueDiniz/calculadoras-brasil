@@ -4,6 +4,14 @@
   "compatibility_date": "2026-06-23",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+  // calcule-brasil.lucas-hdo.workers.dev served the whole site with a 200 and no noindex: a second
+  // copy of calculebrasil.com. The apex is attached in the dashboard, not here, and wrangler only
+  // publishes the routes this file declares, so turning workers.dev off leaves the apex alone.
+  // Preview URLs stay on, explicitly: with `preview_urls` absent, wrangler 4.160's deploy warns that
+  // they go off together with workers.dev, and the Workers Builds check on every PR posts one. They
+  // answer with `X-Robots-Tag: noindex` (measured 2026-11-14), so they are not a duplicate.
+  "workers_dev": false,
+  "preview_urls": true,
   // Prerendering writes `<route>/index.html`, and the asset server's default
   // `auto-trailing-slash` then answers the canonical form with a 307 to the
   // trailing-slash one. Every canonical tag and every sitemap entry uses the

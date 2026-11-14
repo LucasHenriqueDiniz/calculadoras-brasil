@@ -29,6 +29,20 @@ confirms it (`Done in 16.2s using pnpm v11.24.0`). That is why the build command
 only calls the build — an `install` there would be a second install of the same
 tree.
 
+## Hosts
+
+`calculebrasil.com` is the only host that serves the site. The two others answer like this, and the
+first one also lives only in the dashboard:
+
+| host | answers | where it is set |
+|---|---|---|
+| `www.calculebrasil.com` | `301` to `https://calculebrasil.com` + same path and query | Cloudflare → zone `calculebrasil.com`: a **proxied** DNS record `www` pointing at the placeholder `AAAA 100::`, and a Redirect Rule from the "Redirect from WWW to root" template (`301`, preserve query string). The placeholder has no origin: delete the rule and `www` answers 522. |
+| `calcule-brasil.lucas-hdo.workers.dev` | not served | `"workers_dev": false` in `wrangler.jsonc` |
+| `<version>-calcule-brasil.lucas-hdo.workers.dev` | the PR preview, `X-Robots-Tag: noindex` | `"preview_urls": true` in `wrangler.jsonc` |
+
+Before 2026-11-14, `www` did not resolve and `workers.dev` served the whole site with a 200
+(`docs/plans/organic-traffic/slice-01-hosts.md`).
+
 ## When changing package manager or Node version
 
 Touching `packageManager` or `.nvmrc` does **not** update the dashboard. Check
