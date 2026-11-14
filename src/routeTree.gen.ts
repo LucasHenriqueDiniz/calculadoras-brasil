@@ -41,6 +41,7 @@ import { Route as BlogCustoPetAnualRouteImport } from './routes/blog/custo-pet-a
 import { Route as BlogDeducoesIrpfEsquecaRouteImport } from './routes/blog/deducoes-irpf-esqueca'
 import { Route as BlogDespesasDedutiveisAutonomoRouteImport } from './routes/blog/despesas-dedutiveis-autonomo'
 import { Route as BlogInvestimentosIsentosIrpfRouteImport } from './routes/blog/investimentos-isentos-irpf'
+import { Route as TarifaDeEnergiaSlugRouteImport } from './routes/tarifa-de-energia_.$slug'
 import { Route as ApiLocationsCitiesRouteImport } from './routes/api.locations.cities'
 import { Route as ApiLocationsStatesRouteImport } from './routes/api.locations.states'
 import { Route as ApiPublicDataSourcesRouteImport } from './routes/api.public-data.sources'
@@ -212,6 +213,11 @@ const BlogInvestimentosIsentosIrpfRoute =
     path: '/investimentos-isentos-irpf',
     getParentRoute: () => BlogRoute,
   } as any)
+const TarifaDeEnergiaSlugRoute = TarifaDeEnergiaSlugRouteImport.update({
+  id: '/tarifa-de-energia_/$slug',
+  path: '/tarifa-de-energia/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiLocationsCitiesRoute = ApiLocationsCitiesRouteImport.update({
   id: '/api/locations/cities',
   path: '/api/locations/cities',
@@ -260,6 +266,7 @@ export interface FileRoutesByFullPath {
   '/blog/deducoes-irpf-esqueca': typeof BlogDeducoesIrpfEsquecaRoute
   '/blog/despesas-dedutiveis-autonomo': typeof BlogDespesasDedutiveisAutonomoRoute
   '/blog/investimentos-isentos-irpf': typeof BlogInvestimentosIsentosIrpfRoute
+  '/tarifa-de-energia/$slug': typeof TarifaDeEnergiaSlugRoute
   '/blog/': typeof BlogIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
@@ -296,6 +303,7 @@ export interface FileRoutesByTo {
   '/blog/deducoes-irpf-esqueca': typeof BlogDeducoesIrpfEsquecaRoute
   '/blog/despesas-dedutiveis-autonomo': typeof BlogDespesasDedutiveisAutonomoRoute
   '/blog/investimentos-isentos-irpf': typeof BlogInvestimentosIsentosIrpfRoute
+  '/tarifa-de-energia/$slug': typeof TarifaDeEnergiaSlugRoute
   '/blog': typeof BlogIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
@@ -334,6 +342,7 @@ export interface FileRoutesById {
   '/blog/deducoes-irpf-esqueca': typeof BlogDeducoesIrpfEsquecaRoute
   '/blog/despesas-dedutiveis-autonomo': typeof BlogDespesasDedutiveisAutonomoRoute
   '/blog/investimentos-isentos-irpf': typeof BlogInvestimentosIsentosIrpfRoute
+  '/tarifa-de-energia_/$slug': typeof TarifaDeEnergiaSlugRoute
   '/blog/': typeof BlogIndexRoute
   '/api/locations/cities': typeof ApiLocationsCitiesRoute
   '/api/locations/states': typeof ApiLocationsStatesRoute
@@ -373,6 +382,7 @@ export interface FileRouteTypes {
     | '/blog/deducoes-irpf-esqueca'
     | '/blog/despesas-dedutiveis-autonomo'
     | '/blog/investimentos-isentos-irpf'
+    | '/tarifa-de-energia/$slug'
     | '/blog/'
     | '/api/locations/cities'
     | '/api/locations/states'
@@ -409,6 +419,7 @@ export interface FileRouteTypes {
     | '/blog/deducoes-irpf-esqueca'
     | '/blog/despesas-dedutiveis-autonomo'
     | '/blog/investimentos-isentos-irpf'
+    | '/tarifa-de-energia/$slug'
     | '/blog'
     | '/api/locations/cities'
     | '/api/locations/states'
@@ -446,6 +457,7 @@ export interface FileRouteTypes {
     | '/blog/deducoes-irpf-esqueca'
     | '/blog/despesas-dedutiveis-autonomo'
     | '/blog/investimentos-isentos-irpf'
+    | '/tarifa-de-energia_/$slug'
     | '/blog/'
     | '/api/locations/cities'
     | '/api/locations/states'
@@ -478,6 +490,7 @@ export interface RootRouteChildren {
   ApiFuelPricesRoute: typeof ApiFuelPricesRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiVehicleEfficiencyRoute: typeof ApiVehicleEfficiencyRoute
+  TarifaDeEnergiaSlugRoute: typeof TarifaDeEnergiaSlugRoute
   ApiLocationsCitiesRoute: typeof ApiLocationsCitiesRoute
   ApiLocationsStatesRoute: typeof ApiLocationsStatesRoute
   ApiPublicDataSourcesRoute: typeof ApiPublicDataSourcesRoute
@@ -709,6 +722,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogInvestimentosIsentosIrpfRouteImport
       parentRoute: typeof BlogRoute
     }
+    '/tarifa-de-energia_/$slug': {
+      id: '/tarifa-de-energia_/$slug'
+      path: '/tarifa-de-energia/$slug'
+      fullPath: '/tarifa-de-energia/$slug'
+      preLoaderRoute: typeof TarifaDeEnergiaSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/locations/cities': {
       id: '/api/locations/cities'
       path: '/api/locations/cities'
@@ -782,6 +802,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiFuelPricesRoute: ApiFuelPricesRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiVehicleEfficiencyRoute: ApiVehicleEfficiencyRoute,
+  TarifaDeEnergiaSlugRoute: TarifaDeEnergiaSlugRoute,
   ApiLocationsCitiesRoute: ApiLocationsCitiesRoute,
   ApiLocationsStatesRoute: ApiLocationsStatesRoute,
   ApiPublicDataSourcesRoute: ApiPublicDataSourcesRoute,

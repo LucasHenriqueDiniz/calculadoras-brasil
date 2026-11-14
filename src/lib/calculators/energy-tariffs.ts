@@ -284,3 +284,191 @@ export function summarizeRanking(
     biggestRise: summaryRow(biggestRise),
   };
 }
+
+// --- One distributor's page -------------------------------------------------------------------
+
+export type HistoryEntry =
+  | {
+      kind: "period";
+      start: string;
+      end: string;
+      kwh: number;
+      tusdKwh: number;
+      teKwh: number;
+      resolution: string | null;
+      /** Against the period right before; null for the first one and after a gap. */
+      changePct: number | null;
+    }
+  | { kind: "gap"; start: string; end: string };
+
+const round5 = (value: number) => Math.round(value * 100_000) / 100_000;
+const pctChange = (now: number, before: number) => Math.round((now / before - 1) * 1000) / 10;
+
+/** The day before an ISO date, by the same string arithmetic as `nextDay`. */
+export function previousDay(date: string): string {
+  let [year, month, day] = date.split("-").map(Number);
+  day -= 1;
+  if (day === 0) {
+    month -= 1;
+    if (month === 0) {
+      month = 12;
+      year -= 1;
+    }
+    day = daysInMonth(year, month);
+  }
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+/**
+ * The periods oldest first, with a "gap" entry wherever ANEEL published no tariff: COPEL-DIS has
+ * none from 2012-06-24 to 2013-01-23. A gap is shown, never filled in.
+ */
+export function historyWithGaps(periods: readonly TariffPeriod[]): HistoryEntry[] {
+  const entries: HistoryEntry[] = [];
+  let previous: TariffPeriod | null = null;
+  for (const period of [...periods].sort((a, b) => a.start.localeCompare(b.start))) {
+    const contiguous = previous !== null && nextDay(previous.end) === period.start;
+    if (previous !== null && !contiguous) {
+      entries.push({ kind: "gap", start: nextDay(previous.end), end: previousDay(period.start) });
+    }
+    const kwh = kwhPrice(period);
+    entries.push({
+      kind: "period",
+      start: period.start,
+      end: period.end,
+      kwh,
+      tusdKwh: round5(period.tusdMwh / 1000),
+      teKwh: round5(period.teMwh / 1000),
+      resolution: period.resolution,
+      changePct: contiguous && previous ? pctChange(kwh, kwhPrice(previous)) : null,
+    });
+    previous = period;
+  }
+  return entries;
+}
+
+export interface BillRow {
+  kwh: number;
+  /** R$, before taxes, to the centavo. */
+  cost: number;
+}
+
+export const BILL_LEVELS = [50, 100, 150, 200, 250, 300, 400, 500] as const;
+
+/** The bill for each monthly consumption in `levels`, at `pricePerKwh`, before taxes. */
+export function billTable(pricePerKwh: number, levels: readonly number[] = BILL_LEVELS): BillRow[] {
+  return levels.map((kwh) => ({ kwh, cost: Math.round(kwh * pricePerKwh * 100) / 100 }));
+}
+
+/** A period shorter than this is a revision outside the yearly cycle (e.g. 2015-03-02). */
+const OFF_CYCLE_DAYS = 300;
+
+function daysBetween(start: string, end: string): number {
+  let days = 0;
+  for (let day = start; day <= end && days < 400; day = nextDay(day)) days += 1;
+  return days;
+}
+
+export interface DistributorFacts {
+  agent: string;
+  uf: string | null;
+  rank: number;
+  count: number;
+  nationalMedianKwh: number;
+  nationalMedianChangePct: number;
+  current: Extract<HistoryEntry, { kind: "period" }>;
+  first: Extract<HistoryEntry, { kind: "period" }>;
+  changePct: number | null;
+  sinceFirstPct: number;
+  biggestRise: Extract<HistoryEntry, { kind: "period" }> | null;
+  biggestDrop: Extract<HistoryEntry, { kind: "period" }> | null;
+  reductions: number;
+  gaps: number;
+  offCycle: number;
+  /** The distributors either side in the national ranking. */
+  above: RankedDistributor | null;
+  below: RankedDistributor | null;
+  /** Position among the distributors of the same state, most expensive first. */
+  stateRank: number;
+  stateCount: number;
+}
+
+/**
+ * Everything the distributor's page says in words, read off its own history and the national
+ * ranking. The page's sentences branch on these facts, so two distributors only read alike when
+ * their numbers tell the same story.
+ */
+export function distributorFacts(
+  distributor: DistributorTariffs,
+  ranked: readonly RankedDistributor[],
+  date: string,
+): DistributorFacts {
+  const position = ranked.findIndex((row) => row.agent === distributor.agent);
+  if (position === -1) throw new Error(`${distributor.agent} has no tariff in force on ${date}.`);
+  const own = ranked[position];
+  const periods = historyWithGaps(distributor.periods).filter(
+    (entry): entry is Extract<HistoryEntry, { kind: "period" }> => entry.kind === "period",
+  );
+  const current = periods.find((period) => period.start <= date && period.end >= date);
+  if (!current) throw new Error(`${distributor.agent} has no period covering ${date}.`);
+  const changes = periods.filter((period) => period.changePct !== null);
+  const byChange = [...changes].sort((a, b) => (b.changePct ?? 0) - (a.changePct ?? 0));
+  const state = ranked.filter((row) => row.uf !== null && row.uf === distributor.uf);
+  const nationalChanges = ranked.flatMap((row) => (row.changePct === null ? [] : [row.changePct]));
+
+  return {
+    agent: distributor.agent,
+    uf: distributor.uf,
+    rank: own.rank,
+    count: ranked.length,
+    nationalMedianKwh: round5(median(ranked.map((row) => row.kwh))),
+    nationalMedianChangePct: Math.round(median(nationalChanges) * 10) / 10,
+    current,
+    first: periods[0],
+    changePct: own.changePct,
+    sinceFirstPct: pctChange(current.kwh, periods[0].kwh),
+    biggestRise: byChange.length > 0 && (byChange[0].changePct ?? 0) > 0 ? byChange[0] : null,
+    biggestDrop:
+      byChange.length > 0 && (byChange[byChange.length - 1].changePct ?? 0) < 0
+        ? byChange[byChange.length - 1]
+        : null,
+    reductions: changes.filter((period) => (period.changePct ?? 0) < 0).length,
+    gaps: historyWithGaps(distributor.periods).filter((entry) => entry.kind === "gap").length,
+    offCycle: periods.filter(
+      (period) => period !== current && daysBetween(period.start, period.end) < OFF_CYCLE_DAYS,
+    ).length,
+    above: position > 0 ? ranked[position - 1] : null,
+    below: position < ranked.length - 1 ? ranked[position + 1] : null,
+    stateRank: state.findIndex((row) => row.agent === distributor.agent) + 1,
+    stateCount: state.length,
+  };
+}
+
+/** What a distributor page's <head> states: small enough to sit outside the code-split chunk. */
+export interface DistributorHeadSummary {
+  agent: string;
+  uf: string | null;
+  kwh: number;
+  rank: number;
+  count: number;
+  changePct: number | null;
+  since: string;
+  resolution: string | null;
+  firstStart: string;
+  sinceFirstPct: number;
+}
+
+export function headSummary(facts: DistributorFacts): DistributorHeadSummary {
+  return {
+    agent: facts.agent,
+    uf: facts.uf,
+    kwh: facts.current.kwh,
+    rank: facts.rank,
+    count: facts.count,
+    changePct: facts.changePct,
+    since: facts.current.start,
+    resolution: facts.current.resolution,
+    firstStart: facts.first.start,
+    sinceFirstPct: facts.sinceFirstPct,
+  };
+}

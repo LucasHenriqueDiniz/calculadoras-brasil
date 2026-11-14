@@ -30,6 +30,16 @@ const PUBLIC_ROUTES = [
   "/blog/despesas-dedutiveis-autonomo",
   "/blog/contador-necessario-pj",
   "/tarifa-de-energia",
+  "/tarifa-de-energia/cemig",
+  "/tarifa-de-energia/enel-sao-paulo",
+  "/tarifa-de-energia/neoenergia-coelba",
+  "/tarifa-de-energia/cpfl-paulista",
+  "/tarifa-de-energia/copel",
+  "/tarifa-de-energia/neoenergia-pernambuco",
+  "/tarifa-de-energia/light",
+  "/tarifa-de-energia/enel-ceara",
+  "/tarifa-de-energia/equatorial-goias",
+  "/tarifa-de-energia/celesc",
   "/sobre",
   "/metodologia",
   "/privacidade",
@@ -455,6 +465,46 @@ try {
     textContent(copelRow).includes("R$ 0,76802"),
     "/tarifa-de-energia must show COPEL-DIS at the tariff ANEEL set",
   );
+
+  // D8: no two distributor pages may read the same with the names swapped. Their prose is
+  // written from each distributor's own facts; with every number, name, acronym and state masked,
+  // what is left must still differ between every pair.
+  const distributorPaths = PUBLIC_ROUTES.filter((path) => path.startsWith("/tarifa-de-energia/"));
+  const masks = [];
+  const narratives = new Map();
+  for (const path of distributorPaths) {
+    const html = await (await fetch(`${BASE_URL}${path}`)).text();
+    const agent = decodeHtml(html.match(/data-distributor="([^"]+)"/)?.[1] ?? "");
+    const name = textContent(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? "").replace(
+      /^Tarifa de energia da /,
+      "",
+    );
+    assert.ok(agent && name, `${path} must name its distributor`);
+    masks.push(agent, name);
+    const narrative = html.match(/<div\b[^>]*data-narrative[^>]*>([\s\S]*?)<\/div>/)?.[1];
+    assert.ok(narrative, `${path} must carry its narrative`);
+    narratives.set(path, textContent(narrative));
+    const periods = (html.match(/<tr\b[^>]*data-period-start=/g) ?? []).length;
+    const bills = (html.match(/<tr\b[^>]*data-kwh-level=/g) ?? []).length;
+    assert.ok(periods >= 8, `${path} must show the history, got ${periods} periods`);
+    assert.equal(bills, 8, `${path} must show the bill for 8 consumptions`);
+  }
+  const STATES =
+    /\b(d[eoa]) (Acre|Alagoas|Amapá|Amazonas|Bahia|Ceará|Distrito Federal|Espírito Santo|Goiás|Maranhão|Mato Grosso do Sul|Mato Grosso|Minas Gerais|Pará|Paraíba|Paraná|Pernambuco|Piauí|Rio de Janeiro|Rio Grande do Norte|Rio Grande do Sul|Rondônia|Roraima|Santa Catarina|São Paulo|Sergipe|Tocantins)\b/g;
+  const masked = new Map(
+    [...narratives].map(([path, text]) => {
+      let out = text.replace(STATES, "STATE");
+      for (const word of [...masks].sort((a, b) => b.length - a.length)) {
+        out = out.replaceAll(word, "NAME");
+      }
+      return [path, out.replace(/\d+/g, "#").replace(/\b[A-Z]{2}\b/g, "UF")];
+    }),
+  );
+  for (const [a, textA] of masked) {
+    for (const [b, textB] of masked) {
+      if (a < b) assert.notEqual(textA, textB, `${a} and ${b} read the same once masked`);
+    }
+  }
 
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });
   assert.equal(missing.status, 404, "An unknown URL must return HTTP 404");

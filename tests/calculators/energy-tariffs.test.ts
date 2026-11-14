@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import fixture from "../fixtures/aneel-b1-history-2026-11-14.json";
 import {
+  billTable,
+  distributorFacts,
   groupByDistributor,
+  historyWithGaps,
+  previousDay,
   kwhPrice,
   median,
   mergeRepeatedPeriods,
@@ -153,5 +157,74 @@ describe("dates and labels", () => {
   it("takes the middle value, or the mean of the two middle ones", () => {
     expect(median([3, 1, 2])).toBe(2);
     expect(median([4, 1, 3, 2])).toBe(2.5);
+  });
+});
+
+describe("historyWithGaps", () => {
+  const history = historyWithGaps(withState("COPEL-DIS").periods);
+
+  it("shows COPEL-DIS's 18 periods and the two stretches ANEEL left blank, in order", () => {
+    expect(history.filter((entry) => entry.kind === "period")).toHaveLength(18);
+    expect(history.filter((entry) => entry.kind === "gap")).toEqual([
+      { kind: "gap", start: "2012-06-24", end: "2013-01-23" },
+      { kind: "gap", start: "2016-06-24", end: "2017-03-31" },
+    ]);
+  });
+
+  it("measures each period against the one right before, and not across a gap", () => {
+    const byStart = Object.fromEntries(
+      history.flatMap((entry) => (entry.kind === "period" ? [[entry.start, entry]] : [])),
+    );
+    // 309,26 R$/MWh after 300,00: +3.1%.
+    expect(byStart["2011-06-24"]).toMatchObject({ kwh: 0.30926, changePct: 3.1 });
+    // Right after the 2012 gap: nothing to compare with.
+    expect(byStart["2013-01-24"]).toMatchObject({ changePct: null });
+    expect(byStart["2010-06-24"]).toMatchObject({ changePct: null });
+  });
+});
+
+describe("billTable", () => {
+  it("prices common consumptions at COPEL-DIS's tariff, to the centavo", () => {
+    // 200 kWh at R$ 0,76802 is R$ 153,60: the figure Google's AI Overview printed on 2026-11-14.
+    expect(billTable(0.76802)).toEqual([
+      { kwh: 50, cost: 38.4 },
+      { kwh: 100, cost: 76.8 },
+      { kwh: 150, cost: 115.2 },
+      { kwh: 200, cost: 153.6 },
+      { kwh: 250, cost: 192.01 },
+      { kwh: 300, cost: 230.41 },
+      { kwh: 400, cost: 307.21 },
+      { kwh: 500, cost: 384.01 },
+    ]);
+  });
+});
+
+describe("distributorFacts", () => {
+  const distributors = ["CEMIG-D", "COPEL-DIS", "ELETROPAULO"].map(withState);
+  const ranked = rankByTariff(distributors, TODAY);
+  const copel = distributorFacts(distributors[1], ranked, TODAY);
+
+  it("reads COPEL-DIS's story off its own rows", () => {
+    expect(copel).toMatchObject({
+      rank: 3,
+      count: 3,
+      changePct: 19.6,
+      sinceFirstPct: 156,
+      reductions: 2,
+      gaps: 2,
+      offCycle: 4,
+    });
+    expect(copel.biggestRise).toMatchObject({ start: "2015-03-02", changePct: 31.9 });
+    expect(copel.biggestDrop).toMatchObject({ start: "2020-06-24", changePct: -0.9 });
+    expect(copel.above?.agent).toBe("ELETROPAULO");
+    expect(copel.below).toBeNull();
+  });
+});
+
+describe("previousDay", () => {
+  it("walks back across months, years and leap days", () => {
+    expect(previousDay("2026-01-01")).toBe("2025-12-31");
+    expect(previousDay("2028-03-01")).toBe("2028-02-29");
+    expect(previousDay("2013-01-24")).toBe("2013-01-23");
   });
 });

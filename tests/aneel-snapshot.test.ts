@@ -2,10 +2,18 @@ import { describe, expect, it } from "vitest";
 import { ANEEL_DISTRIBUTOR_STATES } from "../src/data/aneel-distributor-states";
 import { ANEEL_TARIFF_SNAPSHOT } from "../src/data/aneel-tariff-snapshot";
 import { ANEEL_TARIFF_SUMMARY } from "../src/data/aneel-tariff-summary";
+import { ANEEL_DISTRIBUTOR_SUMMARIES } from "../src/data/aneel-distributor-summaries";
+import { DISTRIBUTOR_PAGES } from "../src/data/distributor-pages";
 import { BRAZILIAN_STATES } from "../src/lib/public-data/states";
 import { lastmodFor } from "../src/lib/seo-pages";
 import { distributorsForState } from "../src/server/adapters/aneel";
-import { periodOn, rankByTariff, summarizeRanking } from "../src/lib/calculators/energy-tariffs";
+import {
+  distributorFacts,
+  headSummary,
+  periodOn,
+  rankByTariff,
+  summarizeRanking,
+} from "../src/lib/calculators/energy-tariffs";
 
 const UFS = new Set<string>(BRAZILIAN_STATES.map((state) => state.value));
 const { referenceDate, distributors } = ANEEL_TARIFF_SNAPSHOT;
@@ -42,6 +50,24 @@ describe("ANEEL_TARIFF_SNAPSHOT", () => {
     expect(ANEEL_TARIFF_SUMMARY).toEqual(
       summarizeRanking(rankByTariff(distributors, referenceDate), referenceDate),
     );
+  });
+
+  it("carries each distributor page's head summary, equal to its facts", () => {
+    const ranked = rankByTariff(distributors, referenceDate);
+    const computed = Object.fromEntries(
+      DISTRIBUTOR_PAGES.map((page) => {
+        const distributor = distributors.find((d) => d.agent === page.agent);
+        if (!distributor) throw new Error(`${page.agent} is not in the snapshot`);
+        return [page.slug, headSummary(distributorFacts(distributor, ranked, referenceDate))];
+      }),
+    );
+    expect(ANEEL_DISTRIBUTOR_SUMMARIES).toEqual(computed);
+  });
+
+  it("dates every distributor page by the snapshot it renders", () => {
+    for (const page of DISTRIBUTOR_PAGES) {
+      expect(lastmodFor(`/tarifa-de-energia/${page.slug}`)).toBe(referenceDate);
+    }
   });
 
   it("writes the same states into the file the API filters by", () => {
