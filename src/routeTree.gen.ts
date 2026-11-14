@@ -28,6 +28,7 @@ import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as MetodologiaRouteImport } from './routes/metodologia'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as TarifaDeEnergiaRouteImport } from './routes/tarifa-de-energia'
 import { Route as TermosRouteImport } from './routes/termos'
 import { Route as ApiEnergyTariffsRouteImport } from './routes/api.energy-tariffs'
 import { Route as ApiFuelPricesRouteImport } from './routes/api.fuel-prices'
@@ -142,6 +143,11 @@ const SobreRoute = SobreRouteImport.update({
   path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TarifaDeEnergiaRoute = TarifaDeEnergiaRouteImport.update({
+  id: '/tarifa-de-energia',
+  path: '/tarifa-de-energia',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermosRoute = TermosRouteImport.update({
   id: '/termos',
   path: '/termos',
@@ -242,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/metodologia': typeof MetodologiaRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sobre': typeof SobreRoute
+  '/tarifa-de-energia': typeof TarifaDeEnergiaRoute
   '/termos': typeof TermosRoute
   '/api/energy-tariffs': typeof ApiEnergyTariffsRoute
   '/api/fuel-prices': typeof ApiFuelPricesRoute
@@ -277,6 +284,7 @@ export interface FileRoutesByTo {
   '/metodologia': typeof MetodologiaRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sobre': typeof SobreRoute
+  '/tarifa-de-energia': typeof TarifaDeEnergiaRoute
   '/termos': typeof TermosRoute
   '/api/energy-tariffs': typeof ApiEnergyTariffsRoute
   '/api/fuel-prices': typeof ApiFuelPricesRoute
@@ -314,6 +322,7 @@ export interface FileRoutesById {
   '/metodologia': typeof MetodologiaRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sobre': typeof SobreRoute
+  '/tarifa-de-energia': typeof TarifaDeEnergiaRoute
   '/termos': typeof TermosRoute
   '/api/energy-tariffs': typeof ApiEnergyTariffsRoute
   '/api/fuel-prices': typeof ApiFuelPricesRoute
@@ -352,6 +361,7 @@ export interface FileRouteTypes {
     | '/metodologia'
     | '/privacidade'
     | '/sobre'
+    | '/tarifa-de-energia'
     | '/termos'
     | '/api/energy-tariffs'
     | '/api/fuel-prices'
@@ -387,6 +397,7 @@ export interface FileRouteTypes {
     | '/metodologia'
     | '/privacidade'
     | '/sobre'
+    | '/tarifa-de-energia'
     | '/termos'
     | '/api/energy-tariffs'
     | '/api/fuel-prices'
@@ -423,6 +434,7 @@ export interface FileRouteTypes {
     | '/metodologia'
     | '/privacidade'
     | '/sobre'
+    | '/tarifa-de-energia'
     | '/termos'
     | '/api/energy-tariffs'
     | '/api/fuel-prices'
@@ -460,6 +472,7 @@ export interface RootRouteChildren {
   MetodologiaRoute: typeof MetodologiaRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   SobreRoute: typeof SobreRoute
+  TarifaDeEnergiaRoute: typeof TarifaDeEnergiaRoute
   TermosRoute: typeof TermosRoute
   ApiEnergyTariffsRoute: typeof ApiEnergyTariffsRoute
   ApiFuelPricesRoute: typeof ApiFuelPricesRoute
@@ -603,6 +616,13 @@ declare module '@tanstack/react-router' {
       path: '/sobre'
       fullPath: '/sobre'
       preLoaderRoute: typeof SobreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tarifa-de-energia': {
+      id: '/tarifa-de-energia'
+      path: '/tarifa-de-energia'
+      fullPath: '/tarifa-de-energia'
+      preLoaderRoute: typeof TarifaDeEnergiaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/termos': {
@@ -756,6 +776,7 @@ const rootRouteChildren: RootRouteChildren = {
   MetodologiaRoute: MetodologiaRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   SobreRoute: SobreRoute,
+  TarifaDeEnergiaRoute: TarifaDeEnergiaRoute,
   TermosRoute: TermosRoute,
   ApiEnergyTariffsRoute: ApiEnergyTariffsRoute,
   ApiFuelPricesRoute: ApiFuelPricesRoute,

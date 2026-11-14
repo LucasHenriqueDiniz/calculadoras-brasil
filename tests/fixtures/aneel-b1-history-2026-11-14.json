@@ -1,0 +1,1186 @@
+{
+ "source": "https://dadosabertos.aneel.gov.br/api/action/datastore_search?resource_id=fcf2906c-7c32-4b9b-a637-054e7a5234f4 (B1 residencial convencional filters)",
+ "recorded": "2026-11-14",
+ "records": [
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2010-06-24",
+   "DatFimVigencia": "2011-06-23",
+   "VlrTUSD": "188,98",
+   "VlrTE": "111,02",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.015, DE 22 DE JUNHO DE 2010",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2011-06-24",
+   "DatFimVigencia": "2012-06-23",
+   "VlrTUSD": "193,62",
+   "VlrTE": "115,64",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.158, DE 21 DE JUNHO DE 2011",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2013-01-24",
+   "DatFimVigencia": "2013-06-23",
+   "VlrTUSD": "117,16",
+   "VlrTE": "125,42",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.431, DE 24 DE JANEIRO DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2013-06-24",
+   "DatFimVigencia": "2014-06-23",
+   "VlrTUSD": "123,68",
+   "VlrTE": "139,87",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.541, DE 20 DE JUNHO DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2014-06-24",
+   "DatFimVigencia": "2015-03-01",
+   "VlrTUSD": "138,52",
+   "VlrTE": "187,85",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.763, DE 22 DE JULHO DE 2014",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2015-03-02",
+   "DatFimVigencia": "2015-06-23",
+   "VlrTUSD": "193,36",
+   "VlrTE": "237,01",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.858, DE 27 DE FEVEREIRO DE 2015",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2015-06-24",
+   "DatFimVigencia": "2016-06-23",
+   "VlrTUSD": "209,20",
+   "VlrTE": "283,11",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.897, DE 16 DE JUNHO DE 2015",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2017-04-01",
+   "DatFimVigencia": "2017-06-23",
+   "VlrTUSD": "190,09",
+   "VlrTE": "226,04",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.214, DE 28 DE MARÇO DE 2017",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2017-06-24",
+   "DatFimVigencia": "2018-06-23",
+   "VlrTUSD": "191,24",
+   "VlrTE": "249,32",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.255, DE 20 DE JUNHO DE 2017",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2018-06-24",
+   "DatFimVigencia": "2019-06-23",
+   "VlrTUSD": "219,33",
+   "VlrTE": "288,19",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.402, DE 19 DE JUNHO DE 2018",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2019-06-24",
+   "DatFimVigencia": "2020-06-23",
+   "VlrTUSD": "243,70",
+   "VlrTE": "273,91",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.559, DE 18 DE JUNHO DE 2019",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2020-06-24",
+   "DatFimVigencia": "2021-06-23",
+   "VlrTUSD": "250,86",
+   "VlrTE": "261,91",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.704, DE 23 DE JUNHO DE 2020",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2021-06-24",
+   "DatFimVigencia": "2022-06-23",
+   "VlrTUSD": "269,91",
+   "VlrTE": "288,90",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.886, DE 22 DE JUNHO DE 2021",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2022-06-24",
+   "DatFimVigencia": "2023-06-23",
+   "VlrTUSD": "310,80",
+   "VlrTE": "258,94",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.049, DE 21 DE JUNHO DE 2022",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2023-06-24",
+   "DatFimVigencia": "2024-06-23",
+   "VlrTUSD": "328,37",
+   "VlrTE": "302,14",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.209, DE 20 DE JUNHO DE 2023",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2024-06-24",
+   "DatFimVigencia": "2025-06-23",
+   "VlrTUSD": "339,82",
+   "VlrTE": "290,19",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.336, DE 18 DE JUNHO DE 2024",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2025-06-24",
+   "DatFimVigencia": "2025-12-31",
+   "VlrTUSD": "366,67",
+   "VlrTE": "275,75",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.472, DE 17 DE JUNHO DE 2025",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2026-01-01",
+   "DatFimVigencia": "2026-06-23",
+   "VlrTUSD": "366,67",
+   "VlrTE": "275,75",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.472, DE 17 DE JUNHO DE 2025",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "COPEL-DIS",
+   "NumCNPJDistribuidora": "04368898000106",
+   "DatInicioVigencia": "2026-06-24",
+   "DatFimVigencia": "2027-06-23",
+   "VlrTUSD": "457,17",
+   "VlrTE": "310,85",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.592, DE 23 DE JUNHO DE 2026",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2010-07-04",
+   "DatFimVigencia": "2011-07-03",
+   "VlrTUSD": "170,03",
+   "VlrTE": "126,48",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.025, DE 29 DE JUNHO DE 2010",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2011-07-04",
+   "DatFimVigencia": "2012-07-03",
+   "VlrTUSD": "144,10",
+   "VlrTE": "124,58",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.317, DE 2 DE JULHO DE 2012",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2012-07-04",
+   "DatFimVigencia": "2013-01-23",
+   "VlrTUSD": "142,93",
+   "VlrTE": "148,21",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.319, DE 3 DE JULHO DE 2012",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2013-01-24",
+   "DatFimVigencia": "2013-07-03",
+   "VlrTUSD": "103,58",
+   "VlrTE": "134,43",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.436, DE 24 DE JANEIRO DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2013-07-04",
+   "DatFimVigencia": "2014-07-03",
+   "VlrTUSD": "91,20",
+   "VlrTE": "147,24",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.563, DE 2 DE JULHO DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2015-01-08",
+   "DatFimVigencia": "2015-03-01",
+   "VlrTUSD": "119,05",
+   "VlrTE": "171,11",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.844, DE 5 DE JANEIRO DE 2015",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2015-03-02",
+   "DatFimVigencia": "2015-07-03",
+   "VlrTUSD": "170,96",
+   "VlrTE": "200,86",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.858, DE 27 DE FEVEREIRO DE 2015",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2015-07-04",
+   "DatFimVigencia": "2016-07-03",
+   "VlrTUSD": "198,96",
+   "VlrTE": "237,15",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.920, DE 30 DE JUNHO DE 2015",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2017-04-01",
+   "DatFimVigencia": "2017-07-03",
+   "VlrTUSD": "180,41",
+   "VlrTE": "218,65",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.214, DE 28 DE MARÇO DE 2017",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2017-07-04",
+   "DatFimVigencia": "2018-07-03",
+   "VlrTUSD": "180,74",
+   "VlrTE": "238,87",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.263, DE 27 DE JUNHO DE 2017",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2018-07-04",
+   "DatFimVigencia": "2019-07-03",
+   "VlrTUSD": "212,76",
+   "VlrTE": "270,87",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.412, DE 3 DE JULHO DE 2018",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2019-07-04",
+   "DatFimVigencia": "2020-07-03",
+   "VlrTUSD": "259,71",
+   "VlrTE": "255,88",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.568, DE 2 DE JULHO DE 2019",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2020-07-04",
+   "DatFimVigencia": "2021-07-03",
+   "VlrTUSD": "285,51",
+   "VlrTE": "248,68",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.719, DE 30 DE JUNHO DE 2020",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2021-07-04",
+   "DatFimVigencia": "2022-07-03",
+   "VlrTUSD": "307,11",
+   "VlrTE": "287,38",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.890, DE 29 DE JUNHO DE 2021",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2022-07-04",
+   "DatFimVigencia": "2023-07-03",
+   "VlrTUSD": "396,03",
+   "VlrTE": "260,46",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.053, DE 28 DE JUNHO DE 2022",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2023-07-04",
+   "DatFimVigencia": "2024-07-03",
+   "VlrTUSD": "366,83",
+   "VlrTE": "282,27",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.215, DE 27 DE JUNHO DE 2023",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2024-07-04",
+   "DatFimVigencia": "2025-07-03",
+   "VlrTUSD": "373,17",
+   "VlrTE": "263,07",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.339, DE 2 DE JULHO DE 2024",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2025-07-04",
+   "DatFimVigencia": "2025-12-31",
+   "VlrTUSD": "432,44",
+   "VlrTE": "292,74",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.477, DE 1 DE JULHO DE 2025",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2026-01-01",
+   "DatFimVigencia": "2026-07-03",
+   "VlrTUSD": "432,44",
+   "VlrTE": "292,74",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.477, DE 1 DE JULHO DE 2025",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "ELETROPAULO",
+   "NumCNPJDistribuidora": "61695227000193",
+   "DatInicioVigencia": "2026-07-04",
+   "DatFimVigencia": "2027-07-03",
+   "VlrTUSD": "472,42",
+   "VlrTE": "316,96",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.596, DE 3 DE JULHO DE 2026",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2010-04-08",
+   "DatFimVigencia": "2011-04-07",
+   "VlrTUSD": "253,37",
+   "VlrTE": "112,26",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 0.960, DE 6 DE ABRIL DE 2010",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2011-04-08",
+   "DatFimVigencia": "2012-04-07",
+   "VlrTUSD": "257,25",
+   "VlrTE": "132,53",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.127, DE 5 DE ABRIL DE 2011",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2012-04-08",
+   "DatFimVigencia": "2013-01-23",
+   "VlrTUSD": "265,74",
+   "VlrTE": "138,49",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.269, DE 3 DE ABRIL DE 2012",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2013-01-24",
+   "DatFimVigencia": "2013-04-07",
+   "VlrTUSD": "219,02",
+   "VlrTE": "111,88",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.422, DE 24 DE JANEIRO DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2013-04-08",
+   "DatFimVigencia": "2014-04-07",
+   "VlrTUSD": "184,78",
+   "VlrTE": "162,22",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.507, DE 5 DE ABRIL DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2014-04-08",
+   "DatFimVigencia": "2015-03-01",
+   "VlrTUSD": "209,78",
+   "VlrTE": "186,64",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.700, DE 7 DE ABRIL DE 2014",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2015-03-02",
+   "DatFimVigencia": "2015-04-07",
+   "VlrTUSD": "261,98",
+   "VlrTE": "219,24",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.858, DE 27 DE FEVEREIRO DE 2015",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2015-04-08",
+   "DatFimVigencia": "2016-05-27",
+   "VlrTUSD": "270,55",
+   "VlrTE": "239,19",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.872, DE 7 DE ABRIL DE 2015",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2017-04-01",
+   "DatFimVigencia": "2017-05-27",
+   "VlrTUSD": "278,49",
+   "VlrTE": "247,36",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.214, DE 28 DE MARÇO DE 2017",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2017-05-28",
+   "DatFimVigencia": "2018-05-27",
+   "VlrTUSD": "247,79",
+   "VlrTE": "246,35",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.248, DE 23 DE MAIO DE 2017",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2018-05-28",
+   "DatFimVigencia": "2019-05-27",
+   "VlrTUSD": "318,83",
+   "VlrTE": "268,01",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.396, DE 22 DE MAIO DE 2018",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2020-05-28",
+   "DatFimVigencia": "2020-06-30",
+   "VlrTUSD": "346,52",
+   "VlrTE": "281,81",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.691, DE 26 DE MAIO DE 2020",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2020-08-19",
+   "DatFimVigencia": "2021-05-27",
+   "VlrTUSD": "353,77",
+   "VlrTE": "264,35",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.757, DE 18 DE AGOSTO DE 2020",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2022-05-28",
+   "DatFimVigencia": "2022-06-21",
+   "VlrTUSD": "344,74",
+   "VlrTE": "273,31",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.040, DE 24 DE MAIO DE 2022",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2022-06-22",
+   "DatFimVigencia": "2023-05-27",
+   "VlrTUSD": "409,13",
+   "VlrTE": "244,00",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.046, DE 21 DE JUNHO DE 2022",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2023-05-28",
+   "DatFimVigencia": "2024-05-27",
+   "VlrTUSD": "435,42",
+   "VlrTE": "313,64",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.202, DE 24 DE MAIO DE 2023",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2024-05-28",
+   "DatFimVigencia": "2025-05-27",
+   "VlrTUSD": "486,18",
+   "VlrTE": "313,51",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.328, DE 21 DE MAIO DE 2024",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2025-05-28",
+   "DatFimVigencia": "2025-12-31",
+   "VlrTUSD": "541,30",
+   "VlrTE": "317,28",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.459, DE 20 DE MAIO DE 2025",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2026-01-01",
+   "DatFimVigencia": "2026-05-27",
+   "VlrTUSD": "541,30",
+   "VlrTE": "317,28",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.459, DE 20 DE MAIO DE 2025",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CEMIG-D",
+   "NumCNPJDistribuidora": "06981180000116",
+   "DatInicioVigencia": "2026-05-28",
+   "DatFimVigencia": "2027-05-27",
+   "VlrTUSD": "593,08",
+   "VlrTE": "310,21",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.589, DE 26 DE MAIO DE 2026",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL SANTA CRUZ",
+   "NumCNPJDistribuidora": "61116265000144",
+   "DatInicioVigencia": "2010-02-03",
+   "DatFimVigencia": "2011-02-02",
+   "VlrTUSD": "247,10",
+   "VlrTE": "107,00",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 0.935, DE 2 DE FEVEREIRO DE 2010",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL JAGUARI",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2010-02-03",
+   "DatFimVigencia": "2011-02-02",
+   "VlrTUSD": "181,51",
+   "VlrTE": "104,85",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 0.937, DE 2 DE FEVEREIRO DE 2010",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL SANTA CRUZ",
+   "NumCNPJDistribuidora": "61116265000144",
+   "DatInicioVigencia": "2011-02-03",
+   "DatFimVigencia": "2012-02-02",
+   "VlrTUSD": "243,57",
+   "VlrTE": "155,81",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.108, DE 1 DE FEVEREIRO DE 2011",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL JAGUARI",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2011-02-03",
+   "DatFimVigencia": "2012-02-02",
+   "VlrTUSD": "187,29",
+   "VlrTE": "118,88",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.106, DE 1 DE FEVEREIRO DE 2011",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL JAGUARI",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2012-02-03",
+   "DatFimVigencia": "2013-01-23",
+   "VlrTUSD": "144,58",
+   "VlrTE": "124,56",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.393, DE 11 DE DEZEMBRO DE 2012",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL SANTA CRUZ",
+   "NumCNPJDistribuidora": "61116265000144",
+   "DatInicioVigencia": "2012-02-03",
+   "DatFimVigencia": "2013-01-23",
+   "VlrTUSD": "201,04",
+   "VlrTE": "157,20",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.391, DE 11 DE DEZEMBRO DE 2012",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL SANTA CRUZ",
+   "NumCNPJDistribuidora": "61116265000144",
+   "DatInicioVigencia": "2013-01-24",
+   "DatFimVigencia": "2013-02-02",
+   "VlrTUSD": "138,50",
+   "VlrTE": "149,31",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.452, DE 24 DE JANEIRO DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL JAGUARI",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2013-01-24",
+   "DatFimVigencia": "2013-02-02",
+   "VlrTUSD": "105,35",
+   "VlrTE": "114,42",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.450, DE 24 DE JANEIRO DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL SANTA CRUZ",
+   "NumCNPJDistribuidora": "61116265000144",
+   "DatInicioVigencia": "2013-02-03",
+   "DatFimVigencia": "2014-02-02",
+   "VlrTUSD": "111,91",
+   "VlrTE": "148,79",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.476, DE 29 DE JANEIRO DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL JAGUARI",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2013-02-03",
+   "DatFimVigencia": "2014-02-02",
+   "VlrTUSD": "66,15",
+   "VlrTE": "142,62",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.475, DE 29 DE JANEIRO DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL SANTA CRUZ",
+   "NumCNPJDistribuidora": "61116265000144",
+   "DatInicioVigencia": "2014-02-03",
+   "DatFimVigencia": "2015-02-02",
+   "VlrTUSD": "148,43",
+   "VlrTE": "191,64",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.682, DE 30 DE JANEIRO DE 2014",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL JAGUARI",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2014-02-03",
+   "DatFimVigencia": "2015-02-02",
+   "VlrTUSD": "113,89",
+   "VlrTE": "124,49",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.680, DE 30 DE JANEIRO DE 2014",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL JAGUARI",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2015-04-08",
+   "DatFimVigencia": "2016-03-21",
+   "VlrTUSD": "182,00",
+   "VlrTE": "194,56",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA N° 1.870, DE 7 DE ABRIL DE 2015",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL SANTA CRUZ",
+   "NumCNPJDistribuidora": "61116265000144",
+   "DatInicioVigencia": "2015-04-08",
+   "DatFimVigencia": "2016-03-21",
+   "VlrTUSD": "215,26",
+   "VlrTE": "244,61",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA N° 1.870, DE 7 DE ABRIL DE 2015",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL JAGUARI",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2016-03-22",
+   "DatFimVigencia": "2017-03-21",
+   "VlrTUSD": "215,17",
+   "VlrTE": "225,88",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.028, DE 22 DE MARÇO DE 2016",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL SANTA CRUZ",
+   "NumCNPJDistribuidora": "61116265000144",
+   "DatInicioVigencia": "2016-03-22",
+   "DatFimVigencia": "2017-03-21",
+   "VlrTUSD": "254,23",
+   "VlrTE": "267,10",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.026, DE 22 DE MARÇO DE 2016",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL SANTA CRUZ",
+   "NumCNPJDistribuidora": "61116265000144",
+   "DatInicioVigencia": "2017-03-22",
+   "DatFimVigencia": "2018-03-21",
+   "VlrTUSD": "231,35",
+   "VlrTE": "235,64",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.211, DE 21 DE MARÇO DE 2017",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL JAGUARI",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2017-03-22",
+   "DatFimVigencia": "2018-03-21",
+   "VlrTUSD": "199,09",
+   "VlrTE": "218,72",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.213, DE 21 DE MARÇO DE 2017",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL Santa Cruz",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2018-03-22",
+   "DatFimVigencia": "2019-03-21",
+   "VlrTUSD": "262,96",
+   "VlrTE": "228,49",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.376, DE 13 DE MARÇO DE 2018",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL Santa Cruz",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2019-03-22",
+   "DatFimVigencia": "2020-03-21",
+   "VlrTUSD": "303,99",
+   "VlrTE": "243,70",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.522, DE 20 DE MARÇO DE 2019",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL Santa Cruz",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2020-03-22",
+   "DatFimVigencia": "2021-03-21",
+   "VlrTUSD": "309,66",
+   "VlrTE": "231,49",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.668, DE 17 DE MARÇO DE 2020",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL Santa Cruz",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2021-03-22",
+   "DatFimVigencia": "2022-03-21",
+   "VlrTUSD": "316,86",
+   "VlrTE": "248,11",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.837, DE 16 DE MARÇO DE 2021",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL Santa Cruz",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2022-07-13",
+   "DatFimVigencia": "2023-03-21",
+   "VlrTUSD": "342,55",
+   "VlrTE": "249,33",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.059, DE 12 DE JULHO DE 2022",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL Santa Cruz",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2023-03-22",
+   "DatFimVigencia": "2024-03-21",
+   "VlrTUSD": "395,04",
+   "VlrTE": "233,31",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.178, DE 21 DE MARÇO DE 2023",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL Santa Cruz",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2024-03-22",
+   "DatFimVigencia": "2025-05-21",
+   "VlrTUSD": "402,20",
+   "VlrTE": "268,24",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.311, DE 19 DE MARÇO DE 2024",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL Santa Cruz",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2025-05-22",
+   "DatFimVigencia": "2025-12-31",
+   "VlrTUSD": "442,66",
+   "VlrTE": "246,05",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.460, DE 20 DE MAIO DE 2025",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL Santa Cruz",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2026-01-01",
+   "DatFimVigencia": "2026-04-21",
+   "VlrTUSD": "442,66",
+   "VlrTE": "246,05",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.460, DE 20 DE MAIO DE 2025",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "CPFL Santa Cruz",
+   "NumCNPJDistribuidora": "53859112000169",
+   "DatInicioVigencia": "2026-04-22",
+   "DatFimVigencia": "2027-04-21",
+   "VlrTUSD": "560,39",
+   "VlrTE": "252,19",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.580, DE 22 DE ABRIL DE 2026",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE SUL",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2010-04-19",
+   "DatFimVigencia": "2011-04-18",
+   "VlrTUSD": "196,45",
+   "VlrTE": "99,93",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 0.965, DE 13 DE ABRIL DE 2010",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016439000138",
+   "DatInicioVigencia": "2010-06-19",
+   "DatFimVigencia": "2011-06-18",
+   "VlrTUSD": "230,14",
+   "VlrTE": "154,15",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.009, DE 15 DE JUNHO DE 2010",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE SUL",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2011-04-19",
+   "DatFimVigencia": "2012-04-18",
+   "VlrTUSD": "187,01",
+   "VlrTE": "127,96",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.135, DE 12 DE ABRIL DE 2011",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016439000138",
+   "DatInicioVigencia": "2011-06-19",
+   "DatFimVigencia": "2012-06-18",
+   "VlrTUSD": "232,32",
+   "VlrTE": "176,17",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.153, DE 14 DE JUNHO DE 2011",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE SUL",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2012-04-19",
+   "DatFimVigencia": "2013-01-23",
+   "VlrTUSD": "191,95",
+   "VlrTE": "139,40",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.280, DE 17 DE ABRIL DE 2012",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016439000138",
+   "DatInicioVigencia": "2012-06-19",
+   "DatFimVigencia": "2013-01-23",
+   "VlrTUSD": "235,11",
+   "VlrTE": "187,42",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.294, DE 5 DE JUNHO DE 2012",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016439000138",
+   "DatInicioVigencia": "2013-01-24",
+   "DatFimVigencia": "2013-06-18",
+   "VlrTUSD": "177,37",
+   "VlrTE": "152,19",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.411, DE 24 DE JANEIRO DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE SUL",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2013-01-24",
+   "DatFimVigencia": "2013-04-18",
+   "VlrTUSD": "145,51",
+   "VlrTE": "107,56",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.412, DE 24 DE JANEIRO DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE SUL",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2013-04-19",
+   "DatFimVigencia": "2014-04-18",
+   "VlrTUSD": "132,17",
+   "VlrTE": "130,07",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.514, DE 16 DE ABRIL DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016439000138",
+   "DatInicioVigencia": "2013-06-19",
+   "DatFimVigencia": "2014-06-18",
+   "VlrTUSD": "135,08",
+   "VlrTE": "149,70",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.535, DE 18 DE JUNHO DE 2013",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE SUL",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2014-04-19",
+   "DatFimVigencia": "2015-03-01",
+   "VlrTUSD": "151,60",
+   "VlrTE": "186,33",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.718, DE 16 DE ABRIL DE 2014",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016439000138",
+   "DatInicioVigencia": "2014-06-19",
+   "DatFimVigencia": "2015-03-01",
+   "VlrTUSD": "151,82",
+   "VlrTE": "198,87",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.739, DE 17 DE JUNHO DE 2014",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016439000138",
+   "DatInicioVigencia": "2015-03-02",
+   "DatFimVigencia": "2015-06-18",
+   "VlrTUSD": "208,93",
+   "VlrTE": "257,56",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.858, DE 27 DE FEVEREIRO DE 2015",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE SUL",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2015-03-02",
+   "DatFimVigencia": "2015-04-18",
+   "VlrTUSD": "197,70",
+   "VlrTE": "262,60",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.858, DE 27 DE FEVEREIRO DE 2015",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE SUL",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2015-04-19",
+   "DatFimVigencia": "2016-04-18",
+   "VlrTUSD": "217,39",
+   "VlrTE": "262,96",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.879, DE 14 DE ABRIL DE 2015",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016439000138",
+   "DatInicioVigencia": "2015-06-19",
+   "DatFimVigencia": "2016-06-18",
+   "VlrTUSD": "232,10",
+   "VlrTE": "214,70",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 1.896, DE 16 DE JUNHO DE 2015",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE SUL",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2016-04-19",
+   "DatFimVigencia": "2017-04-18",
+   "VlrTUSD": "220,66",
+   "VlrTE": "258,16",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.059, DE 12 DE ABRIL DE 2016",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016439000138",
+   "DatInicioVigencia": "2017-04-01",
+   "DatFimVigencia": "2017-06-18",
+   "VlrTUSD": "199,06",
+   "VlrTE": "211,60",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.214, DE 28 DE MARÇO DE 2017",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE SUL",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2017-04-19",
+   "DatFimVigencia": "2018-04-18",
+   "VlrTUSD": "199,99",
+   "VlrTE": "252,03",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.218, DE 11 DE ABRIL DE 2017",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016439000138",
+   "DatInicioVigencia": "2017-06-19",
+   "DatFimVigencia": "2018-06-18",
+   "VlrTUSD": "200,39",
+   "VlrTE": "233,47",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.252, DE 13 DE JUNHO DE 2017",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016439000138",
+   "DatInicioVigencia": "2018-06-19",
+   "DatFimVigencia": "2019-06-18",
+   "VlrTUSD": "265,00",
+   "VlrTE": "262,59",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.401, DE 12 DE JUNHO DE 2018",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE SUL",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2019-04-19",
+   "DatFimVigencia": "2019-06-18",
+   "VlrTUSD": "250,50",
+   "VlrTE": "296,82",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.528, DE 9 DE ABRIL DE 2019",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2020-06-19",
+   "DatFimVigencia": "2020-06-30",
+   "VlrTUSD": "290,26",
+   "VlrTE": "270,01",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.697, DE 17 DE JUNHO DE 2020",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2020-07-01",
+   "DatFimVigencia": "2021-06-18",
+   "VlrTUSD": "314,97",
+   "VlrTE": "274,60",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 2.697, DE 17 DE JUNHO DE 2020",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2022-06-19",
+   "DatFimVigencia": "2022-06-21",
+   "VlrTUSD": "358,50",
+   "VlrTE": "284,59",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.044, DE 14 DE JUNHO DE 2022",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2022-06-22",
+   "DatFimVigencia": "2023-06-18",
+   "VlrTUSD": "437,54",
+   "VlrTE": "261,62",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.045, DE 21 DE JUNHO DE 2022",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2023-06-19",
+   "DatFimVigencia": "2024-08-18",
+   "VlrTUSD": "429,09",
+   "VlrTE": "290,47",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.206, DE 13 DE JUNHO DE 2023",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2024-08-19",
+   "DatFimVigencia": "2025-06-18",
+   "VlrTUSD": "435,21",
+   "VlrTE": "284,78",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.372, DE 16 DE AGOSTO DE 2024",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2025-06-19",
+   "DatFimVigencia": "2025-12-31",
+   "VlrTUSD": "517,75",
+   "VlrTE": "304,45",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.473, DE 17 DE JUNHO DE 2025",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2026-01-01",
+   "DatFimVigencia": "2026-06-18",
+   "VlrTUSD": "517,75",
+   "VlrTE": "304,45",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.473, DE 17 DE JUNHO DE 2025",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  },
+  {
+   "SigAgente": "RGE",
+   "NumCNPJDistribuidora": "02016440000162",
+   "DatInicioVigencia": "2026-06-19",
+   "DatFimVigencia": "2027-06-18",
+   "VlrTUSD": "588,50",
+   "VlrTE": "356,11",
+   "DscREH": "RESOLUÇÃO HOMOLOGATÓRIA Nº 3.590, DE 16 DE JUNHO DE 2026",
+   "DatGeracaoConjuntoDados": "2026-11-14"
+  }
+ ]
+}
