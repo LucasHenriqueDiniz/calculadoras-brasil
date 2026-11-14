@@ -1,0 +1,61 @@
+{
+  "site": "calculebrasil",
+  "start": "2026-07-25",
+  "end": "2026-11-12",
+  "dimensions": [
+    "query",
+    "page"
+  ],
+  "rows": [
+    {
+      "keys": [
+        "calcular imt e imposto de selo 2026",
+        "https://calculebrasil.com/"
+      ],
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 21
+    },
+    {
+      "keys": [
+        "calcule net inss",
+        "https://calculebrasil.com/"
+      ],
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 99
+    },
+    {
+      "keys": [
+        "irpf 2026",
+        "https://calculebrasil.com/calculadora-irpf-2026"
+      ],
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 85
+    },
+    {
+      "keys": [
+        "onde posso encontrar uma calculadora de custos de vida?",
+        "https://calculebrasil.com/"
+      ],
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 10
+    },
+    {
+      "keys": [
+        "valor pet",
+        "https://calculebrasil.com/calculadora-custo-pet"
+      ],
+      "clicks": 0,
+      "impressions": 1,
+      "ctr": 0,
+      "position": 92
+    }
+  ]
+}
