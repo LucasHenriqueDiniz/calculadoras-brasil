@@ -14,11 +14,19 @@ export interface GuideStep {
   why: string;
 }
 
+/** A page that is not a calculator but answers the situation's question with data. */
+export interface GuideExtraLink {
+  to: "/tarifa-de-energia";
+  title: string;
+  why: string;
+}
+
 export interface GuideSituation {
   id: string;
   title: string;
   intro: string;
   steps: GuideStep[];
+  extra?: GuideExtraLink;
 }
 
 export const calculatorGuide: GuideSituation[] = [
@@ -129,5 +137,10 @@ export const calculatorGuide: GuideSituation[] = [
         why: "Mostra quais aparelhos pesam mais na conta, que é por onde a economia começa.",
       },
     ],
+    extra: {
+      to: "/tarifa-de-energia",
+      title: "Tarifa de energia por distribuidora",
+      why: "Quanto a sua distribuidora cobra por kWh, como isso se compara com as outras e quanto mudou em 12 meses.",
+    },
   },
 ];

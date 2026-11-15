@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageShell, PageHeader, Prose } from "@/components/layout/PageShell";
 import { RelatedCalculators } from "@/components/calculator/RelatedCalculators";
 import { RelatedPosts } from "@/components/calculator/RelatedPosts";
@@ -120,6 +120,12 @@ function BlogPost() {
           <p>
             Saiba quanto cada aparelho consome.{" "}
             <a href="/calculadora-conta-de-luz">Use nossa calculadora</a> para ver o impacto exato.
+          </p>
+
+          <p>
+            O preço de cada kWh depende da distribuidora que atende a sua casa. O{" "}
+            <Link to="/tarifa-de-energia">ranking das tarifas de energia</Link> mostra a tarifa de
+            cada uma e quanto ela mudou em 12 meses.
           </p>
 
           <h2>Economia esperada</h2>
