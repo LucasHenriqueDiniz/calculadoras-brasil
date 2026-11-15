@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getCalculator, relatedPostsFor } from "@/data/calculators";
+import { DISTRIBUTOR_PAGES, distributorPageByAgent } from "@/data/distributor-pages";
 import { formatBRL, formatNumber, parseBRNumber } from "@/lib/format";
 import {
   APPLIANCE_PRESETS,
@@ -217,6 +218,23 @@ function TariffSection({
         disabled={isLoadingDistributors}
         hint="A lista vem da API pública da ANEEL. A UF selecionada é usada na consulta da tarifa."
       />
+      <p className="text-sm text-muted-foreground sm:col-span-2">
+        {distributorPageByAgent(distributor) ? (
+          <>
+            <Link
+              to="/tarifa-de-energia/$slug"
+              params={{ slug: distributorPageByAgent(distributor)?.slug ?? "" }}
+              className="text-primary underline underline-offset-2"
+            >
+              Histórico da tarifa da {distributorPageByAgent(distributor)?.name}
+            </Link>{" "}
+            ·{" "}
+          </>
+        ) : null}
+        <Link to="/tarifa-de-energia" className="text-primary underline underline-offset-2">
+          Comparar com as outras distribuidoras
+        </Link>
+      </p>
       <div className="sm:col-span-2">
         <Button
           type="button"
@@ -625,7 +643,16 @@ function ElectricityArticle() {
       <p>
         Para comparar a sua distribuidora com as outras, o{" "}
         <Link to="/tarifa-de-energia">ranking das tarifas de energia por distribuidora</Link> mostra
-        a tarifa residencial em vigor de cada uma e quanto ela mudou em 12 meses.
+        a tarifa residencial em vigor de cada uma e quanto ela mudou em 12 meses. O histórico de
+        cada reajuste desde 2010 está nas páginas das distribuidoras com mais consumidores:{" "}
+        {DISTRIBUTOR_PAGES.map((page, i) => (
+          <span key={page.slug}>
+            <Link to="/tarifa-de-energia/$slug" params={{ slug: page.slug }}>
+              {page.name}
+            </Link>
+            {i < DISTRIBUTOR_PAGES.length - 1 ? ", " : "."}
+          </span>
+        ))}
       </p>
 
       <h2>Limitações</h2>

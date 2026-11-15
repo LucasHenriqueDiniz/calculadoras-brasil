@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { readFile, stat } from "node:fs/promises";
 import process from "node:process";
+import { linkGraph } from "../scripts/link-graph.mjs";
 
 const HOST = "127.0.0.1";
 const PORT = 4173;
@@ -504,6 +505,20 @@ try {
     for (const [b, textB] of masked) {
       if (a < b) assert.notEqual(textA, textB, `${a} and ${b} read the same once masked`);
     }
+  }
+
+  // Slice 5: the tariff pages are reached the way Google reaches pages it keeps. From the built
+  // site, crawled from "/": at most two clicks deep, and linked from at least three distinct pages.
+  const graph = await linkGraph(new URL("../dist/client", import.meta.url).pathname);
+  for (const row of graph.filter((r) => r.path.startsWith("/tarifa-de-energia"))) {
+    assert.ok(
+      row.depth !== null && row.depth <= 2,
+      `${row.path} must be ≤ 2 clicks from /, is ${row.depth}`,
+    );
+    assert.ok(
+      row.sources.length >= 3,
+      `${row.path} must be linked from ≥ 3 pages, is ${row.sources.length}`,
+    );
   }
 
   const missing = await fetch(`${BASE_URL}/route-that-does-not-exist`, { redirect: "manual" });

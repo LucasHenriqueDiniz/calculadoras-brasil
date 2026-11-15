@@ -4,7 +4,12 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { PageHeader, PageShell, Prose } from "@/components/layout/PageShell";
 import { ANEEL_TARIFF_SNAPSHOT } from "@/data/aneel-tariff-snapshot";
 import { distributorName } from "@/data/distributor-names";
-import { distributorPageByAgent, SAMP_MONTH, type DistributorPage } from "@/data/distributor-pages";
+import {
+  DISTRIBUTOR_PAGES,
+  distributorPageByAgent,
+  SAMP_MONTH,
+  type DistributorPage,
+} from "@/data/distributor-pages";
 import {
   billTable,
   distributorFacts,
@@ -340,6 +345,19 @@ export function DistributorTariffPage({ page, faq }: { page: DistributorPage; fa
             abaixo, mais barata: {facts.below ? neighbourLink(facts.below) : "nenhuma"}. A tabela
             completa está no{" "}
             <Link to="/tarifa-de-energia">ranking das {facts.count} distribuidoras</Link>.
+          </p>
+
+          <h2>Outras distribuidoras</h2>
+          <p>
+            O histórico das outras distribuidoras com mais consumidores residenciais:{" "}
+            {DISTRIBUTOR_PAGES.filter((other) => other.slug !== page.slug).map((other, i, all) => (
+              <span key={other.slug}>
+                <Link to="/tarifa-de-energia/$slug" params={{ slug: other.slug }}>
+                  {other.name}
+                </Link>
+                {i < all.length - 1 ? ", " : "."}
+              </span>
+            ))}
           </p>
 
           <h2>Quanto custa a conta, pela tarifa</h2>

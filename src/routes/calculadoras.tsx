@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
 import { PageShell, PageHeader } from "@/components/layout/PageShell";
 import { calculatorGuide } from "@/data/calculator-guide";
 import { calculators, getCalculator } from "@/data/calculators";
@@ -84,6 +84,29 @@ function CalculatorGuidePage() {
                   );
                 })}
               </ol>
+
+              {situation.extra && (
+                <Link
+                  to={situation.extra.to}
+                  className="group mt-3 flex items-start gap-4 rounded-2xl border border-dashed border-border p-5 transition hover:border-primary/30"
+                >
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-primary">
+                    <Zap className="h-5 w-5" aria-hidden />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-display text-base font-semibold text-foreground">
+                      {situation.extra.title}
+                    </span>
+                    <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">
+                      {situation.extra.why}
+                    </span>
+                  </span>
+                  <ArrowRight
+                    className="mt-1 h-4 w-4 shrink-0 text-primary transition group-hover:translate-x-0.5"
+                    aria-hidden
+                  />
+                </Link>
+              )}
             </section>
           ))}
         </div>
